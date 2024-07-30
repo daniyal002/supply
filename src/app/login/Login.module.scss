@@ -1,0 +1,78 @@
+.formLogin{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .loginForgotPassword{
+        display: flex;
+        justify-content: flex-end;
+    }
+    .loginForgotPasswordText{
+        color: #1677ff;
+        text-align: left;
+        background-color: #fff;
+        padding: 5px;
+        border-radius: 6px;
+        border: 0;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.5s;
+
+        &:hover{
+            color: #3f6499;    
+        }
+    }
+
+    .formItem{
+        display: flex;
+        flex-direction: column;
+        gap:10px;
+
+        .formItemLabel{
+            font-weight: 300;
+        }
+    }
+    .usernameInput, .passwordInput{
+        width: 100%;
+        height: 50px;
+        font-size: 25px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 2px solid #678098;
+        background-color: #678098;
+        outline: none;
+        color: #fff;
+
+        &::placeholder{
+            color: #fff;
+        }
+    }
+    
+    .loginSubmit{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        font-size: 20px;
+        height: 50px;
+        background-color: #678098;
+        color: #fff;
+        box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+        border: 1px solid transparent;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: 0.5s;
+        &:hover{
+        background-color: #3e4c58;
+
+        }
+        }
+    
+}
+// .error {
+//     margin-top: -50px; /* Изменяем margin-top при ошибке (можете выбрать подходящее значение) */
+//   }
+
+

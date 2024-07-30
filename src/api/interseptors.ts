@@ -4,7 +4,7 @@ import axios, { type CreateAxiosDefaults } from 'axios';
 import { errorCatch } from './error';
 
 const options: CreateAxiosDefaults = {
-    baseURL: "http://192.168.30.178:8000",
+    baseURL: "http://192.168.30.153:8000",
     headers: {
         'Content-Type': 'application/json',
     },
