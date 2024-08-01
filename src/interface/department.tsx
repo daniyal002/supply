@@ -1,4 +1,4 @@
-import { IHousing } from "./housing"
+import { HousingOption, IHousing } from "./housing"
 
 export interface IDepartment{
     id?:number,
@@ -20,3 +20,14 @@ export interface IDepartmentAddResponse{
     detail:string,
     department: IDepartment
 }
+
+export interface IDepartmentFormValues {
+    id?: number;
+    department_name: string;
+    housing?: HousingOption;
+  }
+
+export interface IDepartmentOption {
+    value: number;
+    label: string;
+  }

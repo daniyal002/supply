@@ -11,3 +11,8 @@ export interface IHousingAddResponse{
     detail:string,
     housing: IHousing
 }
+
+export interface HousingOption {
+    value: number;
+    label: string;
+  }

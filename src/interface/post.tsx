@@ -11,3 +11,8 @@ export interface IPostAddResponse{
     detail:string,
     post: IPost
 }
+
+export interface IPostOption {
+    value: number;
+    label: string;
+  }

@@ -1,0 +1,53 @@
+.postForm{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .formItem{
+        display: flex;
+        flex-direction: column;
+        
+        .formItemLabel{
+            font-size: 16px;
+            font-weight: 600;
+            color: #649ace;
+        }
+
+        .postName{
+            padding: 10px;
+            border: 2px solid #678098;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+    
+            &:focus{
+            border: 2px solid #649ace;
+            }
+            &::placeholder{
+                color: #678098;
+            }
+        }
+    }
+    
+
+    .error{
+        color: red;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+    .postNameSubmit{
+        padding: 10px;
+        border-radius: 6px;
+        border: 0;
+        background-color: #649ace;
+        color: #fff;
+        font-size: 18px;
+        letter-spacing: 0.8px;
+        transition: 0.5s;
+        cursor: pointer;
+        &:hover{
+            background-color: #678098;
+        }
+       
+    }
+}

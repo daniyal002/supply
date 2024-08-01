@@ -6,3 +6,8 @@ export interface IFloor{
 export interface IFloorRespone{
     detail:IFloor[]
 }
+
+export interface IFloorOption {
+    value: number;
+    label: string;
+  }

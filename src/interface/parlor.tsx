@@ -1,6 +1,6 @@
-import { IDepartment } from "./department";
+import { IDepartment, IDepartmentOption } from "./department";
 import { IEmployeeFromParlorGetMe } from "./employee";
-import { IFloor } from "./floor";
+import { IFloor, IFloorOption } from "./floor";
 
 export interface IParlor{
     id?:number,
@@ -32,3 +32,15 @@ export interface IParlorGetMe{
     floor?: IFloor | undefined
     employees:IEmployeeFromParlorGetMe[]
 }
+
+export interface IParlorFormValues{
+    id?:number,
+    parlor_name:string,
+    department?:IDepartmentOption
+    floor?: IFloorOption
+}
+
+export interface IParlorOption {
+    value: number;
+    label: string;
+  }

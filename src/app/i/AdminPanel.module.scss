@@ -1,0 +1,32 @@
+.adminButtons{
+    display: flex;
+    flex-wrap: wrap;
+    gap:10px;
+    margin: 20px 0;
+    justify-content: center;
+
+    .adminButton{
+        max-width: 116px;
+        width: 100%;
+        padding: 10px 5px;
+        border: 2px solid #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        background-color: #fff;
+        font-size: 14px;
+        transition: 0.5s;
+        &:hover{
+        border: 2px solid #1677ff;
+        color: #1677ff;
+        }
+    }
+    .active{
+        background-color: #1677ff;
+        color: #fff;
+        border: 2px solid #1677ff;
+        &:hover{
+            border: 2px solid #d9d9d9;
+            color: #fff;
+            }
+    }
+}

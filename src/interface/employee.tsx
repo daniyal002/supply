@@ -1,5 +1,5 @@
-import { IParlor, IParlorGetMe } from "./parlor"
-import { IPost } from "./post"
+import { IParlor, IParlorGetMe, IParlorOption } from "./parlor"
+import { IPost, IPostOption } from "./post"
 
 export interface IEmployee{
     id?:number
@@ -64,3 +64,22 @@ export interface IEmployeeFromParlorGetMe{
 //     employee_id:number,
 //     parlor_id:number
 // }
+
+export interface IEmployeeFormValues{
+    id?:number
+    buyer_name: string,
+    buyer_type: {value:string, label:string},
+    buyer_1C_code?: string,
+    email?: string,
+    phone?: string,
+    internal_phone?: string,
+    note?: string
+    post:IPostOption,
+    parlor:IParlorOption[] | undefined
+}
+
+
+export interface IEmployeeOption {
+    value: number;
+    label: string;
+  }

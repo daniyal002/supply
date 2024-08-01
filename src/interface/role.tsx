@@ -11,3 +11,8 @@ export interface IRoleAddResponse{
     detail:string,
     role: IRole
 }
+
+export interface IRoleOption {
+    value: number;
+    label: string;
+  }
