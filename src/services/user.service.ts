@@ -8,10 +8,10 @@ export const userService = {
         return response.data.detail
     },
 
-    async getMe (){
-        const response = await axiosWidthAuth.get<IGetMe>('/user/get_me')
+    async getMe (token:string){
+        const response = token ? await axiosWidthAuth.get<IGetMe>('/user/get_me') : null
         
-        return response.data
+        return response !== null ? response.data : response
     },
 
     async addUser(data:IUserRequest){

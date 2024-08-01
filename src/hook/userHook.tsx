@@ -4,6 +4,7 @@ import { IUser } from "@/interface/user";
 import { message } from "antd";
 import axios, { AxiosError } from "axios";
 import { IErrorResponse } from "@/interface/error";
+import { getAccessToken } from "@/services/auth-token.service";
 
 export const useUserData = () => {
   const {
@@ -19,11 +20,14 @@ export const useUserData = () => {
 };
 
 export const useGetMe = () => {
+  const accessToken = getAccessToken()
   const {
     data: GetMeData,
     isLoading,
     error,
-  } = useQuery({ queryKey: ["getMe"], queryFn: userService.getMe });
+  } = useQuery({ queryKey: ["getMe"], queryFn: () => userService.getMe(accessToken as string),
+    staleTime: Infinity,
+   });
   return { GetMeData, isLoading, error };
 };
 
