@@ -1,6 +1,6 @@
 import { getAccessToken } from "@/services/auth-token.service";
 
-export const protectedRoutes = [{path:'/i',role:['admin']}]
+export const protectedRoutes = [{key:"2",path:'/i',role:['admin']}]
 
 export function isRole() {
     const token = getAccessToken();
