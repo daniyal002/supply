@@ -26,10 +26,10 @@ export default function RootLayout({
           <body className={inter.className}>
             <Header />
             <div  className={style.layout}>
-            <SiderL />
-            <main className="main">
+            {/* <SiderL /> */}
+            <div className="main">
             {children}
-            </main>
+            </div>
             </div>
           </body>
         </QueryClientContextProvider>

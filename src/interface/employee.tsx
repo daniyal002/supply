@@ -54,8 +54,8 @@ export interface IEmployeeGetMe{
 
 export interface IEmployeeFromParlorGetMe{
         id: number,
-        name: string
-        type: string,
+        buyer_name: string
+        buyer_type: string,
         post: string,
         role: string
 }

@@ -2,14 +2,7 @@ import { Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import style from "./EmployeeModal.module.scss";
-import { useDepartmentData } from "@/hook/departmentHook";
-import {
-  useCreateParlorMutation,
-  useParlorData,
-  useUpdateParlorMutation,
-} from "@/hook/parlorHook";
-import { useFloorData } from "@/hook/floorHook";
-import { IParlor, IParlorFormValues } from "@/interface/parlor";
+import {useParlorData} from "@/hook/parlorHook";
 import { usePostData } from "@/hook/postHook";
 import {
   useCreateEmployeeMutation,
@@ -54,9 +47,6 @@ export default function EmployeeModal({
     const itemPostData = postData?.find(
       (post) => post.id === data.post?.value
     );
-    console.log("data", data);
-    console.log("itemParlorData",itemParlorData);
-    console.log("itemPostData",itemPostData);
     const updateParlor: IEmployee = {
       ...data,
       buyer_type:data.buyer_type.value,
@@ -75,7 +65,6 @@ export default function EmployeeModal({
   );
 
   useEffect(() => {
-    console.log(itemEmployeeData);
     if (employeeId === undefined) {
       reset({
         buyer_name: undefined,

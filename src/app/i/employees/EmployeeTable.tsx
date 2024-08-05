@@ -2,19 +2,17 @@
 
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
-import { IDepartment } from "@/interface/department";
 import { IParlor } from "@/interface/parlor";
-import { useDeleteParlorMutation } from "@/hook/parlorHook";
 import { IEmployee } from "@/interface/employee";
 import { IPost } from "@/interface/post";
 import { useDeleteEmployeeMutation } from "@/hook/employeeHook";
 
-interface PostTableProps {
+interface EmployeeTableProps {
   employeeData: IEmployee[] | undefined;
   onEdit: (id: number) => void;
 }
 
-const ParlorTable: React.FC<PostTableProps> = ({ employeeData, onEdit }) => {
+const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) => {
   const { mutate: deleteEmployeeMutation } = useDeleteEmployeeMutation();
 
   const columns: TableColumnsType<IEmployee> = [
@@ -92,4 +90,4 @@ const ParlorTable: React.FC<PostTableProps> = ({ employeeData, onEdit }) => {
   return <Table dataSource={dataSource} columns={columns} />;
 };
 
-export default ParlorTable;
+export default EmployeeTable;
