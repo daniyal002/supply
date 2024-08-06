@@ -10,7 +10,7 @@ export const authService = {
 
         if(response.data.access_token){
             saveAccessToken(response.data.access_token)
-            await userService.getMe()
+            await userService.getMe(response.data.access_token)
         }
 
         if(response.data.refresh_token){

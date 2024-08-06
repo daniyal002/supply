@@ -1,8 +1,9 @@
+import OrderList from "@/components/Order/OrderList/OrderList";
 
 export default function Home() {
   return (
-    <main>
-      
-    </main>
+    <div>
+      <OrderList/>
+    </div>
   );
 }

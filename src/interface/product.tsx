@@ -9,8 +9,8 @@ export interface IProduct{
 }
 
 export interface IProductGroup{
-    id:1,
-    name:string
+    product_group_id:number,
+    product_group_name:string
 }
 
 export interface IProductUnit{

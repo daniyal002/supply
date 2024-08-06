@@ -2,7 +2,7 @@ import { IParlor, IParlorGetMe, IParlorOption } from "./parlor"
 import { IPost, IPostOption } from "./post"
 
 export interface IEmployee{
-    id?:number
+    buyer_id?:number
     buyer_name: string,
     buyer_type: string,
     buyer_1C_code?: string,
@@ -53,11 +53,11 @@ export interface IEmployeeGetMe{
 } 
 
 export interface IEmployeeFromParlorGetMe{
-        id: number,
+        buyer_id: number,
         buyer_name: string
         buyer_type: string,
-        post: string,
-        role: string
+        buyer_post: string,
+        buyer_role: string
 }
 // export interface IDoctorParlor{
 //     key:number,

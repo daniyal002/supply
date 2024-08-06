@@ -4,11 +4,11 @@ import { IProductUnit } from "./product";
 import { IUnit } from "./unit";
 
 export interface IProductTable{
-    id:number | undefined,
+    order_product_id:number | undefined,
     product:IProductUnit,
-    unitProductTable:IUnit,
+    unit_measurement:IUnit,
     product_quantity:number
-    employee?:IEmployeeFromParlorGetMe[]
+    buyer?:IEmployeeFromParlorGetMe[]
     note?:string,
 }
 
@@ -21,10 +21,10 @@ export interface IProductTableRequest{
 }
 
 export interface IProductTableFormValues{
-    id?:number | undefined,
+    order_product_id?:number | undefined,
     product:IProductUnit,
-    unitProductTable:IBasicUnitOption,
+    unit_measurement:IBasicUnitOption,
     product_quantity:number
-    employee?:IEmployeeOption[]
+    buyer?:IEmployeeOption[]
     note?:string,
 }

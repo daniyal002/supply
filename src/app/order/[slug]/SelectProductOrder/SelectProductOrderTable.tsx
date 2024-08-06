@@ -12,6 +12,11 @@ interface ProductTableProps {
 
 const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, showModal,setProductId }) => {
 
+  const productGroup = productData?.map(product => ({
+    text: product.product_group.product_group_name,
+    value: product.product_group.product_group_id
+  }))
+
   const columns: TableColumnsType<IProductUnit> = [
     {
       title: "Товар",
@@ -28,10 +33,12 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       key: "product_group",
       sorter: {
         compare: (a: any, b: any) =>
-          a.product_group.name.localeCompare(b.product_group.name, "ru"),
+          a.product_group.product_group_name.localeCompare(b.product_group.product_group_name, "ru"),
       },
-      render: (product_group: IProductGroup) => product_group.name,
+      render: (product_group: IProductGroup) => product_group.product_group_name,
       responsive: ["sm"],
+      filters: productGroup,
+      onFilter: (value, record) => record.product_group.product_group_id === value,
     },
     {
       title: "Ед. измерения",
@@ -39,9 +46,9 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       key: "unit_measurement",
       sorter: {
         compare: (a: any, b: any) =>
-          a.unit_measurement.name.localeCompare(b.unit_measurement.name, "ru"),
+          a.unit_measurement.unit_measurement_name.localeCompare(b.unit_measurement.unit_measurement_name, "ru"),
       },
-      render: (unit_measurement: IBasicUnit) => unit_measurement.name,
+      render: (unit_measurement: IBasicUnit) => unit_measurement.unit_measurement_name,
       responsive: ["sm"],
     },
     {

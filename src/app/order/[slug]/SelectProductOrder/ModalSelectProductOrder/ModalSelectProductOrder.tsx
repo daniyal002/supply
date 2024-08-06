@@ -52,23 +52,26 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const [buyerType, setBuyerType] = useState<string>();
 
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
+    console.log(itemProductData)
     console.log(data);
     const unit = itemProductData?.directory_unit_measurement.find(
       (item) =>
-        item.unit_measurement.id === getValuesModal("unitProductTable.value")
+        item.unit_measurement.unit_measurement_id === getValuesModal("unit_measurement.value")
     );
-    const doctors = employees.filter((employee) =>
-      getValuesModal("employee")?.some(
-        (selectEmployee) => selectEmployee.value === employee.id
+    const doctors = employees.filter((buyer) =>
+      getValuesModal("buyer")?.some(
+        (selectEmployee) => selectEmployee.value === buyer.buyer_id
       )
     );
 
     const productTable = {
       ...data,
       product: itemProductData,
-      employee: doctors,
-      unitProductTable: unit,
+      buyer: doctors,
+      unit_measurement: unit,
     };
+    console.log(productTable)
+
     const products = getValues("products") || [];
 
     if (editProductId !== null) {
@@ -91,7 +94,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     GetMeData?.employee?.parlor
       ?.filter((parlor) =>
         parlor.employees.some(
-          (employee) => employee.id === getValues("employee_id.value")
+          (employee) => employee.buyer_id === getValues("employee_id.value")
         )
       )
       ?.flatMap((parlor) => parlor.employees) || [];
@@ -100,11 +103,11 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     const employee = GetMeData?.employee.parlor
       ?.filter((parlor) =>
         parlor.employees.some(
-          (employee) => employee.id === getValues("employee_id.value")
+          (employee) => employee.buyer_id === getValues("employee_id.value")
         )
       )
       .flatMap((parlor) => parlor.employees)
-      .find((employee) => employee.id === getValues("employee_id.value"));
+      .find((employee) => employee.buyer_id === getValues("employee_id.value"));
     if (employee) {
       setBuyerType(employee?.buyer_type);
     }
@@ -115,26 +118,25 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     if (type === "Добавить") {
       reset({
         product: undefined,
-        employee: undefined,
+        buyer: undefined,
         product_quantity: undefined,
-        unitProductTable: undefined,
+        unit_measurement: undefined,
         note:undefined,
       });
     } else if (type === "Изменить" && editProductId !== null) {
       const products = getValues("products") || [];
       const productToEdit = products[editProductId as number];
-      console.log(productToEdit);
       reset({
         product: itemProductData,
         product_quantity: productToEdit?.product_quantity,
-        unitProductTable: {
-          value: productToEdit?.unitProductTable?.id,
-          label: productToEdit?.unitProductTable?.unit_measurement?.name,
+        unit_measurement: {
+          value: productToEdit?.unit_measurement?.unit_measurement.unit_measurement_id,
+          label: productToEdit?.unit_measurement?.unit_measurement?.unit_measurement_name,
         },
-        employee: productToEdit?.employee?.map((emp: any) => ({
-          value: emp.id,
-          label: emp.buyer_name,
-        })),
+        // buyer: productToEdit?.buyer ? productToEdit?.buyer?.map((emp: any) => ({
+        //   value: emp.id,
+        //   label: emp.buyer_name,
+        // })) : undefined,
         note:productToEdit?.note,
       });
     }
@@ -145,16 +147,16 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     return employees
       .filter((employee) => {
         if (employee.buyer_type === "employee") {
-          if (employeeSet.has(employee.id)) {
+          if (employeeSet.has(employee.buyer_id)) {
             return false;
           } else {
-            employeeSet.add(employee.id);
+            employeeSet.add(employee.buyer_id);
             return true;
           }
         }
       })
       .map((employee) => ({
-        value: employee.id,
+        value: employee.buyer_id,
         label: employee.buyer_name,
       }));
   }, [employees]);
@@ -162,8 +164,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const optionsUnit = useMemo(
     () =>
       itemProductData?.directory_unit_measurement?.map((item) => ({
-        value: item.unit_measurement.id,
-        label: `${item.unit_measurement.name}(${item.coefficient} ${itemProductData.unit_measurement.name})`,
+        value: item.unit_measurement.unit_measurement_id,
+        label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
       })) || [],
     [itemProductData]
   );
@@ -200,7 +202,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           </label>
           <Controller
             control={control}
-            name="unitProductTable"
+            name="unit_measurement"
             rules={{
               required: { value: true, message: "Выберите Единицу измерения" },
             }}
@@ -216,8 +218,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               />
             )}
           />
-          {errors.unitProductTable && (
-            <p className={style.error}>{errors.unitProductTable.message}</p>
+          {errors.unit_measurement && (
+            <p className={style.error}>{errors.unit_measurement.message}</p>
           )}
         </div>
         {buyerType === "parlor" && (
@@ -225,7 +227,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             <label className={style.formItemLabel}>Выберите врача</label>
             <Controller
               control={control}
-              name="employee"
+              name="buyer"
               rules={{
                 required: {
                   value: buyerType === "parlor" ? true : false,
@@ -242,8 +244,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                 />
               )}
             />
-            {errors.employee && (
-              <p className={style.error}>{errors.employee.message}</p>
+            {errors.buyer && (
+              <p className={style.error}>{errors.buyer.message}</p>
             )}
           </div>
         )}

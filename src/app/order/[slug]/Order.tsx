@@ -3,7 +3,7 @@
 import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import style from "./Order.module.scss";
-import { useCreateOrderMutation } from "@/hook/orderHook";
+import { useCreateOrderMutation, useGetOrderById } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
@@ -11,7 +11,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 
 interface Props {
-  orderid?: number;
+  orderid?:string;
   type: "Добавить" | "Изменить";
 }
 
@@ -28,6 +28,7 @@ export default function Order({ orderid, type }: Props) {
     setValue,
     watch,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
+  const {getOrderByIdData} = useGetOrderById(orderid as string)
   const productsWatch = watch("products");
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
     console.log(data);
@@ -41,15 +42,16 @@ export default function Order({ orderid, type }: Props) {
       products: data.products.map((product) => ({
         product_id: product.product.product_id,
         product_quantity: product.product_quantity,
-        unit_measurement_id: product.unitProductTable.unit_measurement.id as number,
+        unit_measurement_id: product.unit_measurement.unit_measurement.unit_measurement_id as number,
         note:product.note,
-        employee_ids: product.employee?.map(employee => employee.id),
+        employee_ids: product.buyer?.map(buyer => buyer.buyer_id),
       })),
     };
     createOrderMutation(order);
   };
 
   useEffect(() => {
+    console.log(getOrderByIdData?.order_products)
     if (orderid === undefined) {
       reset({
         employee_id: undefined,
@@ -57,22 +59,25 @@ export default function Order({ orderid, type }: Props) {
         oms: false,
         products: undefined,
       });
-    } else if (type === "Изменить") {
+    } else if (orderid !== "newOrder") {
       reset({
-        // id: itemEmployeeData?.id,
-        // buyer_name: itemEmployeeData.buyer_name,
-        // buyer_type: {value:itemEmployeeData.buyer_type},
-        // post: {
-        //   value: itemEmployeeData?.post?.id,
-        //   label: itemEmployeeData?.post?.post_name,
-        // },
-        // parlor: itemEmployeeData?.parlor?.map(parlor => ({
-        //   value: parlor?.id,
-        //   label: parlor.parlor_name,
-        // }))
+        order_id:getOrderByIdData?.order_id,
+        employee_id:{
+          value:getOrderByIdData?.buyer?.buyer_id,
+          label:getOrderByIdData?.buyer?.buyer_name,
+        },
+        department_id:{
+          value:getOrderByIdData?.department?.department_id,
+          label:getOrderByIdData?.department?.department_name,
+        },
+        oms:getOrderByIdData?.oms,
+        order_route_id:1,
+        order_status_id:getOrderByIdData?.order_status.order_status_id,
+        note:getOrderByIdData?.note,
+        products:getOrderByIdData?.order_products
       });
     }
-  }, [reset, type, orderid]);
+  }, [reset, type, orderid,getOrderByIdData]);
 
   return (
     <div className={style.newOrder}>

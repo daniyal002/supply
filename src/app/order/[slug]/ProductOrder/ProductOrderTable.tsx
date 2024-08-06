@@ -29,13 +29,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({productTableData,s
 
   {
     title: "Ед. измерения",
-    dataIndex: "unitProductTable",
-    key: "unitProductTable",
+    dataIndex: "unit_measurement",
+    key: "unit_measurement",
     sorter: {
       compare: (a: any, b: any) =>
-        a.unitProductTable?.unit_measurement.name.localeCompare(b.unitProductTable?.unit_measurement.name.name, "ru"),
+        a.unit_measurement?.unit_measurement.name.localeCompare(b.unit_measurement?.unit_measurement.name.name, "ru"),
     },
-    render: (unitProductTable: IUnit) => unitProductTable?.unit_measurement.name,
+    render: (unit_measurement: IUnit) => unit_measurement?.unit_measurement?.unit_measurement_name,
     responsive: ["sm"],
   },
   {

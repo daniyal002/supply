@@ -33,23 +33,21 @@ export default function HeaderOrder({
   const { GetMeData } = useGetMe();
   const employee_idWatch = watch("employee_id");
   
-  useEffect(()=>{
-    console.log(getValues("employee_id.value"))
-  },[employee_idWatch])
+
   const employeeSet = new Set();
   const optionsEmployee =
     GetMeData?.employee?.parlor?.flatMap((parlor) =>
       parlor.employees
         .filter((employee) => {
-          if (employeeSet.has(employee.id)) {
+          if (employeeSet.has(employee.buyer_id)) {
             return false;
           } else {
-            employeeSet.add(employee.id);
+            employeeSet.add(employee.buyer_id);
             return true;
           }
         })
         .map((employee) => ({
-          value: employee.id,
+          value: employee.buyer_id,
           label: employee.buyer_name,
         }))
     ) || [];
@@ -58,21 +56,21 @@ export default function HeaderOrder({
   const optionsDepartment = GetMeData?.employee?.parlor
     ?.flatMap((parlor) =>
       parlor.employees.some(
-        (employee) => employee.id === getValues("employee_id.value")
+        (employee) => employee.buyer_id === getValues("employee_id.value")
       )
         ? [parlor]
         : []
     )
     .filter((parlor) => {
-      if (departmentSet.has(parlor.department?.id)) {
+      if (departmentSet.has(parlor.department?.department_id)) {
         return false;
       } else {
-        departmentSet.add(parlor.department?.id);
+        departmentSet.add(parlor.department?.department_id);
         return true;
       }
     })
     .map((parlor) => ({
-      value: parlor.department?.id,
+      value: parlor.department?.department_id,
       label: parlor.department?.department_name,
     }));
   return (
@@ -84,7 +82,7 @@ export default function HeaderOrder({
         <Controller
           control={control}
           name="oms"
-          render={({ field }) => <Checkbox {...field} />}
+          render={({ field }) => <Checkbox {...field} checked={field.value}/>}
         />
       </div>
       <div className={style.formItem}>

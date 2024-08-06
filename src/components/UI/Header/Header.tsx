@@ -1,11 +1,12 @@
 "use client";
-import { Container, EllipsisVertical, Menu } from "lucide-react";
+import { Container, EllipsisVertical, LogOut, Menu } from "lucide-react";
 import style from "./Header.module.scss";
 import Link from "next/link";
 import { useGetMe } from "@/hook/userHook";
 import { useEffect, useState } from "react";
 import { useHeaderStore } from "../../../../store/headerStore";
 import { usePathname } from "next/navigation";
+import { useLogout } from "@/hook/useAuth";
 export default function Header() {
   const setLogin = useHeaderStore((state) => state.setLogin);
   const login = useHeaderStore((state) => state.login);
@@ -18,6 +19,9 @@ export default function Header() {
       setLogin(GetMeData?.login);
     }
   }, [GetMeData]);
+
+  const {mutate:logout} = useLogout()
+ 
 
   if (pathname === "/login") {
     return null;
@@ -42,7 +46,7 @@ export default function Header() {
       <div className={style.headerButtons}>
         <p className={style.headerLoginChar}>{login[0]}</p>
         <p className={style.headerLogin}>{login}</p>
-        <EllipsisVertical size={32} color="#678098" />
+        <LogOut size={32} color="#fff" cursor="pointer" onClick={() => logout()}/>
       </div>
     </div>
   );

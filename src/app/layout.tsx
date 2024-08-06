@@ -27,9 +27,9 @@ export default function RootLayout({
             <Header />
             <div  className={style.layout}>
             {/* <SiderL /> */}
-            <div className="main">
+            <main className="main">
             {children}
-            </div>
+            </main>
             </div>
           </body>
         </QueryClientContextProvider>
