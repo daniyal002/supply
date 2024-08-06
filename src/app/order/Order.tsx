@@ -37,10 +37,12 @@ export default function Order({ orderid, type }: Props) {
       oms: data.oms,
       order_route_id: 1,
       order_status_id: 1,
+      note:data.note,
       products: data.products.map((product) => ({
         product_id: product.product.product_id,
         product_quantity: product.product_quantity,
         unit_measurement_id: product.unitProductTable.unit_measurement.id as number,
+        note:product.note,
         employee_ids: product.employee?.map(employee => employee.id),
       })),
     };

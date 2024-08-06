@@ -24,6 +24,7 @@ interface Props {
 
 export default function HeaderOrder({
   control,
+  register,
   getValues,
   setValue,
   watch,
@@ -76,6 +77,8 @@ export default function HeaderOrder({
     }));
   return (
     <div className={style.headerOrder}>
+      <div className={style.headerOrderSelect}>
+
       <div className={`${style.Checkbox}`}>
         <label className={style.formItemLabel}>ОМС</label>
         <Controller
@@ -131,7 +134,17 @@ export default function HeaderOrder({
         />
       </div>
       {errors && <p className={style.error}>{errors.department_id?.message}</p>}
-
+      </div>
+    <div className={style.headerOrderTextArea}>
+      <div className={style.formItem}>
+          <label className={style.formItemLabel}>Примечание</label>
+          <textarea
+            placeholder="Примечание"
+            className={style.modalTextArea}
+            {...register("note")}
+          />
+        </div>
+        </div>
     </div>
   );
 }

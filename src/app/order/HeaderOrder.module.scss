@@ -1,33 +1,89 @@
 .headerOrder{
     display: flex;
-    flex-direction: row;
-    @media screen and (max-width:560px) {
     flex-direction: column;
-    align-items: center;
-    };
-    flex-wrap: wrap;
-    gap:20px;
-    padding: 20px 0;
-    align-items: flex-start;
-    .Checkbox{
+    .headerOrderSelect{
         display: flex;
         flex-direction: row;
-        align-items: center;
-        gap:10px;
-        .formItemLabel{
-            font-size: 16px;
-            font-weight: 600;
-            color: #649ace;
-        }
-    }
-    .formItem{
-        display: flex;
+        @media screen and (max-width:560px) {
         flex-direction: column;
-        gap: 5px;
-        .formItemLabel{
-            font-size: 16px;
-            font-weight: 600;
-            color: #649ace;
+        align-items: center;
+        };
+        flex-wrap: wrap;
+        gap:20px;
+        padding: 20px 0;
+        align-items: flex-start;
+        .Checkbox{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap:10px;
+            .formItemLabel{
+                font-size: 16px;
+                font-weight: 600;
+                color: #649ace;
+            }
+        }
+        .formItem{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            .formItemLabel{
+                font-size: 16px;
+                font-weight: 600;
+                color: #649ace;
+            }
+            .modalTextArea{
+                padding: 10px;
+                border: 2px solid #678098;
+                border-radius: 6px;
+                font-size: 16px;
+                outline: none;
+        
+                &:focus{
+                border: 2px solid #649ace;
+                }
+                &::placeholder{
+                    color: #678098;
+                }
+            }
+    
+            .modalTextArea{
+                width: 100%;
+                resize: none;
+            }
         }
     }
+
+    .headerOrderTextArea{
+        .formItem{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            .formItemLabel{
+                font-size: 16px;
+                font-weight: 600;
+                color: #649ace;
+            }
+            .modalTextArea{
+                padding: 10px;
+                border: 1px solid #678098;
+                border-radius: 6px;
+                font-size: 16px;
+                outline: none;
+        
+                &:focus{
+                border: 1px solid #649ace;
+                }
+                &::placeholder{
+                    color: #678098;
+                }
+            }
+    
+            .modalTextArea{
+                width: 100%;
+                resize: none;
+            }
+    }
+}
+
 }

@@ -9,6 +9,7 @@ export interface IProductTable{
     unitProductTable:IUnit,
     product_quantity:number
     employee?:IEmployeeFromParlorGetMe[]
+    note?:string,
 }
 
 export interface IProductTableRequest{
@@ -25,4 +26,5 @@ export interface IProductTableFormValues{
     unitProductTable:IBasicUnitOption,
     product_quantity:number
     employee?:IEmployeeOption[]
+    note?:string,
 }

@@ -118,6 +118,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         employee: undefined,
         product_quantity: undefined,
         unitProductTable: undefined,
+        note:undefined,
       });
     } else if (type === "Изменить" && editProductId !== null) {
       const products = getValues("products") || [];
@@ -134,6 +135,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           value: emp.id,
           label: emp.buyer_name,
         })),
+        note:productToEdit?.note,
       });
     }
   }, [type, reset, editProductId, isModalOpen]);
@@ -245,6 +247,14 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             )}
           </div>
         )}
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Примечание</label>
+          <textarea
+            placeholder="Примечание"
+            className={style.modalTextArea}
+            {...register("note")}
+          />
+        </div>
 
         <button type="submit" className={style.modalSubmit}>
           {type}

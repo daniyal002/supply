@@ -13,7 +13,7 @@
             color: #649ace;
         }
 
-        .modalName{
+        .modalName, .modalTextArea{
             padding: 10px;
             border: 2px solid #678098;
             border-radius: 6px;
@@ -26,6 +26,11 @@
             &::placeholder{
                 color: #678098;
             }
+        }
+
+        .modalTextArea{
+            max-width: 450px;
+            resize: none;
         }
     }
     
