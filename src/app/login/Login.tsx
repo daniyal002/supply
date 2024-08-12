@@ -5,22 +5,20 @@ import style from "./Login.module.scss";
 import { useLogin } from "@/hook/useAuth";
 import { ILoginRequest } from "@/interface/auth";
 import { toast, Toaster } from "sonner";
+import { Alert } from "antd";
 
 export function Login() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ILoginRequest>({mode:"onChange"});
-  const { mutate } = useLogin();
+  } = useForm<ILoginRequest>({ mode: "onChange" });
+  const { mutate, error } = useLogin();
   const onSubmit: SubmitHandler<ILoginRequest> = (data) => mutate(data);
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className={`${style.formLogin}`}
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className={`${style.formLogin}`}>
         <div className={style.formItem}>
           <label htmlFor="login" className={style.formItemLabel}>
             Логин
@@ -29,7 +27,9 @@ export function Login() {
             type="text"
             placeholder="Логин"
             className={style.usernameInput}
-            {...register("login", { required: {message:"Введите логин", value:true}, })}
+            {...register("login", {
+              required: { message: "Введите логин", value: true },
+            })}
           />
         </div>
         {errors.login && <p className={style.error}>{errors.login.message}</p>}
@@ -41,7 +41,9 @@ export function Login() {
             type="password"
             placeholder="Пароль"
             className={style.passwordInput}
-            {...register("password", { required: {message:"Введите пароль", value:true} })}
+            {...register("password", {
+              required: { message: "Введите пароль", value: true },
+            })}
           />
           {errors.password && (
             <p className={style.error}>{errors.password.message}</p>
@@ -66,6 +68,15 @@ export function Login() {
           Войти
         </button>
       </form>
+
+      {error && (
+        <Alert
+          message="Ошибка"
+          description={`${error.response?.data.detail} `}
+          type="error"
+          showIcon
+        />
+      )}
     </>
   );
 }
