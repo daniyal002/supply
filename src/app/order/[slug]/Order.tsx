@@ -27,9 +27,13 @@ export default function Order({ orderid, type }: Props) {
     getValues,
     setValue,
     watch,
+    resetField
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const {getOrderByIdData} = useGetOrderById(orderid as string)
   const productsWatch = watch("products");
+  useEffect(()=>{
+    resetField('department_id',{defaultValue:undefined})
+  },[getValues('employee_id')])
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
     console.log(data);
     const order: IOrderItemRequest = {
