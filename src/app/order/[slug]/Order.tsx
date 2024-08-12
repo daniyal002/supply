@@ -44,7 +44,7 @@ export default function Order({ orderid, type }: Props) {
         product_quantity: product.product_quantity,
         unit_measurement_id: product.unit_measurement.unit_measurement.unit_measurement_id as number,
         note:product.note,
-        employee_ids: product.buyer?.map(buyer => buyer.buyer_id),
+        employee_ids: product.buyers?.map(buyer => buyer.buyer_id),
       })),
     };
     createOrderMutation(order);

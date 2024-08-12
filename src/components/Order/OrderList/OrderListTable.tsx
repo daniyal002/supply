@@ -44,7 +44,8 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
       dataIndex: 'buyer',
       key: 'buyer',
       sorter: (a: any, b: any) => a.buyer.buyer_name.localeCompare(b.buyer.buyer_name, 'ru'),
-      render: (buyer: IEmployee) => buyer?.buyer_name
+      render: (buyer: IEmployee) => buyer?.buyer_name,
+      responsive: ["lg"]
     },
     {
       title: 'Подразделение',
@@ -58,7 +59,8 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
       dataIndex: 'oms',
       key: 'oms',
       // sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
-      render: (oms: boolean) => oms === true ? "ОМС" : "ПУ" 
+      render: (oms: boolean) => oms === true ? "ОМС" : "ПУ", 
+      responsive: ["lg"]
     },
     {
       title: "Действия",
@@ -95,7 +97,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
     key: order.order_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} />;
+  return <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }}/>;
 };
 
 export default OrderListTable;

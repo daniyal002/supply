@@ -8,7 +8,7 @@ export interface IProductTable{
     product:IProductUnit,
     unit_measurement:IUnit,
     product_quantity:number
-    buyer?:IEmployeeFromParlorGetMe[]
+    buyers?:IEmployeeFromParlorGetMe[]
     note?:string,
 }
 
@@ -25,6 +25,6 @@ export interface IProductTableFormValues{
     product:IProductUnit,
     unit_measurement:IBasicUnitOption,
     product_quantity:number
-    buyer?:IEmployeeOption[]
+    buyers?:IEmployeeOption[]
     note?:string,
 }

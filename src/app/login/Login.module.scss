@@ -34,7 +34,7 @@
         }
     }
     .usernameInput, .passwordInput{
-        width: 100%;
+        // width: 100%;
         height: 50px;
         font-size: 25px;
         padding: 5px 10px;
@@ -50,7 +50,7 @@
     }
     
     .loginSubmit{
-        width: 100%;
+        // width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -71,8 +71,9 @@
         }
     
 }
-// .error {
-//     margin-top: -50px; /* Изменяем margin-top при ошибке (можете выбрать подходящее значение) */
-//   }
-
+.error{
+    color: red;
+    font-size: 12px;
+    text-transform: uppercase;
+}
 

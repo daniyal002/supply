@@ -26,7 +26,7 @@ export default function RootLayout({
           <body className={inter.className}>
             <Header />
             <div  className={style.layout}>
-            {/* <SiderL /> */}
+            <SiderL />
             <main className="main">
             {children}
             </main>

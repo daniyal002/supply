@@ -52,14 +52,13 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const [buyerType, setBuyerType] = useState<string>();
 
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
-    console.log(itemProductData)
-    console.log(data);
+    console.log(data)
     const unit = itemProductData?.directory_unit_measurement.find(
       (item) =>
         item.unit_measurement.unit_measurement_id === getValuesModal("unit_measurement.value")
     );
     const doctors = employees.filter((buyer) =>
-      getValuesModal("buyer")?.some(
+      getValuesModal("buyers")?.some(
         (selectEmployee) => selectEmployee.value === buyer.buyer_id
       )
     );
@@ -67,7 +66,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     const productTable = {
       ...data,
       product: itemProductData,
-      buyer: doctors,
+      buyers: doctors,
       unit_measurement: unit,
     };
     console.log(productTable)
@@ -114,11 +113,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   }, [getValues("employee_id.value")]);
 
   useEffect(() => {
-    console.log(editProductId);
     if (type === "Добавить") {
       reset({
         product: undefined,
-        buyer: undefined,
+        buyers: undefined,
         product_quantity: undefined,
         unit_measurement: undefined,
         note:undefined,
@@ -133,10 +131,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           value: productToEdit?.unit_measurement?.unit_measurement.unit_measurement_id,
           label: productToEdit?.unit_measurement?.unit_measurement?.unit_measurement_name,
         },
-        // buyer: productToEdit?.buyer ? productToEdit?.buyer?.map((emp: any) => ({
-        //   value: emp.id,
-        //   label: emp.buyer_name,
-        // })) : undefined,
+        buyers: productToEdit?.buyers?.map((emp: any) => ({
+          value: emp.buyer_id,
+          label: emp.buyer_name,
+        })),
         note:productToEdit?.note,
       });
     }
@@ -156,6 +154,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         }
       })
       .map((employee) => ({
+        key: employee.buyer_id,
         value: employee.buyer_id,
         label: employee.buyer_name,
       }));
@@ -227,7 +226,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             <label className={style.formItemLabel}>Выберите врача</label>
             <Controller
               control={control}
-              name="buyer"
+              name="buyers"
               rules={{
                 required: {
                   value: buyerType === "parlor" ? true : false,
@@ -236,16 +235,22 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
-                  options={optionsEmployees}
-                  onChange={(value, option) => field.onChange(option)}
-                  mode="multiple"
-                  placeholder="Врач"
-                />
+                {...field}
+                mode="multiple"
+                options={optionsEmployees}
+                placeholder="Врач"
+                onChange={(value, option) => field.onChange(option)}
+              >
+                {optionsEmployees.map(option => (
+                  <Select.Option key={option.key} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
               )}
             />
-            {errors.buyer && (
-              <p className={style.error}>{errors.buyer.message}</p>
+            {errors.buyers && (
+              <p className={style.error}>{errors.buyers.message}</p>
             )}
           </div>
         )}

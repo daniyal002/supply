@@ -29,13 +29,10 @@ export default function Header() {
   return (
     <div className={style.header}>
       <div className={style.headerlogo}>
-        <div className={style.headerlogoContainer}>
-          <Container size={40} color="#fff" />
-          <Link href="/">
-            {" "}
+          <Link href="/" className={style.headerlogoContainer}>
+            <Container size={40} color="#fff" />
             <h1 className={style.headerLogoText}>Снабжение</h1>
           </Link>
-        </div>
         <Menu
           size={20}
           color="#678098"

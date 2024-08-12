@@ -5,35 +5,56 @@ import { useHeaderStore } from "../../../../store/headerStore";
 import { UnorderedListOutlined, UserOutlined } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { isRole, protectedRoutes } from "@/helper/ProtectedRoutes";
+import { useEffect, useState } from "react";
+import style from "./Sider.module.scss"
 
 const { Sider } = Layout;
+
+interface MenuItem {
+  key: string;
+  icon: JSX.Element;
+  label: string;
+  onClick: () => void;
+}
 
 const SiderL: React.FC = () => {
   const pathname = usePathname();
 
   const collapsed = useHeaderStore((state) => state.collapsed);
+  const login = useHeaderStore((state) => state.login);
   const { push } = useRouter();
 
-  const items=[
-    {
-      key: "1",
-      icon: <UnorderedListOutlined />,
-      label: "Заявки",
-      onClick: () => {
-        push("/");
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    const role = isRole();
+    const items = [
+      {
+        key: "1",
+        icon: <UnorderedListOutlined />,
+        label: "Заявки",
+        onClick: () => {
+          push("/");
+        },
       },
-    },
-    {
-      key: "2",
-      icon: <UserOutlined />,
-      label: "Админ-панель",
-      onClick: () => {
-        push("/i");
+      {
+        key: "2",
+        icon: <UserOutlined />,
+        label: "Админ-панель",
+        onClick: () => {
+          push("/i");
+        },
       },
-    },
-  ]
-  const role = isRole()
-  const protectedItems = items.filter(item => protectedRoutes.some(protectedI => (protectedI.key === item.key && protectedI.role.some(protectedIRole => protectedIRole === role) || protectedI.key !== item.key)))
+    ];
+    
+    const protectedItems = items.filter(item =>
+      protectedRoutes.some(protectedI =>
+        (protectedI.key === item.key && protectedI.role.includes(role)) || protectedI.key !== item.key
+      )
+    );
+
+    setMenuItems(protectedItems);
+  }, [push,login]);
 
   if (pathname === "/login") {
     return null;
@@ -44,17 +65,16 @@ const SiderL: React.FC = () => {
       collapsible
       collapsed={collapsed}
       style={{
-        height: "100%",
-        background: "#fff",
         boxShadow: "-4px 10px 15px 0.5px black",
       }}
+      className={!collapsed ? ` ${style.siderActive} ${style.sider}` : `${style.sider}`}
     >
       <div className="demo-logo-vertical" />
       <Menu
         theme="light"
         mode="inline"
         defaultSelectedKeys={["1"]}
-        items={protectedItems}
+        items={menuItems}
       />
     </Sider>
   );

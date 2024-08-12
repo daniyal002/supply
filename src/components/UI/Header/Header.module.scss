@@ -28,13 +28,18 @@
         font-size: 25px;
         &:hover{
         color:#cde2f7;
-
+        }
+        @media screen and (max-width:767px) {
+            display: none;
         }
     }
     .headerLogin{
         font-size: 14px;
         font-weight: 600;
         color: #fff;
+        @media screen and (max-width:767px) {
+            display: none;
+        }
     }
     .headerLoginChar{
         background-color: #ffffff;
