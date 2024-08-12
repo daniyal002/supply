@@ -11,7 +11,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 
 interface Props {
-  orderid?:string;
+  orderid?: string;
   type: "Добавить" | "Изменить";
 }
 
@@ -27,13 +27,15 @@ export default function Order({ orderid, type }: Props) {
     getValues,
     setValue,
     watch,
-    resetField
+    resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
-  const {getOrderByIdData} = useGetOrderById(orderid as string)
+  const { getOrderByIdData } = useGetOrderById(orderid as string);
   const productsWatch = watch("products");
-  useEffect(()=>{
-    resetField('department_id',{defaultValue:undefined})
-  },[getValues('employee_id')])
+
+  useEffect(() => {
+    resetField("department_id", { defaultValue: undefined });
+  }, [getValues("employee_id")]);
+
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
     console.log(data);
     const order: IOrderItemRequest = {
@@ -42,20 +44,21 @@ export default function Order({ orderid, type }: Props) {
       oms: data.oms,
       order_route_id: 1,
       order_status_id: 1,
-      note:data.note,
+      note: data.note,
       products: data.products.map((product) => ({
         product_id: product.product.product_id,
         product_quantity: product.product_quantity,
-        unit_measurement_id: product.unit_measurement.unit_measurement.unit_measurement_id as number,
-        note:product.note,
-        employee_ids: product.buyers?.map(buyer => buyer.buyer_id),
+        unit_measurement_id: product.unit_measurement.unit_measurement
+          .unit_measurement_id as number,
+        note: product.note,
+        employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
       })),
     };
     createOrderMutation(order);
   };
 
   useEffect(() => {
-    console.log(getOrderByIdData?.order_products)
+    console.log(getOrderByIdData?.order_products);
     if (orderid === undefined) {
       reset({
         employee_id: undefined,
@@ -65,23 +68,23 @@ export default function Order({ orderid, type }: Props) {
       });
     } else if (orderid !== "newOrder") {
       reset({
-        order_id:getOrderByIdData?.order_id,
-        employee_id:{
-          value:getOrderByIdData?.buyer?.buyer_id,
-          label:getOrderByIdData?.buyer?.buyer_name,
+        order_id: getOrderByIdData?.order_id,
+        employee_id: {
+          value: getOrderByIdData?.buyer?.buyer_id,
+          label: getOrderByIdData?.buyer?.buyer_name,
         },
-        department_id:{
-          value:getOrderByIdData?.department?.department_id,
-          label:getOrderByIdData?.department?.department_name,
+        department_id: {
+          value: getOrderByIdData?.department?.department_id,
+          label: getOrderByIdData?.department?.department_name,
         },
-        oms:getOrderByIdData?.oms,
-        order_route_id:1,
-        order_status_id:getOrderByIdData?.order_status.order_status_id,
-        note:getOrderByIdData?.note,
-        products:getOrderByIdData?.order_products
+        oms: getOrderByIdData?.oms,
+        order_route_id: 1,
+        order_status_id: getOrderByIdData?.order_status.order_status_id,
+        note: getOrderByIdData?.note,
+        products: getOrderByIdData?.order_products,
       });
     }
-  }, [reset, type, orderid,getOrderByIdData]);
+  }, [reset, type, orderid, getOrderByIdData]);
 
   return (
     <div className={style.newOrder}>
@@ -94,7 +97,7 @@ export default function Order({ orderid, type }: Props) {
       <div
         className={
           toggle
-            ? style.selectProductOrder + style.active
+            ? `${style.active} ${style.selectProductOrder}`
             : style.selectProductOrder
         }
       >
@@ -107,9 +110,10 @@ export default function Order({ orderid, type }: Props) {
 
       <div
         className={
-          !toggle ? style.productOrder + style.active : style.productOrder
+          !toggle ? `${style.active} ${style.productOrder}` : style.productOrder
         }
       >
+       
         <form key={1} onSubmit={handleSubmit(onSubmit)}>
           <HeaderOrder
             control={control}
@@ -119,14 +123,14 @@ export default function Order({ orderid, type }: Props) {
             watch={watch}
             errors={errors}
           />
-          <ProductOrder
-            productTableData={getValues("products")}
-            getValues={getValues}
-            setValue={setValue}
-            watch={watch}
-          />
-          <button type="submit">Создать</button>
+        <button type="submit" className={style.buttonOrderCreate}>Создать</button>
         </form>
+        <ProductOrder
+          productTableData={getValues("products")}
+          getValues={getValues}
+          setValue={setValue}
+          watch={watch}
+        />
       </div>
     </div>
   );

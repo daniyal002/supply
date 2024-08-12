@@ -9,7 +9,8 @@
         align-items: center;
         };
         flex-wrap: wrap;
-        gap:20px;
+        column-gap:20px;
+        row-gap:6px;
         padding: 20px 0;
         align-items: flex-start;
         .Checkbox{
@@ -70,7 +71,8 @@
                 border-radius: 6px;
                 font-size: 16px;
                 outline: none;
-        
+                width: 95%;
+                resize: none;
                 &:focus{
                 border: 1px solid #649ace;
                 }
@@ -79,10 +81,7 @@
                 }
             }
     
-            .modalTextArea{
-                width: 100%;
-                resize: none;
-            }
+           
     }
 }
 
