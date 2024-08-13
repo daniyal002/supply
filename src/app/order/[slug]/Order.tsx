@@ -3,12 +3,14 @@
 import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import style from "./Order.module.scss";
-import { useCreateOrderMutation, useGetOrderById } from "@/hook/orderHook";
+import { useCreateOrderMutation, useGetOrderById, useUpdateOrderMutation } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
+import { useRouter } from "next/navigation";
+import { useGetMe } from "@/hook/userHook";
 
 interface Props {
   orderid?: string;
@@ -18,6 +20,7 @@ interface Props {
 export default function Order({ orderid, type }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
   const { mutate: createOrderMutation } = useCreateOrderMutation();
+  const { mutate: updateOrderMutation } = useUpdateOrderMutation();
   const {
     register,
     handleSubmit,
@@ -30,10 +33,23 @@ export default function Order({ orderid, type }: Props) {
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const { getOrderByIdData } = useGetOrderById(orderid as string);
+  const {GetMeData} = useGetMe()
   const productsWatch = watch("products");
 
   useEffect(() => {
     resetField("department_id", { defaultValue: undefined });
+
+    const buyerType = GetMeData?.employee?.parlor
+    ?.filter((parlor) =>
+      parlor.employees.some(
+        (employee) => employee.buyer_id === getValues("employee_id.value")
+      )
+    )
+    ?.flatMap((parlor) => parlor.employees).find(employee => employee.buyer_id === getValues("employee_id.value"))?.buyer_type
+    
+    if(buyerType === "employee"){
+      setValue("products", getValues("products")?.map(product => ({ ...product, buyers: [] })) || [])
+    }
   }, [getValues("employee_id")]);
 
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
@@ -54,7 +70,12 @@ export default function Order({ orderid, type }: Props) {
         employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
       })),
     };
-    createOrderMutation(order);
+    if(orderid !== "newOrder" && getOrderByIdData){
+      order.order_id = Number(orderid)
+      updateOrderMutation(order)
+    }else{
+      createOrderMutation(order);
+    }
   };
 
   useEffect(() => {
@@ -123,7 +144,7 @@ export default function Order({ orderid, type }: Props) {
             watch={watch}
             errors={errors}
           />
-        <button type="submit" className={style.buttonOrderCreate}>Создать</button>
+        <button type="submit" className={style.buttonOrderCreate}>{orderid === "newOrder" ? "Создать" : "Изменить"}</button>
         </form>
         <ProductOrder
           productTableData={getValues("products")}

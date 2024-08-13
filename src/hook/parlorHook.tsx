@@ -26,7 +26,7 @@ export const useCreateParlorMutation = () => {
     mutationFn: (data: IParlor) =>
       parlorService.addParlor({
         parlor_name: data.parlor_name,
-        department_id: data.department?.id as number,
+        department_id: data.department?.department_id as number,
         floor_id: data.floor?.id as number,
       }),
     onSuccess: (newParlor) => {
@@ -54,7 +54,7 @@ export const useUpdateParlorMutation = () => {
       parlorService.updateParlor({
         id: data.id,
         parlor_name: data.parlor_name,
-        department_id: data.department?.id as number,
+        department_id: data.department?.department_id as number,
         floor_id: data.floor?.id as number,
       }),
     onSuccess: (updatedParlor, variables) => {
@@ -84,7 +84,7 @@ export const useDeleteParlorMutation = () => {
       parlorService.deleteParlorById({
         id: data.id,
         parlor_name: data.parlor_name,
-        department_id: data.department?.id as number,
+        department_id: data.department?.department_id as number,
         floor_id: data.floor?.id as number,
       }),
     onSuccess: (updatedParlor, variables) => {

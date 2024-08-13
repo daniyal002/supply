@@ -57,7 +57,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       key: "action",
       render: (_: any, record: IEmployee) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.buyer_id as number)}>
             Изменить
           </Button>
           <Button
@@ -84,7 +84,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
 
   const dataSource = employeeData?.map((employee) => ({
     ...employee,
-    key: employee.id, // Ensure each item has a unique key
+    key: employee.buyer_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;

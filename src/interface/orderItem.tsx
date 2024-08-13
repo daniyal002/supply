@@ -24,6 +24,7 @@ export interface IOrderItem {
 
   export interface IOrderItemRequest{
     order_id?:number
+    order_number?: string,
     oms: boolean,
     order_status_id: number,
     order_route_id: number,
@@ -31,6 +32,11 @@ export interface IOrderItem {
     department_id: number,
     note?: string,
     products: IProductTableRequest[]
+  }
+
+  export interface IOrderItemRequestDelete{
+    order_id?:number
+    order_number?: string,
   }
 
   

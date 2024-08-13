@@ -49,7 +49,7 @@ export default function DepartmentModal({
   };
 
   const itemDepartmentData = departmentData?.find(
-    (department) => department.id === departmentId
+    (department) => department.department_id === departmentId
   );
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function DepartmentModal({
       });
     } else if (type === "Изменить" && itemDepartmentData) {
       reset({
-        id: itemDepartmentData?.id,
+        id: itemDepartmentData?.department_id,
         department_name: itemDepartmentData?.department_name,
         housing: {
           value: itemDepartmentData?.housing?.id,

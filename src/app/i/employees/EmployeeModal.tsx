@@ -61,7 +61,7 @@ export default function EmployeeModal({
   };
 
   const itemEmployeeData = employeeData?.find(
-    (employee) => employee.id === employeeId
+    (employee) => employee.buyer_id === employeeId
   );
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function EmployeeModal({
       });
     } else if (type === "Изменить" && itemEmployeeData) {
       reset({
-        id: itemEmployeeData?.id,
+        id: itemEmployeeData?.buyer_id,
         buyer_name: itemEmployeeData.buyer_name,
         buyer_type: {value:itemEmployeeData.buyer_type},
         post: {

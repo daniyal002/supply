@@ -51,7 +51,7 @@ export const useUpdateEmployeeMutation = () => {
             data.parlor?.forEach(item=>{
                 parlorIds.push(item.id as number)
             })
-          return employeeService.updateEmployee({employee:{id:data.id,buyer_name:data.buyer_name,buyer_type:data.buyer_type,post_id:data.post.id as number},parlor_ids:parlorIds})
+          return employeeService.updateEmployee({employee:{id:data.buyer_id,buyer_name:data.buyer_name,buyer_type:data.buyer_type,post_id:data.post.id as number},parlor_ids:parlorIds})
         },
         onSuccess: (updatedEmployee, variables) => {
           queryClient.setQueryData(
@@ -59,7 +59,7 @@ export const useUpdateEmployeeMutation = () => {
             (oldData: IEmployee[] | undefined) => {
               if (!oldData) return [];
               return oldData.map((employee) =>
-                employee.id === variables.id ? variables : employee
+                employee.buyer_id === variables.buyer_id ? variables : employee
               );
             }
           );
@@ -84,7 +84,7 @@ export const useDeleteEmployeeMutation = () => {
           (oldData: IEmployee[] | undefined) => {
             if (!oldData) return [];
             return oldData.filter((employee) =>
-              employee.id !== variables.id 
+              employee.buyer_id !== variables.buyer_id 
             );
           }
         );

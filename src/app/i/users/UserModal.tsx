@@ -37,7 +37,7 @@ export default function UserModal({
 
   const onSubmit: SubmitHandler<IUserFormValues> = (data) => {
     const itemEmployeeData = employeeData?.find(
-      (employee) => employee.id === data.employee.value
+      (employee) => employee.buyer_id === data.employee.value
     );
 
     const itemRoleData = roleData?.find(
@@ -70,7 +70,7 @@ export default function UserModal({
         login: itemUserData?.login,
         password: itemUserData?.password,
         employee: {
-          value: itemUserData?.employee.id,
+          value: itemUserData?.employee.buyer_id,
           label: itemUserData?.employee?.buyer_name,
         },
         role: {
@@ -82,7 +82,7 @@ export default function UserModal({
   }, [reset, type, userId, itemUserData]);
 
   const optionsEmployee = employeeData?.map((employee) => ({
-    value: employee.id as number,
+    value: employee.buyer_id as number,
     label: employee.buyer_name as string,
   }));
 

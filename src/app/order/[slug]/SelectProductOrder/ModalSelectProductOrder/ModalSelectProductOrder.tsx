@@ -46,10 +46,12 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const { productData } = useProductData();
   const { GetMeData } = useGetMe();
   const employeeIdWatch = watch("employee_id.value");
+  
   const itemProductData = productData?.find(
     (product) => product.product_id === productId
   );
   const [buyerType, setBuyerType] = useState<string>();
+
 
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
     console.log(data)

@@ -1,4 +1,3 @@
-import { Table } from "antd";
 import { useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";

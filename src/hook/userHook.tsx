@@ -39,7 +39,7 @@ export const useCreateUserMutation = () => {
       userService.addUser({
         login: data.login,
         password: data.password,
-        employee_id: data.employee.id as number,
+        employee_id: data.employee.buyer_id as number,
         role_id: data.role?.id as number,
       }),
     onSuccess: (newUser) => {
@@ -64,7 +64,7 @@ export const useUpdateUserMutation = () => {
         id: data.id,
         login: data.login,
         password: data.password,
-        employee_id: data.employee.id as number,
+        employee_id: data.employee.buyer_id as number,
         role_id: data.role?.id as number,
       }),
     onSuccess: (updatedEmployee, variables) => {
@@ -91,7 +91,7 @@ export const useDeleteUserMutation = () => {
         id: data.id,
         login: data.login,
         password: data.password,
-        employee_id: data.employee.id as number,
+        employee_id: data.employee.buyer_id as number,
         role_id: data.role?.id as number,
       }),
     onSuccess: (updatedEmployee, variables) => {

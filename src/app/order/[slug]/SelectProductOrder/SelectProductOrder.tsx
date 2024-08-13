@@ -38,7 +38,7 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
         setValue={setValue}
         editProductId={null}
       />
-      <SelectProductOrderTableColumn productData={productData} setProductId={setProductId} showModal={showModal}/>
+      <SelectProductOrderTableColumn productData={productData ? productData : []} setProductId={setProductId} showModal={showModal}/>
     </>
   );
 }

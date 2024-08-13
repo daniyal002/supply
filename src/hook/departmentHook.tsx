@@ -51,7 +51,7 @@ export const useUpdateDepartmentMutation = () => {
     mutationKey: ["updateDepartment"],
     mutationFn: (data: IDepartment) => 
       departmentService.updateDepartment({
-        id: data.id,
+        id: data.department_id,
         department_name: data.department_name,
         housing_id: data.housing?.id as number,
       }),
@@ -61,7 +61,7 @@ export const useUpdateDepartmentMutation = () => {
         (oldData: IDepartment[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((department) =>
-            department.id === variables.id ? variables : department
+            department.department_id === variables.department_id ? variables : department
           );
         }
       );
@@ -80,7 +80,7 @@ export const useDeleteDepartmentMutation = () => {
     mutationKey: ["deleteDepartment"],
     mutationFn: (data: IDepartment) =>
       departmentService.deleteDepartmentById({
-        id: data.id,
+        id: data.department_id,
         department_name: data.department_name,
         housing_id: data.housing?.id as number,
       }),
@@ -89,7 +89,7 @@ export const useDeleteDepartmentMutation = () => {
         ["Departments"],
         (oldData: IDepartment[] | undefined) => {
           if (!oldData) return [];
-          return oldData.filter((department) => department.id !== variables.id);
+          return oldData.filter((department) => department.department_id !== variables.department_id);
         }
       );
     },

@@ -1,19 +1,23 @@
-'use client'
-import React from 'react'
-import OrderListTable from './OrderListTable'
-import { useOrderUserData } from '@/hook/orderHook'
-import Link from 'next/link'
-import style from "./OrderList.module.scss"
+"use client";
+import React from "react";
+import OrderListTable from "./OrderListTable";
+import { useOrderUserData } from "@/hook/orderHook";
+import Link from "next/link";
+import style from "./OrderList.module.scss";
+import { Toaster } from "sonner";
 
 export default function OrderList() {
-    const {orderUserData} = useOrderUserData()
+  const { orderUserData } = useOrderUserData();
 
-    const onEdit = (id:number) => console.log(id)
+  const onEdit = (id: number) => console.log(id);
 
   return (
     <div className={style.orderList}>
-        <Link href={'/order/newOrder'} className={style.newOrderButton}>Добавить заявку</Link>
-        <OrderListTable OrderData={orderUserData} onEdit={onEdit}/>
+      <Toaster />
+      <Link href={"/order/newOrder"} className={style.newOrderButton}>
+        Добавить заявку
+      </Link>
+      <OrderListTable OrderData={orderUserData} onEdit={onEdit} />
     </div>
-  )
+  );
 }

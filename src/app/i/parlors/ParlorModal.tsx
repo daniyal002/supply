@@ -40,12 +40,12 @@ export default function ParlorModal({
 
   const onSubmit: SubmitHandler<IParlorFormValues> = (data) => {
     const itemDepartmentData = departmentData?.find(
-      (department) => department.id === data.department?.value
+      (department) => department.department_id === data.department?.value
     );
 
     const itemFloorData = floorData?.find((floor) => floor.id === data.floor?.value);
     console.log("data",data);
-    // console.log("itemDepartmentData",itemDepartmentData);
+    console.log("itemDepartmentData",itemDepartmentData);
     // console.log("itemFloorData",itemFloorData);
     const updateParlor: IParlor = {
       ...data,
@@ -74,7 +74,7 @@ export default function ParlorModal({
         id: itemParlorData?.id,
         parlor_name: itemParlorData.parlor_name,
         department: {
-          value: itemParlorData?.department?.id,
+          value: itemParlorData?.department?.department_id,
           label: itemParlorData?.department?.department_name,
         },
         floor: {
@@ -86,7 +86,7 @@ export default function ParlorModal({
   }, [reset, type, parlorId, itemParlorData]);
 
   const optionsDepartment = departmentData?.map((department) => ({
-    value: department.id as number,
+    value: department.department_id as number,
     label: department.department_name as string,
   }));
 

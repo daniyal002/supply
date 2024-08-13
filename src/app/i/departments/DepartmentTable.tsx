@@ -37,7 +37,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
       key: "action",
       render: (_: any, record: IDepartment) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.department_id as number)}>
             Изменить
           </Button>
           <Button
@@ -64,7 +64,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
 
   const dataSource = departmentData?.map((department) => ({
     ...department,
-    key: department.id, // Ensure each item has a unique key
+    key: department.department_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;
