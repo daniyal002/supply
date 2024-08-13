@@ -88,7 +88,7 @@ export default function Order({ orderid, type }: Props) {
 
   return (
     <div className={style.newOrder}>
-      <h1>Заявка {orderid}</h1>
+      <h1>{orderid === "newOrder" ? "Новая заявка" : `Заявка №-${getOrderByIdData?.order_number}`}</h1>
 
       <Button onClick={() => setToggle(!toggle)}>
         {toggle ? "Список выбранных товаров" : "Подбор товара"}

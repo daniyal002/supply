@@ -3,7 +3,7 @@
 import { Button, Space, Table, TableColumnsType, Input } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { IProductGroup, IProductUnit } from "@/interface/product";
 import { IBasicUnit } from "@/interface/basicUnit";
 import type { InputRef, TableColumnType } from 'antd';
@@ -110,15 +110,29 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
     text: product.product_group.product_group_name,
     value: product.product_group.product_group_id
   }));
-  const unitGroup = productData?.map(product => ({
-    text: product.unit_measurement.unit_measurement_name,
-    value: product.unit_measurement.unit_measurement_id
-  }));
+
+  const unitGroup = useMemo(() => {
+    const productSet = new Set();
+    return productData?.filter((product) => {
+          if (productSet.has(product.unit_measurement.unit_measurement_id)) {
+            return false;
+          } else {
+            productSet.add(product.unit_measurement.unit_measurement_id);
+            return true;
+          }
+      })
+      .map((product) => ({
+        value: product.unit_measurement.unit_measurement_id,
+        text: product.unit_measurement.unit_measurement_name,
+      }));
+  }, [productData]);
+
   const columns: TableColumnsType<IProductUnit> = [
     {
       title: "Товар",
       dataIndex: "product_name",
       key: "product_name",
+      width:"400px",
       sorter: (a, b) => a.product_name.localeCompare(b.product_name, "ru"),
       ...getColumnSearchProps('product_name'), // Add search capability here
     },
@@ -126,6 +140,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       title: "Группа товаров",
       dataIndex: "product_group",
       key: "product_group",
+      width:"350px",
       sorter: (a, b) => a.product_group.product_group_name.localeCompare(b.product_group.product_group_name, "ru"),
       render: (product_group: IProductGroup) => product_group.product_group_name,
       responsive: ["sm"],
@@ -136,6 +151,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       title: "Ед. измерения",
       dataIndex: "unit_measurement",
       key: "unit_measurement",
+      width:"180px",
       sorter: (a, b) => a.unit_measurement.unit_measurement_name.localeCompare(b.unit_measurement.unit_measurement_name, "ru"),
       render: (unit_measurement: IBasicUnit) => unit_measurement.unit_measurement_name,
       responsive: ["sm"],
@@ -145,6 +161,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
     {
       title: "Действия",
       key: "action",
+      width:"100px",
       render: (_: any, record: IProductUnit) => (
         <Space size="middle">
           <Button
@@ -165,7 +182,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
     key: product.product_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} />;
+  return <Table dataSource={dataSource} columns={columns} size="large"/>;
 };
 
 export default SelectProductOrderTable;
