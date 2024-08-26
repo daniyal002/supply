@@ -10,8 +10,8 @@ export interface IEmployee{
     phone?: string,
     internal_phone?: string,
     note?: string
-    post:IPost,
-    parlor:IParlor[] | undefined
+    post?:IPost,
+    parlors:IParlor[] | undefined
 } 
 
 
@@ -21,7 +21,7 @@ export interface IEmployeeResponse{
 
 export interface IEmployeeRequest{
     employee:{
-    id?:number
+    buyer_id?:number
     buyer_name: string,
     buyer_type: string,
     post_id: number,
@@ -40,7 +40,7 @@ export interface IEmployeeAddResponse{
 }
 
 export interface IEmployeeGetMe{
-    id?:number
+    buyer_id?:number
     buyer_name: string,
     buyer_type: string,
     buyer_1C_code?: string,
@@ -49,7 +49,7 @@ export interface IEmployeeGetMe{
     internal_phone?: string,
     note?: string
     post:IPost,
-    parlor:IParlorGetMe[] | undefined
+    parlors:IParlorGetMe[] | undefined
 } 
 
 export interface IEmployeeFromParlorGetMe{
@@ -66,7 +66,7 @@ export interface IEmployeeFromParlorGetMe{
 // }
 
 export interface IEmployeeFormValues{
-    id?:number
+    buyer_id?:number
     buyer_name: string,
     buyer_type: {value:string, label:string},
     buyer_1C_code?: string,

@@ -17,8 +17,8 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "department_id",
+      key: "department_id",
     },
     {
       title: "Подразделение",

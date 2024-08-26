@@ -33,7 +33,7 @@ export default function HousingModal({
     reset();
     setIsModalOpen(false);
   };
-  const itemHousingsData = housingsData?.find((housing) => housing.id === housingId);
+  const itemHousingsData = housingsData?.find((housing) => housing.housing_id === housingId);
 
   useEffect(() => {
     if (housingId === undefined) {
@@ -42,7 +42,7 @@ export default function HousingModal({
       });
     } else if (type === "Изменить") {
       reset({
-        id: itemHousingsData?.id,
+        housing_id: itemHousingsData?.housing_id,
         housing_name: itemHousingsData?.housing_name,
       });
     }

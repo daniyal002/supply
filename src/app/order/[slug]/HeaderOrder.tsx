@@ -12,6 +12,8 @@ import {
 } from "react-hook-form";
 import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import { useGetMe } from "@/hook/userHook";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/db/db";
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -30,13 +32,14 @@ export default function HeaderOrder({
   watch,
   errors
 }: Props) {
-  const { GetMeData } = useGetMe();
+  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
   const employee_idWatch = watch("employee_id");
   
 
   const employeeSet = new Set();
   const optionsEmployee =
-    GetMeData?.employee?.parlor?.flatMap((parlor) =>
+    GetMeData?.employee?.parlors?.flatMap((parlor) =>
       parlor.employees
         .filter((employee) => {
           if (employeeSet.has(employee.buyer_id)) {
@@ -53,7 +56,7 @@ export default function HeaderOrder({
     ) || [];
 
   const departmentSet = new Set();
-  const optionsDepartment = GetMeData?.employee?.parlor
+  const optionsDepartment = GetMeData?.employee?.parlors
     ?.flatMap((parlor) =>
       parlor.employees.some(
         (employee) => employee.buyer_id === getValues("employee_id.value")
@@ -71,7 +74,7 @@ export default function HeaderOrder({
     })
     .map((parlor) => ({
       value: parlor.department?.department_id,
-      label: parlor.department?.department_name,
+      label: `${parlor.department?.department_name}-${parlor.department?.housing?.housing_name}`,
     }));
   return (
     <div className={style.headerOrder}>
@@ -107,8 +110,8 @@ export default function HeaderOrder({
             />
           )}
         />
-      </div>
       {errors && <p className={style.error}>{errors.employee_id?.message}</p>}
+      </div>
 
       <div className={style.formItem}>
         <label className={style.formItemLabel}>Выберите подразделение</label>
@@ -130,8 +133,8 @@ export default function HeaderOrder({
             />
           )}
         />
-      </div>
       {errors && <p className={style.error}>{errors.department_id?.message}</p>}
+      </div>
       </div>
     <div className={style.headerOrderTextArea}>
       <div className={style.formItem}>

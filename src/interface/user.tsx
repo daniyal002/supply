@@ -2,7 +2,7 @@ import { IEmployee, IEmployeeGetMe, IEmployeeOption } from "./employee";
 import { IRole, IRoleOption } from "./role";
 
 export interface IUser{
-    id?:number,
+    user_id?:number,
     login:string,
     password:string,
     role:IRole | undefined,
@@ -14,7 +14,7 @@ export interface IUserResponse{
 }
 
 export interface IUserRequest{
-    id?:number,
+    user_id?:number,
     login:string,
     password:string,
     role_id:number,
@@ -27,7 +27,7 @@ export interface IUserAddResponse{
 }
 
 export interface IGetMe{
-    id?:number,
+    user_id?:number,
     login:string,
     password:string,
     role:IRole | undefined,
@@ -35,7 +35,7 @@ export interface IGetMe{
 }
 
 export interface IUserFormValues{
-    id?:number,
+    user_id?:number,
     login:string,
     password:string,
     role:IRoleOption

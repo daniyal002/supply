@@ -13,6 +13,8 @@ import { useProductData } from "@/hook/productHook";
 import { IProductTableFormValues } from "@/interface/productTable";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useGetMe } from "@/hook/userHook";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/db/db";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -44,7 +46,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     getValues: getValuesModal,
   } = useForm<IProductTableFormValues>({ mode: "onChange" });
   const { productData } = useProductData();
-  const { GetMeData } = useGetMe();
+  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
   const employeeIdWatch = watch("employee_id.value");
   
   const itemProductData = productData?.find(
@@ -73,26 +76,24 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     };
     console.log(productTable)
 
-    const products = getValues("products") || [];
+    const products = getValues("order_products") || [];
 
     if (editProductId !== null) {
-      console.log("editProductId", editProductId);
-
       const updatedProducts = products.map((product, index) =>
         index === editProductId ? productTable : product
       );
       // @ts-ignore: Unreachable code error
-      setValue("products", updatedProducts);
+      setValue("order_products", updatedProducts);
     } else {
       // @ts-ignore: Unreachable code error
-      setValue("products", [...products, productTable]);
+      setValue("order_products", [...products, productTable]);
     }
     reset();
     setIsModalOpen(false);
   };
 
   const employees =
-    GetMeData?.employee?.parlor
+    GetMeData?.employee?.parlors
       ?.filter((parlor) =>
         parlor.employees.some(
           (employee) => employee.buyer_id === getValues("employee_id.value")
@@ -101,7 +102,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       ?.flatMap((parlor) => parlor.employees) || [];
 
   useEffect(() => {
-    const employee = GetMeData?.employee.parlor
+    const employee = GetMeData?.employee.parlors
       ?.filter((parlor) =>
         parlor.employees.some(
           (employee) => employee.buyer_id === getValues("employee_id.value")
@@ -124,7 +125,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         note:undefined,
       });
     } else if (type === "Изменить" && editProductId !== null) {
-      const products = getValues("products") || [];
+      const products = getValues("order_products") || [];
       const productToEdit = products[editProductId as number];
       reset({
         product: itemProductData,
@@ -190,6 +191,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             className={style.modalName}
             {...register("product_quantity", {
               required: { value: true, message: "Количество обязательно" },
+              pattern: {value: /^[0-9]+$/, message: 'Вводить можно только цифры',},
             })}
           />
           {errors.product_quantity && (

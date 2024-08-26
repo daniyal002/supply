@@ -51,7 +51,7 @@ export const useUpdateHousingMutation = () => {
         (oldData: IHousing[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((housing) =>
-            housing.id === variables.id ? variables : housing
+            housing.housing_id === variables.housing_id ? variables : housing
           );
         }
       );
@@ -74,7 +74,7 @@ export const useDeleteHousingMutation = () => {
         ["Housings"],
         (oldData: IHousing[] | undefined) => {
           if (!oldData) return [];
-          return oldData.filter((housing) => housing.id !== variables.id);
+          return oldData.filter((housing) => housing.housing_id !== variables.housing_id);
         }
       );
     },

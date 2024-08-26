@@ -18,8 +18,8 @@ const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "role_id",
+      key: "role_id",
     },
     {
       title: "Роль",
@@ -31,7 +31,7 @@ const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
       key: "action",
       render: (_: any, record: IRole) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.role_id as number)}>
             Изменить
           </Button>
           <Button
@@ -58,7 +58,7 @@ const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
 
   const dataSource = roleData?.map((role) => ({
     ...role,
-    key: role.id, // Ensure each item has a unique key
+    key: role.role_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;

@@ -2,7 +2,7 @@
 
 import { Button } from "antd";
 import { Toaster } from "sonner";
-import ParlorModal from "./EmployeeModal";
+import EmployeeModal from "./EmployeeModal";
 import { useState } from "react";
 import { useEmployeeData } from "@/hook/employeeHook";
 import EmployeeTable from "./EmployeeTable";
@@ -29,7 +29,7 @@ export default function AdminEmployee() {
   return (
     <div>
       <Toaster />
-      <ParlorModal
+      <EmployeeModal
         type={type}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

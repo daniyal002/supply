@@ -26,7 +26,7 @@ export const useOrderUserData = () => {
   } = useQuery({
     queryKey: ["OrderUser"],
     queryFn: orderService.getUserOrder,
-    staleTime: Infinity,
+    // staleTime: Infinity,
   });
   return { orderUserData, isLoading, error };
 };

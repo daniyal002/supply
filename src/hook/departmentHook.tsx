@@ -26,7 +26,7 @@ export const useCreateDepartmentMutation = () => {
     mutationFn: (data: IDepartment) =>
       departmentService.addDepartment({
         department_name: data.department_name,
-        housing_id: data.housing?.id as number,
+        housing_id: data.housing?.housing_id as number,
       }),
     onSuccess: (newDepartment) => {
       queryClient.setQueryData(
@@ -51,9 +51,9 @@ export const useUpdateDepartmentMutation = () => {
     mutationKey: ["updateDepartment"],
     mutationFn: (data: IDepartment) => 
       departmentService.updateDepartment({
-        id: data.department_id,
+        department_id: data.department_id,
         department_name: data.department_name,
-        housing_id: data.housing?.id as number,
+        housing_id: data.housing?.housing_id as number,
       }),
     onSuccess: (updatedDepartment, variables) => {
       queryClient.setQueryData(
@@ -80,9 +80,9 @@ export const useDeleteDepartmentMutation = () => {
     mutationKey: ["deleteDepartment"],
     mutationFn: (data: IDepartment) =>
       departmentService.deleteDepartmentById({
-        id: data.department_id,
+        department_id: data.department_id,
         department_name: data.department_name,
-        housing_id: data.housing?.id as number,
+        housing_id: data.housing?.housing_id as number,
       }),
     onSuccess: (updatedDepartment, variables) => {
       queryClient.setQueryData(

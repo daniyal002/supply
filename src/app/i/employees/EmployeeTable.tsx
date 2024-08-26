@@ -18,8 +18,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
   const columns: TableColumnsType<IEmployee> = [
     {
       title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'buyer_id',
+      key: 'buyer_id',
       sorter: (a:any, b:any) => a.id - b.id,
     },
     
@@ -38,10 +38,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
     },
     {
       title: 'Кабинет',
-      dataIndex: 'parlor',
-      key: 'parlor',
-      sorter: (a: any, b: any) => a.parlor.parlor_name.localeCompare(b.parlor.parlor_name, 'ru'),
-      render: (parlor: IParlor[]) => parlor?.map((parlor, index) => (
+      dataIndex: 'parlors',
+      key: 'parlors',
+      sorter: (a: any, b: any) => a.parlors.parlor_name.localeCompare(b.parlors.parlor_name, 'ru'),
+      render: (parlors: IParlor[]) => parlors?.map((parlor, index) => (
         <div key={index}>{parlor?.parlor_name}</div> 
       ))
     },

@@ -37,7 +37,7 @@ export default function RoleModal({
     reset();
     setIsModalOpen(false);
   };
-  const itemRoleData = roleData?.find((role) => role.id === roleId);
+  const itemRoleData = roleData?.find((role) => role.role_id === roleId);
 
   useEffect(() => {
     if (roleId === undefined) {
@@ -46,7 +46,7 @@ export default function RoleModal({
       });
     } else if (type === "Изменить") {
       reset({
-        id: itemRoleData?.id,
+        role_id: itemRoleData?.role_id,
         role_name: itemRoleData?.role_name,
       });
     }

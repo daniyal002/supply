@@ -16,8 +16,8 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "post_id",
+      key: "post_id",
     },
     {
       title: "Должность",
@@ -29,7 +29,7 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
       key: "action",
       render: (_: any, record: IPost) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.post_id as number)}>
             Изменить
           </Button>
           <Button
@@ -56,7 +56,7 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
 
   const dataSource = postData?.map((post) => ({
     ...post,
-    key: post.id, // Ensure each item has a unique key
+    key: post.post_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;

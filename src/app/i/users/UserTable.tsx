@@ -18,8 +18,8 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
   const columns: TableColumnsType<IUser> = [
     {
         title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
+        dataIndex: 'user_id',
+        key: 'user_id',
         sorter: (a:any, b:any) => a.id - b.id,
       },
       {
@@ -48,7 +48,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
       key: "action",
       render: (_: any, record: IUser) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.user_id as number)}>
             Изменить
           </Button>
           <Button
@@ -75,7 +75,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
 
   const dataSource = userData?.map((user) => ({
     ...user,
-    key: user.id, // Ensure each item has a unique key
+    key: user.user_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;

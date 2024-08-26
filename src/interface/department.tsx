@@ -11,7 +11,7 @@ export interface IDepartmentResponse{
 }
 
 export interface IDepartmentRequest{
-    id?:number,
+    department_id?:number,
     department_name: string 
     housing_id:number
 }
@@ -22,7 +22,7 @@ export interface IDepartmentAddResponse{
 }
 
 export interface IDepartmentFormValues {
-    id?: number;
+    department_id?: number;
     department_name: string;
     housing?: HousingOption;
   }

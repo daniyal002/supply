@@ -1,5 +1,5 @@
 export interface IHousing{
-    id?:number,
+    housing_id?:number,
     housing_name:string
 }
 

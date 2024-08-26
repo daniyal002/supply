@@ -1,5 +1,5 @@
 export interface IFloor{
-    id?:number,
+    floor_id?:number,
     floor_name:string
 }
 

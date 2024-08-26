@@ -17,11 +17,11 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "housing_id",
+      key: "housing_id",
     },
     {
-      title: "Должность",
+      title: "Корпус",
       dataIndex: "housing_name",
       key: "housing_name",
     },
@@ -30,7 +30,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
       key: "action",
       render: (_: any, record: IHousing) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.housing_id as number)}>
             Изменить
           </Button>
           <Button
@@ -57,7 +57,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
 
   const dataSource = housingsData?.map((housing) => ({
     ...housing,
-    key: housing.id, // Ensure each item has a unique key
+    key: housing.housing_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;

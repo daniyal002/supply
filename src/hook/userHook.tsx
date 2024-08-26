@@ -5,6 +5,7 @@ import { message } from "antd";
 import axios, { AxiosError } from "axios";
 import { IErrorResponse } from "@/interface/error";
 import { getAccessToken } from "@/services/auth-token.service";
+import { tree } from "next/dist/build/templates/app-page";
 
 export const useUserData = () => {
   const {
@@ -20,13 +21,12 @@ export const useUserData = () => {
 };
 
 export const useGetMe = () => {
-  const accessToken = getAccessToken()
   const {
     data: GetMeData,
     isLoading,
     error,
-  } = useQuery({ queryKey: ["getMe"], queryFn: () => userService.getMe(accessToken as string),
-    staleTime: Infinity,
+  } = useQuery({ queryKey: ["getMe"], queryFn: () => userService.getMe(),
+    // staleTime: Infinity,
    });
   return { GetMeData, isLoading, error };
 };
@@ -40,7 +40,7 @@ export const useCreateUserMutation = () => {
         login: data.login,
         password: data.password,
         employee_id: data.employee.buyer_id as number,
-        role_id: data.role?.id as number,
+        role_id: data.role?.role_id as number,
       }),
     onSuccess: (newUser) => {
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
@@ -61,17 +61,17 @@ export const useUpdateUserMutation = () => {
     mutationKey: ["updateUser"],
     mutationFn: (data: IUser) =>
       userService.updateUser({
-        id: data.id,
+        user_id: data.user_id,
         login: data.login,
         password: data.password,
         employee_id: data.employee.buyer_id as number,
-        role_id: data.role?.id as number,
+        role_id: data.role?.role_id as number,
       }),
     onSuccess: (updatedEmployee, variables) => {
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((users) =>
-          users.id === variables.id ? variables : users
+          users.user_id === variables.user_id ? variables : users
         );
       });
     },
@@ -88,16 +88,16 @@ export const useDeleteUserMutation = () => {
     mutationKey: ["deleteUser"],
     mutationFn: (data: IUser) =>
       userService.deleteUserById({
-        id: data.id,
+        user_id: data.user_id,
         login: data.login,
         password: data.password,
         employee_id: data.employee.buyer_id as number,
-        role_id: data.role?.id as number,
+        role_id: data.role?.role_id as number,
       }),
     onSuccess: (updatedEmployee, variables) => {
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
         if (!oldData) return [];
-        return oldData.filter((users) => users.id !== variables.id);
+        return oldData.filter((users) => users.user_id !== variables.user_id);
       });
     },
     onError(error: AxiosError<IErrorResponse>) {

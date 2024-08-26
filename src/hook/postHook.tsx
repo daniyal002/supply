@@ -44,7 +44,7 @@ export const useUpdatePostMutation = () => {
       queryClient.setQueryData(["Posts"], (oldData: IPost[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((post) =>
-          post.id === variables.id ? variables : post
+          post.post_id === variables.post_id ? variables : post
         );
       });
     },
@@ -63,7 +63,7 @@ export const useDeletePostMutation = () => {
     onSuccess(updatedPost, variables) {
       queryClient.setQueryData(["Posts"], (oldData: IPost[] | undefined) => {
         if (!oldData) return [];
-        return oldData.filter((post) => post.id !== variables.id);
+        return oldData.filter((post) => post.post_id !== variables.post_id);
       });
     },
     onError(error: AxiosError<IErrorResponse>) {},

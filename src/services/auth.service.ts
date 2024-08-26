@@ -1,8 +1,8 @@
 import { axiosClassic, axiosWidthAuth } from "@/api/interseptors";
 import { ILoginRequest, ILoginResponse, IRefreshRequest } from "@/interface/auth";
 import { removeAccessTokenFromStorage, removeRefreshTokenFromStorage, saveAccessToken, saveRefreshToken } from "./auth-token.service";
-import { removeGetME } from "./user-getMe.service";
 import { userService } from "./user.service";
+import { deleteGetMe } from "@/db/db";
  
 export const authService = {
     async login (body:ILoginRequest){
@@ -10,7 +10,7 @@ export const authService = {
 
         if(response.data.access_token){
             saveAccessToken(response.data.access_token)
-            await userService.getMe(response.data.access_token)
+            await userService.getMe()
         }
 
         if(response.data.refresh_token){
@@ -25,7 +25,7 @@ export const authService = {
         await axiosWidthAuth.post('/auth/logout')
         removeAccessTokenFromStorage()
         removeRefreshTokenFromStorage()
-        removeGetME()
+        deleteGetMe()
     },
 
     async refresh(body:IRefreshRequest){

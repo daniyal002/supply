@@ -31,6 +31,8 @@ export default function EmployeeModal({
     formState: { errors },
     reset,
     control,
+    watch,
+    getValues,
   } = useForm<IEmployeeFormValues>({ mode: "onChange" });
   const { employeeData } = useEmployeeData();
   const { parlorData } = useParlorData();
@@ -39,18 +41,20 @@ export default function EmployeeModal({
   const { mutate: createEmployeeMutation } = useCreateEmployeeMutation();
   const { mutate: updateEmployeeMutation } = useUpdateEmployeeMutation();
 
+  const watchBuyerType = watch("buyer_type")
+
   const onSubmit: SubmitHandler<IEmployeeFormValues> = (data) => {
     const itemParlorData = parlorData?.filter((parlor) =>
-      data.parlor?.some((selectedParlor) => selectedParlor.value === parlor.id)
+      data.parlor?.some((selectedParlor) => selectedParlor.value === parlor.parlor_id)
     );
 
     const itemPostData = postData?.find(
-      (post) => post.id === data.post?.value
+      (post) => post.post_id === data.post?.value
     );
     const updateParlor: IEmployee = {
       ...data,
       buyer_type:data.buyer_type.value,
-      parlor: itemParlorData,
+      parlors: itemParlorData,
       post: itemPostData as IPost,
     };
     type === "Добавить"
@@ -64,6 +68,7 @@ export default function EmployeeModal({
     (employee) => employee.buyer_id === employeeId
   );
 
+
   useEffect(() => {
     if (employeeId === undefined) {
       reset({
@@ -74,15 +79,15 @@ export default function EmployeeModal({
       });
     } else if (type === "Изменить" && itemEmployeeData) {
       reset({
-        id: itemEmployeeData?.buyer_id,
+        buyer_id: itemEmployeeData?.buyer_id,
         buyer_name: itemEmployeeData.buyer_name,
         buyer_type: {value:itemEmployeeData.buyer_type},
         post: {
-          value: itemEmployeeData?.post?.id,
+          value: itemEmployeeData?.post?.post_id,
           label: itemEmployeeData?.post?.post_name,
         },
-        parlor: itemEmployeeData?.parlor?.map(parlor => ({
-          value: parlor?.id,
+        parlor: itemEmployeeData?.parlors?.map(parlor => ({
+          value: parlor?.parlor_id,
           label: parlor.parlor_name,
         }))
       });
@@ -90,12 +95,12 @@ export default function EmployeeModal({
   }, [reset, type, employeeId, itemEmployeeData]);
 
   const optionsParlor = parlorData?.map((parlor) => ({
-    value: parlor.id as number,
+    value: parlor.parlor_id as number,
     label: parlor.parlor_name as string,
   }));
 
   const optionsPost = postData?.map((post) => ({
-    value: post.id as number,
+    value: post.post_id as number,
     label: post.post_name as string,
   }));
 
@@ -164,30 +169,6 @@ export default function EmployeeModal({
         {errors && <p className={style.error}>{errors.parlor?.message}</p>}
 
         <div className={style.formItem}>
-          <label className={style.formItemLabel}>Выберите должность</label>
-          <Controller
-            control={control}
-            name="post"
-            rules={{
-              required: { message: "Выберите должность", value: true },
-            }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={optionsPost}
-                onChange={(value, option) =>
-                  // @ts-ignore: Unreachable code error
-                  field.onChange({ value: value, label: option.label })
-                }
-                placeholder="Должность"
-              />
-            )}
-          />
-        </div>
-
-        {errors && <p className={style.error}>{errors.post?.message}</p>}
-
-        <div className={style.formItem}>
           <label className={style.formItemLabel}>Выберите вид</label>
           <Controller
             control={control}
@@ -210,6 +191,34 @@ export default function EmployeeModal({
         </div>
 
         {errors && <p className={style.error}>{errors.buyer_type?.message}</p>}
+
+        {getValues("buyer_type.value") === "employee" && (
+          <>
+            <div className={style.formItem}>
+              <label className={style.formItemLabel}>Выберите должность</label>
+              <Controller
+                control={control}
+                name="post"
+                rules={{
+                  required: { message: "Выберите должность", value: getValues("buyer_type.value") === "employee" ? true : false },
+                }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={optionsPost}
+                    onChange={(value, option) =>
+                      // @ts-ignore: Unreachable code error
+                      field.onChange({ value: value, label: option.label })
+                    }
+                    placeholder="Должность"
+                  />
+                )}
+              />
+            </div>
+
+            {errors && <p className={style.error}>{errors.post?.message}</p>}
+          </>
+        )}
 
         <button type="submit" className={style.employeeNameSubmit}>
           {type}

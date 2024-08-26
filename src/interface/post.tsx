@@ -1,5 +1,5 @@
 export interface IPost{
-    id?:number,
+    post_id?:number,
     post_name:string
 }
 

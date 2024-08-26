@@ -49,7 +49,7 @@ export const useUpdateRoleMutation = () => {
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((role) =>
-          role.id === variables.id ? variables : role
+          role.role_id === variables.role_id ? variables : role
         );
       });
     },
@@ -70,7 +70,7 @@ export const useDeleteRoleMutation = () => {
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
-        return oldData.filter((role) => role.id !== variables.id);
+        return oldData.filter((role) => role.role_id !== variables.role_id);
       });
     },
     onError(error: AxiosError<IErrorResponse>) {

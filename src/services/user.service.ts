@@ -1,6 +1,6 @@
 import { axiosWidthAuth } from "@/api/interseptors"
 import { IUserRequest, IUserAddResponse, IUserResponse, IGetMe } from "@/interface/user"
-import { saveGetME } from "./user-getMe.service"
+import { saveGetMe } from "@/db/db"
 
 export const userService = {
     async getUser (){
@@ -8,10 +8,12 @@ export const userService = {
         return response.data.detail
     },
 
-    async getMe (token:string){
-        const response = token ? await axiosWidthAuth.get<IGetMe>('/user/get_me') : null
-        
-        return response !== null ? response.data : response
+    async getMe (){
+        const response = await axiosWidthAuth.get<IGetMe>('/user/get_me')
+        if(response.data){
+            saveGetMe(response.data)
+        }
+        return response.data 
     },
 
     async addUser(data:IUserRequest){

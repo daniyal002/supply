@@ -22,8 +22,8 @@ export default function ProductOrder({productTableData,getValues,setValue,watch}
   };
 
   const deleteProduct = (productIndex:number) => {
-    const updatedProducts = getValues("products").filter((_, index) => index !== productIndex);
-    setValue("products", updatedProducts);
+    const updatedProducts = getValues("order_products").filter((_, index) => index !== productIndex);
+    setValue("order_products", updatedProducts);
   }
 
   return (

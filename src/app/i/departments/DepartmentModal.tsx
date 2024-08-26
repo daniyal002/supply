@@ -37,7 +37,7 @@ export default function DepartmentModal({
 
   const onSubmit: SubmitHandler<IDepartmentFormValues> = (data) => {
     const itemHousingData = housingsData?.find(
-      (housing) => housing.id === data.housing?.value
+      (housing) => housing.housing_id === data.housing?.value
     );
 
     const updateDepartment: IDepartment = { ...data, housing: itemHousingData };
@@ -60,10 +60,10 @@ export default function DepartmentModal({
       });
     } else if (type === "Изменить" && itemDepartmentData) {
       reset({
-        id: itemDepartmentData?.department_id,
+        department_id: itemDepartmentData?.department_id,
         department_name: itemDepartmentData?.department_name,
         housing: {
-          value: itemDepartmentData?.housing?.id,
+          value: itemDepartmentData?.housing?.housing_id,
           label: itemDepartmentData?.housing?.housing_name,
         },
       });
@@ -71,7 +71,7 @@ export default function DepartmentModal({
   }, [reset, type, departmentId, itemDepartmentData]);
 
   const options = housingsData?.map((housing) => ({
-    value: housing.id as number,
+    value: housing.housing_id as number,
     label: housing.housing_name as string,
   }));
 

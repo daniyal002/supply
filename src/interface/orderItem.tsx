@@ -17,8 +17,8 @@ export interface IOrderItem {
     buyer: IEmployee | undefined;
     oms:true | false,
     department:IDepartment | undefined;
-    // parlor:IParlor | undefined;
     order_products?:IProductTable[];
+    user_id?:number
   }
 
 
@@ -42,14 +42,15 @@ export interface IOrderItem {
   
   export interface IOrderItemFormValues{
     order_id?:number
+    order_number?: string,
     oms: boolean,
-    user_id: number,
+    user_id?: number,
     order_status_id: number,
     order_route_id: number,
     employee_id: IEmployeeOption,
     department_id: IDepartmentOption,
     note: string,
-    products: IProductTable[]
+    order_products: IProductTable[]
   }
 
   export interface IOrderItemResponse{

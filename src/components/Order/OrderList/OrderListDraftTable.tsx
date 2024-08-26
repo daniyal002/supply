@@ -13,17 +13,9 @@ interface OrderListProps {
   onEdit: (id: number) => void;
 }
 
-const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
-  const { mutate: deleteOrderMutation } = useDeleteOrderMutation();
+const OrderListDraftTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
 
   const columns: TableColumnsType<IOrderItem> = [
-    {
-      title: "№",
-      dataIndex: "order_number",
-      key: "order_number",
-      sorter: (a: any, b: any) =>
-        a.order_number.localeCompare(b.order_number, "ru"),
-    },
     {
       title: "Дата",
       dataIndex: "created_at",
@@ -83,24 +75,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
       key: "action",
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
-          <Link href={`/order/${record.order_id}`}>Изменить</Link>
-          <Button
-            type="primary"
-            danger
-            onClick={() =>
-              toast.error("Вы точно хотите удалить заявку ?", {
-                style: {
-                  color: "red",
-                },
-                action: {
-                  label: "Удалить",
-                  onClick: () => deleteOrderMutation(record),
-                },
-              })
-            }
-          >
-            Удалить
-          </Button>
+          <Link href={`/order/draft${record.order_id}`}>Изменить</Link>
         </Space>
       ),
     },
@@ -116,4 +91,4 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
   );
 };
 
-export default OrderListTable;
+export default OrderListDraftTable;

@@ -37,7 +37,7 @@ export default function PostModal({
     reset();
     setIsModalOpen(false);
   };
-  const itemPostData = postData?.find((post) => post.id === postId);
+  const itemPostData = postData?.find((post) => post.post_id === postId);
 
   useEffect(() => {
     if (postId === undefined) {
@@ -46,7 +46,7 @@ export default function PostModal({
       });
     } else if (type === "Изменить") {
       reset({
-        id: itemPostData?.id,
+        post_id: itemPostData?.post_id,
         post_name: itemPostData?.post_name,
       });
     }

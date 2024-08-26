@@ -17,8 +17,8 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
   const columns: TableColumnsType<IParlor> = [
     {
       title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'parlor_id',
+      key: 'parlor_id',
       sorter: (a:any, b:any) => a.id - b.id,
     },
     
@@ -40,7 +40,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
       key: "action",
       render: (_: any, record: IParlor) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.id as number)}>
+          <Button type="dashed" onClick={() => onEdit(record.parlor_id as number)}>
             Изменить
           </Button>
           <Button
@@ -67,7 +67,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
 
   const dataSource = parlorData?.map((parlor) => ({
     ...parlor,
-    key: parlor.id, // Ensure each item has a unique key
+    key: parlor.parlor_id, // Ensure each item has a unique key
   }));
 
   return <Table dataSource={dataSource} columns={columns} />;

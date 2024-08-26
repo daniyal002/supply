@@ -41,7 +41,7 @@ export default function UserModal({
     );
 
     const itemRoleData = roleData?.find(
-      (role) => role.id === data.role.value
+      (role) => role.role_id === data.role.value
     );
 
     const updateUser: IUser = { ...data, employee: itemEmployeeData as IEmployee,role:itemRoleData };
@@ -53,7 +53,7 @@ export default function UserModal({
   };
 
   const itemUserData = userData?.find(
-    (user) => user.id === userId
+    (user) => user.user_id === userId
   );
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function UserModal({
       });
     } else if (type === "Изменить" && itemUserData) {
       reset({
-        id: itemUserData?.id,
+        user_id: itemUserData?.user_id,
         login: itemUserData?.login,
         password: itemUserData?.password,
         employee: {
@@ -74,7 +74,7 @@ export default function UserModal({
           label: itemUserData?.employee?.buyer_name,
         },
         role: {
-          value: itemUserData?.role?.id,
+          value: itemUserData?.role?.role_id,
           label: itemUserData?.role?.role_name,
         },
       });
@@ -87,7 +87,7 @@ export default function UserModal({
   }));
 
   const optionsRole = roleData?.map((role) => ({
-    value: role.id as number,
+    value: role.role_id as number,
     label: role.role_name as string,
   }));
 

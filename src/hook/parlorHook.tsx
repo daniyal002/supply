@@ -27,7 +27,7 @@ export const useCreateParlorMutation = () => {
       parlorService.addParlor({
         parlor_name: data.parlor_name,
         department_id: data.department?.department_id as number,
-        floor_id: data.floor?.id as number,
+        floor_id: data.floor?.floor_id as number,
       }),
     onSuccess: (newParlor) => {
       queryClient.setQueryData(
@@ -52,10 +52,10 @@ export const useUpdateParlorMutation = () => {
     mutationKey: ["updateParlor"],
     mutationFn: (data: IParlor) =>
       parlorService.updateParlor({
-        id: data.id,
+        parlor_id: data.parlor_id,
         parlor_name: data.parlor_name,
         department_id: data.department?.department_id as number,
-        floor_id: data.floor?.id as number,
+        floor_id: data.floor?.floor_id as number,
       }),
     onSuccess: (updatedParlor, variables) => {
       queryClient.setQueryData(
@@ -63,7 +63,7 @@ export const useUpdateParlorMutation = () => {
         (oldData: IParlor[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((parlor) =>
-            parlor.id === variables.id ? variables : parlor
+            parlor.parlor_id === variables.parlor_id ? variables : parlor
           );
         }
       );
@@ -82,17 +82,17 @@ export const useDeleteParlorMutation = () => {
     mutationKey: ["deleteParlor"],
     mutationFn: (data: IParlor) =>
       parlorService.deleteParlorById({
-        id: data.id,
+        parlor_id: data.parlor_id,
         parlor_name: data.parlor_name,
         department_id: data.department?.department_id as number,
-        floor_id: data.floor?.id as number,
+        floor_id: data.floor?.floor_id as number,
       }),
     onSuccess: (updatedParlor, variables) => {
       queryClient.setQueryData(
         ["Parlors"],
         (oldData: IParlor[] | undefined) => {
           if (!oldData) return [];
-          return oldData.filter((parlor) => parlor.id !== variables.id);
+          return oldData.filter((parlor) => parlor.parlor_id !== variables.parlor_id);
         }
       );
     },

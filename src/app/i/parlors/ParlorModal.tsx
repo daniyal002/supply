@@ -43,7 +43,7 @@ export default function ParlorModal({
       (department) => department.department_id === data.department?.value
     );
 
-    const itemFloorData = floorData?.find((floor) => floor.id === data.floor?.value);
+    const itemFloorData = floorData?.find((floor) => floor.floor_id === data.floor?.value);
     console.log("data",data);
     console.log("itemDepartmentData",itemDepartmentData);
     // console.log("itemFloorData",itemFloorData);
@@ -59,7 +59,7 @@ export default function ParlorModal({
     setIsModalOpen(false);
   };
 
-  const itemParlorData = parlorData?.find((parlor) => parlor.id === parlorId);
+  const itemParlorData = parlorData?.find((parlor) => parlor.parlor_id === parlorId);
 
   useEffect(() => {
     console.log(itemParlorData);
@@ -71,14 +71,14 @@ export default function ParlorModal({
       });
     } else if (type === "Изменить" && itemParlorData) {
       reset({
-        id: itemParlorData?.id,
+        parlor_id: itemParlorData?.parlor_id,
         parlor_name: itemParlorData.parlor_name,
         department: {
           value: itemParlorData?.department?.department_id,
           label: itemParlorData?.department?.department_name,
         },
         floor: {
-          value: itemParlorData?.floor?.id,
+          value: itemParlorData?.floor?.floor_id,
           label: itemParlorData?.floor?.floor_name,
         },
       });
@@ -91,7 +91,7 @@ export default function ParlorModal({
   }));
 
   const optionsFloor = floorData?.map((floor) => ({
-    value: floor.id as number,
+    value: floor.floor_id as number,
     label: floor.floor_name as string,
   }));
 

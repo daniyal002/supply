@@ -2,17 +2,19 @@
 import { Container, EllipsisVertical, LogOut, Menu } from "lucide-react";
 import style from "./Header.module.scss";
 import Link from "next/link";
-import { useGetMe } from "@/hook/userHook";
 import { useEffect, useState } from "react";
 import { useHeaderStore } from "../../../../store/headerStore";
 import { usePathname } from "next/navigation";
 import { useLogout } from "@/hook/useAuth";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/db/db";
 export default function Header() {
   const setLogin = useHeaderStore((state) => state.setLogin);
   const login = useHeaderStore((state) => state.login);
   const editCollapsed = useHeaderStore((state) => state.editCollapsed);
   const collapsed = useHeaderStore((state) => state.collapsed);
-  const { GetMeData } = useGetMe();
+  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
   const pathname = usePathname();
   useEffect(() => {
     if (GetMeData) {
