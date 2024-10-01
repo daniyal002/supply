@@ -38,7 +38,7 @@ export default function Order({ orderid, type }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const productsWatch = watch("order_products");
-  
+
   useEffect(()=>{
     if(orderid === "newOrder" || orderid === `draft${Number(orderid?.split("draft").join(""))}`){
 
@@ -59,6 +59,7 @@ export default function Order({ orderid, type }: Props) {
     const userId = GetMeData?.user_id
 
     const data:IOrderItem = {
+      // @ts-ignores
       buyer:buyer,
       department:department,
       oms:getValues("oms") === undefined ? false : getValues("oms"),
@@ -101,6 +102,7 @@ export default function Order({ orderid, type }: Props) {
       order_route_id: 1,
       order_status_id: 1,
       note: data.note,
+      product_group_id:data.product_group.value,
       products: data.order_products.map((product) => ({
         product_id: product.product.product_id,
         product_quantity: product.product_quantity,
@@ -120,7 +122,6 @@ export default function Order({ orderid, type }: Props) {
   };
 
   useEffect(() => {
-    console.log(getOrderByIdData?.order_products);
     if (orderid === undefined) {
       reset({
         employee_id: undefined,
@@ -139,6 +140,10 @@ export default function Order({ orderid, type }: Props) {
         department_id: {
           value: getOrderByIdData?.department?.department_id,
           label: getOrderByIdData?.department?.department_name,
+        },
+        product_group:{
+          value: getOrderByIdData?.product_group?.product_group_id,
+          label: getOrderByIdData?.product_group?.product_group_name,
         },
         oms: getOrderByIdData?.oms,
         order_route_id: 1,
@@ -172,15 +177,15 @@ export default function Order({ orderid, type }: Props) {
             order_products: orderDraftItem?.order_products,
           });
         }
-      } 
+      }
     }, [ orderDraftItem]);
   }
-  
+
 
   return (
     <div className={style.newOrder}>
       <h1>{orderid === "newOrder" ? "Новая заявка" : orderid === `draft${Number(orderid?.split("draft").join(""))}` ? "Черновик":`Заявка №-${getOrderByIdData?.order_number}`}</h1>
-     
+
 
       <div
         className={
@@ -204,7 +209,7 @@ export default function Order({ orderid, type }: Props) {
           !toggle ? `${style.active} ${style.productOrder}` : style.productOrder
         }
       >
-       
+
         <form key={1} onSubmit={handleSubmit(onSubmit)}>
           <HeaderOrder
             control={control}
@@ -216,9 +221,11 @@ export default function Order({ orderid, type }: Props) {
           />
         <button type="submit" className={style.buttonOrderCreate}>{orderid === "newOrder" || orderid ===`draft${Number(orderid?.split("draft").join(""))}` ? "Создать" : "Изменить"}</button>
         </form>
-        <button onClick={() => setToggle(!toggle)} className={style.toggleBtn}>
-        {toggle ? "Список выбранных товаров" : "Подбор товара"}
-      </button>
+        {getValues("product_group.value") && (
+          <button onClick={() => setToggle(!toggle)} className={style.toggleBtn}>
+          {toggle ? "Список выбранных товаров" : "Подбор товара"}
+        </button>
+        )}
         <ProductOrder
           productTableData={getValues("order_products")}
           getValues={getValues}

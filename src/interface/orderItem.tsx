@@ -1,6 +1,7 @@
 import { IDepartment, IDepartmentOption } from "@/interface/department";
 import { IEmployee, IEmployeeOption } from "@/interface/employee";
 import { IProductTable, IProductTableRequest } from "@/interface/productTable";
+import { IProductGroup, IProductGroupOption } from "./product";
 
 export interface IStatusOrder{
   order_status_id:number,
@@ -17,6 +18,7 @@ export interface IOrderItem {
     buyer: IEmployee | undefined;
     oms:true | false,
     department:IDepartment | undefined;
+    product_group:IProductGroup,
     order_products?:IProductTable[];
     user_id?:number
   }
@@ -30,6 +32,7 @@ export interface IOrderItem {
     order_route_id: number,
     employee_id: number,
     department_id: number,
+    product_group_id:number,
     note?: string,
     products: IProductTableRequest[]
   }
@@ -39,7 +42,7 @@ export interface IOrderItem {
     order_number?: string,
   }
 
-  
+
   export interface IOrderItemFormValues{
     order_id?:number
     order_number?: string,
@@ -49,6 +52,7 @@ export interface IOrderItem {
     order_route_id: number,
     employee_id: IEmployeeOption,
     department_id: IDepartmentOption,
+    product_group:IProductGroupOption,
     note: string,
     order_products: IProductTable[]
   }

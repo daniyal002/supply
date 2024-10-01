@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalSelectProductOrder from "./ModalSelectProductOrder/ModalSelectProductOrder";
-import { IProductUnit } from "@/interface/product";
+import { IProductResponse, IProductUnit } from "@/interface/product";
 import SelectProductOrderTableColumn from "./SelectProductOrderTable";
 import { useProductData } from "@/hook/productHook";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
@@ -19,11 +19,21 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productId, setProductId] = useState<number>();
 
+  const productGroup = watch("product_group")
+  const [filterProductData,setFilterProductData] = useState<IProductUnit[]>(productData as IProductUnit[])
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
+  useEffect(() => {
+    const filteredProductData = productData?.filter(product => product.product_group.product_group_id === getValues("product_group.value"));
+    if (filteredProductData) {
+      setFilterProductData(filteredProductData);
+    } else {
+      setFilterProductData([]);
+    }
+  }, [productGroup]);
 
 
   return (
@@ -38,7 +48,7 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
         setValue={setValue}
         editProductId={null}
       />
-      <SelectProductOrderTableColumn productData={productData ? productData : []} setProductId={setProductId} showModal={showModal}/>
+      <SelectProductOrderTableColumn productData={filterProductData ? filterProductData : []} setProductId={setProductId} showModal={showModal}/>
     </>
   );
 }

@@ -13,6 +13,11 @@ export interface IProductGroup{
     product_group_name:string
 }
 
+export interface IProductGroupOption{
+    value:number,
+    label:string
+}
+
 export interface IProductUnit{
     product_id: number,
     product_name: string,

@@ -3,7 +3,7 @@ import { authService } from "@/services/auth.service";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from 'axios';
 import { IErrorResponse } from "@/interface/error";
-import { useRouter,permanentRedirect } from "next/navigation";
+import { useRouter} from "next/navigation";
 import { useHeaderStore } from "../../store/headerStore";
 
 
@@ -19,7 +19,8 @@ export const useLogin = () => {
         },
         onError(error:AxiosError<IErrorResponse>){
             // alert(error)
-          }  
+            // console.log(error)
+          }
       })
 
       return {mutate,isSuccess,error}
@@ -36,9 +37,8 @@ export const useLogout = () => {
         },
         onError(error:AxiosError<IErrorResponse>){
             alert(error)
-          }  
+          }
       })
 
       return {mutate,isSuccess,error}
 };
-
