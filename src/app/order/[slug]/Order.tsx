@@ -3,9 +3,17 @@
 import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import style from "./Order.module.scss";
-import { useCreateOrderMutation, useGetOrderById, useUpdateOrderMutation } from "@/hook/orderHook";
+import {
+  useCreateOrderMutation,
+  useGetOrderById,
+  useUpdateOrderMutation,
+} from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IOrderItem, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
+import {
+  IOrderItem,
+  IOrderItemFormValues,
+  IOrderItemRequest,
+} from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
@@ -39,57 +47,81 @@ export default function Order({ orderid, type }: Props) {
 
   const productsWatch = watch("order_products");
 
-  useEffect(()=>{
-    if(orderid === "newOrder" || orderid === `draft${Number(orderid?.split("draft").join(""))}`){
+  useEffect(() => {
+    if (
+      orderid === "newOrder" ||
+      orderid === `draft${Number(orderid?.split("draft").join(""))}`
+    ) {
+      const buyer = GetMeData?.employee?.parlors
+        ?.filter((parlor) =>
+          parlor.employees.some(
+            (employee) => employee.buyer_id === getValues("employee_id.value")
+          )
+        )
+        ?.flatMap((parlor) => parlor.employees)
+        .find(
+          (employee) => employee.buyer_id === getValues("employee_id.value")
+        );
 
-    const buyer = GetMeData?.employee?.parlors
-    ?.filter((parlor) =>
-      parlor.employees.some(
-        (employee) => employee.buyer_id === getValues("employee_id.value")
-      )
-    )
-    ?.flatMap((parlor) => parlor.employees).find(employee => employee.buyer_id === getValues("employee_id.value"))
-    const department = GetMeData?.employee?.parlors
-    ?.filter((parlor) =>
-      parlor.employees.some(
-        (employee) => employee.buyer_id === getValues("employee_id.value")
-      )
-    )
-    ?.flatMap((parlor) => parlor.department).find(department => department?.department_id === getValues("department_id.value"))
-    const userId = GetMeData?.user_id
+      const department = GetMeData?.employee?.parlors
+        ?.filter((parlor) =>
+          parlor.employees.some(
+            (employee) => employee.buyer_id === getValues("employee_id.value")
+          )
+        )
+        ?.flatMap((parlor) => parlor.department)
+        .find(
+          (department) =>
+            department?.department_id === getValues("department_id.value")
+        );
 
-    const data:IOrderItem = {
-      // @ts-ignores
-      buyer:buyer,
-      department:department,
-      oms:getValues("oms") === undefined ? false : getValues("oms"),
-      note:getValues("note"),
-      order_products:getValues("order_products"),
-      // order_route_id:getValues("order_route_id"),
-      order_status:{order_status_id:99,order_status_name:"Черновик"},
-      created_at:Date(),
-      user_id:userId
+      const userId = GetMeData?.user_id;
+
+      const data: IOrderItem = {
+        // @ts-ignores
+        buyer: buyer,
+        department: department,
+        oms: getValues("oms") === undefined ? false : getValues("oms"),
+        note: getValues("note"),
+        order_products: getValues("order_products"),
+        // order_route_id:getValues("order_route_id"),
+        order_status: { order_status_id: 99, order_status_name: "Черновик" },
+        created_at: Date(),
+        user_id: userId,
+        product_group: {
+          product_group_id: getValues("product_group.value"),
+          product_group_name: getValues("product_group.label"),
+        },
+      };
+      if (getValues("order_products")) {
+        console.log(getValues("order_products"))
+        addOrderIndexedDB(data, userId as number);
+      }
     }
-    if(getValues("order_products")){
-      addOrderIndexedDB(data,userId as number)
-    }
-  }
-
-  },[productsWatch])
+  }, [productsWatch]);
 
   useEffect(() => {
     resetField("department_id", { defaultValue: undefined });
 
     const buyerType = GetMeData?.employee?.parlors
-    ?.filter((parlor) =>
-      parlor.employees.some(
-        (employee) => employee.buyer_id === getValues("employee_id.value")
+      ?.filter((parlor) =>
+        parlor.employees.some(
+          (employee) => employee.buyer_id === getValues("employee_id.value")
+        )
       )
-    )
-    ?.flatMap((parlor) => parlor.employees).find(employee => employee.buyer_id === getValues("employee_id.value"))?.buyer_type
+      ?.flatMap((parlor) => parlor.employees)
+      .find(
+        (employee) => employee.buyer_id === getValues("employee_id.value")
+      )?.buyer_type;
 
-    if(buyerType === "employee"){
-      setValue("order_products", getValues("order_products")?.map(product => ({ ...product, buyers: [] })) || [])
+    if (buyerType === "employee") {
+      setValue(
+        "order_products",
+        getValues("order_products")?.map((product) => ({
+          ...product,
+          buyers: [],
+        })) || []
+      );
     }
   }, [getValues("employee_id")]);
 
@@ -102,7 +134,7 @@ export default function Order({ orderid, type }: Props) {
       order_route_id: 1,
       order_status_id: 1,
       note: data.note,
-      product_group_id:data.product_group.value,
+      product_group_id: data.product_group.value,
       products: data.order_products.map((product) => ({
         product_id: product.product.product_id,
         product_quantity: product.product_quantity,
@@ -112,12 +144,13 @@ export default function Order({ orderid, type }: Props) {
         employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
       })),
     };
-    if(orderid !== "newOrder" && getOrderByIdData){
-      order.order_id = Number(orderid)
-      updateOrderMutation(order)
-    }else{
+    if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}` && getOrderByIdData) {
+      console.log(orderid?.split("draft")[1])
+      order.order_id = Number(orderid);
+      updateOrderMutation(order);
+    } else {
       createOrderMutation(order);
-      deleteOrderIndexedDB(GetMeData?.user_id as number)
+      deleteOrderIndexedDB(GetMeData?.user_id as number);
     }
   };
 
@@ -128,9 +161,9 @@ export default function Order({ orderid, type }: Props) {
         department_id: undefined,
         oms: false,
         order_products: undefined,
+        product_group:undefined,
       });
-
-    } else if (orderid !== "newOrder" && orderid !== "draft" ) {
+    } else if (orderid !== "newOrder" && orderid !== "draft") {
       reset({
         order_id: getOrderByIdData?.order_id,
         employee_id: {
@@ -141,7 +174,7 @@ export default function Order({ orderid, type }: Props) {
           value: getOrderByIdData?.department?.department_id,
           label: getOrderByIdData?.department?.department_name,
         },
-        product_group:{
+        product_group: {
           value: getOrderByIdData?.product_group?.product_group_id,
           label: getOrderByIdData?.product_group?.product_group_name,
         },
@@ -154,12 +187,17 @@ export default function Order({ orderid, type }: Props) {
     }
   }, [reset, type, orderid, getOrderByIdData]);
 
-  if(orderid === `draft${Number(orderid?.split("draft").join(""))}`){
-    const orderDraftItem = useLiveQuery(() => db.orderItem.get(Number(orderid?.split("draft").join(""))));
+  if (orderid === `draft${Number(orderid?.split("draft").join(""))}`) {
+    const orderDraftItem = useLiveQuery(() =>
+      db.orderItem.get(Number(orderid?.split("draft").join("")))
+    );
 
     useEffect(() => {
-       if (orderid !== "newOrder" && orderid === `draft${Number(orderid?.split("draft").join(""))}` ){
-        if(orderDraftItem){
+      if (
+        orderid !== "newOrder" &&
+        orderid === `draft${Number(orderid?.split("draft").join(""))}`
+      ) {
+        if (orderDraftItem) {
           reset({
             // order_id: orderDraftItem[0]?.order_id,
             employee_id: {
@@ -170,6 +208,10 @@ export default function Order({ orderid, type }: Props) {
               value: orderDraftItem?.department?.department_id,
               label: orderDraftItem?.department?.department_name,
             },
+            product_group:{
+              value: orderDraftItem?.product_group?.product_group_id,
+              label: orderDraftItem?.product_group?.product_group_name,
+            },
             oms: orderDraftItem?.oms,
             order_route_id: 1,
             order_status_id: orderDraftItem?.order_status.order_status_id,
@@ -178,14 +220,18 @@ export default function Order({ orderid, type }: Props) {
           });
         }
       }
-    }, [ orderDraftItem]);
+    }, [orderDraftItem]);
   }
-
 
   return (
     <div className={style.newOrder}>
-      <h1>{orderid === "newOrder" ? "Новая заявка" : orderid === `draft${Number(orderid?.split("draft").join(""))}` ? "Черновик":`Заявка №-${getOrderByIdData?.order_number}`}</h1>
-
+      <h1>
+        {orderid === "newOrder"
+          ? "Новая заявка"
+          : orderid === `draft${Number(orderid?.split("draft").join(""))}`
+          ? "Черновик"
+          : `Заявка №-${getOrderByIdData?.order_number}`}
+      </h1>
 
       <div
         className={
@@ -195,8 +241,8 @@ export default function Order({ orderid, type }: Props) {
         }
       >
         <button onClick={() => setToggle(!toggle)} className={style.toggleBtn}>
-        {toggle ? "Список выбранных товаров" : "Подбор товара"}
-      </button>
+          {toggle ? "Список выбранных товаров" : "Подбор товара"}
+        </button>
         <SelectProductOrder
           watch={watch}
           getValues={getValues}
@@ -209,7 +255,6 @@ export default function Order({ orderid, type }: Props) {
           !toggle ? `${style.active} ${style.productOrder}` : style.productOrder
         }
       >
-
         <form key={1} onSubmit={handleSubmit(onSubmit)}>
           <HeaderOrder
             control={control}
@@ -219,12 +264,20 @@ export default function Order({ orderid, type }: Props) {
             watch={watch}
             errors={errors}
           />
-        <button type="submit" className={style.buttonOrderCreate}>{orderid === "newOrder" || orderid ===`draft${Number(orderid?.split("draft").join(""))}` ? "Создать" : "Изменить"}</button>
+          <button type="submit" className={style.buttonOrderCreate}>
+            {orderid === "newOrder" ||
+            orderid === `draft${Number(orderid?.split("draft").join(""))}`
+              ? "Создать"
+              : "Изменить"}
+          </button>
         </form>
         {getValues("product_group.value") && (
-          <button onClick={() => setToggle(!toggle)} className={style.toggleBtn}>
-          {toggle ? "Список выбранных товаров" : "Подбор товара"}
-        </button>
+          <button
+            onClick={() => setToggle(!toggle)}
+            className={style.toggleBtn}
+          >
+            {toggle ? "Список выбранных товаров" : "Подбор товара"}
+          </button>
         )}
         <ProductOrder
           productTableData={getValues("order_products")}
