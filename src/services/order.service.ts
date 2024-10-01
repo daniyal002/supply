@@ -3,8 +3,10 @@ import { IOrderItem, IOrderItemByIdResponse, IOrderItemRequest, IOrderItemReques
 
 export const orderService = {
     async getOrderById (id:string){
-        const response = await axiosWidthAuth.get<IOrderItemByIdResponse>(`/order/get_order_by_id?order_id=${id}`)
-        return response.data.detail
+        if (!isNaN(Number(id)) && Number(id) > 0) {
+            const response = await axiosWidthAuth.get<IOrderItemByIdResponse>(`/order/get_order_by_id?order_id=${id}`)
+            return response.data.detail
+          }
     },
 
     async getUserOrder (){
