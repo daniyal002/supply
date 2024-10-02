@@ -18,6 +18,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { addOrderIndexedDB, db, deleteOrderIndexedDB } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { message } from "antd";
 
 interface Props {
   orderid?: string;
@@ -128,6 +129,7 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
 
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
     console.log(data);
+    if(data.order_products && data.order_products.length > 0){
     const order: IOrderItemRequest = {
       department_id: data.department_id.value,
       employee_id: data.employee_id.value,
@@ -146,7 +148,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       })),
     };
     if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}` && getOrderByIdData) {
-      console.log(orderid?.split("draft")[1])
       order.order_id = Number(orderid);
       updateOrderMutation(order);
       remove(targetKey)
@@ -155,6 +156,9 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       deleteOrderIndexedDB(GetMeData?.user_id as number);
       remove(targetKey)
     }
+  }else{
+    message.warning("Добавьте товары в заявку !")
+  }
   };
 
   useEffect(() => {
