@@ -146,6 +146,7 @@ export default function Tab() {
       activeKey={activeKey}
       onEdit={onEdit}
       items={items}
+      style={{padding:"0 10px"}}
     />
   );
 }

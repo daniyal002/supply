@@ -128,6 +128,7 @@ export default function HeaderOrder({
                   field.onChange({ value: value, label: option.label });
                 }}
                 placeholder="Сотрудник"
+                className={style.formItemSelect}
               />
             )}
           />
@@ -153,6 +154,7 @@ export default function HeaderOrder({
                   field.onChange({ value: value, label: option.label })
                 }
                 placeholder="Подразделение"
+                className={style.formItemSelect}
               />
             )}
           />
@@ -179,6 +181,7 @@ export default function HeaderOrder({
                   field.onChange({ value: value, label: option.label })
                 }
                 placeholder="Группа товара"
+                className={style.formItemSelect}
               />
             )}
           />
