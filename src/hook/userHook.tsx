@@ -43,6 +43,7 @@ export const useCreateUserMutation = () => {
         role_id: data.role?.role_id as number,
       }),
     onSuccess: (newUser) => {
+      message.success(`Пользователь "${newUser.user.login}" успешно создана`)
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
         if (!oldData) return [];
         return [...oldData, newUser.user];
@@ -68,6 +69,7 @@ export const useUpdateUserMutation = () => {
         role_id: data.role?.role_id as number,
       }),
     onSuccess: (updatedEmployee, variables) => {
+      message.success(`Пользователь "${variables.login}" успешно изменен`)
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((users) =>
@@ -95,6 +97,7 @@ export const useDeleteUserMutation = () => {
         role_id: data.role?.role_id as number,
       }),
     onSuccess: (updatedEmployee, variables) => {
+      message.success(`Пользователь "${variables.login}" успешно удален`)
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
         if (!oldData) return [];
         return oldData.filter((users) => users.user_id !== variables.user_id);

@@ -25,6 +25,7 @@ export const useCreateHousingMutation = () => {
     mutationFn: (data: IHousing) =>
       housingService.addHousing(data.housing_name),
     onSuccess: (newHousing) => {
+      message.success(`Корпус "${newHousing.housing.housing_name}" успешно создан`)
       queryClient.setQueryData(
         ["Housings"],
         (oldData: IHousing[] | undefined) => {
@@ -46,6 +47,7 @@ export const useUpdateHousingMutation = () => {
     mutationKey: ["updateHousing"],
     mutationFn: (data: IHousing) => housingService.updateHousing(data),
     onSuccess: (updatedHousing, variables) => {
+      message.success(`Корпус "${variables.housing_name}" успешно изменен`)
       queryClient.setQueryData(
         ["Housings"],
         (oldData: IHousing[] | undefined) => {
@@ -70,6 +72,7 @@ export const useDeleteHousingMutation = () => {
     mutationKey: ["deleteHousing"],
     mutationFn: (data: IHousing) => housingService.deleteHousingById(data),
     onSuccess: (updatedHousing, variables) => {
+      message.success(`Корпус "${variables.housing_name}" успешно удален`)
       queryClient.setQueryData(
         ["Housings"],
         (oldData: IHousing[] | undefined) => {

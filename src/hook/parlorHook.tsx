@@ -30,6 +30,7 @@ export const useCreateParlorMutation = () => {
         floor_id: data.floor?.floor_id as number,
       }),
     onSuccess: (newParlor) => {
+      message.success(`Кабинет "${newParlor.parlor.parlor_name}" успешно создан`)
       queryClient.setQueryData(
         ["Parlors"],
         (oldData: IParlor[] | undefined) => {
@@ -58,6 +59,7 @@ export const useUpdateParlorMutation = () => {
         floor_id: data.floor?.floor_id as number,
       }),
     onSuccess: (updatedParlor, variables) => {
+      message.success(`Кабинет "${variables.parlor_name}" успешно изменен`)
       queryClient.setQueryData(
         ["Parlors"],
         (oldData: IParlor[] | undefined) => {
@@ -88,6 +90,7 @@ export const useDeleteParlorMutation = () => {
         floor_id: data.floor?.floor_id as number,
       }),
     onSuccess: (updatedParlor, variables) => {
+      message.success(`Кабинет "${variables.parlor_name}" успешно удален`)
       queryClient.setQueryData(
         ["Parlors"],
         (oldData: IParlor[] | undefined) => {

@@ -29,6 +29,7 @@ export const useCreateDepartmentMutation = () => {
         housing_id: data.housing?.housing_id as number,
       }),
     onSuccess: (newDepartment) => {
+      message.success(`Подразделение "${newDepartment.department.department_name}" успешно удалено`)
       queryClient.setQueryData(
         ["Departments"],
         (oldData: IDepartment[] | undefined) => {
@@ -49,13 +50,14 @@ export const useUpdateDepartmentMutation = () => {
 
   const { mutate } = useMutation({
     mutationKey: ["updateDepartment"],
-    mutationFn: (data: IDepartment) => 
+    mutationFn: (data: IDepartment) =>
       departmentService.updateDepartment({
         department_id: data.department_id,
         department_name: data.department_name,
         housing_id: data.housing?.housing_id as number,
       }),
     onSuccess: (updatedDepartment, variables) => {
+      message.success(`Подразделение "${variables.department_name}" успешно изменено`)
       queryClient.setQueryData(
         ["Departments"],
         (oldData: IDepartment[] | undefined) => {
@@ -85,6 +87,7 @@ export const useDeleteDepartmentMutation = () => {
         housing_id: data.housing?.housing_id as number,
       }),
     onSuccess: (updatedDepartment, variables) => {
+      message.success(`Подразделение "${variables.department_name}" успешно удалено`)
       queryClient.setQueryData(
         ["Departments"],
         (oldData: IDepartment[] | undefined) => {

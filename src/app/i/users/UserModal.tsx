@@ -31,7 +31,7 @@ export default function UserModal({
   const { userData } = useUserData();
   const { employeeData } = useEmployeeData();
   const { roleData } = useRoleData();
-  
+
   const { mutate: createUserMutation } = useCreateUserMutation();
   const { mutate: updateUserMutation } = useUpdateUserMutation();
 
@@ -126,6 +126,7 @@ export default function UserModal({
             className={style.userPassword}
             {...register("password", {
               required: { message: "Введите пароль", value: true },
+              minLength: { message: "Пароль должен быть не менее 6 символов", value: 6 },
             })}
           />
         </div>
@@ -148,7 +149,7 @@ export default function UserModal({
                 options={optionsEmployee}
                 // @ts-ignore: Unreachable code error
                 onChange={(value, option) => field.onChange({value:value,label:option.label})}
-                placeholder="Сотрудник" 
+                placeholder="Сотрудник"
               />
             )}
           />
@@ -172,7 +173,7 @@ export default function UserModal({
                 options={optionsRole}
                 // @ts-ignore: Unreachable code error
                 onChange={(value, option) => field.onChange({value:value,label:option.label})}
-                placeholder="Роль" 
+                placeholder="Роль"
               />
             )}
           />

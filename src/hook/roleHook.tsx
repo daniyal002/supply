@@ -25,6 +25,7 @@ export const useCreateRoleMutation = () => {
     mutationKey: ["createRole"],
     mutationFn: (data: IRole) => roleService.addRole(data),
     onSuccess: (newRole) => {
+      message.success(`Роль "${newRole.role.role_name}" успешно создана`)
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
@@ -45,6 +46,7 @@ export const useUpdateRoleMutation = () => {
     mutationKey: ["updateRole"],
     mutationFn: (data: IRole) => roleService.updateRole(data),
     onSuccess: (updatedRole, variables) => {
+      message.success(`Роль "${variables.role_name}" успешно изменена`)
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
@@ -67,6 +69,7 @@ export const useDeleteRoleMutation = () => {
     mutationKey: ["deleteRole"],
     mutationFn: (data: IRole) => roleService.deleteRoleById(data),
     onSuccess: (updatedRole, variables) => {
+      message.success(`Роль "${variables.role_name}" успешно удалена`)
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
