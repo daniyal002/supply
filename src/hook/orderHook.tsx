@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { useOrderIdStore } from "../../store/orderIdStore";
 
 export const useGetOrderById = (id: string) => {
   const {
@@ -12,8 +13,9 @@ export const useGetOrderById = (id: string) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["getOrderById"],
+    queryKey: ["getOrderById", id],
     queryFn: () => orderService.getOrderById(id),
+    enabled: !!id,
   });
   return { getOrderByIdData, isLoading, error };
 };
@@ -33,21 +35,22 @@ export const useOrderUserData = () => {
 
 export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
-  const { replace } = useRouter();
+  const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId);
 
   const { mutate } = useMutation({
     mutationKey: ["createOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.addOrder(data),
     onSuccess: (newOrder,variables) => {
-      replace("/");
-
-          // queryClient.setQueryData(
-          //   ["Employees"],
-          //   (oldData: IOrderItem[] | undefined) => {
-          //     if (!oldData) return [];
-          //     return [...oldData, newEmployee.employee];
-          //   }
-          // );
+          setDraftOrderId("0"),
+          queryClient.setQueryData(
+            ["OrderUser"],
+            (oldData: IOrderItem[] | undefined) => {
+              console.log(oldData)
+              console.log(newOrder)
+              if (!oldData) return [];
+              return [...oldData, newOrder.order];
+            }
+          );
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
@@ -59,20 +62,26 @@ export const useCreateOrderMutation = () => {
 export const useUpdateOrderMutation = () => {
   const queryClient = useQueryClient();
   const { replace } = useRouter();
+  const setOrderId = useOrderIdStore(state => state.setOrderId)
 
   const { mutate } = useMutation({
     mutationKey: ["updateOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.updateOrder(data),
-    onSuccess: (newOrder,variables) => {
-      replace("/");
-
-          // queryClient.setQueryData(
-          //   ["Employees"],
-          //   (oldData: IOrderItem[] | undefined) => {
-          //     if (!oldData) return [];
-          //     return [...oldData, newEmployee.employee];
-          //   }
-          // );
+    onSuccess: (newOrder, variables) => {
+      queryClient.invalidateQueries({queryKey:['OrderUser']})
+      setOrderId("0")
+      // queryClient.setQueryData(
+      //   ["OrderUser"],
+      //   (oldData: IOrderItem[] | undefined) => {
+      //     if (!oldData) return [];
+      //     return oldData.map((order) => {
+      //       if (order.order_id === variables.order_id) {
+      //         return newOrder.order;
+      //       }
+      //       return order;
+      //     });
+      //   }
+      // );
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
@@ -102,4 +111,3 @@ export const useDeleteOrderMutation = () => {
   });
   return { mutate };
 };
-

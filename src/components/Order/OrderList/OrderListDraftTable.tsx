@@ -1,19 +1,18 @@
 "use client";
 
-import { Button, Space, Table, TableColumnsType } from "antd";
-import { toast } from "sonner";
+import {  Button, Space, Table, TableColumnsType } from "antd";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import Link from "next/link";
-import { useDeleteOrderMutation } from "@/hook/orderHook";
+import { useOrderIdStore } from "../../../../store/orderIdStore";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
-  onEdit: (id: number) => void;
 }
 
-const OrderListDraftTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
+const OrderListDraftTable: React.FC<OrderListProps> = ({ OrderData}) => {
+  const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId)
 
   const columns: TableColumnsType<IOrderItem> = [
     {
@@ -76,6 +75,8 @@ const OrderListDraftTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) =>
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
           <Link href={`/order/draft${record.order_id}`}>Изменить</Link>
+          <Button onClick={() => setDraftOrderId(String(`draft${record.order_id}`))}>Изменить</Button>
+
         </Space>
       ),
     },

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import style from "./Order.module.scss";
 import {
@@ -17,16 +16,18 @@ import {
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
-import { useGetMe } from "@/hook/userHook";
 import { addOrderIndexedDB, db, deleteOrderIndexedDB } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
 
 interface Props {
   orderid?: string;
   type: "Добавить" | "Изменить";
+  targetKey?:string,
+  remove?:any
+
 }
 
-export default function Order({ orderid, type }: Props) {
+export default function Order({ orderid, type,remove,targetKey }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
   const { mutate: createOrderMutation } = useCreateOrderMutation();
   const { mutate: updateOrderMutation } = useUpdateOrderMutation();
@@ -148,9 +149,11 @@ export default function Order({ orderid, type }: Props) {
       console.log(orderid?.split("draft")[1])
       order.order_id = Number(orderid);
       updateOrderMutation(order);
+      remove(targetKey)
     } else {
       createOrderMutation(order);
       deleteOrderIndexedDB(GetMeData?.user_id as number);
+      remove(targetKey)
     }
   };
 
@@ -163,7 +166,7 @@ export default function Order({ orderid, type }: Props) {
         order_products: undefined,
         product_group:undefined,
       });
-    } else if (orderid !== "newOrder" && orderid !== "draft") {
+    } else if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}`) {
       reset({
         order_id: getOrderByIdData?.order_id,
         employee_id: {
@@ -180,13 +183,12 @@ export default function Order({ orderid, type }: Props) {
         },
         oms: getOrderByIdData?.oms,
         order_route_id: 1,
-        order_status_id: getOrderByIdData?.order_status.order_status_id,
+        order_status_id: getOrderByIdData?.order_status?.order_status_id,
         note: getOrderByIdData?.note,
         order_products: getOrderByIdData?.order_products,
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);
-
   if (orderid === `draft${Number(orderid?.split("draft").join(""))}`) {
     const orderDraftItem = useLiveQuery(() =>
       db.orderItem.get(Number(orderid?.split("draft").join("")))
@@ -196,7 +198,8 @@ export default function Order({ orderid, type }: Props) {
       if (
         orderid !== "newOrder" &&
         orderid === `draft${Number(orderid?.split("draft").join(""))}`
-      ) {
+      )
+      {
         if (orderDraftItem) {
           reset({
             // order_id: orderDraftItem[0]?.order_id,
@@ -224,6 +227,7 @@ export default function Order({ orderid, type }: Props) {
   }
 
   return (
+
     <div className={style.newOrder}>
       <h1>
         {orderid === "newOrder"

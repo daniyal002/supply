@@ -5,17 +5,16 @@ import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import Link from "next/link";
 import { useDeleteOrderMutation } from "@/hook/orderHook";
+import { useOrderIdStore } from "../../../../store/orderIdStore";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
-  onEdit: (id: number) => void;
 }
 
-const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
+const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
   const { mutate: deleteOrderMutation } = useDeleteOrderMutation();
-
+  const setOrderId = useOrderIdStore(state => state.setOrderId)
   const columns: TableColumnsType<IOrderItem> = [
     {
       title: "№",
@@ -83,7 +82,8 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData, onEdit }) => {
       key: "action",
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
-          <Link href={`/order/${record.order_id}`}>Изменить</Link>
+          {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
+          <Button onClick={() => setOrderId(String(record.order_id))}>Изменить</Button>
           <Button
             type="primary"
             danger

@@ -9,8 +9,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import OrderListDraftTable from "./OrderListDraftTable";
 import { IOrderItem } from "@/interface/orderItem";
-import { useGetMe } from "@/hook/userHook";
-import { Button } from "antd";
+
+
 
 export default function OrderList() {
   const { orderUserData } = useOrderUserData();
@@ -25,17 +25,14 @@ export default function OrderList() {
 
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
-  const onEdit = (id: number) => console.log(id);
 
   useEffect(() => {
     const filterOrder = orderDraftItem?.filter(
       (item) => item.user_id === GetMeData?.user_id
     );
     if (filterOrder) {
-      console.log(GetMeData?.user_id);
       setFilterOrderDraftItem(filterOrder as IOrderItem[]);
     }
-    console.log(orderDraftItem);
   }, [orderDraftItem, orderUserData]);
 
   useEffect(() => {
@@ -46,18 +43,15 @@ export default function OrderList() {
     <div className={style.orderList}>
       <Toaster />
       <div className={style.orderListButton}>
-        <Link href={"/order/newOrder"} className={style.newOrderButton}>
-          Создать заявку
-        </Link>
         {filterOrderDraftItem?.length !== 0  && (
           <button  className={style.draftOrderButton} onClick={() => setIsDraft(!isDraft)}>{!isDraft ? "Черновик" : "Все заявки"}</button>
         )}
       </div>
         <p data-text={isDraft ? "Черновик" : "Все заявки"} className={style.orderListText}>{isDraft ? "Черновик" : "Все заявки"}</p>
       {isDraft ? (
-        <OrderListDraftTable OrderData={filterOrderDraftItem} onEdit={onEdit} />
+        <OrderListDraftTable OrderData={filterOrderDraftItem} />
       ) : (
-        <OrderListTable OrderData={orderData} onEdit={onEdit} />
+        <OrderListTable OrderData={orderData} />
       )}
     </div>
   );
