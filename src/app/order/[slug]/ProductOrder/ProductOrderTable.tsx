@@ -70,7 +70,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "action",
       render: (record: IProductTable) => (
         <Space size="middle">
-          <div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:"10px"}}>
             <Button
               onClick={() => {
                 setProductId(record.product.product_id as number);
@@ -82,6 +82,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               Изменить
             </Button>
             <Button
+              danger
+              type="primary"
               onClick={() => {
                 // @ts-ignore: Unreachable code error
                 deleteProduct(record.key);
