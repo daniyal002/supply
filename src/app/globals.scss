@@ -12,5 +12,20 @@
 }
 body{
   height: 100vh;
-  
+}
+
+@media (max-width: 768px) {
+  .ant-picker-dropdown {
+    width: 100% !important;
+    left: 0 !important;
+  }
+
+  .ant-picker-panel-container {
+    display: flex;
+    flex-direction: column; /* или row */
+  }
+
+  .ant-picker-panel {
+    width: 100% !important;
+  }
 }

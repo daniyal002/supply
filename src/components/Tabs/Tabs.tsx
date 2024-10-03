@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import OrderList from "../Order/OrderList/OrderList";
-import { Tabs } from "antd";
+import { ConfigProvider, Tabs } from "antd";
 import Order from "@/app/order/[slug]/Order";
 import { useOrderIdStore } from "../../../store/orderIdStore";
 import { useQueryClient } from "@tanstack/react-query";
@@ -140,13 +140,16 @@ export default function Tab() {
   };
 
   return (
-    <Tabs
-      type="editable-card"
-      onChange={onChange}
-      activeKey={activeKey}
-      onEdit={onEdit}
-      items={items}
-      style={{padding:"0 10px"}}
-    />
+    <ConfigProvider theme={{token:{colorPrimary:"#678098"}}}>
+      <Tabs
+        type="editable-card"
+        onChange={onChange}
+        activeKey={activeKey}
+        onEdit={onEdit}
+        items={items}
+        style={{padding:"0 10px"}}
+      />
+    </ConfigProvider>
+
   );
 }
