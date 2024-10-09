@@ -33,6 +33,14 @@ export const useOrderUserData = () => {
   return { orderUserData, isLoading, error };
 };
 
+export const useOderStatusData = () =>{
+  const {data:oderStatusData, isLoading, error} = useQuery({
+    queryKey: ["OrderStatus"],
+    queryFn: orderService.getOrderStatus,
+    });
+    return {oderStatusData, isLoading, error};
+}
+
 export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
   const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId);

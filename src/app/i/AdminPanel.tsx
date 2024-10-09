@@ -79,6 +79,16 @@ export default function AdminPanel() {
         >
           Должности
         </button>
+        <button
+          onClick={() => push("/i/routes")}
+          className={
+            isActive("/i/routes")
+              ? `${style.adminButton} ${style.active}`
+              : style.adminButton
+          }
+        >
+          Маршруты
+        </button>
       </div>
   );
 }

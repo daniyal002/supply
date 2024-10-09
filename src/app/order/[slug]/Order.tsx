@@ -134,7 +134,7 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       department_id: data.department_id.value,
       employee_id: data.employee_id.value,
       oms: data.oms,
-      order_route_id: 1,
+      order_route_id: 4,
       order_status_id: 1,
       note: data.note,
       product_group_id: data.product_group.value,

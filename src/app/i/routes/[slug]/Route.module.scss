@@ -1,0 +1,57 @@
+.routeForm {
+    // max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .formHeader {
+    margin-bottom: 20px;
+    text-align: center;
+
+    h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+  }
+
+  .stepContainer {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+
+    .stepHeader {
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #555;
+    }
+  }
+
+  .addButton {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+  }
+
+  .submitButton {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+  }
+
+  .stepHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .removeButton {
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    cursor: pointer;
+  }

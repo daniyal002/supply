@@ -8,6 +8,10 @@ export interface IStatusOrder{
   order_status_name:string,
 }
 
+export interface IStatusOrderResponse{
+  detail:IStatusOrder[]
+}
+
 export interface IOrderItem {
     order_id?:number;
     order_number: string;
