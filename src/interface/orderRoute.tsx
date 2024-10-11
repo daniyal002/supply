@@ -1,5 +1,5 @@
 import { IDepartment } from "./department"
-import { IOrderRouteStepRequest } from "./orderRouteStep"
+import { IOrderRouteStepRequest, IOrderRouteStepResponse } from "./orderRouteStep"
 
 export interface IOrderRouteRequest{
     route_id?:number
@@ -8,13 +8,26 @@ export interface IOrderRouteRequest{
 }
 
 export interface IOrderRouteResponse{
+    detail:IOrderRouteResponseDetail[]
+}
+
+export interface IOrderRouteResponseDetail{
     route_id?:number
     route_name:string
-    department_id?:IDepartment
+    department?:IDepartment
 }
 
 export interface IAddRouterRequest {
     route_name: string;
     department_id: number;
     steps: IOrderRouteStepRequest[]
+}
+
+export  interface IOrderRouteByIdResponse {
+    detail:{
+        route_id?:number
+        route_name:string
+        department?:IDepartment
+        steps:IOrderRouteStepResponse[]
+    }
 }

@@ -4,10 +4,11 @@ import { IPost } from "@/interface/post";
 import { Button, Space, Table } from "antd";
 import { toast } from "sonner";
 import { useDeletePostMutation } from "@/hook/postHook";
-import { IOrderRouteRequest, IOrderRouteResponse } from "@/interface/orderRoute";
+import { IOrderRouteRequest, IOrderRouteResponse, IOrderRouteResponseDetail } from "@/interface/orderRoute";
+import { IDepartment } from "@/interface/department";
 
 interface RouteTableProps {
-  routeData: IOrderRouteRequest[] | undefined;
+  routeData: IOrderRouteResponseDetail[] | undefined;
   onEdit: (id: number) => void;
 }
 
@@ -25,9 +26,15 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
       key: "route_name",
     },
     {
+      title: "Подразделение",
+      dataIndex: "department",
+      key: "department",
+      render: (department:IDepartment) => department?.department_name
+    },
+    {
       title: "Действия",
       key: "action",
-      render: (_: any, record: IOrderRouteRequest) => (
+      render: (_: any, record: IOrderRouteResponseDetail) => (
         <Space size="middle">
           <Button type="dashed" onClick={() => onEdit(record.route_id as number)}>
             Изменить

@@ -3,10 +3,11 @@
 import { usePostData } from "@/hook/postHook";
 import { Button } from "antd";
 import { Toaster } from "sonner";
-import PostTable from "./RouteTable";
+import RouteTable from "./RouteTable";
 import { useState } from "react";
 import { IOrderRouteRequest } from "@/interface/orderRoute";
 import Link from "next/link";
+import { useOrderRouteData } from "@/hook/orderRouterHook";
 
 export default function AdminPost() {
   const orderRoutes: IOrderRouteRequest[] = [
@@ -27,7 +28,7 @@ export default function AdminPost() {
     }
 ];
 
-  const { postData } = usePostData();
+  const { orderRouteData } = useOrderRouteData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [postId, setPostId] = useState<number>();
 
@@ -50,7 +51,7 @@ export default function AdminPost() {
       <Toaster />
 
       <Link href="routes/newRoute">Добавить Маршрут</Link>
-      <PostTable routeData={orderRoutes} onEdit={onEdit} />
+      <RouteTable routeData={orderRouteData?.detail} onEdit={onEdit} />
     </div>
   );
 }

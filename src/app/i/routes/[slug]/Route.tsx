@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Input, Select, Button, Form } from 'antd';
 import styles from './Route.module.scss';
@@ -8,18 +8,23 @@ import { useEmployeeData } from '@/hook/employeeHook';
 import { useDepartmentData } from '@/hook/departmentHook';
 import { useOderStatusData } from '@/hook/orderHook';
 import { useProductGroupData } from '@/hook/productHook';
-import { useCreateOrderRouteMutation } from '@/hook/orderRouterHook';
+import { useCreateOrderRouteMutation, useOrderRouteByIdData } from '@/hook/orderRouterHook';
 
 const { Option } = Select;
 
-export default function Route() {
-  const {employeeData} = useEmployeeData()
-  const {departmentData} = useDepartmentData()
-  const {oderStatusData} = useOderStatusData()
-  const {productGroupData} = useProductGroupData()
-  const {mutate} = useCreateOrderRouteMutation()
+interface Props {
+  routeId: string;
+}
 
-  const { control, handleSubmit, watch, setValue } = useForm<IAddRouterRequest>({mode:"onChange"});
+export default function Route({ routeId }: Props) {
+  const { employeeData } = useEmployeeData();
+  const { departmentData } = useDepartmentData();
+  const { oderStatusData } = useOderStatusData();
+  const { productGroupData } = useProductGroupData();
+  const { mutate } = useCreateOrderRouteMutation();
+  const { orderRouteByIdData } = useOrderRouteByIdData(Number(routeId));
+
+  const { control, handleSubmit, watch, setValue } = useForm<IAddRouterRequest>({ mode: "onChange" });
 
   const { fields, append, update, remove } = useFieldArray({
     control,
@@ -27,6 +32,26 @@ export default function Route() {
   });
 
   const watchSteps = watch('steps');
+
+  useEffect(() => {
+    if (orderRouteByIdData && routeId !== "newRoute") {
+      // Set form values using the data retrieved
+      setValue("route_name", orderRouteByIdData.route_name);
+      setValue("department_id", orderRouteByIdData?.department?.department_id as number);
+
+      // Populate steps
+      orderRouteByIdData.steps.forEach((step, index) => {
+        append({
+          employee_id: step.employee.buyer_id as number,
+          step_number: step.step_number,
+          free_or_paid: step.free_or_paid,
+          status_reject_id: step.status_reject_id.order_status_id,
+          status_agreed_id: step.status_agreed_id.order_status_id,
+          product_group_ids: step.product_group_ids.map(pg => pg.product_group_id),
+        });
+      });
+    }
+  }, [orderRouteByIdData, routeId, setValue, append]);
 
   const onStepNumberChange = (index: number, value: number) => {
     const updatedSteps = [...watchSteps];
@@ -37,7 +62,7 @@ export default function Route() {
 
   const onSubmit = (data: any) => {
     console.log(data);
-    mutate(data)
+    mutate(data);
   };
 
   return (
@@ -61,8 +86,10 @@ export default function Route() {
           render={({ field }) => (
             <Select {...field} placeholder="Выберите подразделение">
               {departmentData?.map(department => (
-                   <Option value={department.department_id}>{department.department_name}</Option>
-                  ))}
+                <Option key={department.department_id} value={department.department_id}>
+                  {department.department_name}
+                </Option>
+              ))}
             </Select>
           )}
         />
@@ -79,7 +106,7 @@ export default function Route() {
             >
               ✖
             </Button>
-          </div>
+          </div >
 
           <Form.Item label="Согласующий сотрудник">
             <Controller
@@ -88,9 +115,10 @@ export default function Route() {
               render={({ field }) => (
                 <Select {...field}>
                   {employeeData?.map(employee => (
-                    <Option value={employee.buyer_id}>{employee.buyer_name}</Option>
+                    <Option key={employee.buyer_id} value={employee.buyer_id}>
+                      {employee.buyer_name}
+                    </Option>
                   ))}
-                  {/* Add more employee options as needed */}
                 </Select>
               )}
             />
@@ -136,7 +164,9 @@ export default function Route() {
               render={({ field }) => (
                 <Select {...field}>
                   {oderStatusData?.map(status => (
-                  <Option value={status.order_status_id}>{status.order_status_name}</Option>
+                    <Option key={status.order_status_id} value={status.order_status_id}>
+                      {status.order_status_name}
+                    </Option>
                   ))}
                 </Select>
               )}
@@ -149,8 +179,10 @@ export default function Route() {
               control={control}
               render={({ field }) => (
                 <Select {...field}>
-                   {oderStatusData?.map(status => (
-                  <Option value={status.order_status_id}>{status.order_status_name}</Option>
+                  {oderStatusData?.map(status => (
+                    <Option key={status.order_status_id} value={status.order_status_id}>
+                      {status.order_status_name}
+                    </Option>
                   ))}
                 </Select>
               )}
@@ -163,8 +195,10 @@ export default function Route() {
               control={control}
               render={({ field }) => (
                 <Select {...field} mode="multiple" placeholder="Выберите группу продуктов">
-                  {productGroupData?.map(productGroup =>(
-                    <Option value={productGroup.product_group_id}>{productGroup.product_group_name}</Option>
+                  {productGroupData?.map(productGroup => (
+                    <Option key={productGroup.product_group_id} value={productGroup.product_group_id}>
+                      {productGroup.product_group_name}
+                    </Option>
                   ))}
                 </Select>
               )}
