@@ -1,11 +1,11 @@
 import { IErrorResponse } from "@/interface/error";
 import { IOrderItem } from "@/interface/orderItem";
-import { IAddRouterRequest, IOrderRouteResponse, IOrderRouteResponseDetail } from "@/interface/orderRoute";
+import { IAddRouterRequest, IOrderRouteDeleteRequest, IOrderRouteResponse, IOrderRouteResponseDetail } from "@/interface/orderRoute";
 import { orderRouteService } from "@/services/orderRouter.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import axios, { AxiosError } from "axios";
-// import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 
 
@@ -35,7 +35,7 @@ export const useOrderRouteData = () => {
 
 export const useCreateOrderRouteMutation = () => {
     const queryClient = useQueryClient();
-	// const { replace } = useRouter()
+	const { replace } = useRouter()
 
     const { mutate } = useMutation({
       mutationKey: ["createOrderRoute"],
@@ -48,10 +48,55 @@ export const useCreateOrderRouteMutation = () => {
                 return [...oldData, newOrderRoute];
               }
             );
-            // replace('i/routes')
+            replace('/i/routes')
       },
       onError(error: AxiosError<IErrorResponse>) {
         message.error(error?.response?.data?.detail);
+      },
+    });
+    return { mutate };
+  };
+
+  export const  useUpdateOrderRouteMutation = () => {
+    const queryClient = useQueryClient();
+    const { replace } = useRouter()
+    const { mutate } = useMutation({
+      mutationKey: ["updateOrderRoute"],
+      mutationFn: (data: IAddRouterRequest) => orderRouteService.updateOrderRoute(data),
+      onSuccess: (newOrderRoute,variables) => {
+        queryClient.setQueryData(
+          ["newOrderRoute"],
+          (oldData: IOrderRouteResponseDetail[] | undefined) => {
+            if (!oldData) return [];
+            return oldData.map(orderRoute =>  orderRoute.route_id === variables.route_id ? newOrderRoute : orderRoute);
+
+          }
+        )
+        replace('/i/routes')
+  },
+  })
+  return {mutate}
+};
+
+
+  export const useDeleteOrderRouteMutation = () => {
+    const queryClient = useQueryClient();
+
+    const { mutate } = useMutation({
+      mutationKey: ["deleteOrderRoute"],
+      mutationFn: (data:IOrderRouteDeleteRequest) => orderRouteService.deleteOrderRoute(data),
+      onSuccess: (newOrder,variables) => {
+          queryClient.setQueryData(
+            ["newOrderRoute"],
+            (oldData: IOrderRouteResponseDetail[] | undefined) => {
+              if (!oldData) return [];
+              return oldData.filter((orderRoute) => orderRoute.route_id !== variables.route_id);
+            }
+          );
+      },
+      onError(error: AxiosError<IErrorResponse>) {
+        message.error(error?.response?.data?.detail);
+        console.log(error?.response?.data)
       },
     });
     return { mutate };

@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { useDeletePostMutation } from "@/hook/postHook";
 import { IOrderRouteRequest, IOrderRouteResponse, IOrderRouteResponseDetail } from "@/interface/orderRoute";
 import { IDepartment } from "@/interface/department";
+import { useDeleteOrderRouteMutation } from "@/hook/orderRouterHook";
+import Link from "next/link";
 
 interface RouteTableProps {
   routeData: IOrderRouteResponseDetail[] | undefined;
@@ -13,7 +15,7 @@ interface RouteTableProps {
 }
 
 const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
-
+const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
   const columns = [
     {
       title: "ID",
@@ -36,20 +38,21 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
       key: "action",
       render: (_: any, record: IOrderRouteResponseDetail) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.route_id as number)}>
+          <Link href={`/i/routes/${record.route_id}`}>
             Изменить
-          </Button>
+          </Link>
           <Button
             type="primary"
             danger
             onClick={() =>
-              toast.error("Вы точно хотите удалить должность ?", {
+              toast.error("Вы точно хотите удалить маршрут ?", {
                 style: {
                   color: "red",
                 },
                 action: {
                   label: "Удалить",
-                  onClick: () => console.log(record),
+                  onClick: () => deleteOrderRouteMutation({route_id:record.route_id as number, route_name:record.route_name}),
+
                 },
               })
             }
@@ -65,7 +68,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
     ...route,
     key: route.route_id, // Ensure each item has a unique key
   }));
-
+  console.log(dataSource)
   return <Table dataSource={dataSource} columns={columns} />;
 };
 

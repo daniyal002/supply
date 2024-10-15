@@ -102,7 +102,7 @@ export const useDeleteOrderMutation = () => {
   const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
-    mutationKey: ["updateOrder"],
+    mutationKey: ["deleteOrder"],
     mutationFn: (data: IOrderItemRequestDelete) => orderService.deleteOrderById(data),
     onSuccess: (newOrder,variables) => {
         queryClient.setQueryData(

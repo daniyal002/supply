@@ -51,7 +51,7 @@ export default function AdminPost() {
       <Toaster />
 
       <Link href="routes/newRoute">Добавить Маршрут</Link>
-      <RouteTable routeData={orderRouteData?.detail} onEdit={onEdit} />
+      <RouteTable routeData={orderRouteData} onEdit={onEdit} />
     </div>
   );
 }

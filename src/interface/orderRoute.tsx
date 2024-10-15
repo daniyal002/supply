@@ -18,6 +18,7 @@ export interface IOrderRouteResponseDetail{
 }
 
 export interface IAddRouterRequest {
+    route_id?:number;
     route_name: string;
     department_id: number;
     steps: IOrderRouteStepRequest[]
@@ -30,4 +31,9 @@ export  interface IOrderRouteByIdResponse {
         department?:IDepartment
         steps:IOrderRouteStepResponse[]
     }
+}
+
+export interface IOrderRouteDeleteRequest{
+    route_id:number,
+    route_name:string,
 }

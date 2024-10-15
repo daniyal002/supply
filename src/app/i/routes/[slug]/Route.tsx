@@ -8,7 +8,8 @@ import { useEmployeeData } from '@/hook/employeeHook';
 import { useDepartmentData } from '@/hook/departmentHook';
 import { useOderStatusData } from '@/hook/orderHook';
 import { useProductGroupData } from '@/hook/productHook';
-import { useCreateOrderRouteMutation, useOrderRouteByIdData } from '@/hook/orderRouterHook';
+import { useCreateOrderRouteMutation, useOrderRouteByIdData, useUpdateOrderRouteMutation } from '@/hook/orderRouterHook';
+import { usePathname } from 'next/navigation';
 
 const { Option } = Select;
 
@@ -17,14 +18,16 @@ interface Props {
 }
 
 export default function Route({ routeId }: Props) {
+  const pathname = usePathname()
   const { employeeData } = useEmployeeData();
   const { departmentData } = useDepartmentData();
   const { oderStatusData } = useOderStatusData();
   const { productGroupData } = useProductGroupData();
-  const { mutate } = useCreateOrderRouteMutation();
+  const { mutate:createOrderRouteMutation } = useCreateOrderRouteMutation();
+  const { mutate:updateOrderRouteMutation } = useUpdateOrderRouteMutation();
   const { orderRouteByIdData } = useOrderRouteByIdData(Number(routeId));
 
-  const { control, handleSubmit, watch, setValue } = useForm<IAddRouterRequest>({ mode: "onChange" });
+  const { control, handleSubmit, watch, setValue,reset,getValues } = useForm<IAddRouterRequest>({ mode: "onChange" });
 
   const { fields, append, update, remove } = useFieldArray({
     control,
@@ -33,27 +36,35 @@ export default function Route({ routeId }: Props) {
 
   const watchSteps = watch('steps');
 
-  useEffect(() => {
-    if (orderRouteByIdData && routeId !== "newRoute") {
-      // Set form values using the data retrieved
-      setValue("route_name", orderRouteByIdData.route_name);
-      setValue("department_id", orderRouteByIdData?.department?.department_id as number);
 
-      // Populate steps
-      orderRouteByIdData.steps.forEach((step, index) => {
-        append({
-          employee_id: step.employee.buyer_id as number,
-          step_number: step.step_number,
-          free_or_paid: step.free_or_paid,
-          status_reject_id: step.status_reject_id.order_status_id,
-          status_agreed_id: step.status_agreed_id.order_status_id,
-          product_group_ids: step.product_group_ids.map(pg => pg.product_group_id),
-        });
-      });
+
+  useEffect(()=>{
+    if(orderRouteByIdData && routeId !== "newRoute"){
+      reset({
+        route_name: orderRouteByIdData.route_name,
+        department_id:orderRouteByIdData.department?.department_id,
+        route_id:orderRouteByIdData.route_id,
+        steps: orderRouteByIdData.steps.map(orderRoute => ({
+          employee_id: orderRoute.employee.buyer_id,
+          free_or_paid:orderRoute.free_or_paid,
+          step_number:orderRoute.step_number,
+          status_agreed_id:orderRoute.status_agreed_id.order_status_id,
+          status_reject_id:orderRoute.status_reject_id.order_status_id,
+          product_group_ids:orderRoute.product_group_ids.map(pg => pg.product_group_id),
+        }))
+      })
+    }else{
+      reset({
+        route_id:undefined,
+        route_name:undefined,
+        department_id:undefined,
+        steps:[]
+      })
     }
-  }, [orderRouteByIdData, routeId, setValue, append]);
+  },[orderRouteByIdData, routeId])
 
   const onStepNumberChange = (index: number, value: number) => {
+    if (!watchSteps || !watchSteps.length) return; // Add this check
     const updatedSteps = [...watchSteps];
     updatedSteps[index].step_number = value;
     updatedSteps.sort((a, b) => a.step_number - b.step_number);
@@ -61,12 +72,19 @@ export default function Route({ routeId }: Props) {
   };
 
   const onSubmit = (data: any) => {
-    console.log(data);
-    mutate(data);
+    if (routeId === "newRoute") {
+      createOrderRouteMutation(data)
+    }else{
+      updateOrderRouteMutation({...data, route_id:Number(routeId)})
+    }
   };
 
   return (
-    <Form onFinish={handleSubmit(onSubmit)} className={styles.routeForm} style={{ padding: "20px" }}>
+    <Form
+      onFinish={handleSubmit(onSubmit)}
+      className={styles.routeForm}
+      style={{ padding: "20px" }}
+    >
       <div className={styles.formHeader}>
         <h2>Настройка маршрута</h2>
       </div>
@@ -85,8 +103,11 @@ export default function Route({ routeId }: Props) {
           control={control}
           render={({ field }) => (
             <Select {...field} placeholder="Выберите подразделение">
-              {departmentData?.map(department => (
-                <Option key={department.department_id} value={department.department_id}>
+              {departmentData?.map((department) => (
+                <Option
+                  key={department.department_id}
+                  value={department.department_id}
+                >
                   {department.department_name}
                 </Option>
               ))}
@@ -98,7 +119,11 @@ export default function Route({ routeId }: Props) {
       {fields.map((item, index) => (
         <div key={item.id} className={styles.stepContainer}>
           <div className={styles.stepHeader}>
-            Шаг {watchSteps[index].step_number}
+            {watchSteps && watchSteps[index] ? (
+              <span>Шаг {watchSteps[index].step_number}</span>
+            ) : (
+              <span>Шаг {index + 1}</span>
+            )}
             <Button
               type="text"
               onClick={() => remove(index)}
@@ -106,7 +131,7 @@ export default function Route({ routeId }: Props) {
             >
               ✖
             </Button>
-          </div >
+          </div>
 
           <Form.Item label="Согласующий сотрудник">
             <Controller
@@ -114,7 +139,7 @@ export default function Route({ routeId }: Props) {
               control={control}
               render={({ field }) => (
                 <Select {...field}>
-                  {employeeData?.map(employee => (
+                  {employeeData?.map((employee) => (
                     <Option key={employee.buyer_id} value={employee.buyer_id}>
                       {employee.buyer_name}
                     </Option>
@@ -163,8 +188,11 @@ export default function Route({ routeId }: Props) {
               control={control}
               render={({ field }) => (
                 <Select {...field}>
-                  {oderStatusData?.map(status => (
-                    <Option key={status.order_status_id} value={status.order_status_id}>
+                  {oderStatusData?.map((status) => (
+                    <Option
+                      key={status.order_status_id}
+                      value={status.order_status_id}
+                    >
                       {status.order_status_name}
                     </Option>
                   ))}
@@ -179,8 +207,11 @@ export default function Route({ routeId }: Props) {
               control={control}
               render={({ field }) => (
                 <Select {...field}>
-                  {oderStatusData?.map(status => (
-                    <Option key={status.order_status_id} value={status.order_status_id}>
+                  {oderStatusData?.map((status) => (
+                    <Option
+                      key={status.order_status_id}
+                      value={status.order_status_id}
+                    >
                       {status.order_status_name}
                     </Option>
                   ))}
@@ -194,9 +225,16 @@ export default function Route({ routeId }: Props) {
               name={`steps.${index}.product_group_ids`}
               control={control}
               render={({ field }) => (
-                <Select {...field} mode="multiple" placeholder="Выберите группу продуктов">
-                  {productGroupData?.map(productGroup => (
-                    <Option key={productGroup.product_group_id} value={productGroup.product_group_id}>
+                <Select
+                  {...field}
+                  mode="multiple"
+                  placeholder="Выберите группу продуктов"
+                >
+                  {productGroupData?.map((productGroup) => (
+                    <Option
+                      key={productGroup.product_group_id}
+                      value={productGroup.product_group_id}
+                    >
                       {productGroup.product_group_name}
                     </Option>
                   ))}
@@ -207,19 +245,25 @@ export default function Route({ routeId }: Props) {
         </div>
       ))}
 
-      <Button type="dashed" onClick={() => append({
-        employee_id: 0,
-        step_number: fields.length + 1,
-        free_or_paid: 'free',
-        status_reject_id: 0,
-        status_agreed_id: 0,
-        product_group_ids: []
-      })} className={styles.addButton}>
+      <Button
+        type="dashed"
+        onClick={() =>
+          append({
+            employee_id: 0,
+            step_number: fields.length + 1,
+            free_or_paid: "free",
+            status_reject_id: 0,
+            status_agreed_id: 0,
+            product_group_ids: [],
+          })
+        }
+        className={styles.addButton}
+      >
         Добавить шаг
       </Button>
 
       <Button type="primary" htmlType="submit" className={styles.submitButton}>
-        Сохранить
+        {routeId === "newRoute" ? "Сохранить" : "Изменить"}
       </Button>
     </Form>
   );
