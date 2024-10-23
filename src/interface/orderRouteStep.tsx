@@ -3,6 +3,7 @@ import { IStatusOrder, IStatusOrderResponse } from "./orderItem"
 import { IProductGroup } from "./product"
 
 export interface IOrderRouteStepRequest{
+    // step_id?:number,
     route_id?:number
     employee_id:number
     step_number:number
@@ -18,6 +19,7 @@ export interface IOrderRouteStepProductGroup{
 }
 
 export interface IOrderRouteStepResponse{
+    // step_id?:number,
     route_id?:number
     employee:IEmployee
     step_number:number

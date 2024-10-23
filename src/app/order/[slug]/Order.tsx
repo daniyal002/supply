@@ -133,8 +133,8 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     const order: IOrderItemRequest = {
       department_id: data.department_id.value,
       employee_id: data.employee_id.value,
-      oms: data.oms,
-      order_route_id: 4,
+      oms: data.oms || false,
+      // order_route_id: 4,
       order_status_id: 1,
       note: data.note,
       product_group_id: data.product_group.value,
@@ -149,12 +149,14 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     };
     if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}` && getOrderByIdData) {
       order.order_id = Number(orderid);
-      updateOrderMutation(order);
-      remove(targetKey)
+      updateOrderMutation(order,{onSuccess() {
+        remove(targetKey)
+      },});
     } else {
-      createOrderMutation(order);
+      createOrderMutation(order,{onSuccess(){
+        remove(targetKey)
+      }});
       deleteOrderIndexedDB(GetMeData?.user_id as number);
-      remove(targetKey)
     }
   }else{
     message.warning("Добавьте товары в заявку !")

@@ -33,6 +33,13 @@ export const useOrderUserData = () => {
   return { orderUserData, isLoading, error };
 };
 
+export const useApprovalOrders  = () => {
+  const { data: approvalOrders, isLoading, error } = useQuery({
+    queryKey: ["approvalOrders"],
+    queryFn: orderService.getApprovalOrders,})
+    return {approvalOrders, isLoading, error}
+}
+
 export const useOderStatusData = () =>{
   const {data:oderStatusData, isLoading, error} = useQuery({
     queryKey: ["OrderStatus"],
@@ -59,6 +66,7 @@ export const useCreateOrderMutation = () => {
               return [...oldData, newOrder.order];
             }
           );
+          message.success(newOrder.detail)
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);

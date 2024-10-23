@@ -3,7 +3,7 @@ import { ILoginRequest, ILoginResponse, IRefreshRequest } from "@/interface/auth
 import { removeAccessTokenFromStorage, removeRefreshTokenFromStorage, saveAccessToken, saveRefreshToken } from "./auth-token.service";
 import { userService } from "./user.service";
 import { deleteGetMe } from "@/db/db";
- 
+
 export const authService = {
     async login (body:ILoginRequest){
         const response = await axiosClassic.post<ILoginResponse>('/auth/login',body)
@@ -38,8 +38,14 @@ export const authService = {
     if(response.data.refresh_token){
         saveRefreshToken(response.data.refresh_token)
     }
+    console.log(response)
+    if(response.status === 401){
+        removeAccessTokenFromStorage()
+        removeRefreshTokenFromStorage()
+    }
+
 
       return response.data
     }
 
-} 
+}

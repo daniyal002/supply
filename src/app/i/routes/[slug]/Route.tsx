@@ -45,6 +45,8 @@ export default function Route({ routeId }: Props) {
         department_id:orderRouteByIdData.department?.department_id,
         route_id:orderRouteByIdData.route_id,
         steps: orderRouteByIdData.steps.map(orderRoute => ({
+          route_id:orderRoute.route_id,
+          // step_id:orderRoute.step_id,
           employee_id: orderRoute.employee.buyer_id,
           free_or_paid:orderRoute.free_or_paid,
           step_number:orderRoute.step_number,
@@ -177,6 +179,7 @@ export default function Route({ routeId }: Props) {
                 <Select {...field}>
                   <Option value="free">ОМС</Option>
                   <Option value="paid">ПУ</Option>
+                  <Option value="all">ОМС и ПУ</Option>
                 </Select>
               )}
             />

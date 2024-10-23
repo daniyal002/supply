@@ -1,5 +1,5 @@
 import { axiosWidthAuth } from "@/api/interseptors"
-import { IOrderItem, IOrderItemByIdResponse, IOrderItemRequest, IOrderItemRequestDelete, IOrderItemResponse, IStatusOrderResponse } from "@/interface/orderItem"
+import { IOrderItem, IOrderItemAddResponse, IOrderItemByIdResponse, IOrderItemRequest, IOrderItemRequestDelete, IOrderItemResponse, IStatusOrderResponse } from "@/interface/orderItem"
 
 export const orderService = {
     async getOrderById (id:string){
@@ -8,7 +8,11 @@ export const orderService = {
             return response.data.detail
           }
     },
+    async getApprovalOrders (){
+        const response = await axiosWidthAuth.get<IOrderItemResponse>('/order/get_approval_orders')
+        return response.data.detail
 
+    },
     async getOrderStatus (){
         const response = await axiosWidthAuth.get<IStatusOrderResponse>('/order/get_order_status')
         return response.data.detail
@@ -20,7 +24,7 @@ export const orderService = {
     },
 
     async addOrder(data:IOrderItemRequest){
-        const response = await axiosWidthAuth.post<IOrderItem>('order/add_order',data)
+        const response = await axiosWidthAuth.post<IOrderItemAddResponse>('order/add_order',data)
         return response.data
     },
 

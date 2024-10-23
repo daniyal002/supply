@@ -2,11 +2,12 @@
 
 import { Layout, Menu } from "antd";
 import { useHeaderStore } from "../../../../store/headerStore";
-import { UnorderedListOutlined, UserOutlined } from "@ant-design/icons";
+import { InboxOutlined, UnorderedListOutlined, UserOutlined } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { isRole, protectedRoutes } from "@/helper/ProtectedRoutes";
 import { useEffect, useState } from "react";
 import style from "./Sider.module.scss"
+import { icons } from "lucide-react";
 
 const { Sider } = Layout;
 
@@ -22,7 +23,7 @@ const SiderL: React.FC = () => {
 
   const collapsed = useHeaderStore((state) => state.collapsed);
   const login = useHeaderStore((state) => state.login);
-  const { push } = useRouter(); 
+  const { push } = useRouter();
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
@@ -45,8 +46,17 @@ const SiderL: React.FC = () => {
           push("/i");
         },
       },
+      {
+        key:'3',
+        icon:<InboxOutlined />,
+        label: "Согласования",
+        onClick: () => {
+          push("/approval");
+        }
+      }
+
     ];
-    
+
     const protectedItems = items.filter(item =>
       protectedRoutes.some(protectedI =>
         (protectedI.key === item.key && protectedI.role.includes(role)) || protectedI.key !== item.key

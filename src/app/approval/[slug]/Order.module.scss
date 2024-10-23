@@ -1,0 +1,103 @@
+.newOrder {
+  position: relative;
+  padding: 0 10px;
+  .active {
+    display: flex !important;
+    position: relative;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .selectProductOrder {
+    display: none;
+  }
+  .productOrder {
+    display: none;
+    padding-bottom: 50px;
+  }
+
+  // .buttonOrderCreate {
+  //   width: 10%;
+  //   position: absolute;
+  //   bottom: -20px;
+  //   z-index: 99;
+  //   margin-left: auto;
+  //   margin-right: auto;
+  //   margin-bottom: 25px;
+  //   left: 0;
+  //   right: 0;
+  //   text-align: center;
+  //   @media (max-width: 630px) {
+  //     width: 20%;
+  //   }
+
+  //   color: #fff;
+  //   padding: 10px;
+  //   background-color: #678098;
+  //   text-align: center;
+  //   border-radius: 8px;
+  //   box-shadow: 2px 2px 8px 0.5px #678098;
+  //   transition: 0.2s ease-in;
+  //   border: 0;
+  //   font-size: 16px;
+  //   cursor: pointer;
+  //   &:hover {
+  //     background-color: #606f7e;
+  //     box-shadow: 1px 1px 1px 0.5px #678098;
+  //   }
+  // }
+.commentAndButtons{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  .comment{
+    padding: 10px;
+    border: 1px solid #678098;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+    resize: none;
+    &::placeholder{
+      color: #678098;
+    }
+  }
+  .buttonGroup{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    .buttonOrderApproval {
+      text-align: center;
+      color: #fff;
+      padding: 10px;
+      background-color: #678098;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px 0.5px #678098;
+      transition: 0.2s ease-in;
+      border: 0;
+      font-size: 16px;
+      cursor: pointer;
+      &:hover {
+        background-color: #606f7e;
+        box-shadow: 1px 1px 1px 0.5px #678098;
+      }
+    }
+
+    .buttonOrderApprovalReject{
+      background-color: #c5635c;
+      box-shadow: 2px 2px 8px 0.5px #c5635c;
+      &:hover {
+        background-color: #ac4b44;
+        box-shadow: 1px 1px 1px 0.5px #c5635c;
+      }
+
+    }
+  }
+}
+
+}

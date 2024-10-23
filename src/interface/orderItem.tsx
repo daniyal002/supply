@@ -27,13 +27,17 @@ export interface IOrderItem {
     user_id?:number
   }
 
+  export interface IOrderItemAddResponse{
+    detail:string,
+    order:IOrderItem
+  }
 
   export interface IOrderItemRequest{
     order_id?:number
     order_number?: string,
     oms: boolean,
     order_status_id: number,
-    order_route_id: number,
+    // order_route_id: number,
     employee_id: number,
     department_id: number,
     product_group_id:number,

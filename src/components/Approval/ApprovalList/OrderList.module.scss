@@ -1,0 +1,72 @@
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 10px;
+
+  .orderListText {
+    position: relative;
+    color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #678098;
+    transition: 1s;
+    text-align: left;
+    padding: 5px;
+    animation-name: example;
+    animation-duration: 20s;
+    background-color: #606f7e;
+
+    &::before {
+      content: attr(data-text);
+      position: absolute;
+      overflow: hidden;
+      max-width: 7em;
+      white-space: nowrap;
+      color: #fff;
+      animation: loading 8s linear;
+    }
+  }
+  @keyframes loading {
+    0% {
+      max-width: 0;
+    }
+  }
+
+  .orderListButton {
+    display: flex;
+    gap: 10px;
+    .newOrderButton {
+      text-decoration: none;
+      color: #fff;
+      padding: 10px;
+      background-color: #678098;
+      width: 200px;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px 0.5px #678098;
+      transition: 0.2s ease-in;
+      &:hover {
+        background-color: #606f7e;
+        box-shadow: 1px 1px 1px 0.5px #678098;
+      }
+    }
+
+    .draftOrderButton {
+      color: #fff;
+      padding: 10px;
+      background-color: #678098;
+      width: 200px;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px 0.5px #678098;
+      transition: 0.2s ease-in;
+      border: 0;
+      font-size: 16px;
+      cursor: pointer;
+      &:hover {
+        background-color: #606f7e;
+        box-shadow: 1px 1px 1px 0.5px #678098;
+      }
+    }
+  }
+}

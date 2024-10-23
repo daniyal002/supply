@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { useDeleteOrderMutation } from "@/hook/orderHook";
+import { useApprovalOrders, useDeleteOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -24,12 +24,13 @@ import { useSearch } from "./hook/useSearch";
 import StatusFilter from "./Filters/StatusFilter";
 import CheckboxFilter from "./Filters/CheckboxFilter";
 import SearchFilter from "./Filters/SearchFilter";
+import { useApprovalStore } from "../../../../store/approvalStore";
 
-interface OrderListProps {
+interface ApprovalListProps {
   OrderData: IOrderItem[] | undefined;
 }
 
-const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
+const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
 
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
   const StatusOption = OrderData
@@ -43,8 +44,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
 
 
 
-  const { mutate: deleteOrderMutation } = useDeleteOrderMutation();
-  const setOrderId = useOrderIdStore((state) => state.setOrderId);
+  const setApprovalOrderId = useApprovalStore((state) => state.setApprovalOrderId);
   const columns: TableColumnsType<IOrderItem> = [
     {
       title: "№",
@@ -186,26 +186,8 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       key: "action",
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
-          {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
-          <Button onClick={() => setOrderId(String(record.order_id))}>
-            Изменить
-          </Button>
-          <Button
-            type="primary"
-            danger
-            onClick={() =>
-              toast.error("Вы точно хотите удалить заявку ?", {
-                style: {
-                  color: "red",
-                },
-                action: {
-                  label: "Удалить",
-                  onClick: () => deleteOrderMutation(record),
-                },
-              })
-            }
-          >
-            Удалить
+          <Button onClick={() => setApprovalOrderId(String(record.order_id))}>
+            Просмотр
           </Button>
         </Space>
       ),
@@ -230,4 +212,4 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
   );
 };
 
-export default OrderListTable;
+export default ApprovalListTable;
