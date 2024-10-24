@@ -106,6 +106,50 @@ export const useUpdateOrderMutation = () => {
   return { mutate };
 };
 
+export const useAgreedOrderMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["agreedOrder"],
+    mutationFn: (data:{order_id: number, note:string}) => orderService.agreedOrder(data.order_id,data.note),
+    onSuccess: (agreedOrder, variables) => {
+      queryClient.setQueryData(
+        ["approvalOrders"],
+        (oldData: IOrderItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.filter((order) => order.order_id !== variables.order_id);
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};
+
+export const useRejectOrderMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["rejectOrder"],
+    mutationFn: (data:{order_id: number, note:string}) => orderService.rejectOrder(data.order_id,data.note),
+    onSuccess: (rejectOrder, variables) => {
+      queryClient.setQueryData(
+        ["approvalOrders"],
+        (oldData: IOrderItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.filter((order) => order.order_id !== variables.order_id);
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};
+
 export const useDeleteOrderMutation = () => {
   const queryClient = useQueryClient();
 

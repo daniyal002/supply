@@ -33,44 +33,53 @@ axiosWidthAuth.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
     // Обработка таймаута соединения
     if (error.code === "ERR_NETWORK") {
-        message.error("Ошибка: нет связи с сервером, обратитесь в тех. поддержку")
+      message.error("Ошибка: нет связи с сервером, обратитесь в тех. поддержку");
       return Promise.reject(error);
     }
 
+    // Проверяем статус 401 или 403
     if (
-      (error?.response?.status === 401 || error?.response?.status === 403) &&
+      ((error?.response?.status === 401 || error?.response?.status === 403) && error?.response?.data?.detail !== "Неверный токен обновления.") &&
       !originalRequest._isRetry
     ) {
       originalRequest._isRetry = true;
       const refreshToken = getRefreshToken();
-
       if (!refreshToken) {
+        // Если refresh-токен отсутствует, удаляем токены и перенаправляем на страницу входа
         removeAccessTokenFromStorage();
         removeRefreshTokenFromStorage();
         return window.location.replace("/login");
       }
 
       try {
+        // Пытаемся обновить токен
         const { access_token } = await authService.refresh({
           refresh_token: refreshToken as string,
         });
         saveAccessToken(access_token);
 
-        // Обновляем заголовок оригинального запроса с новым access_token
-        // originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
-
-        // Повторяем оригинальный запрос с новым токеном
+        // Повторяем оригинальный запрос с новым access-токеном
         return axiosWidthAuth(originalRequest);
       } catch (refreshError) {
-        console.error("Error during token refresh:", refreshError);
-        removeAccessTokenFromStorage();
-        removeRefreshTokenFromStorage();
-        return window.location.replace("/login");
+        // Если refresh-токен недействителен, обрабатываем ошибку 401
+        if (refreshError?.response?.status === 401) {
+          console.error("Refresh token is invalid:", refreshError);
+          // Удаляем токены и перенаправляем на страницу входа
+          removeAccessTokenFromStorage();
+          removeRefreshTokenFromStorage();
+          return window.location.replace("/login");
+        } else {
+          // Обработка других ошибок при обновлении токена
+          console.error("Ошибка при обновлении токена:", refreshError);
+          return Promise.reject(refreshError);
+        }
       }
     }
 
+    // Если это не ошибка 401 или 403, просто отклоняем ошибку
     return Promise.reject(error);
   }
 );

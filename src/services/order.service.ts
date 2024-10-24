@@ -33,6 +33,16 @@ export const orderService = {
         return response.data
     },
 
+    async agreedOrder(order_id:number,note:string){
+        const response = await axiosWidthAuth.put<string>(`/order/agreed_order?order_id=${order_id}&note=${note}`)
+        return response.data
+    },
+
+    async rejectOrder(order_id:number,note:string){
+
+        const response = await axiosWidthAuth.put<string>(`/order/reject_order?order_id=${order_id}&note=${note}`)
+        return response.data
+    },
     async deleteOrderById(data:IOrderItemRequestDelete){
         const response = await axiosWidthAuth.delete<string>('order/delete_order_by_id',{data:data},)
         return response.data

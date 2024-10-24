@@ -38,10 +38,10 @@ export const authService = {
     if(response.data.refresh_token){
         saveRefreshToken(response.data.refresh_token)
     }
-    console.log(response)
     if(response.status === 401){
         removeAccessTokenFromStorage()
         removeRefreshTokenFromStorage()
+        window.location.replace("/login");
     }
 
 

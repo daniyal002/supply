@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import style from "./Order.module.scss";
-import { useGetOrderById } from "@/hook/orderHook";
+import { useAgreedOrderMutation, useGetOrderById, useRejectOrderMutation } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   IOrderItemFormValues,
@@ -34,6 +34,22 @@ export default function ApprovalOrder({
     handleSubmit,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const { getOrderByIdData } = useGetOrderById(orderid as string);
+  const {mutate:agreedOrderMutation} = useAgreedOrderMutation()
+  const {mutate:rejectOrderMutation} = useRejectOrderMutation()
+  const [note,  setnote] = React.useState('')
+
+
+  const agreedOrder = (order_id:number) => {
+    agreedOrderMutation({order_id,note},{onSuccess(){
+      remove(targetKey)
+    }})
+  }
+
+  const  rejectOrder = (order_id:number) => {
+    rejectOrderMutation({order_id,note},{onSuccess(){
+      remove(targetKey)
+      }})
+      }
 
   // useEffect(() => {
   //   if (
@@ -199,13 +215,14 @@ export default function ApprovalOrder({
         getValues={getValues}
         setValue={setValue}
       />
-      <div className={style.commentAndButtons}>
-        <textarea placeholder="Комментарий" className={style.comment}/>
+      <div className={style.noteAndButtons}>
+        <textarea placeholder="Комментарий" className={style.note} value={note} onChange={(e)=>setnote(e.target.value)}/>
       <div className={style.buttonGroup}>
 
-        <button className={style.buttonOrderApproval}>Согласовать</button>
+        <button className={style.buttonOrderApproval} onClick={() => agreedOrder(Number(orderid))}>Согласовать</button>
         <button
           className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
+          onClick={() => rejectOrder(Number(orderid))}
           >
           Отклонить
         </button>
