@@ -19,6 +19,7 @@ const options: CreateAxiosDefaults = {
 
 const axiosClassic = axios.create(options);
 const axiosWidthAuth = axios.create(options);
+const axiosOneC = axios.create(options)
 
 axiosWidthAuth.interceptors.request.use((config) => {
   const accessToken = getAccessToken();
@@ -28,6 +29,12 @@ axiosWidthAuth.interceptors.request.use((config) => {
   return config;
 });
 
+
+axiosOneC.interceptors.request.use((config)=>{
+  config.auth = {username:"WebUsr",password:"112233"}
+  config.baseURL = "http://192.168.30.216/UNF_Test/hs/InventoryAccounting"
+  return config
+})
 
 axiosWidthAuth.interceptors.response.use(
   (response) => response,
@@ -93,4 +100,4 @@ axiosWidthAuth.interceptors.response.use(
 //         }
 //     }
 // )
-export { axiosClassic, axiosWidthAuth };
+export { axiosClassic, axiosWidthAuth, axiosOneC };

@@ -18,7 +18,10 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { addOrderIndexedDB, db, deleteOrderIndexedDB } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message } from "antd";
+import { message, Tabs } from "antd";
+import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
+import { TabsProps } from "antd/lib";
+import RouteInfo from "@/components/RouteInfo/RouteInfo";
 
 interface Props {
   orderid?: string;
@@ -44,6 +47,34 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const { getOrderByIdData } = useGetOrderById(orderid as string);
+
+  const items: TabsProps['items'] = [
+    {
+      key: '1',
+      label: 'Выбранные товары',
+      children:  <ProductOrder
+      productTableData={getValues("order_products")}
+      getValues={getValues}
+      setValue={setValue}
+      watch={watch}
+    />,
+    },
+    {
+      key: '2',
+      label: 'История согласования',
+      children: <OrderStepHistory order_id={Number(orderid)}/>
+      ,
+    },
+    {
+      key: '3',
+      label: 'Маршрут',
+      children: <RouteInfo order_id={Number(orderid)}/>,
+    },
+  ];
+
+  const onChange = (key: string) => {
+    console.log(key);
+  };
 
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
@@ -289,12 +320,8 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
             {toggle ? "Список выбранных товаров" : "Подбор товара"}
           </button>
         )}
-        <ProductOrder
-          productTableData={getValues("order_products")}
-          getValues={getValues}
-          setValue={setValue}
-          watch={watch}
-        />
+
+        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
     </div>
   );

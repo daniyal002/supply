@@ -51,6 +51,7 @@ export default function ApprovalList() {
     <div className={style.orderList}>
       <Toaster />
       <ConfigProvider locale={locale} theme={{token:{colorPrimary:"#678098"}}}>
+        <h3>Фильтр по дате</h3>
       <RangePicker
       //@ts-ignore
         value={dateRange}

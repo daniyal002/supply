@@ -2,15 +2,10 @@
 
 import {
   Button,
-  Checkbox,
   ConfigProvider,
-  Input,
-  InputRef,
-  Select,
   Space,
   Table,
   TableColumnsType,
-  TableColumnType,
 } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";

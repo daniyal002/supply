@@ -9,6 +9,9 @@ import {
 } from "@/interface/orderItem";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import ApprovalHeaderOrder from "./ApprovalHeaderOrder";
+import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
+import { message, Tabs, TabsProps } from "antd";
+import RouteInfo from "@/components/RouteInfo/RouteInfo";
 
 interface Props {
   orderid?: string;
@@ -37,7 +40,33 @@ export default function ApprovalOrder({
   const {mutate:agreedOrderMutation} = useAgreedOrderMutation()
   const {mutate:rejectOrderMutation} = useRejectOrderMutation()
   const [note,  setnote] = React.useState('')
+  const items: TabsProps['items'] = [
+    {
+      key: '1',
+      label: 'Выбранные товары',
+      children:  <ProductOrder
+      productTableData={getValues("order_products")}
+      getValues={getValues}
+      setValue={setValue}
+      watch={watch}
+    />,
+    },
+    {
+      key: '2',
+      label: 'История согласования',
+      children: <OrderStepHistory order_id={Number(orderid)}/>
+      ,
+    },
+    {
+      key: '3',
+      label: 'Маршрут',
+      children: <RouteInfo order_id={Number(orderid)}/>,
+    },
+  ];
 
+  const onChange = (key: string) => {
+    console.log(key);
+  };
 
   const agreedOrder = (order_id:number) => {
     agreedOrderMutation({order_id,note},{onSuccess(){
@@ -46,10 +75,16 @@ export default function ApprovalOrder({
   }
 
   const  rejectOrder = (order_id:number) => {
-    rejectOrderMutation({order_id,note},{onSuccess(){
-      remove(targetKey)
+    if(note  === ''){
+      message.warning("Введите комментарий")
+    }else if(note.length < 5){
+      message.warning("Введите корректный комментарий")
+    }else{
+      rejectOrderMutation({order_id,note},{onSuccess(){
+        remove(targetKey)
       }})
-      }
+    }
+  }
 
   // useEffect(() => {
   //   if (
@@ -209,14 +244,10 @@ export default function ApprovalOrder({
            Согласовать
           </button> */}
       {/* </form> */}
-      <ProductOrder
-        productTableData={getValues("order_products")}
-        watch={watch}
-        getValues={getValues}
-        setValue={setValue}
-      />
-      <div className={style.noteAndButtons}>
-        <textarea placeholder="Комментарий" className={style.note} value={note} onChange={(e)=>setnote(e.target.value)}/>
+      <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+
+      <div className={style.commentAndButtons}>
+        <textarea placeholder="Комментарий" className={style.comment} value={note} onChange={(e)=>setnote(e.target.value)}/>
       <div className={style.buttonGroup}>
 
         <button className={style.buttonOrderApproval} onClick={() => agreedOrder(Number(orderid))}>Согласовать</button>

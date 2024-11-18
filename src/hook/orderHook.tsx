@@ -48,6 +48,22 @@ export const useOderStatusData = () =>{
     return {oderStatusData, isLoading, error};
 }
 
+export const useOrderStepHistory = (order_id:number) => {
+  const { data: orderStepHistory, isLoading, error } = useQuery({
+    queryKey: ["OrderStepHistory"],
+    queryFn: () => orderService.getOrderStepHistory(order_id),
+  })
+  return { orderStepHistory, isLoading, error };
+}
+
+export const useOrderRouteSteps = (order_id:number) => {
+  const { data: orderRouteSteps, isLoading, error } = useQuery({
+    queryKey: ["OrderRouteSteps"],
+    queryFn: () => orderService.getOrderRouteSteps(order_id),
+  })
+  return { orderRouteSteps, isLoading, error };
+}
+
 export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
   const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId);

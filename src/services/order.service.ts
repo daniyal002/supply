@@ -1,5 +1,7 @@
 import { axiosWidthAuth } from "@/api/interseptors"
 import { IOrderItem, IOrderItemAddResponse, IOrderItemByIdResponse, IOrderItemRequest, IOrderItemRequestDelete, IOrderItemResponse, IStatusOrderResponse } from "@/interface/orderItem"
+import { IRouteInfoResponse } from "@/interface/routeInfo"
+import { IStepHistoryResponse } from "@/interface/stepHistory"
 
 export const orderService = {
     async getOrderById (id:string){
@@ -21,6 +23,16 @@ export const orderService = {
     async getUserOrder (){
         const response = await axiosWidthAuth.get<IOrderItemResponse>("/order/get_user_order")
         return response.data.detail
+    },
+
+    async getOrderStepHistory (order_id:number){
+        const response = await axiosWidthAuth.get<IStepHistoryResponse>(`/order/get_order_steps_history?order_id=${order_id}`)
+        return response.data.steps_history
+    },
+
+    async getOrderRouteSteps (order_id:number){
+        const response = await axiosWidthAuth.get<IRouteInfoResponse>(`/order/get_order_route_steps?order_id=${order_id}`)
+        return response.data
     },
 
     async addOrder(data:IOrderItemRequest){
