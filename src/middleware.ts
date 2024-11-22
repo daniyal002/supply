@@ -6,11 +6,11 @@ import { cookies } from 'next/headers';
 
 function role() {
     const token = cookies().get("access_token");
-    
+
     if (!token) {
         return null;
     }
-    
+
     try {
         const parse = JSON.parse(Buffer.from(token.value.split('.')[1], 'base64').toString());
         return parse.role
@@ -22,7 +22,7 @@ function role() {
 
 export default function middleware(req: NextRequest) {
     const userRole = role();
-    
+
     for (const item of protectedRoutes) {
         if (req.nextUrl.pathname.startsWith(item.path)) {
             if (!item.role.includes(userRole)) {

@@ -10,8 +10,7 @@ import {
   UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
-import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
-import { useGetMe } from "@/hook/userHook";
+import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
@@ -48,14 +47,21 @@ export default function HeaderOrder({
     }
   },[isProductInTable])
 
-  const optionsProductGroup = Array.from(
-    new Set(
-      productData?.map((product) => ({
-        value: product.product_group.product_group_id,
-        label: product.product_group.product_group_name,
-      }))
-    )
-  );
+  const optionsProductGroupSet = new Set();
+  const optionsProductGroup1 = productData
+    ?.map((product) => product.product_group)
+    .filter((productGroup) => {
+      if (optionsProductGroupSet.has(productGroup.product_group_id)) {
+        return false;
+      } else {
+        optionsProductGroupSet.add(productGroup.product_group_id);
+        return true;
+      }
+    })
+    .map((productGroup) => ({
+      value: productGroup.product_group_id,
+      label: productGroup.product_group_name,
+    })).sort((a, b) => a.label.localeCompare(b.label, 'ru'));
 
   const employeeSet = new Set();
   const optionsEmployee =
@@ -174,7 +180,7 @@ export default function HeaderOrder({
             render={({ field }) => (
               <Select
                 {...field}
-                options={optionsProductGroup}
+                options={optionsProductGroup1}
                 disabled={productSelect}
                 onChange={(value, option) =>
                   // @ts-ignore: Unreachable code error

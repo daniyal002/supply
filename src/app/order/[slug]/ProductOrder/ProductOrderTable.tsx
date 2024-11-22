@@ -12,6 +12,7 @@ interface productOrderTableProps {
   setProductId: (product: number) => void;
   setProductIndex: (key: number) => void;
   deleteProduct: (key: number) => void;
+  setIsNewProduct: (isNewProduct:boolean) => void;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -20,6 +21,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   showModal,
   setProductIndex,
   deleteProduct,
+  setIsNewProduct,
 }) => {
   const columns: TableColumnsType<IProductTable> = [
     {
@@ -31,6 +33,25 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
       },
       render: (product: IProduct) => product?.product_name,
+    },
+
+    {
+      title: "Добавленный товар",
+      dataIndex: "order_product_name",
+      key: "order_product_name",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product.order_product_name.localeCompare(b.product.order_product_name, "ru"),
+      },
+    },
+    {
+      title: "Ссылка товар",
+      dataIndex: "order_product_link",
+      key: "order_product_link",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product.order_product_link.localeCompare(b.product.order_product_link, "ru"),
+      },
     },
 
     {
@@ -73,8 +94,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           <div style={{display:"flex",flexWrap:"wrap",gap:"10px"}}>
             <Button
               onClick={() => {
-                setProductId(record.product.product_id as number);
+                setProductId(record.product ? record.product.product_id as number: NaN);
                 showModal();
+                setIsNewProduct( record.product ? false :true  );
                 // @ts-ignore: Unreachable code error
                 setProductIndex(record.key);
               }}

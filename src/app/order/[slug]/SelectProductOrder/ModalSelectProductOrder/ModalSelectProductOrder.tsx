@@ -25,6 +25,7 @@ interface Props {
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
   editProductId: number | null;
+  isNewProduct:boolean
 }
 
 const ModalSelectProductOrder: React.FC<Props> = ({
@@ -36,6 +37,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   getValues,
   setValue,
   editProductId,
+  isNewProduct
 }) => {
   const {
     register,
@@ -49,7 +51,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const employeeIdWatch = watch("employee_id.value");
-  
+
   const itemProductData = productData?.find(
     (product) => product.product_id === productId
   );
@@ -58,6 +60,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
     console.log(data)
+    console.log(editProductId)
     const unit = itemProductData?.directory_unit_measurement.find(
       (item) =>
         item.unit_measurement.unit_measurement_id === getValuesModal("unit_measurement.value")
@@ -78,7 +81,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
     const products = getValues("order_products") || [];
 
-    if (editProductId !== null) {
+    if (editProductId !== null && editProductId !== undefined ) {
       const updatedProducts = products.map((product, index) =>
         index === editProductId ? productTable : product
       );
@@ -121,6 +124,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         product: undefined,
         buyers: undefined,
         product_quantity: undefined,
+        order_product_link:undefined,
+        order_product_name:undefined,
         unit_measurement: undefined,
         note:undefined,
       });
@@ -138,6 +143,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           value: emp.buyer_id,
           label: emp.buyer_name,
         })),
+        order_product_name:productToEdit?.order_product_name,
+        order_product_link:productToEdit?.order_product_link,
         note:productToEdit?.note,
       });
     }
@@ -174,7 +181,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
   return (
     <Modal
-      title={`${type} ${itemProductData?.product_name}`}
+      title={!isNewProduct ?`${type} ${itemProductData?.product_name}`: "Новый товар"}
       open={isModalOpen}
       onCancel={() => {
         setIsModalOpen(false);
@@ -183,6 +190,55 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       footer={null}
     >
       <form onSubmit={handleSubmit(onSubmit)} className={style.modalForm}>
+        {isNewProduct && (
+          <>
+            <div className={style.formItem}>
+              <label className={style.formItemLabel}>Ссылка на товар</label>
+              <input
+                type="text"
+                placeholder="Ссылка на товар"
+                className={style.modalName}
+                {...register("order_product_link", {
+                  required: {
+                    value: isNewProduct,
+                    message: "Ссылка обязательна",
+                  },
+                  pattern: {
+                    value:
+                      /^https?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$/,
+                    message: "Вводить можно только ссылку",
+                  },
+                })}
+              />
+              {errors.order_product_link && (
+                <p className={style.error}>
+                  {errors.order_product_link.message}
+                </p>
+              )}
+            </div>
+
+            <div className={style.formItem}>
+              <label className={style.formItemLabel}>Наименование товара</label>
+              <input
+                type="text"
+                placeholder="Наименование товара"
+                className={style.modalName}
+                {...register("order_product_name", {
+                  required: {
+                    value: isNewProduct,
+                    message: "Наименование товара обязательна",
+                  },
+                })}
+              />
+              {errors.order_product_name && (
+                <p className={style.error}>
+                  {errors.order_product_name.message}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Количество</label>
           <input
@@ -191,7 +247,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             className={style.modalName}
             {...register("product_quantity", {
               required: { value: true, message: "Количество обязательно" },
-              pattern: {value: /^[0-9]+$/, message: 'Вводить можно только цифры',},
+              pattern: {
+                value: /^[0-9]+$/,
+                message: "Вводить можно только цифры",
+              },
             })}
           />
           {errors.product_quantity && (
@@ -207,7 +266,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             control={control}
             name="unit_measurement"
             rules={{
-              required: { value: true, message: "Выберите Единицу измерения" },
+              required: { value: !isNewProduct, message: "Выберите Единицу измерения" },
             }}
             render={({ field }) => (
               <Select
@@ -239,18 +298,18 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               }}
               render={({ field }) => (
                 <Select
-                {...field}
-                mode="multiple"
-                options={optionsEmployees}
-                placeholder="Врач"
-                onChange={(value, option) => field.onChange(option)}
-              >
-                {optionsEmployees.map(option => (
-                  <Select.Option key={option.key} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </Select>
+                  {...field}
+                  mode="multiple"
+                  options={optionsEmployees}
+                  placeholder="Врач"
+                  onChange={(value, option) => field.onChange(option)}
+                >
+                  {optionsEmployees.map((option) => (
+                    <Select.Option key={option.key} value={option.value}>
+                      {option.label}
+                    </Select.Option>
+                  ))}
+                </Select>
               )}
             />
             {errors.buyers && (

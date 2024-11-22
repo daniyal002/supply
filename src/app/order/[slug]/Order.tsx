@@ -22,13 +22,13 @@ import { message, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
+import { CaretLeftFilled, LeftSquareFilled } from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
   type: "Добавить" | "Изменить";
   targetKey?:string,
   remove?:any
-
 }
 
 export default function Order({ orderid, type,remove,targetKey }: Props) {
@@ -161,6 +161,7 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
     console.log(data);
     if(data.order_products && data.order_products.length > 0){
+
     const order: IOrderItemRequest = {
       department_id: data.department_id.value,
       employee_id: data.employee_id.value,
@@ -169,14 +170,22 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       order_status_id: 1,
       note: data.note,
       product_group_id: data.product_group.value,
-      products: data.order_products.map((product) => ({
-        product_id: product.product.product_id,
-        product_quantity: product.product_quantity,
-        unit_measurement_id: product.unit_measurement.unit_measurement
-          .unit_measurement_id as number,
-        note: product.note,
-        employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
-      })),
+      products: data.order_products.map((product) => {
+        const productData = product.product || {}; // Если product не существует, используем пустой объект
+        const hasOrderProductName = !!product.order_product_name;
+        const hasProductId = !!productData.product_id;
+        return {
+          product_id: hasOrderProductName ? NaN : (hasProductId ? productData.product_id : NaN),
+        order_product_name: hasProductId ? "" : (hasOrderProductName ? product.order_product_name : ""),
+        order_product_link: hasProductId ? "" : (hasOrderProductName ? product.order_product_link : ""),
+          product_quantity: product.product_quantity,
+          // unit_measurement_id: product.unit_measurement.unit_measurement
+          //   .unit_measurement_id as number,
+          unit_measurement_id: 8,
+          note: product.note,
+          employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
+        };
+      }),
     };
     if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}` && getOrderByIdData) {
       order.order_id = Number(orderid);
@@ -264,8 +273,9 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   }
 
   return (
-
     <div className={style.newOrder}>
+      {!toggle ? (
+
       <h1>
         {orderid === "newOrder"
           ? "Новая заявка"
@@ -273,6 +283,7 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
           ? "Черновик"
           : `Заявка №-${getOrderByIdData?.order_number}`}
       </h1>
+      ): (<h1>Выбор товара</h1>)}
 
       <div
         className={
@@ -281,9 +292,21 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
             : style.selectProductOrder
         }
       >
-        <button onClick={() => setToggle(!toggle)} className={style.toggleBtn}>
-          {toggle ? "Список выбранных товаров" : "Подбор товара"}
-        </button>
+        {!toggle ? (
+          <button
+            onClick={() => setToggle(!toggle)}
+            className={style.toggleBtn}
+          >
+            Подбор товара
+          </button>
+        ) : (
+          <LeftSquareFilled
+            title="Назад"
+            onClick={() => setToggle(!toggle)}
+            className={style.toggleBackButton}
+          />
+        )}
+
         <SelectProductOrder
           watch={watch}
           getValues={getValues}
@@ -313,12 +336,20 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
           </button>
         </form>
         {getValues("product_group.value") && (
+         !toggle ? (
           <button
             onClick={() => setToggle(!toggle)}
             className={style.toggleBtn}
           >
-            {toggle ? "Список выбранных товаров" : "Подбор товара"}
+            Подбор товара
           </button>
+        ) : (
+          <LeftSquareFilled
+            title="Назад"
+            onClick={() => setToggle(!toggle)}
+            className={style.toggleBackButton}
+          />
+        )
         )}
 
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />

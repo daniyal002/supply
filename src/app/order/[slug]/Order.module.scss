@@ -71,4 +71,24 @@
     }
 
   }
+
+  .toggleBackButton{
+    width: 30px;
+    color: #fff;
+    padding: 10px;
+    background-color: #678098;
+    text-align: center;
+    border-radius: 8px;
+    // box-shadow: 2px 2px 8px 0.5px #678098;
+    transition: 0.2s ease-in;
+    border: 0;
+    font-size: 30px;
+    cursor: pointer;
+    &:hover {
+      background-color: #606f7e;
+      // box-shadow: 1px 1px 1px 0.5px #678098;
+    }
+
+
+  }
 }

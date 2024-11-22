@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
 import ModalSelectProductOrder from "../SelectProductOrder/ModalSelectProductOrder/ModalSelectProductOrder";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import { Button } from "antd";
 
 interface Props {
   productTableData:IProductTable[];
@@ -15,21 +16,36 @@ interface Props {
 export default function ProductOrder({productTableData,getValues,setValue,watch}:Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
-  const [productIndex,setProductIndex] = useState<number>()
+  const [productIndex,setProductIndex] = useState<number | null>()
+  const [isNewProduct, setIsNewProduct] = useState(false);
+  const [type, setType] = useState<"Добавить" | "Изменить">("Изменить")
+
 
   const showModal = () => {
     setIsModalOpen(true);
+    setIsNewProduct(false)
+    setType('Изменить')
   };
 
+  const showModalIsNewProduct = () => {
+    setType('Добавить')
+    setIsNewProduct(true)
+    setProductIndex(null)
+    setIsModalOpen(true);
+  };
   const deleteProduct = (productIndex:number) => {
     const updatedProducts = getValues("order_products").filter((_, index) => index !== productIndex);
     setValue("order_products", updatedProducts);
   }
 
+  useEffect(()=>{
+    console.log(isNewProduct)
+  },[isNewProduct])
+
   return (
     <>
       <ModalSelectProductOrder
-        type="Изменить"
+        type={type}
         isModalOpen={isModalOpen}
        editProductId={productIndex as number}
        productId={productId}
@@ -37,8 +53,10 @@ export default function ProductOrder({productTableData,getValues,setValue,watch}
        getValues={getValues}
        setValue={setValue}
        watch={watch}
+       isNewProduct={isNewProduct}
       />
-      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct}/>
+      <Button onClick={() => showModalIsNewProduct()} style={{width:"100%", marginBottom:"10px"}}>Добавить новый товар</Button>
+      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct} setIsNewProduct={setIsNewProduct}/>
     </>
   );
 }

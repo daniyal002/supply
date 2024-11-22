@@ -5,6 +5,7 @@ import SelectProductOrderTableColumn from "./SelectProductOrderTable";
 import { useProductData } from "@/hook/productHook";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
+import { Button } from "antd";
 
 
 interface Props{
@@ -18,7 +19,6 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
   const { productData } = useProductData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productId, setProductId] = useState<number>();
-
   const productGroup = watch("product_group")
   const [filterProductData,setFilterProductData] = useState<IProductUnit[]>(productData as IProductUnit[])
 
@@ -47,6 +47,7 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
         getValues={getValues}
         setValue={setValue}
         editProductId={null}
+        isNewProduct={false}
       />
       <SelectProductOrderTableColumn productData={filterProductData ? filterProductData : []} setProductId={setProductId} showModal={showModal}/>
     </>
