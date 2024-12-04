@@ -45,15 +45,6 @@ const SiderL: React.FC = () => {
           push("/i");
         },
       },
-      {
-        key:'3',
-        icon:<InboxOutlined />,
-        label: "Согласования",
-        onClick: () => {
-          push("/approval");
-        }
-      }
-
     ];
 
     const protectedItems = items.filter(item =>

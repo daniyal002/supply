@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import { ConfigProvider, Tabs } from "antd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useApprovalStore } from "../../../store/approvalStore";
-import ApprovalList from "../Approval/ApprovalList/ApprovalList";
 import ApprovalOrder from "@/app/approval/[slug]/ApprovalOrder";
+import { useTabStore } from "../../../store/tabStore";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 export default function ApprovalTabs() {
+  const { tabsApproval, addTabApproval, removeTabApproval, setTabsApproval, activeTabApproval, setActiveTabApproval } = useTabStore();
   const approvalOrderId = useApprovalStore((state) => state.approvalOrderId);
   const setApprovalOrderId = useApprovalStore(
     (state) => state.setApprovalOrderId
@@ -18,11 +19,10 @@ export default function ApprovalTabs() {
 
   const edit = (orderid: string) => {
     const newActiveKey = `order-${orderid}`;
-    const newPanes = [...items];
-    const existingPane = newPanes.find((pane) => pane.key === newActiveKey);
+    const existingPane = tabsApproval.find((pane) => pane.key === newActiveKey);
 
     if (!existingPane) {
-      newPanes.push({
+      const newTab = {
         label: `Заявка №${orderid}`,
         children: (
           <ApprovalOrder
@@ -31,24 +31,19 @@ export default function ApprovalTabs() {
             remove={remove}
             targetKey={newActiveKey}
           />
-        ),
+      ),
         key: newActiveKey,
-        closable: true,
-      });
+      };
+      addTabApproval(newTab); // Добавляем вкладку в глобальное состояние
     }
 
-    setItems(newPanes);
     setActiveKey(newActiveKey);
   };
 
-  const initialItems = [
-    {
-      label: "Заявки на согласовании",
-      children: <ApprovalList />,
-      key: "1",
-      closable: false,
-    },
-  ];
+  useEffect(() => {
+    setTabsApproval(tabsApproval); // Синхронизируем вкладки при монтировании
+  }, [tabsApproval]);
+
 
   useEffect(() => {
     if (approvalOrderId !== "0" && approvalOrderId) {
@@ -56,8 +51,7 @@ export default function ApprovalTabs() {
     }
   }, [approvalOrderId]);
 
-  const [activeKey, setActiveKey] = useState(initialItems[0].key);
-  const [items, setItems] = useState(initialItems);
+  const [activeKey, setActiveKey] = useState(tabsApproval[0].key);
   const newTabIndex = useRef(1);
 
   useEffect(() => {
@@ -72,28 +66,37 @@ export default function ApprovalTabs() {
 
   const onChange = (newActiveKey: string) => {
     setActiveKey(newActiveKey);
+    setActiveTabApproval(newActiveKey)
   };
+
 
   const remove = (targetKey: TargetKey) => {
     let newActiveKey = activeKey;
     let lastIndex = -1;
-    items.forEach((item, i) => {
-      if (item.key === targetKey) {
-        lastIndex = i - 1;
-      }
+
+    // Находим индекс удаляемой вкладки
+    tabsApproval.forEach((item, i) => {
+        if (item.key === targetKey) {
+            lastIndex = i - 1; // Запоминаем индекс предыдущей вкладки
+        }
     });
-    const newPanes = items.filter((item) => item.key !== targetKey);
+
+    // Удаляем вкладку из Zustand store
+    removeTabApproval(targetKey as string);
+
+    // Обновляем активный ключ
+    const newPanes = tabsApproval.filter((item) => item.key !== targetKey);
     if (newPanes.length && newActiveKey === targetKey) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
+        if (lastIndex >= 0) {
+            newActiveKey = newPanes[lastIndex].key; // Устанавливаем предыдущую вкладку как активную
+        } else {
+            newActiveKey = newPanes[0].key; // Устанавливаем первую вкладку как активную
+        }
     }
-    setItems(newPanes);
-    setActiveKey(newActiveKey);
+
+    setActiveKey(newActiveKey); // Обновляем активный ключ
     setApprovalOrderId("0");
-  };
+};
 
   const onEdit = (
     targetKey: React.MouseEvent | React.KeyboardEvent | string,
@@ -112,8 +115,10 @@ export default function ApprovalTabs() {
         onChange={onChange}
         activeKey={activeKey}
         onEdit={onEdit}
-        items={items}
+        items={tabsApproval} // Используем вкладки из глобального состояния
         style={{ padding: "0 10px" }}
+        destroyInactiveTabPane={false}
+        defaultActiveKey={activeTabApproval}
       />
     </ConfigProvider>
   );

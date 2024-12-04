@@ -68,7 +68,6 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
     ...route,
     key: route.route_id, // Ensure each item has a unique key
   }));
-  console.log(dataSource)
   return <Table dataSource={dataSource} columns={columns} />;
 };
 

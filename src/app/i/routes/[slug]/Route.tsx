@@ -9,7 +9,6 @@ import { useDepartmentData } from '@/hook/departmentHook';
 import { useOderStatusData } from '@/hook/orderHook';
 import { useProductGroupData } from '@/hook/productHook';
 import { useCreateOrderRouteMutation, useOrderRouteByIdData, useUpdateOrderRouteMutation } from '@/hook/orderRouterHook';
-import { usePathname } from 'next/navigation';
 
 const { Option } = Select;
 
@@ -18,7 +17,6 @@ interface Props {
 }
 
 export default function Route({ routeId }: Props) {
-  const pathname = usePathname()
   const { employeeData } = useEmployeeData();
   const { departmentData } = useDepartmentData();
   const { oderStatusData } = useOderStatusData();
@@ -27,7 +25,7 @@ export default function Route({ routeId }: Props) {
   const { mutate:updateOrderRouteMutation } = useUpdateOrderRouteMutation();
   const { orderRouteByIdData } = useOrderRouteByIdData(Number(routeId));
 
-  const { control, handleSubmit, watch, setValue,reset,getValues } = useForm<IAddRouterRequest>({ mode: "onChange" });
+  const { control, handleSubmit, watch,reset } = useForm<IAddRouterRequest>({ mode: "onChange" });
 
   const { fields, append, update, remove } = useFieldArray({
     control,

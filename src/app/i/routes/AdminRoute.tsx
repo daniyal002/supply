@@ -9,24 +9,7 @@ import { IOrderRouteRequest } from "@/interface/orderRoute";
 import Link from "next/link";
 import { useOrderRouteData } from "@/hook/orderRouterHook";
 
-export default function AdminPost() {
-  const orderRoutes: IOrderRouteRequest[] = [
-    {
-        route_id: 1,
-        route_name: "Маршрут 1",
-        department_id: 101
-    },
-    {
-        route_id: 2,
-        route_name: "Маршрут 2",
-        department_id: 102
-    },
-    {
-        route_id: 3,
-        route_name: "Маршрут 3",
-        department_id: 103
-    }
-];
+export default function AdminRoute() {
 
   const { orderRouteData } = useOrderRouteData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
