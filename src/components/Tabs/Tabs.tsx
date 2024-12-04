@@ -61,7 +61,7 @@ export default function Tab() {
   ];
 
   useEffect(() => {
-    if (orderId !== "0" && orderId) {
+    if ((orderId !== "0" && orderId !== "newOrder") && orderId) {
       edit(orderId);
     }
   }, [orderId]);
@@ -100,6 +100,7 @@ export default function Tab() {
       closable: true,
     });
   }
+    setOrderId("newOrder")
     setItems(newPanes);
     setActiveKey(newActiveKey);
   };
@@ -138,12 +139,15 @@ export default function Tab() {
     }
   };
 
-  // useEffect(()=>{
-  //   setItems(initialItems); // Сбросьте вкладки к начальным значениям
-  //   setActiveKey(initialItems[0].key); // Установите активную вкладку на первую
-  //   setOrderId("0"); // Сбросьте orderId
-  //   setDraftOrderId("0"); // Сбросьте draftOrderId
-  // },[]);
+  useEffect(()=>{
+    // setItems(initialItems); // Сбросьте вкладки к начальным значениям
+    // setActiveKey(initialItems[0].key); // Установите активную вкладку на первую
+    // setOrderId("0"); // Сбросьте orderId
+    // setDraftOrderId("0"); // Сбросьте draftOrderId
+
+    console.log(activeKey)
+    console.log(items)
+  },[activeKey]);
 
 
   return (

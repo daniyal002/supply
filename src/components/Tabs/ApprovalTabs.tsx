@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ConfigProvider, Tabs } from "antd";
-import Order from "@/app/order/[slug]/Order";
 import { useQueryClient } from "@tanstack/react-query";
 import { useApprovalStore } from "../../../store/approvalStore";
 import ApprovalList from "../Approval/ApprovalList/ApprovalList";

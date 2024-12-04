@@ -7,7 +7,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { isRole, protectedRoutes } from "@/helper/ProtectedRoutes";
 import { useEffect, useState } from "react";
 import style from "./Sider.module.scss"
-import { icons } from "lucide-react";
 
 const { Sider } = Layout;
 

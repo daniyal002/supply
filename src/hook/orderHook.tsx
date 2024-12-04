@@ -76,8 +76,6 @@ export const useCreateOrderMutation = () => {
           queryClient.setQueryData(
             ["OrderUser"],
             (oldData: IOrderItem[] | undefined) => {
-              console.log(oldData)
-              console.log(newOrder)
               if (!oldData) return [];
               return [...oldData, newOrder.order];
             }
