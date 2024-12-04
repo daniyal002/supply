@@ -80,8 +80,6 @@ export default function Tab() {
     const id = activeKey.startsWith('order-') ? activeKey.split('order-')[1] : null;
     if (id) {
       queryClient.invalidateQueries({ queryKey: ['getOrderById',id]});
-      console.log(id);
-
     }
   }, [activeKey]);
 
@@ -114,6 +112,7 @@ export default function Tab() {
         lastIndex = i - 1;
       }
     });
+
     const newPanes = items.filter((item) => item.key !== targetKey);
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
@@ -138,6 +137,14 @@ export default function Tab() {
       remove(targetKey);
     }
   };
+
+  // useEffect(()=>{
+  //   setItems(initialItems); // Сбросьте вкладки к начальным значениям
+  //   setActiveKey(initialItems[0].key); // Установите активную вкладку на первую
+  //   setOrderId("0"); // Сбросьте orderId
+  //   setDraftOrderId("0"); // Сбросьте draftOrderId
+  // },[]);
+
 
   return (
     <ConfigProvider theme={{token:{colorPrimary:"#678098"}}}>

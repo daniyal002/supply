@@ -100,7 +100,8 @@ export default function HeaderOrder({
     })
     .map((parlor) => ({
       value: parlor.department?.department_id,
-      label: `${parlor.department?.department_name}-${parlor.department?.housing?.housing_name}`,
+      // label: `${parlor.department?.department_name}-${parlor.department?.housing?.housing_name}`,
+      label: parlor.department?.department_name,
     }));
   return (
     <div className={style.headerOrder}>

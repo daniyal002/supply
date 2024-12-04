@@ -38,9 +38,6 @@ export default function ProductOrder({productTableData,getValues,setValue,watch}
     setValue("order_products", updatedProducts);
   }
 
-  useEffect(()=>{
-    console.log(isNewProduct)
-  },[isNewProduct])
 
   return (
     <>

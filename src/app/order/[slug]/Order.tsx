@@ -73,7 +73,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   ];
 
   const onChange = (key: string) => {
-    console.log(key);
   };
 
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
@@ -127,7 +126,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
         },
       };
       if (getValues("order_products")) {
-        console.log(getValues("order_products"))
         addOrderIndexedDB(data, userId as number);
       }
     }
@@ -159,7 +157,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   }, [getValues("employee_id")]);
 
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
-    console.log(data);
     if(data.order_products && data.order_products.length > 0){
 
     const order: IOrderItemRequest = {

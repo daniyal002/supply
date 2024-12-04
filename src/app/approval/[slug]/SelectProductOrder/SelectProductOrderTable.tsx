@@ -8,6 +8,7 @@ import { IProductGroup, IProductUnit } from "@/interface/product";
 import { IBasicUnit } from "@/interface/basicUnit";
 import type { InputRef, TableColumnType } from 'antd';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 
 interface ProductTableProps {
   productData: IProductUnit[];
@@ -72,15 +73,11 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
     filterIcon: (filtered: boolean) => (
       <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()),
-    onFilterDropdownOpenChange: visible => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
+    onFilter: (value, record) => {
+      const searchValue = (value as string).toLowerCase();
+      const productName = record.product_name.toString().toLowerCase();
+
+      return filterBySearchText(searchValue, productName);
     },
     render: text =>
       searchedColumn === dataIndex ? (

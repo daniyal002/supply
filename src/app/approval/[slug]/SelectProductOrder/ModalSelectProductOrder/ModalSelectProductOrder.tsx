@@ -49,7 +49,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const employeeIdWatch = watch("employee_id.value");
-  
+
   const itemProductData = productData?.find(
     (product) => product.product_id === productId
   );
@@ -57,7 +57,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
 
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
-    console.log(data)
     const unit = itemProductData?.directory_unit_measurement.find(
       (item) =>
         item.unit_measurement.unit_measurement_id === getValuesModal("unit_measurement.value")
@@ -74,7 +73,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       buyers: doctors,
       unit_measurement: unit,
     };
-    console.log(productTable)
 
     const products = getValues("order_products") || [];
 

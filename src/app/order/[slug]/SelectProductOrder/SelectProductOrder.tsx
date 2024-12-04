@@ -28,14 +28,12 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
 
   useEffect(() => {
     const filteredProductData = productData?.filter(product => product.product_group.product_group_id === getValues("product_group.value"));
-    if (filteredProductData) {
+    if(filteredProductData){
       setFilterProductData(filteredProductData);
-    } else {
+    }else{
       setFilterProductData([]);
     }
-  }, [productGroup]);
-
-
+  }, [productData,productGroup]);
   return (
     <>
       <ModalSelectProductOrder

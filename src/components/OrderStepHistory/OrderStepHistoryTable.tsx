@@ -8,10 +8,11 @@ import {
 
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { useSearch } from "./hook/useSearch";
-import StatusFilter from "./Filters/StatusFilter";
-import SearchFilter from "./Filters/SearchFilter";
 import { IStepHistory } from "@/interface/stepHistory";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 
 interface OrderStepHistoryProps {
   OrderStepHistoryData: IStepHistory[] | undefined;
@@ -45,15 +46,11 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       filterIcon: (filtered: boolean) => (
         <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
       ),
-      onFilter: (value, record) =>
-        record.buyer_name
-          .toString()
-          .toLowerCase()
-          .includes((value as string).toLowerCase()),
-      onFilterDropdownOpenChange: (visible) => {
-        if (visible) {
-          setTimeout(() => searchInput.current?.select(), 100);
-        }
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const buyer_name = record.buyer_name.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, buyer_name);
       },
       render: (text) =>
         searchedColumn === "buyer_name" ? (

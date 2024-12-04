@@ -9,7 +9,7 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import style from "./ModalSelectProductOrder.module.scss";
-import { useProductData } from "@/hook/productHook";
+import { useAllMesument, useProductData } from "@/hook/productHook";
 import { IProductTableFormValues } from "@/interface/productTable";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useGetMe } from "@/hook/userHook";
@@ -48,6 +48,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     getValues: getValuesModal,
   } = useForm<IProductTableFormValues>({ mode: "onChange" });
   const { productData } = useProductData();
+  const {allMesument} = useAllMesument()
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const employeeIdWatch = watch("employee_id.value");
@@ -70,12 +71,12 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         (selectEmployee) => selectEmployee.value === buyer.buyer_id
       )
     );
-
+    const newUnitMesurement = {unit_measurement:{unit_measurement_id: data.unit_measurement.value, unit_measurement_name:data.unit_measurement.label}}
     const productTable = {
       ...data,
       product: itemProductData,
       buyers: doctors,
-      unit_measurement: unit,
+      unit_measurement: isNewProduct ? newUnitMesurement  : unit,
     };
     console.log(productTable)
 
@@ -170,14 +171,23 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       }));
   }, [employees]);
 
-  const optionsUnit = useMemo(
-    () =>
-      itemProductData?.directory_unit_measurement?.map((item) => ({
-        value: item.unit_measurement.unit_measurement_id,
-        label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
-      })) || [],
-    [itemProductData]
-  );
+  const optionsUnit = isNewProduct
+    ? useMemo(
+        () =>
+          allMesument?.map((unit) => ({
+            value: unit.unit_measurement_id,
+            label: unit.unit_measurement_name,
+          })),
+        [allMesument]
+      )
+    : useMemo(
+        () =>
+          itemProductData?.directory_unit_measurement?.map((item) => ({
+            value: item.unit_measurement.unit_measurement_id,
+            label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
+          })) || [],
+        [itemProductData]
+      );
 
   return (
     <Modal

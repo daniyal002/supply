@@ -1,10 +1,14 @@
-import { IBasicUnit } from "@/interface/basicUnit";
 import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
 import { IProductTable, IProductTableRequest } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType } from "antd";
-import { useEffect, useState } from "react";
+import { SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import { useMemo } from "react";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -23,6 +27,24 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   deleteProduct,
   setIsNewProduct,
 }) => {
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+
+  const unitGroup = useMemo(() => {
+    const productSet = new Set();
+    return productTableData?.filter((product) => {
+          if (productSet.has(product.unit_measurement.unit_measurement.unit_measurement_id)) {
+            return false;
+          } else {
+            productSet.add(product.unit_measurement.unit_measurement.unit_measurement_id);
+            return true;
+          }
+      })
+      .map((product) => ({
+        value: product.unit_measurement.unit_measurement.unit_measurement_id,
+        text: product.unit_measurement.unit_measurement.unit_measurement_name,
+      }));
+  }, [productTableData]);
+
   const columns: TableColumnsType<IProductTable> = [
     {
       title: "Товар",
@@ -32,7 +54,37 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) =>
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
       },
-      render: (product: IProduct) => product?.product_name,
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="product_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productName = record.product.product_name.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, productName);
+      },
+      render: (text:IProduct) =>
+        searchedColumn === "product_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text?.product_name ? text?.product_name.toString() : ""}
+          />
+        ) : (
+          text?.product_name
+        ),
     },
 
     {
@@ -41,8 +93,39 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "order_product_name",
       sorter: {
         compare: (a: any, b: any) =>
-          a.product.order_product_name.localeCompare(b.product.order_product_name, "ru"),
+          a?.product?.order_product_name?.localeCompare(b?.product?.order_product_name, "ru"),
       },
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="order_product_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productName = record?.order_product_name?.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, productName as string);
+      },
+      render: (text:string) =>
+        searchedColumn === "order_product_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
     },
     {
       title: "Ссылка товар",
@@ -50,8 +133,39 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "order_product_link",
       sorter: {
         compare: (a: any, b: any) =>
-          a.product.order_product_link.localeCompare(b.product.order_product_link, "ru"),
+          a?.product?.order_product_link?.localeCompare(b?.product?.order_product_link, "ru"),
       },
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="order_product_link"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productLink = record?.order_product_link?.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, productLink as string);
+      },
+      render: (text:string) =>
+        searchedColumn === "order_product_link" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
     },
 
     {
@@ -60,14 +174,17 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "unit_measurement",
       sorter: {
         compare: (a: any, b: any) =>
-          a.unit_measurement?.unit_measurement.name.localeCompare(
-            b.unit_measurement?.unit_measurement.name.name,
+          a.unit_measurement?.unit_measurement.unit_measurement_name.localeCompare(
+            b.unit_measurement?.unit_measurement.unit_measurement_name,
             "ru"
           ),
       },
       render: (unit_measurement: IUnit) =>
         unit_measurement?.unit_measurement?.unit_measurement_name,
       responsive: ["sm"],
+      filters: unitGroup as { text: string; value: number }[],
+      onFilter: (value, record) =>
+        record.unit_measurement.unit_measurement.unit_measurement_id === value,
     },
     {
       title: "Количество",
@@ -124,7 +241,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     key: index, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} />;
+  return <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }}/>;
 };
 
 export default ProductOrderTable;

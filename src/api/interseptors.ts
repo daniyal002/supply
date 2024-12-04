@@ -19,7 +19,7 @@ const options: CreateAxiosDefaults = {
 
 const axiosClassic = axios.create(options);
 const axiosWidthAuth = axios.create(options);
-const axiosOneC = axios.create(options)
+const axiosOneC = axios.create(options);
 
 axiosWidthAuth.interceptors.request.use((config) => {
   const accessToken = getAccessToken();
@@ -29,12 +29,11 @@ axiosWidthAuth.interceptors.request.use((config) => {
   return config;
 });
 
-
-axiosOneC.interceptors.request.use((config)=>{
-  config.auth = {username:"WebUsr",password:"112233"}
-  config.baseURL = "http://192.168.30.216/UNF_Test/hs/InventoryAccounting"
-  return config
-})
+axiosOneC.interceptors.request.use((config) => {
+  config.auth = { username: "WebUsr", password: "112233" };
+  config.baseURL = "http://192.168.30.216/UNF_Test/hs/InventoryAccounting";
+  return config;
+});
 
 axiosWidthAuth.interceptors.response.use(
   (response) => response,
@@ -43,13 +42,15 @@ axiosWidthAuth.interceptors.response.use(
 
     // Обработка таймаута соединения
     if (error.code === "ERR_NETWORK") {
-      message.error("Ошибка: нет связи с сервером, обратитесь в тех. поддержку");
+      message.error(
+        "Ошибка: нет связи с сервером, обратитесь в тех. поддержку"
+      );
       return Promise.reject(error);
     }
 
     // Проверяем статус 401 или 403
     if (
-      ((error?.response?.status === 401 || error?.response?.status === 403) && error?.response?.data?.detail !== "Неверный токен обновления.") &&
+      (error?.response?.status === 401 || error?.response?.status === 403) &&
       !originalRequest._isRetry
     ) {
       originalRequest._isRetry = true;
@@ -71,18 +72,10 @@ axiosWidthAuth.interceptors.response.use(
         // Повторяем оригинальный запрос с новым access-токеном
         return axiosWidthAuth(originalRequest);
       } catch (refreshError) {
-        // Если refresh-токен недействителен, обрабатываем ошибку 401
-        if (refreshError?.response?.status === 401) {
-          console.error("Refresh token is invalid:", refreshError);
-          // Удаляем токены и перенаправляем на страницу входа
-          removeAccessTokenFromStorage();
-          removeRefreshTokenFromStorage();
-          return window.location.replace("/login");
-        } else {
-          // Обработка других ошибок при обновлении токена
-          console.error("Ошибка при обновлении токена:", refreshError);
-          return Promise.reject(refreshError);
-        }
+        console.error("Error during token refresh:", refreshError);
+        removeAccessTokenFromStorage();
+        removeRefreshTokenFromStorage();
+        return window.location.replace("/login");
       }
     }
 

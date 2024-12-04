@@ -2,29 +2,21 @@
 
 import {
   Button,
-  Checkbox,
   ConfigProvider,
-  Input,
-  InputRef,
-  Select,
   Space,
   Table,
   TableColumnsType,
-  TableColumnType,
 } from "antd";
-import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { useApprovalOrders, useDeleteOrderMutation } from "@/hook/orderHook";
-import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { useSearch } from "./hook/useSearch";
-import StatusFilter from "./Filters/StatusFilter";
-import CheckboxFilter from "./Filters/CheckboxFilter";
-import SearchFilter from "./Filters/SearchFilter";
 import { useApprovalStore } from "../../../../store/approvalStore";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
+import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 
 interface ApprovalListProps {
   OrderData: IOrderItem[] | undefined;

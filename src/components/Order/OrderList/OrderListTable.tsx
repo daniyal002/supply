@@ -15,10 +15,10 @@ import { useDeleteOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { useSearch } from "./hook/useSearch";
-import StatusFilter from "./Filters/StatusFilter";
-import CheckboxFilter from "./Filters/CheckboxFilter";
-import SearchFilter from "./Filters/SearchFilter";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
+import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;

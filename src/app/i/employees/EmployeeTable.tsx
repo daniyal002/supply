@@ -6,6 +6,11 @@ import { IParlor } from "@/interface/parlor";
 import { IEmployee } from "@/interface/employee";
 import { IPost } from "@/interface/post";
 import { useDeleteEmployeeMutation } from "@/hook/employeeHook";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import { SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 
 interface EmployeeTableProps {
   employeeData: IEmployee[] | undefined;
@@ -14,27 +19,59 @@ interface EmployeeTableProps {
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) => {
   const { mutate: deleteEmployeeMutation } = useDeleteEmployeeMutation();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
 
   const columns: TableColumnsType<IEmployee> = [
     {
       title: 'ID',
       dataIndex: 'buyer_id',
       key: 'buyer_id',
-      sorter: (a:any, b:any) => a.id - b.id,
+      sorter: (a:any, b:any) => a.buyer_id - b.buyer_id,
     },
-    
+
     {
       title: 'Наименование',
       dataIndex: 'buyer_name',
       key: 'buyer_name',
       sorter: (a: any, b: any) => a.buyer_name.localeCompare(b.buyer_name, 'ru'),
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="buyer_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const buyer_name = record.buyer_name.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, buyer_name);
+      },
+      render: (text) =>
+        searchedColumn === "buyer_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
     },
     {
       title: 'Вид',
       dataIndex: 'buyer_type',
       key: 'buyer_type',
       sorter: (a: any, b: any) => a.buyer_type.localeCompare(b.buyer_type, 'ru'),
-      render:(buyerType) => buyerType === "employee" ? "Сотрудник" : "Кабинет" 
+      render:(buyerType) => buyerType === "employee" ? "Сотрудник" : "Кабинет"
     },
     {
       title: 'Кабинет',
@@ -42,7 +79,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       key: 'parlors',
       sorter: (a: any, b: any) => a.parlors.parlor_name.localeCompare(b.parlors.parlor_name, 'ru'),
       render: (parlors: IParlor[]) => parlors?.map((parlor, index) => (
-        <div key={index}>{parlor?.parlor_name}</div> 
+        <div key={index}>{parlor?.parlor_name}</div>
       ))
     },
     {
@@ -50,7 +87,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       dataIndex: 'post',
       key: 'post',
       sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
-      render: (post: IPost) => post?.post_name // Or any other suitable React element 
+      render: (post: IPost) => post?.post_name // Or any other suitable React element
     },
     {
       title: "Действия",
