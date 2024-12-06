@@ -1,5 +1,5 @@
 import { IErrorResponse } from "@/interface/error";
-import { IOrderItem, IOrderItemRequest, IOrderItemRequestDelete } from "@/interface/orderItem";
+import { IOrderItem, IOrderItemByIdResponse, IOrderItemRequest, IOrderItemRequestDelete } from "@/interface/orderItem";
 import { orderService } from "@/services/order.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
@@ -98,20 +98,21 @@ export const useUpdateOrderMutation = () => {
     mutationKey: ["updateOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.updateOrder(data),
     onSuccess: (newOrder, variables) => {
-      queryClient.invalidateQueries({queryKey:['OrderUser']})
+      // queryClient.invalidateQueries({queryKey:['OrderUser']})
       setOrderId("0")
-      // queryClient.setQueryData(
-      //   ["OrderUser"],
-      //   (oldData: IOrderItem[] | undefined) => {
-      //     if (!oldData) return [];
-      //     return oldData.map((order) => {
-      //       if (order.order_id === variables.order_id) {
-      //         return newOrder.order;
-      //       }
-      //       return order;
-      //     });
-      //   }
-      // );
+      queryClient.setQueryData(
+        ["OrderUser"],
+        (oldData: IOrderItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((order) => {
+            if (order.order_id === variables.order_id) {
+              return newOrder.order;
+            }
+            return order;
+          });
+        }
+      );
+      message.success("Заявка успешно обновлена !")
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
@@ -134,6 +135,7 @@ export const useAgreedOrderMutation = () => {
           return oldData.filter((order) => order.order_id !== variables.order_id);
         }
       );
+      message.success("Заявка успешно согласована !")
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
@@ -156,6 +158,7 @@ export const useRejectOrderMutation = () => {
           return oldData.filter((order) => order.order_id !== variables.order_id);
         }
       );
+      message.success("Заявка успешно отклонена !")
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
@@ -178,10 +181,40 @@ export const useDeleteOrderMutation = () => {
             return oldData.filter((order) => order.order_id !== variables.order_id);
           }
         );
+      message.success("Заявка успешно удалена !")
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
     },
   });
+  return { mutate };
+};
+
+export const useResetOrderMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["resetOrder"],
+    mutationFn: (order_id: number) => orderService.resetOrder(order_id),
+    onSuccess: (newOrder, variables) => {
+      queryClient.setQueryData(
+        ["OrderUser "],
+        (oldData: IOrderItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((order) => {
+            if (order.order_id === variables) {
+              return newOrder.order; // Предполагается, что newOrder содержит обновленный заказ
+            }
+            return order;
+          });
+        }
+      );
+      message.success("Заявка успешно сброшена !")
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
   return { mutate };
 };

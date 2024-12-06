@@ -15,7 +15,7 @@ export const orderService = {
   async getOrderById(id: string) {
     if (!isNaN(Number(id)) && Number(id) > 0) {
       const response = await axiosWidthAuth.get<IOrderItemByIdResponse>(
-        `/order/get_order_by_id?order_id=${id}`
+        `/order/get_order_by_id=${id}`
       );
       return response.data.detail;
     }
@@ -94,4 +94,8 @@ export const orderService = {
     );
     return response.data;
   },
+  async resetOrder(order_id:number){
+    const response = await axiosWidthAuth.put<IOrderItemByIdResponse>('order/reset_order',{order_id:order_id})
+    return response.data
+  }
 };

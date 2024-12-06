@@ -7,6 +7,7 @@ interface Tab {
     key: string;
     label: string;
     children: JSX.Element;
+    closable:boolean
 }
 
 interface ITabStore {
@@ -16,6 +17,7 @@ interface ITabStore {
     setTabsOrders: (tabs: Tab[]) => void;
     activeTabOrders: string;
     setActiveTabOrders: (key: string) => void;
+    deleteTabsOrders: () => void;
 
     tabsApproval: Tab[];
     addTabApproval: (tab: Tab) => void;
@@ -23,7 +25,9 @@ interface ITabStore {
     setTabsApproval: (tabs: Tab[]) => void;
     activeTabApproval: string;
     setActiveTabApproval: (key: string) => void;
-}
+    deleteTabsApproval: () => void;
+
+  }
 
 export const useTabStore = create<ITabStore>()(devtools((set) => ({
     tabsOrders: [
@@ -39,6 +43,14 @@ export const useTabStore = create<ITabStore>()(devtools((set) => ({
     setTabsOrders: (tabs) => set({ tabsOrders:tabs }),
     activeTabOrders: "1",
   setActiveTabOrders: (key) => set({ activeTabOrders: key }),
+  deleteTabsOrders: () => set({ tabsOrders: [
+    {
+      label: "Главная",
+      children: <OrderList />,
+      key: "1",
+      closable: false,
+    },
+  ] }),
 
     tabsApproval: [
         {
@@ -53,5 +65,13 @@ export const useTabStore = create<ITabStore>()(devtools((set) => ({
     setTabsApproval: (tabs) => set({ tabsApproval:tabs }),
     activeTabApproval: "1",
   setActiveTabApproval: (key) => set({ activeTabApproval: key }),
+  deleteTabsApproval: () => set({ tabsApproval: [
+    {
+      label: "Заявки на согласовании",
+      children: <ApprovalList />,
+      key: "1",
+      closable: false,
+    },
+  ] }),
 
 }),{name:"tabsOrders"}));

@@ -23,8 +23,10 @@ export interface IOrderItem {
     oms:true | false,
     department:IDepartment | undefined;
     product_group:IProductGroup,
-    order_products?:IProductTable[];
-    user_id?:number
+    order_products?:IProductTable[],
+    user_id?:number,
+    current_step_container:number | null,
+    in_route: boolean,
   }
 
   export interface IOrderItemAddResponse{

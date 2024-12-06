@@ -22,6 +22,7 @@ interface Props {
   setValue: UseFormSetValue<IOrderItemFormValues>;
   watch: UseFormWatch<IOrderItemFormValues>;
   errors: FieldErrors<IOrderItemFormValues>;
+  disabledOrder:boolean;
 }
 
 export default function HeaderOrder({
@@ -31,6 +32,7 @@ export default function HeaderOrder({
   setValue,
   watch,
   errors,
+  disabledOrder
 }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
@@ -112,7 +114,7 @@ export default function HeaderOrder({
             control={control}
             name="oms"
             render={({ field }) => (
-              <Checkbox {...field} checked={field.value} />
+              <Checkbox {...field} checked={field.value} disabled={disabledOrder}/>
             )}
           />
         </div>
@@ -127,6 +129,7 @@ export default function HeaderOrder({
             render={({ field }) => (
               <Select
                 {...field}
+                disabled={disabledOrder}
                 options={optionsEmployee}
                 onChange={(value, option) => {
                   // @ts-ignore: Unreachable code error
@@ -155,6 +158,7 @@ export default function HeaderOrder({
             render={({ field }) => (
               <Select
                 {...field}
+                disabled={disabledOrder}
                 options={optionsDepartment}
                 onChange={(value, option) =>
                   // @ts-ignore: Unreachable code error
@@ -182,7 +186,7 @@ export default function HeaderOrder({
               <Select
                 {...field}
                 options={optionsProductGroup1}
-                disabled={productSelect}
+                disabled={disabledOrder ? true : productSelect ? true : false  }
                 onChange={(value, option) =>
                   // @ts-ignore: Unreachable code error
                   field.onChange({ value: value, label: option.label })
@@ -203,6 +207,7 @@ export default function HeaderOrder({
           <textarea
             placeholder="Примечание"
             className={style.modalTextArea}
+            disabled={disabledOrder}
             {...register("note")}
           />
         </div>

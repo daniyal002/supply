@@ -5,6 +5,7 @@ import axios, { AxiosError } from 'axios';
 import { IErrorResponse } from "@/interface/error";
 import { useRouter} from "next/navigation";
 import { useHeaderStore } from "../../store/headerStore";
+import { useTabStore } from "../../store/tabStore";
 
 
 export const useLogin = () => {
@@ -28,12 +29,15 @@ export const useLogin = () => {
 
 export const useLogout = () => {
     const { replace } = useRouter()
-
+    const {deleteTabsApproval,deleteTabsOrders} = useTabStore()
     const {mutate, isSuccess, error} = useMutation({
         mutationKey:['logout'],
         mutationFn:() => authService.logout(),
         onSuccess(){
             replace("/login")
+            deleteTabsApproval()
+            deleteTabsOrders()
+
         },
         onError(error:AxiosError<IErrorResponse>){
             alert(error)

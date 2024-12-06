@@ -11,9 +11,10 @@ interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
   getValues:UseFormGetValues<IOrderItemFormValues>;
   setValue:UseFormSetValue<IOrderItemFormValues>
+  disabledOrder:boolean
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch}:Props) {
+export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder}:Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
   const [productIndex,setProductIndex] = useState<number | null>()
@@ -52,8 +53,10 @@ export default function ProductOrder({productTableData,getValues,setValue,watch}
        watch={watch}
        isNewProduct={isNewProduct}
       />
-      <Button onClick={() => showModalIsNewProduct()} style={{width:"100%", marginBottom:"10px"}}>Добавить новый товар</Button>
-      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct} setIsNewProduct={setIsNewProduct}/>
+      {!disabledOrder && (
+        <Button onClick={() => showModalIsNewProduct()} style={{width:"100%", marginBottom:"10px"}}>Добавить новый товар</Button>
+      )}
+      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct} setIsNewProduct={setIsNewProduct} disabledOrder={disabledOrder }/>
     </>
   );
 }

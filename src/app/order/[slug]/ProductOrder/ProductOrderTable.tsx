@@ -17,6 +17,7 @@ interface productOrderTableProps {
   setProductIndex: (key: number) => void;
   deleteProduct: (key: number) => void;
   setIsNewProduct: (isNewProduct:boolean) => void;
+  disabledOrder: boolean
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -26,6 +27,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setProductIndex,
   deleteProduct,
   setIsNewProduct,
+  disabledOrder
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
 
@@ -206,8 +208,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     {
       title: "Действия",
       key: "action",
+
       render: (record: IProductTable) => (
         <Space size="middle">
+          {!disabledOrder && (
+
           <div style={{display:"flex",flexWrap:"wrap",gap:"10px"}}>
             <Button
               onClick={() => {
@@ -231,6 +236,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               Удалить
             </Button>
           </div>
+          )}
         </Space>
       ),
     },

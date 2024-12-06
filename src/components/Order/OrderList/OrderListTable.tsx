@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { useDeleteOrderMutation } from "@/hook/orderHook";
+import { useDeleteOrderMutation, useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -39,6 +39,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
 
 
   const { mutate: deleteOrderMutation } = useDeleteOrderMutation();
+  const { mutate: resetOrderMutation } = useResetOrderMutation()
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
   const columns: TableColumnsType<IOrderItem> = [
     {
@@ -183,25 +184,27 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         <Space size="middle">
           {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
           <Button onClick={() => setOrderId(String(record.order_id))}>
-            Изменить
+            Просмотр
           </Button>
-          <Button
+          {record.in_route && record.current_step_container !== null && (
+            <Button
             type="primary"
             danger
             onClick={() =>
-              toast.error("Вы точно хотите удалить заявку ?", {
+              toast.error("Вы точно хотите сбросить заявку ?", {
                 style: {
                   color: "red",
                 },
                 action: {
-                  label: "Удалить",
-                  onClick: () => deleteOrderMutation(record),
+                  label: "Сбросить",
+                  onClick: () => resetOrderMutation(record.order_id as number),
                 },
               })
             }
           >
-            Удалить
+            Сбросить
           </Button>
+          )}
         </Space>
       ),
     },

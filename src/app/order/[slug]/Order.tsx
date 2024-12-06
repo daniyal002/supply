@@ -47,6 +47,17 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const { getOrderByIdData } = useGetOrderById(orderid as string);
+  const [disabledOrder,setDisabledOrder] = useState<boolean>(false)
+
+  useEffect(()=>{
+    if(orderid && getOrderByIdData){
+      if(getOrderByIdData.current_step_container !== null || (getOrderByIdData.current_step_container == null && getOrderByIdData.in_route === false)){
+        setDisabledOrder(true)
+    }else{
+      setDisabledOrder(false)
+    }
+  }
+  },[getOrderByIdData])
 
   const items: TabsProps['items'] = [
     {
@@ -57,6 +68,7 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       getValues={getValues}
       setValue={setValue}
       watch={watch}
+      disabledOrder={disabledOrder}
     />,
     },
     {
@@ -324,30 +336,39 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
             setValue={setValue}
             watch={watch}
             errors={errors}
+            disabledOrder={disabledOrder}
           />
-          <button type="submit" className={style.buttonOrderCreate}>
+          {!disabledOrder && (
+            <button type="submit" className={style.buttonOrderCreate}>
             {orderid === "newOrder" ||
             orderid === `draft${Number(orderid?.split("draft").join(""))}`
               ? "Создать"
-              : "Изменить"}
+              : "Перезапуск"}
           </button>
+          )}
+
         </form>
-        {getValues("product_group.value") && (
-         !toggle ? (
-          <button
-            onClick={() => setToggle(!toggle)}
-            className={style.toggleBtn}
-          >
-            Подбор товара
-          </button>
-        ) : (
-          <LeftSquareFilled
-            title="Назад"
-            onClick={() => setToggle(!toggle)}
-            className={style.toggleBackButton}
-          />
-        )
-        )}
+        {
+          !disabledOrder && (
+            getValues("product_group.value") && (
+              !toggle ? (
+               <button
+                 onClick={() => setToggle(!toggle)}
+                 className={style.toggleBtn}
+               >
+                 Подбор товара
+               </button>
+             ) : (
+               <LeftSquareFilled
+                 title="Назад"
+                 onClick={() => setToggle(!toggle)}
+                 className={style.toggleBackButton}
+               />
+             )
+             )
+          )
+        }
+
 
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
