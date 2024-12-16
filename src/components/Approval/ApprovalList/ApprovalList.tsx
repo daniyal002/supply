@@ -9,9 +9,7 @@ import { ConfigProvider, DatePicker } from "antd";
 import moment from "moment";
 import locale from 'antd/locale/ru_RU';
 import dayjs from 'dayjs';
-
 import 'dayjs/locale/ru';
-import Link from "next/link";
 
 dayjs.locale('ru_RU');
 

@@ -301,10 +301,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               control={control}
               name="buyers"
               rules={{
-                required: {
-                  value: buyerType === "parlor" ? true : false,
-                  message: "Выберите врача",
-                },
+                // required: {
+                //   value: buyerType === "parlor" ? true : false,
+                //   message: "Выберите врача",
+                // },
               }}
               render={({ field }) => (
                 <Select
@@ -322,9 +322,9 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                 </Select>
               )}
             />
-            {errors.buyers && (
+            {/* {errors.buyers && (
               <p className={style.error}>{errors.buyers.message}</p>
-            )}
+            )} */}
           </div>
         )}
         <div className={style.formItem}>

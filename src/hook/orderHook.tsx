@@ -197,8 +197,9 @@ export const useResetOrderMutation = () => {
     mutationKey: ["resetOrder"],
     mutationFn: (order_id: number) => orderService.resetOrder(order_id),
     onSuccess: (newOrder, variables) => {
+      console.log(newOrder.order, variables)
       queryClient.setQueryData(
-        ["OrderUser "],
+        ["OrderUser"],
         (oldData: IOrderItem[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((order) => {

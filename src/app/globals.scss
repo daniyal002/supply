@@ -27,3 +27,24 @@
     width: 100% !important;
   }
 }
+
+.approval-label{
+  position: relative;
+
+  &::after{
+    content: attr(data-descr);
+    position: absolute;
+    bottom: 8px;
+    // top: 0;
+    right: -18px;
+    font-size: 10px;
+    color: #fff;
+    font-weight: 400;
+    background-color: red;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    text-align: center;
+    font-size: 10px;
+  }
+}

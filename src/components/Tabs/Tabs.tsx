@@ -27,6 +27,7 @@ export default function Tab() {
         label: `Заявка №${orderid}`,
         children: <Order type="Изменить" orderid={orderid} remove={remove} targetKey={newActiveKey} />,
         key: newActiveKey,
+        closable:true,
       };
       addTabOrders(newTab); // Добавляем вкладку в глобальное состояние
     }

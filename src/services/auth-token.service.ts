@@ -2,7 +2,8 @@ import Cookies from 'js-cookie'
 
 export enum EnumTokens {
     'ACCESS_TOKEN' = 'access_token',
-    'REFRESH_TOKEN' = 'refresh_token'
+    'REFRESH_TOKEN' = 'refresh_token',
+    'APPROVAL_COUNT' = 'approval_count',
 }
 
 export const getAccessToken = () => {
@@ -29,4 +30,8 @@ export const saveRefreshToken = (refresh_token: string) => {
 
 export const removeRefreshTokenFromStorage = () => {
     Cookies.remove(EnumTokens.REFRESH_TOKEN)
+}
+
+export const saveApprovalCount = (approval_count: string) => {
+    Cookies.set(EnumTokens.APPROVAL_COUNT,approval_count)
 }

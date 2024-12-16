@@ -10,12 +10,13 @@ import {
 } from "@/interface/orderItem";
 import { IRouteInfoResponse } from "@/interface/routeInfo";
 import { IStepHistoryResponse } from "@/interface/stepHistory";
+import { saveApprovalCount } from "./auth-token.service";
 
 export const orderService = {
   async getOrderById(id: string) {
     if (!isNaN(Number(id)) && Number(id) > 0) {
       const response = await axiosWidthAuth.get<IOrderItemByIdResponse>(
-        `/order/get_order_by_id=${id}`
+        `/order/get_order_by_id?order_id=${id}`
       );
       return response.data.detail;
     }
@@ -24,6 +25,10 @@ export const orderService = {
     const response = await axiosWidthAuth.get<IOrderItemResponse>(
       "/order/get_approval_orders"
     );
+
+    if(response){
+      saveApprovalCount(response.data.detail.length.toString())
+    }
     return response.data.detail;
   },
   async getOrderStatus() {
@@ -67,7 +72,7 @@ export const orderService = {
   },
 
   async updateOrder(data: IOrderItemRequest) {
-    const response = await axiosWidthAuth.put<string>(
+    const response = await axiosWidthAuth.put<IOrderItemAddResponse>(
       "order/update_order",
       data
     );
@@ -76,14 +81,14 @@ export const orderService = {
 
   async agreedOrder(order_id: number, note: string) {
     const response = await axiosWidthAuth.put<string>(
-      `/order/agreed_order?order_id=${order_id}&note=${note}`
+      '/order/agreed_order',{order_id,note}
     );
     return response.data;
   },
 
   async rejectOrder(order_id: number, note: string) {
     const response = await axiosWidthAuth.put<string>(
-      `/order/reject_order?order_id=${order_id}&note=${note}`
+      '/order/reject_order',{order_id,note}
     );
     return response.data;
   },
@@ -95,7 +100,7 @@ export const orderService = {
     return response.data;
   },
   async resetOrder(order_id:number){
-    const response = await axiosWidthAuth.put<IOrderItemByIdResponse>('order/reset_order',{order_id:order_id})
+    const response = await axiosWidthAuth.put<IOrderItemAddResponse>('order/reset_order',{order_id:order_id})
     return response.data
   }
 };

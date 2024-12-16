@@ -33,6 +33,7 @@ export default function ApprovalTabs() {
           />
       ),
         key: newActiveKey,
+        closable:true
       };
       addTabApproval(newTab); // Добавляем вкладку в глобальное состояние
     }
