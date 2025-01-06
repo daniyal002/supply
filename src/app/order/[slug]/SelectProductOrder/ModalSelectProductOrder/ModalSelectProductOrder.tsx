@@ -171,23 +171,19 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       }));
   }, [employees]);
 
-  const optionsUnit = isNewProduct
-    ? useMemo(
-        () =>
-          allMesument?.map((unit) => ({
-            value: unit.unit_measurement_id,
-            label: unit.unit_measurement_name,
-          })),
-        [allMesument]
-      )
-    : useMemo(
-        () =>
-          itemProductData?.directory_unit_measurement?.map((item) => ({
-            value: item.unit_measurement.unit_measurement_id,
-            label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
-          })) || [],
-        [itemProductData]
-      );
+  const optionsUnit = useMemo(() => {
+    if (isNewProduct) {
+      return allMesument?.map((unit) => ({
+        value: unit.unit_measurement_id,
+        label: unit.unit_measurement_name,
+      }));
+    } else {
+      return itemProductData?.directory_unit_measurement?.map((item) => ({
+        value: item.unit_measurement.unit_measurement_id,
+        label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
+      })) || [];
+    }
+  }, [isNewProduct, allMesument, itemProductData]);
 
   return (
     <Modal

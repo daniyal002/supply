@@ -5,7 +5,8 @@ export interface IProduct{
     id?:number,
     product_name:string,
     product_group:string,
-    unit_measurement:IBasicUnit
+    unit_measurement:IBasicUnit,
+    product_article?:string,
 }
 
 export interface IProductGroup{
@@ -28,6 +29,7 @@ export interface IProductUnit{
     unit_measurement: IBasicUnit,
     product_group: IProductGroup
     directory_unit_measurement:IUnit[]
+    product_article?:string
 }
 
 export interface IProductResponse{

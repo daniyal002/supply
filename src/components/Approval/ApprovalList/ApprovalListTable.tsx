@@ -10,7 +10,7 @@ import {
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { SearchOutlined } from "@ant-design/icons";
+import { EyeTwoTone, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useApprovalStore } from "../../../../store/approvalStore";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -179,7 +179,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
           <Button onClick={() => setApprovalOrderId(String(record.order_id))}>
-            Просмотр
+          <EyeTwoTone />
           </Button>
         </Space>
       ),

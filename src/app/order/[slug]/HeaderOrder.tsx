@@ -131,6 +131,10 @@ export default function HeaderOrder({
                 {...field}
                 disabled={disabledOrder}
                 options={optionsEmployee}
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
                 onChange={(value, option) => {
                   // @ts-ignore: Unreachable code error
                   setValue("employee_id.value", value);
@@ -160,6 +164,10 @@ export default function HeaderOrder({
                 {...field}
                 disabled={disabledOrder}
                 options={optionsDepartment}
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
                 onChange={(value, option) =>
                   // @ts-ignore: Unreachable code error
                   field.onChange({ value: value, label: option.label })
@@ -175,23 +183,27 @@ export default function HeaderOrder({
         </div>
 
         <div className={style.formItem}>
-          <label className={style.formItemLabel}>Выберите группу товара</label>
+          <label className={style.formItemLabel}>Выберите категорию товара</label>
           <Controller
             control={control}
             name="product_group"
             rules={{
-              required: { message: "Выберите группу товара", value: true },
+              required: { message: "Выберите категорию товара", value: true },
             }}
             render={({ field }) => (
               <Select
                 {...field}
                 options={optionsProductGroup1}
-                disabled={disabledOrder ? true : productSelect ? true : false  }
+                disabled={disabledOrder ? true : productSelect ? true : false}
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
                 onChange={(value, option) =>
                   // @ts-ignore: Unreachable code error
                   field.onChange({ value: value, label: option.label })
                 }
-                placeholder="Группа товара"
+                placeholder="Категория товара"
                 className={style.formItemSelect}
               />
             )}

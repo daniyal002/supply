@@ -49,6 +49,12 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   const { getOrderByIdData } = useGetOrderById(orderid as string);
   const [disabledOrder,setDisabledOrder] = useState<boolean>(false)
 
+  const orderDraftItem = useLiveQuery(() =>
+    orderid?.startsWith('draft')
+      ? db.orderItem.get(Number(orderid?.split("draft").join("")))
+      : undefined
+  );
+
   useEffect(()=>{
     if(orderid && getOrderByIdData){
       if(getOrderByIdData.current_step_container !== null || (getOrderByIdData.current_step_container == null && getOrderByIdData.in_route === false)){
@@ -244,42 +250,30 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);
-  if (orderid === `draft${Number(orderid?.split("draft").join(""))}`) {
-    const orderDraftItem = useLiveQuery(() =>
-      db.orderItem.get(Number(orderid?.split("draft").join("")))
-    );
 
-    useEffect(() => {
-      if (
-        orderid !== "newOrder" &&
-        orderid === `draft${Number(orderid?.split("draft").join(""))}`
-      )
-      {
-        if (orderDraftItem) {
-          reset({
-            // order_id: orderDraftItem[0]?.order_id,
-            employee_id: {
-              value: orderDraftItem?.buyer?.buyer_id,
-              label: orderDraftItem?.buyer?.buyer_name,
-            },
-            department_id: {
-              value: orderDraftItem?.department?.department_id,
-              label: orderDraftItem?.department?.department_name,
-            },
-            product_group:{
-              value: orderDraftItem?.product_group?.product_group_id,
-              label: orderDraftItem?.product_group?.product_group_name,
-            },
-            oms: orderDraftItem?.oms,
-            order_route_id: 1,
-            order_status_id: orderDraftItem?.order_status.order_status_id,
-            note: orderDraftItem?.note,
-            order_products: orderDraftItem?.order_products,
-          });
-        }
-      }
-    }, [orderDraftItem]);
-  }
+  useEffect(() => {
+    if (orderid?.startsWith('draft') && orderDraftItem) {
+      reset({
+        employee_id: {
+          value: orderDraftItem?.buyer?.buyer_id,
+          label: orderDraftItem?.buyer?.buyer_name,
+        },
+        department_id: {
+          value: orderDraftItem?.department?.department_id,
+          label: orderDraftItem?.department?.department_name,
+        },
+        product_group:{
+          value: orderDraftItem?.product_group?.product_group_id,
+          label: orderDraftItem?.product_group?.product_group_name,
+        },
+        oms: orderDraftItem?.oms,
+        order_route_id: 1,
+        order_status_id: orderDraftItem?.order_status.order_status_id,
+        note: orderDraftItem?.note,
+        order_products: orderDraftItem?.order_products,
+      });
+    }
+  }, [orderDraftItem, orderid]);
 
   return (
     <div className={style.newOrder}>

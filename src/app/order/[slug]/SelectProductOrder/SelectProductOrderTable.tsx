@@ -83,7 +83,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
         ),
     },
     {
-      title: "Группа товаров",
+      title: "Категория товаров",
       dataIndex: "product_group",
       key: "product_group",
       width: "350px",
@@ -98,6 +98,49 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       filters: productGroup,
       onFilter: (value, record) =>
         record.product_group.product_group_id === value,
+    },
+    {
+      title: "Артикул",
+      dataIndex: "product_article",
+      key: "product_article",
+      width: "350px",
+      sorter: (a, b) =>
+        a?.product_article?.localeCompare(
+          b?.product_article ?? '',
+          "ru"
+        ) ?? 0,
+      responsive: ["sm"],
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="product_article"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productName = record.product_article?.toString().toLowerCase() ?? '';
+
+        return filterBySearchText(searchValue, productName);
+      },
+      render: (text) =>
+        searchedColumn === "product_article" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
     },
     {
       title: "Ед. измерения",

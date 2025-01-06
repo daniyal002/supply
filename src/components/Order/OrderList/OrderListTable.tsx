@@ -13,7 +13,7 @@ import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import { useDeleteOrderMutation, useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
-import { SearchOutlined } from "@ant-design/icons";
+import { EyeTwoTone, ReloadOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
@@ -184,7 +184,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         <Space size="middle">
           {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
           <Button onClick={() => setOrderId(String(record.order_id))}>
-            Просмотр
+          <EyeTwoTone />
           </Button>
           {record.in_route && record.current_step_container !== null && (
             <Button
@@ -202,7 +202,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
               })
             }
           >
-            Сбросить
+            <ReloadOutlined />
           </Button>
           )}
         </Space>
