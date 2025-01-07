@@ -138,7 +138,13 @@ export default function Route({ routeId }: Props) {
               name={`steps.${index}.employee_id`}
               control={control}
               render={({ field }) => (
-                <Select {...field}>
+                <Select
+                  {...field}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                >
                   {employeeData?.map((employee) => (
                     <Option key={employee.buyer_id} value={employee.buyer_id}>
                       {employee.buyer_name}

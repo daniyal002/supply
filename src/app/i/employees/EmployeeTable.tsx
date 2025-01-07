@@ -77,7 +77,11 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       title: 'Кабинет',
       dataIndex: 'parlors',
       key: 'parlors',
-      sorter: (a: any, b: any) => a.parlors.parlor_name.localeCompare(b.parlors.parlor_name, 'ru'),
+      sorter: (a: any, b: any) =>
+        (a.parlors?.[0]?.parlor_name ?? '').localeCompare(
+          b.parlors?.[0]?.parlor_name ?? '',
+          'ru'
+        ),
       render: (parlors: IParlor[]) => parlors?.map((parlor, index) => (
         <div key={index}>{parlor?.parlor_name}</div>
       ))

@@ -5,6 +5,12 @@ import { Button, Space, Table } from "antd";
 import { toast } from "sonner";
 import { IHousing } from "@/interface/housing";
 import { useDeleteHousingMutation } from "@/hook/housingHook";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import { SearchOutlined } from "@ant-design/icons";
+import { Key } from "react";
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import Highlighter from "react-highlight-words";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 
 interface PostTableProps {
   housingsData: IHousing[] | undefined;
@@ -13,7 +19,7 @@ interface PostTableProps {
 
 const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
   const { mutate: deletePostMutation } = useDeleteHousingMutation();
-
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
   const columns = [
     {
       title: "ID",
@@ -24,6 +30,37 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
       title: "Корпус",
       dataIndex: "housing_name",
       key: "housing_name",
+      filterDropdown: (props:any) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="housing_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value:boolean|Key, record:IHousing) => {
+        const searchValue = (value as string).toLowerCase();
+        const housing_name = record.housing_name.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, housing_name);
+      },
+      render: (text:string) =>
+        searchedColumn === "housing_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
     },
     {
       title: "Действия",

@@ -147,9 +147,11 @@ export default function UserModal({
               <Select
                 {...field}
                 options={optionsEmployee}
-                // @ts-ignore: Unreachable code error
-                onChange={(value, option) => field.onChange({value:value,label:option.label})}
+                onChange={(value, option:any) => field.onChange({value:value,label:option.label})}
                 placeholder="Сотрудник"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
               />
             )}
           />
