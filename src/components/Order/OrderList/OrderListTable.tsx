@@ -36,9 +36,6 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     })
   : [];
 
-
-
-  const { mutate: deleteOrderMutation } = useDeleteOrderMutation();
   const { mutate: resetOrderMutation } = useResetOrderMutation()
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
   const columns: TableColumnsType<IOrderItem> = [
@@ -48,6 +45,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       key: "order_number",
       sorter: (a: any, b: any) =>
         a.order_number.localeCompare(b.order_number, "ru"),
+      defaultSortOrder: 'descend',
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -72,17 +70,19 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
           setTimeout(() => searchInput.current?.select(), 100);
         }
       },
-      render: (text) =>
-        searchedColumn === "order_number" ? (
+      render: (text) => {
+        const formattedOrderNumber = text ? text.toString().replace(/^0+/, '') : "";
+        return searchedColumn === "order_number" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
             searchWords={[searchText]}
             autoEscape
-            textToHighlight={text ? text.toString() : ""}
+            textToHighlight={formattedOrderNumber}
           />
         ) : (
-          text
-        ),
+          formattedOrderNumber
+        );
+      },
     },
     {
       title: "Дата",
@@ -223,7 +223,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       },
     }}
   >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} />
+    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{pageSize: 10, locale:{items_per_page:"/ Заявок"} }}/>
     </ConfigProvider>
   );
 };

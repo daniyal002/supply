@@ -68,7 +68,7 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
     ...route,
     key: route.route_id, // Ensure each item has a unique key
   }));
-  return <Table dataSource={dataSource} columns={columns} />;
+  return <Table dataSource={dataSource} columns={columns} pagination={{pageSize: 10, locale:{items_per_page:"/ Маршрутов"} }}/>;
 };
 
 export default RouteTable;

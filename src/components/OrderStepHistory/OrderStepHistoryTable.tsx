@@ -132,7 +132,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       },
     }}
   >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} />
+    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{pageSize: 10, locale:{items_per_page:"/ Шагов"} }}/>
     </ConfigProvider>
   );
 };

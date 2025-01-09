@@ -116,7 +116,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
     key: department.department_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} />;
+  return <Table dataSource={dataSource} columns={columns} pagination={{pageSize: 10, locale:{items_per_page:"/ Подразделений"} }} />;
 };
 
 export default DepartmentTable;

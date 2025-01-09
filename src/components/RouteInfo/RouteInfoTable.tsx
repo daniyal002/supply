@@ -56,7 +56,7 @@ const RouteInfoTable: React.FC<RouteInfoProps> = ({ RouteInfoData }) => {
       },
     }}
   >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} rowClassName={rowClassName}/>
+    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} rowClassName={rowClassName} pagination={{pageSize: 10, locale:{items_per_page:"/ Шагов"} }}/>
     </ConfigProvider>
   );
 };

@@ -107,7 +107,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
     key: parlor.parlor_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} />;
+  return <Table dataSource={dataSource} columns={columns} pagination={{pageSize: 10, locale:{items_per_page:"/ Кабинетов"} }}/>;
 };
 
 export default ParlorTable;

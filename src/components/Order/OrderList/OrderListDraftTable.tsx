@@ -88,7 +88,7 @@ const OrderListDraftTable: React.FC<OrderListProps> = ({ OrderData}) => {
   }));
 
   return (
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} />
+    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{pageSize: 10, locale:{items_per_page:"/ Заявок"} }}/>
   );
 };
 
