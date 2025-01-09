@@ -43,6 +43,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       title: "№",
       dataIndex: "order_number",
       key: "order_number",
+      showSorterTooltip: {title:"Сортировка по номеру"},
       sorter: (a: any, b: any) =>
         a.order_number.localeCompare(b.order_number, "ru"),
       defaultSortOrder: 'descend',
@@ -87,6 +88,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "Дата",
       dataIndex: "created_at",
+      showSorterTooltip: {title:"Сортировка по дате"},
       key: "created_at",
       sorter: (a: any, b: any) =>
         a.created_at.localeCompare(b.created_at, "ru"),
@@ -104,6 +106,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     },
     {
         title: "Статус",
+        showSorterTooltip: {title:"Сортировка по статусу"},
         dataIndex: "order_status",
         key: "order_status",
         sorter: (a: any, b: any) =>
@@ -132,15 +135,52 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "Сотрудник/Кабинет",
       dataIndex: "buyer",
+      showSorterTooltip: {title:"Сортировка по сотруднику"},
       key: "buyer",
       sorter: (a: any, b: any) =>
         a.buyer.buyer_name.localeCompare(b.buyer.buyer_name, "ru"),
-      render: (buyer: IEmployee) => buyer?.buyer_name,
       responsive: ["lg"],
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="buyer"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) =>
+        record.buyer?.buyer_name
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase()) || false,
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+      render: (buyer: IEmployee) => {
+        return searchedColumn === "buyer" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={buyer?.buyer_name}
+          />
+        ) : (
+          buyer?.buyer_name
+        );
+      },
     },
     {
       title: "Подразделение",
       dataIndex: "department",
+      showSorterTooltip: {title:"Сортировка по подразделению"},
       key: "department",
       sorter: (a: any, b: any) =>
         a.department_name.localeCompare(b.department_name, "ru"),
@@ -149,6 +189,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "ОМС/ПУ",
       dataIndex: "oms",
+      showSorterTooltip: {title:"Сортировка по ОМС/ПУ"},
       key: "oms",
       // sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
       responsive: ["lg"],
@@ -180,6 +221,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "Действия",
       key: "action",
+      showSorterTooltip: {title:"Действия"},
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
           {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
