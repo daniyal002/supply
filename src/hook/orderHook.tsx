@@ -6,17 +6,29 @@ import { message } from "antd";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useOrderIdStore } from "../../store/orderIdStore";
+import { useEffect } from "react";
 
 export const useGetOrderById = (id: string) => {
+  const queryClient = useQueryClient();
+
   const {
     data: getOrderByIdData,
     isLoading,
     error,
+    isRefetching,
   } = useQuery({
     queryKey: ["getOrderById", id],
     queryFn: () => orderService.getOrderById(id),
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (isRefetching) {
+      queryClient.invalidateQueries({ queryKey: ["OrderStepHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["OrderRouteSteps"] });
+    }
+  }, [isRefetching]);
+
   return { getOrderByIdData, isLoading, error };
 };
 
