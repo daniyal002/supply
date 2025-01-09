@@ -8,10 +8,7 @@ import {
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
-import {
-  IOrderItemFormValues,
-  IOrderItemRequest,
-} from "@/interface/orderItem";
+import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
@@ -21,17 +18,20 @@ import { message, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
-import { LeftSquareFilled } from "@ant-design/icons";
-import { useQueryClient } from "@tanstack/react-query";
+import {
+  LeftSquareFilled,
+  CaretDownOutlined,
+  CaretUpOutlined,
+} from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
   type: "Добавить" | "Изменить";
-  targetKey?:string,
-  remove?:any
+  targetKey?: string;
+  remove?: any;
 }
 
-export default function Order({ orderid, type,remove,targetKey }: Props) {
+export default function Order({ orderid, type, remove, targetKey }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
   const { mutate: createOrderMutation } = useCreateOrderMutation();
   const { mutate: updateOrderMutation } = useUpdateOrderMutation();
@@ -47,50 +47,53 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const { getOrderByIdData } = useGetOrderById(orderid as string);
-  const [disabledOrder,setDisabledOrder] = useState<boolean>(false)
+  const [disabledOrder, setDisabledOrder] = useState<boolean>(false);
 
-  useEffect(()=>{
-    if(orderid && getOrderByIdData){
-      if(getOrderByIdData.current_step_container !== null || (getOrderByIdData.current_step_container == null && getOrderByIdData.in_route === false)){
-        setDisabledOrder(true)
-    }else{
-      setDisabledOrder(false)
+  useEffect(() => {
+    if (orderid && getOrderByIdData) {
+      if (
+        getOrderByIdData.current_step_container !== null ||
+        (getOrderByIdData.current_step_container == null &&
+          getOrderByIdData.in_route === false)
+      ) {
+        setDisabledOrder(true);
+      } else {
+        setDisabledOrder(false);
+      }
     }
-  }
-  },[getOrderByIdData])
+  }, [getOrderByIdData]);
 
-  const items: TabsProps['items'] = [
+  const items: TabsProps["items"] = [
     {
-      key: '1',
-      label: 'Выбранные товары',
-      children:  <ProductOrder
-      productTableData={getValues("order_products")}
-      getValues={getValues}
-      setValue={setValue}
-      watch={watch}
-      disabledOrder={disabledOrder}
-    />,
+      key: "1",
+      label: "Выбранные товары",
+      children: (
+        <ProductOrder
+          productTableData={getValues("order_products")}
+          getValues={getValues}
+          setValue={setValue}
+          watch={watch}
+          disabledOrder={disabledOrder}
+        />
+      ),
     },
     {
-      key: '2',
-      label: 'История согласования',
-      children: <OrderStepHistory order_id={Number(orderid)}/>
-      ,
+      key: "2",
+      label: "История согласования",
+      children: <OrderStepHistory order_id={Number(orderid)} />,
     },
     {
-      key: '3',
-      label: 'Маршрут',
-      children: <RouteInfo order_id={Number(orderid)}/>,
+      key: "3",
+      label: "Маршрут",
+      children: <RouteInfo order_id={Number(orderid)} />,
     },
   ];
 
-  const onChange = (key: string) => {
-  };
+  const onChange = (key: string) => {};
 
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const productsWatch = watch("order_products");
-
 
   useEffect(() => {
     resetField("department_id", { defaultValue: undefined });
@@ -118,46 +121,65 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   }, [getValues("employee_id")]);
 
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
-    if(data.order_products && data.order_products.length > 0){
-
-    const order: IOrderItemRequest = {
-      department_id: data.department_id.value,
-      employee_id: data.employee_id.value,
-      oms: data.oms || false,
-      // order_route_id: 4,
-      order_status_id: 1,
-      note: data.note,
-      product_group_id: data.product_group.value,
-      products: data.order_products.map((product) => {
-        const productData = product.product || {}; // Если product не существует, используем пустой объект
-        const hasOrderProductName = !!product.order_product_name;
-        const hasProductId = !!productData.product_id;
-        return {
-          product_id: hasOrderProductName ? NaN : (hasProductId ? productData.product_id : NaN),
-        order_product_name: hasProductId ? "" : (hasOrderProductName ? product.order_product_name : ""),
-        order_product_link: hasProductId ? "" : (hasOrderProductName ? product.order_product_link : ""),
-          product_quantity: product.product_quantity,
-          // unit_measurement_id: product.unit_measurement.unit_measurement
-          //   .unit_measurement_id as number,
-          unit_measurement_id: 8,
-          note: product.note,
-          employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
-        };
-      }),
-    };
-    if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}` && getOrderByIdData) {
-      order.order_id = Number(orderid);
-      updateOrderMutation(order,{onSuccess() {
-        remove(targetKey)
-      },});
+    if (data.order_products && data.order_products.length > 0) {
+      const order: IOrderItemRequest = {
+        department_id: data.department_id.value,
+        employee_id: data.employee_id.value,
+        oms: data.oms || false,
+        // order_route_id: 4,
+        order_status_id: 1,
+        note: data.note,
+        product_group_id: data.product_group.value,
+        products: data.order_products.map((product) => {
+          const productData = product.product || {}; // Если product не существует, используем пустой объект
+          const hasOrderProductName = !!product.order_product_name;
+          const hasProductId = !!productData.product_id;
+          return {
+            product_id: hasOrderProductName
+              ? NaN
+              : hasProductId
+              ? productData.product_id
+              : NaN,
+            order_product_name: hasProductId
+              ? ""
+              : hasOrderProductName
+              ? product.order_product_name
+              : "",
+            order_product_link: hasProductId
+              ? ""
+              : hasOrderProductName
+              ? product.order_product_link
+              : "",
+            product_quantity: product.product_quantity,
+            // unit_measurement_id: product.unit_measurement.unit_measurement
+            //   .unit_measurement_id as number,
+            unit_measurement_id: 8,
+            note: product.note,
+            employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
+          };
+        }),
+      };
+      if (
+        orderid !== "newOrder" &&
+        orderid !== `draft${orderid?.split("draft")[1]}` &&
+        getOrderByIdData
+      ) {
+        order.order_id = Number(orderid);
+        updateOrderMutation(order, {
+          onSuccess() {
+            remove(targetKey);
+          },
+        });
+      } else {
+        createOrderMutation(order, {
+          onSuccess() {
+            remove(targetKey);
+          },
+        });
+      }
     } else {
-      createOrderMutation(order,{onSuccess(){
-        remove(targetKey)
-      }});
+      message.warning("Добавьте товары в заявку !");
     }
-  }else{
-    message.warning("Добавьте товары в заявку !")
-  }
   };
 
   useEffect(() => {
@@ -167,9 +189,12 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
         department_id: undefined,
         oms: false,
         order_products: undefined,
-        product_group:undefined,
+        product_group: undefined,
       });
-    } else if (orderid !== "newOrder" && orderid !== `draft${orderid?.split("draft")[1]}`) {
+    } else if (
+      orderid !== "newOrder" &&
+      orderid !== `draft${orderid?.split("draft")[1]}`
+    ) {
       reset({
         order_id: getOrderByIdData?.order_id,
         employee_id: {
@@ -193,19 +218,19 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     }
   }, [reset, type, orderid, getOrderByIdData]);
 
-
   return (
     <div className={style.newOrder}>
       {!toggle ? (
-
-      <h1>
-        {orderid === "newOrder"
-          ? "Новая заявка"
-          : orderid === `draft${Number(orderid?.split("draft").join(""))}`
-          ? "Черновик"
-          : `Заявка №-${getOrderByIdData?.order_number}`}
-      </h1>
-      ): (<h1>Выбор товара</h1>)}
+        <h1>
+          {orderid === "newOrder"
+            ? "Новая заявка"
+            : orderid === `draft${Number(orderid?.split("draft").join(""))}`
+            ? "Черновик"
+            : `Заявка №-${getOrderByIdData?.order_number}`}
+        </h1>
+      ) : (
+        <h1>Выбор товара</h1>
+      )}
 
       <div
         className={
@@ -214,14 +239,7 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
             : style.selectProductOrder
         }
       >
-        {!toggle ? (
-          <button
-            onClick={() => setToggle(!toggle)}
-            className={style.toggleBtn}
-          >
-            Подбор товара
-          </button>
-        ) : (
+        {toggle && (
           <LeftSquareFilled
             title="Назад"
             onClick={() => setToggle(!toggle)}
@@ -253,35 +271,21 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
           />
           {!disabledOrder && (
             <button type="submit" className={style.buttonOrderCreate}>
-            {orderid === "newOrder" ||
-            orderid === `draft${Number(orderid?.split("draft").join(""))}`
-              ? "Создать"
-              : "Перезапуск"}
-          </button>
+              {orderid === "newOrder" ||
+              orderid === `draft${Number(orderid?.split("draft").join(""))}`
+                ? "Создать"
+                : "Перезапуск"}
+            </button>
           )}
-
         </form>
-        {
-          !disabledOrder && (
-            getValues("product_group.value") && (
-              !toggle ? (
-               <button
-                 onClick={() => setToggle(!toggle)}
-                 className={style.toggleBtn}
-               >
-                 Подбор товара
-               </button>
-             ) : (
-               <LeftSquareFilled
-                 title="Назад"
-                 onClick={() => setToggle(!toggle)}
-                 className={style.toggleBackButton}
-               />
-             )
-             )
-          )
-        }
-
+        {!disabledOrder && getValues("product_group.value") && !toggle && (
+          <button
+            onClick={() => setToggle(!toggle)}
+            className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
+          >
+            Подбор товара
+          </button>
+        )}
 
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
