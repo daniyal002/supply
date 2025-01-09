@@ -52,6 +52,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Товар",
       dataIndex: "product",
       key: "product",
+      showSorterTooltip: {title:"Сортировка по товару"},
       sorter: {
         compare: (a: any, b: any) =>
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
@@ -93,6 +94,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Добавленный товар",
       dataIndex: "order_product_name",
       key: "order_product_name",
+      showSorterTooltip: {title:"Сортировка по добавленному товару"},
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(b?.product?.order_product_name, "ru"),
@@ -133,6 +135,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Ссылка товар",
       dataIndex: "order_product_link",
       key: "order_product_link",
+      showSorterTooltip: {title:"Сортировка по ссылке товара"},
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_link?.localeCompare(b?.product?.order_product_link, "ru"),
@@ -174,6 +177,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Ед. измерения",
       dataIndex: "unit_measurement",
       key: "unit_measurement",
+      showSorterTooltip: {title:"Сортировка по ед. измерения"},
       sorter: {
         compare: (a: any, b: any) =>
           a.unit_measurement?.unit_measurement.unit_measurement_name.localeCompare(
@@ -192,6 +196,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Количество",
       dataIndex: "product_quantity",
       key: "product_quantity",
+      showSorterTooltip: {title:"Сортировка по количеству"},
       sorter: {
         compare: (a: any, b: any) => a.count - b.count,
       },

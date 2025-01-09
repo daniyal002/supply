@@ -49,6 +49,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "product_name",
       key: "product_name",
       width: "400px",
+      showSorterTooltip: {title:"Сортировка по товару"},
       sorter: (a, b) => a.product_name.localeCompare(b.product_name, "ru"),
       filterDropdown: (props) => (
         <SearchFilter
@@ -87,6 +88,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "product_group",
       key: "product_group",
       width: "350px",
+      showSorterTooltip: {title:"Сортировка по категории товаров"},
       sorter: (a, b) =>
         a.product_group.product_group_name.localeCompare(
           b.product_group.product_group_name,
@@ -104,6 +106,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "product_article",
       key: "product_article",
       width: "350px",
+      showSorterTooltip: {title:"Сортировка по артикулу"},
       sorter: (a, b) =>
         a?.product_article?.localeCompare(
           b?.product_article ?? '',
@@ -147,6 +150,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "unit_measurement",
       key: "unit_measurement",
       width: "180px",
+      showSorterTooltip: {title:"Сортировка по ед. измерения"},
       sorter: (a, b) =>
         a.unit_measurement.unit_measurement_name.localeCompare(
           b.unit_measurement.unit_measurement_name,
@@ -163,6 +167,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       title: "Действия",
       key: "action",
       width: "100px",
+      showSorterTooltip: {title:"Действия"},
       render: (_: any, record: IProductUnit) => (
         <Space size="middle">
           <Button
