@@ -9,20 +9,19 @@ import {
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
-  IOrderItem,
   IOrderItemFormValues,
   IOrderItemRequest,
 } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
-import { addOrderIndexedDB, db, deleteOrderIndexedDB } from "@/db/db";
+import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { message, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
-import { CaretLeftFilled, LeftSquareFilled } from "@ant-design/icons";
+import { LeftSquareFilled } from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
@@ -49,11 +48,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
   const { getOrderByIdData } = useGetOrderById(orderid as string);
   const [disabledOrder,setDisabledOrder] = useState<boolean>(false)
 
-  const orderDraftItem = useLiveQuery(() =>
-    orderid?.startsWith('draft')
-      ? db.orderItem.get(Number(orderid?.split("draft").join("")))
-      : undefined
-  );
 
   useEffect(()=>{
     if(orderid && getOrderByIdData){
@@ -97,57 +91,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
 
   const productsWatch = watch("order_products");
 
-  useEffect(() => {
-    if (
-      orderid === "newOrder" ||
-      orderid === `draft${Number(orderid?.split("draft").join(""))}`
-    ) {
-      const buyer = GetMeData?.employee?.parlors
-        ?.filter((parlor) =>
-          parlor.employees.some(
-            (employee) => employee.buyer_id === getValues("employee_id.value")
-          )
-        )
-        ?.flatMap((parlor) => parlor.employees)
-        .find(
-          (employee) => employee.buyer_id === getValues("employee_id.value")
-        );
-
-      const department = GetMeData?.employee?.parlors
-        ?.filter((parlor) =>
-          parlor.employees.some(
-            (employee) => employee.buyer_id === getValues("employee_id.value")
-          )
-        )
-        ?.flatMap((parlor) => parlor.department)
-        .find(
-          (department) =>
-            department?.department_id === getValues("department_id.value")
-        );
-
-      const userId = GetMeData?.user_id;
-
-      const data: IOrderItem = {
-        // @ts-ignores
-        buyer: buyer,
-        department: department,
-        oms: getValues("oms") === undefined ? false : getValues("oms"),
-        note: getValues("note"),
-        order_products: getValues("order_products"),
-        // order_route_id:getValues("order_route_id"),
-        order_status: { order_status_id: 99, order_status_name: "Черновик" },
-        created_at: Date(),
-        user_id: userId,
-        product_group: {
-          product_group_id: getValues("product_group.value"),
-          product_group_name: getValues("product_group.label"),
-        },
-      };
-      if (getValues("order_products")) {
-        addOrderIndexedDB(data, userId as number);
-      }
-    }
-  }, [productsWatch]);
 
   useEffect(() => {
     resetField("department_id", { defaultValue: undefined });
@@ -211,7 +154,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
       createOrderMutation(order,{onSuccess(){
         remove(targetKey)
       }});
-      deleteOrderIndexedDB(GetMeData?.user_id as number);
     }
   }else{
     message.warning("Добавьте товары в заявку !")
@@ -251,29 +193,6 @@ export default function Order({ orderid, type,remove,targetKey }: Props) {
     }
   }, [reset, type, orderid, getOrderByIdData]);
 
-  useEffect(() => {
-    if (orderid?.startsWith('draft') && orderDraftItem) {
-      reset({
-        employee_id: {
-          value: orderDraftItem?.buyer?.buyer_id,
-          label: orderDraftItem?.buyer?.buyer_name,
-        },
-        department_id: {
-          value: orderDraftItem?.department?.department_id,
-          label: orderDraftItem?.department?.department_name,
-        },
-        product_group:{
-          value: orderDraftItem?.product_group?.product_group_id,
-          label: orderDraftItem?.product_group?.product_group_name,
-        },
-        oms: orderDraftItem?.oms,
-        order_route_id: 1,
-        order_status_id: orderDraftItem?.order_status.order_status_id,
-        note: orderDraftItem?.note,
-        order_products: orderDraftItem?.order_products,
-      });
-    }
-  }, [orderDraftItem, orderid]);
 
   return (
     <div className={style.newOrder}>
