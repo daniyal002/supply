@@ -20,7 +20,7 @@
         transition: 0.5s;
 
         &:hover{
-            color: #3f6499;    
+            color: #3f6499;
         }
     }
 
@@ -48,7 +48,7 @@
             color: #fff;
         }
     }
-    
+
     .loginSubmit{
         // width: 100%;
         display: flex;
@@ -69,11 +69,10 @@
 
         }
         }
-    
+
 }
 .error{
     color: red;
     font-size: 12px;
     text-transform: uppercase;
 }
-

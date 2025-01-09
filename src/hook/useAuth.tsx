@@ -1,11 +1,12 @@
 import { ILoginRequest } from "@/interface/auth";
 import { authService } from "@/services/auth.service";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from 'axios';
 import { IErrorResponse } from "@/interface/error";
 import { useRouter} from "next/navigation";
 import { useHeaderStore } from "../../store/headerStore";
 import { useTabStore } from "../../store/tabStore";
+import { message } from "antd";
 
 
 export const useLogin = () => {
@@ -28,21 +29,29 @@ export const useLogin = () => {
 };
 
 export const useLogout = () => {
+    const queryClient = useQueryClient()
     const { replace } = useRouter()
-    const {deleteTabsApproval,deleteTabsOrders} = useTabStore()
+    const {deleteTabsApproval, deleteTabsOrders} = useTabStore()
+
     const {mutate, isSuccess, error} = useMutation({
-        mutationKey:['logout'],
-        mutationFn:() => authService.logout(),
-        onSuccess(){
-            replace("/login")
+        mutationKey: ['logout'],
+        mutationFn: () => authService.logout(),
+        onSuccess: async () => {
+            // Очищаем состояния
             deleteTabsApproval()
             deleteTabsOrders()
 
-        },
-        onError(error:AxiosError<IErrorResponse>){
-            alert(error)
-          }
-      })
+            // Очищаем все кэши React Query
+            await queryClient.resetQueries()
+            queryClient.clear()
 
-      return {mutate,isSuccess,error}
-};
+            // Редиректим на страницу логина
+            replace("/login")
+        },
+        onError(error: AxiosError<IErrorResponse>) {
+            message.error(error?.response?.data?.detail)
+        }
+    })
+
+    return {mutate, isSuccess, error}
+}
