@@ -153,7 +153,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
     key: user.user_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{pageSize: 10, locale:{items_per_page:"/ Пользователей"} }}/>;
+  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Пользователей"} }}/>;
 };
 
 export default UserTable;

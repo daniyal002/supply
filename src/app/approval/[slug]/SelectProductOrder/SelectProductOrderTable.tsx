@@ -168,7 +168,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
     key: product.product_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} size="large" pagination={{pageSize: 10, locale:{items_per_page:"/ Товаров"} }}/>;
+  return <Table dataSource={dataSource} columns={columns} size="large" pagination={{locale:{items_per_page:"/ Товаров"} }}/>;
 };
 
 export default SelectProductOrderTable;

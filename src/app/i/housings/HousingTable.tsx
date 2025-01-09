@@ -97,7 +97,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
     key: housing.housing_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{pageSize: 10, locale:{items_per_page:"/ Корпусов"} }}/>;
+  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Корпусов"} }}/>;
 };
 
 export default HousingTable;

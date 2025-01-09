@@ -128,7 +128,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
     key: employee.buyer_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{pageSize: 10, locale:{items_per_page:"/ Сотрудников"} }}/>;
+  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Сотрудников"} }}/>;
 };
 
 export default EmployeeTable;
