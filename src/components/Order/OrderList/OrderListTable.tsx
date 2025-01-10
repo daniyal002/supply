@@ -225,11 +225,13 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
           {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
-          <Button onClick={() => setOrderId(String(record.order_id))}>
+          <Button onClick={() => setOrderId(String(record.order_id))} aria-label="Посмотреть заявку" title="Посмотреть заявку" >
           <EyeTwoTone />
           </Button>
           {record.in_route && record.current_step_container !== null && (
             <Button
+            aria-label="Сбросить заявку"
+            title="Сбросить заявку"
             type="primary"
             danger
             onClick={() =>

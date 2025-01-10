@@ -12,6 +12,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Снабжение",
   description: "Снабжанай свой центр",
+  icons: {
+    icon: "./favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -21,6 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
+      <head>
+        <link rel="icon" href="./favicon.ico" />
+      </head>
       <AntdRegistry>
         <QueryClientContextProvider>
           <body className={inter.className}>
