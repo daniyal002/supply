@@ -211,6 +211,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       responsive: ["sm"],
     },
     {
+      title: "Примечание",
+      dataIndex: "note",
+      key: "note",
+      responsive: ["sm"],
+    },
+    {
       title: "Действия",
       key: "action",
 

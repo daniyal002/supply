@@ -25,7 +25,7 @@ interface Props {
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
   editProductId: number | null;
-  isNewProduct:boolean
+  isNewProduct: boolean;
 }
 
 const ModalSelectProductOrder: React.FC<Props> = ({
@@ -37,7 +37,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   getValues,
   setValue,
   editProductId,
-  isNewProduct
+  isNewProduct,
 }) => {
   const {
     register,
@@ -48,7 +48,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     getValues: getValuesModal,
   } = useForm<IProductTableFormValues>({ mode: "onChange" });
   const { productData } = useProductData();
-  const {allMesument} = useAllMesument()
+  const { allMesument } = useAllMesument();
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const employeeIdWatch = watch("employee_id.value");
@@ -58,31 +58,36 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   );
   const [buyerType, setBuyerType] = useState<string>();
 
-
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
-    console.log(data)
-    console.log(editProductId)
+    console.log(data);
+    console.log(editProductId);
     const unit = itemProductData?.directory_unit_measurement.find(
       (item) =>
-        item.unit_measurement.unit_measurement_id === getValuesModal("unit_measurement.value")
+        item.unit_measurement.unit_measurement_id ===
+        getValuesModal("unit_measurement.value")
     );
     const doctors = employees.filter((buyer) =>
       getValuesModal("buyers")?.some(
         (selectEmployee) => selectEmployee.value === buyer.buyer_id
       )
     );
-    const newUnitMesurement = {unit_measurement:{unit_measurement_id: data.unit_measurement.value, unit_measurement_name:data.unit_measurement.label}}
+    const newUnitMesurement = {
+      unit_measurement: {
+        unit_measurement_id: data.unit_measurement.value,
+        unit_measurement_name: data.unit_measurement.label,
+      },
+    };
     const productTable = {
       ...data,
       product: itemProductData,
       buyers: doctors,
-      unit_measurement: isNewProduct ? newUnitMesurement  : unit,
+      unit_measurement: isNewProduct ? newUnitMesurement : unit,
     };
-    console.log(productTable)
+    console.log(productTable);
 
     const products = getValues("order_products") || [];
 
-    if (editProductId !== null && editProductId !== undefined ) {
+    if (editProductId !== null && editProductId !== undefined) {
       const updatedProducts = products.map((product, index) =>
         index === editProductId ? productTable : product
       );
@@ -125,10 +130,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         product: undefined,
         buyers: undefined,
         product_quantity: undefined,
-        order_product_link:undefined,
-        order_product_name:undefined,
+        order_product_link: undefined,
+        order_product_name: undefined,
         unit_measurement: undefined,
-        note:undefined,
+        note: undefined,
       });
     } else if (type === "Изменить" && editProductId !== null) {
       const products = getValues("order_products") || [];
@@ -137,16 +142,20 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         product: itemProductData,
         product_quantity: productToEdit?.product_quantity,
         unit_measurement: {
-          value: productToEdit?.unit_measurement?.unit_measurement.unit_measurement_id,
-          label: productToEdit?.unit_measurement?.unit_measurement?.unit_measurement_name,
+          value:
+            productToEdit?.unit_measurement?.unit_measurement
+              .unit_measurement_id,
+          label:
+            productToEdit?.unit_measurement?.unit_measurement
+              ?.unit_measurement_name,
         },
         buyers: productToEdit?.buyers?.map((emp: any) => ({
           value: emp.buyer_id,
           label: emp.buyer_name,
         })),
-        order_product_name:productToEdit?.order_product_name,
-        order_product_link:productToEdit?.order_product_link,
-        note:productToEdit?.note,
+        order_product_name: productToEdit?.order_product_name,
+        order_product_link: productToEdit?.order_product_link,
+        note: productToEdit?.note,
       });
     }
   }, [type, reset, editProductId, isModalOpen]);
@@ -178,16 +187,22 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         label: unit.unit_measurement_name,
       }));
     } else {
-      return itemProductData?.directory_unit_measurement?.map((item) => ({
-        value: item.unit_measurement.unit_measurement_id,
-        label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
-      })) || [];
+      return (
+        itemProductData?.directory_unit_measurement?.map((item) => ({
+          value: item.unit_measurement.unit_measurement_id,
+          label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
+        })) || []
+      );
     }
   }, [isNewProduct, allMesument, itemProductData]);
 
   return (
     <Modal
-      title={!isNewProduct ?`${type} ${itemProductData?.product_name}`: "Новый товар"}
+      title={
+        !isNewProduct
+          ? `${type} ${itemProductData?.product_name}`
+          : "Новый товар"
+      }
       open={isModalOpen}
       onCancel={() => {
         setIsModalOpen(false);
@@ -254,8 +269,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             {...register("product_quantity", {
               required: { value: true, message: "Количество обязательно" },
               pattern: {
-                value: /^[0-9]+$/,
-                message: "Вводить можно только цифры",
+                value: /^[0-9]*\.?[0-9]+$/, // Обновленное регулярное выражение для целых и дробных чисел
+                message: "Введите корректное число", // Сообщение об ошибке
               },
             })}
           />
@@ -272,7 +287,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             control={control}
             name="unit_measurement"
             rules={{
-              required: { value: !isNewProduct, message: "Выберите Единицу измерения" },
+              required: {
+                value: !isNewProduct,
+                message: "Выберите Единицу измерения",
+              },
             }}
             render={({ field }) => (
               <Select
@@ -296,12 +314,14 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             <Controller
               control={control}
               name="buyers"
-              rules={{
-                // required: {
-                //   value: buyerType === "parlor" ? true : false,
-                //   message: "Выберите врача",
-                // },
-              }}
+              rules={
+                {
+                  // required: {
+                  //   value: buyerType === "parlor" ? true : false,
+                  //   message: "Выберите врача",
+                  // },
+                }
+              }
               render={({ field }) => (
                 <Select
                   {...field}

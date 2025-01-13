@@ -65,6 +65,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
          buyers.map((buyer) => buyer.buyer_name).join(", "),
       responsive: ["sm"],
     },
+    {
+      title: "Примечание",
+      dataIndex: "note",
+      key: "note",
+      responsive: ["sm"],
+    },
     // {
     //   title: "Действия",
     //   key: "action",
