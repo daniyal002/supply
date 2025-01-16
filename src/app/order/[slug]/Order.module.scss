@@ -1,3 +1,13 @@
+.order{
+  position: relative;
+  .spin{
+    margin-top: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
 .newOrder {
   position: relative;
   padding: 0 10px;

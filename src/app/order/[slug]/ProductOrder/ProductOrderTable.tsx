@@ -258,7 +258,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     key: index, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }}  pagination={{locale:{items_per_page:"/ Товаров"} }}/>;
+  return <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }}  pagination={{locale:{items_per_page:"/ Товаров"} }} footer={()=>("Всего: " + (dataSource?.length ? dataSource?.length : 0))}/>;
 };
 
 export default ProductOrderTable;

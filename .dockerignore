@@ -1,0 +1,38 @@
+# Игнорируем node_modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Игнорируем временные файлы и директории
+.DS_Store
+*.log
+*.tmp
+*.temp
+
+# Игнорируем файлы конфигурации IDE
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Игнорируем файлы сборки
+.next
+out
+dist
+
+# Игнорируем файлы окружения
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Игнорируем тестовые файлы
+coverage
+*.spec.ts
+*.spec.js
+*.test.ts
+*.test.js
+
+# Игнорируем документацию
+docs

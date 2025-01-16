@@ -10,7 +10,7 @@ import {
 import ProductOrder from "./ProductOrder/ProductOrder";
 import ApprovalHeaderOrder from "./ApprovalHeaderOrder";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
-import { message, Tabs, TabsProps } from "antd";
+import { message, Spin, Tabs, TabsProps } from "antd";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 
 interface Props {
@@ -37,8 +37,8 @@ export default function ApprovalOrder({
     handleSubmit,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const { getOrderByIdData } = useGetOrderById(orderid as string);
-  const {mutate:agreedOrderMutation} = useAgreedOrderMutation()
-  const {mutate:rejectOrderMutation} = useRejectOrderMutation()
+  const {mutate:agreedOrderMutation,isPending:agreedOrderPending,isSuccess:agreedOrderSuccess} = useAgreedOrderMutation()
+  const {mutate:rejectOrderMutation,isPending:rejectOrderPending,isSuccess:rejectOrderSuccess} = useRejectOrderMutation()
   const [note,  setnote] = React.useState('')
   const items: TabsProps['items'] = [
     {
@@ -228,6 +228,8 @@ export default function ApprovalOrder({
   };
 
   return (
+    <>
+   {(agreedOrderPending || rejectOrderPending)  && <Spin fullscreen={true}/>}
     <div className={style.newOrder}>
       <h1>Заявка на согласовании №: {orderid}</h1>
 
@@ -260,5 +262,7 @@ export default function ApprovalOrder({
           </div>
       </div>
     </div>
+
+    </>
   );
 }

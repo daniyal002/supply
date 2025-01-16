@@ -14,15 +14,14 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message, Tabs } from "antd";
+import { message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import {
   LeftSquareFilled,
-  CaretDownOutlined,
-  CaretUpOutlined,
 } from "@ant-design/icons";
+import { useProductData } from "@/hook/productHook";
 
 interface Props {
   orderid?: string;
@@ -33,6 +32,7 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
+  const {isLoading} = useProductData()
   const { mutate: createOrderMutation } = useCreateOrderMutation();
   const { mutate: updateOrderMutation } = useUpdateOrderMutation();
   const {
@@ -219,6 +219,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   }, [reset, type, orderid, getOrderByIdData]);
 
   return (
+    <div className={style.order}>
+    {isLoading && <Spin fullscreen={true} className={style.spin} size="large"/> }
     <div className={style.newOrder}>
       {!toggle ? (
         <h1>
@@ -289,6 +291,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
+    </div>
     </div>
   );
 }
