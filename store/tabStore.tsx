@@ -1,3 +1,4 @@
+import AdminOrderList from "@/components/AdminOrderList/AdminOrderList";
 import ApprovalList from "@/components/Approval/ApprovalList/ApprovalList";
 import OrderList from "@/components/Order/OrderList/OrderList";
 import { create } from "zustand";
@@ -26,6 +27,14 @@ interface ITabStore {
   activeTabApproval: string;
   setActiveTabApproval: (key: string) => void;
   deleteTabsApproval: () => void;
+
+  tabsAdminOrders: Tab[];
+  addTabAdminOrders: (tab: Tab) => void;
+  removeTabAdminOrders: (key: string) => void;
+  setTabsAdminOrders: (tabs: Tab[]) => void;
+  activeTabAdminOrders: string;
+  setActiveTabAdminOrders: (key: string) => void;
+  deleteTabsAdminOrders: () => void;
 }
 
 export const useTabStore = create<ITabStore>()(
@@ -90,6 +99,37 @@ export const useTabStore = create<ITabStore>()(
           ],
           activeTabApproval: "1",
         }),
+
+        tabsAdminOrders: [
+          {
+            label: "Главная",
+            children: <AdminOrderList />,
+            key: "1",
+            closable: false,
+          },
+        ],
+        addTabAdminOrders: (tab) =>
+          set((state) => ({ tabsAdminOrders: [...state.tabsAdminOrders, tab] })),
+        removeTabAdminOrders: (key) =>
+          set((state) => ({
+            tabsAdminOrders: state.tabsAdminOrders.filter((tab) => tab.key !== key),
+          })),
+        setTabsAdminOrders: (tabs) => set({ tabsAdminOrders: tabs }),
+        activeTabAdminOrders: "1",
+        setActiveTabAdminOrders: (key) => set({ activeTabAdminOrders: key }),
+        deleteTabsAdminOrders: () =>
+          set({
+            tabsAdminOrders: [
+              {
+                label: "Главная",
+                children: <AdminOrderList />,
+                key: "1",
+                closable: false,
+              },
+            ],
+            activeTabAdminOrders: "1",
+          }),
+
     }),
     { name: "tabsOrders" }
   )

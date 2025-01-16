@@ -45,6 +45,19 @@ export const useOrderUserData = () => {
   return { orderUserData, isLoading, error };
 };
 
+export const useOrdersData = () => {
+  const {
+    data: ordersData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["Orders"],
+    queryFn: orderService.getOrders,
+    // staleTime: Infinity,
+  });
+  return { ordersData, isLoading, error };
+};
+
 export const useApprovalOrders  = () => {
   const { data: approvalOrders, isLoading, error } = useQuery({
     queryKey: ["approvalOrders"],

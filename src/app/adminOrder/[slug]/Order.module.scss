@@ -1,0 +1,104 @@
+.order{
+  position: relative;
+  .spin{
+    margin-top: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+.newOrder {
+  position: relative;
+  padding: 0 10px;
+  .active {
+    display: flex !important;
+    position: relative;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .selectProductOrder {
+    display: none;
+  }
+  .productOrder {
+    display: none;
+    padding-bottom: 50px;
+  }
+
+  .buttonOrderCreate {
+    width: 10%;
+    position: absolute;
+    bottom: -20px;
+    z-index: 99;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 25px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    @media (max-width: 630px) {
+      width: 20%;
+    }
+
+    color: #fff;
+    padding: 10px;
+    background-color: #678098;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px 0.5px #678098;
+    transition: 0.2s ease-in;
+    border: 0;
+    font-size: 16px;
+    cursor: pointer;
+    &:hover {
+      background-color: #606f7e;
+      box-shadow: 1px 1px 1px 0.5px #678098;
+    }
+  }
+
+  .toggleBtn {
+    width: 20%;
+    color: #fff;
+    padding: 10px;
+    background-color: #678098;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px 0.5px #678098;
+    transition: 0.2s ease-in;
+    border: 0;
+    font-size: 16px;
+    cursor: pointer;
+    &:hover {
+      background-color: #606f7e;
+      box-shadow: 1px 1px 1px 0.5px #678098;
+    }
+
+    @media (max-width:599px) {
+    width: 30%;
+    }
+    @media (max-width:412px) {
+    width: 40%;
+    }
+
+  }
+
+  .toggleBackButton{
+    width: 30px;
+    color: #fff;
+    padding: 10px;
+    background-color: #678098;
+    text-align: center;
+    border-radius: 8px;
+    // box-shadow: 2px 2px 8px 0.5px #678098;
+    transition: 0.2s ease-in;
+    border: 0;
+    font-size: 30px;
+    cursor: pointer;
+    &:hover {
+      background-color: #606f7e;
+      // box-shadow: 1px 1px 1px 0.5px #678098;
+    }
+
+
+  }
+}

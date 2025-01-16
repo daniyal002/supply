@@ -45,6 +45,13 @@ export const orderService = {
     return response.data.detail;
   },
 
+  async getOrders() {
+    const response = await axiosWidthAuth.get<IOrderItemResponse>(
+      "/order/get_all_order"
+    );
+    return response.data.detail;
+  },
+
   async getOrderStepHistory(order_id: number) {
     if (!isNaN(Number(order_id)) && Number(order_id) > 0) {
       const response = await axiosWidthAuth.get<IStepHistoryResponse>(

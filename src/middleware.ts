@@ -13,7 +13,7 @@ function role() {
 
     try {
         const parse = JSON.parse(Buffer.from(token.value.split('.')[1], 'base64').toString());
-        return parse.role
+        return parse.role;
     } catch (e) {
         console.error('Ошибка при декодировании токена:', e);
         return null;
@@ -22,6 +22,11 @@ function role() {
 
 export default function middleware(req: NextRequest) {
     const userRole = role();
+
+    // Проверяем, если путь - это главная страница
+    if (req.nextUrl.pathname === '/') {
+        return NextResponse.next(); // Разрешаем доступ к главной странице для всех
+    }
 
     for (const item of protectedRoutes) {
         if (req.nextUrl.pathname.startsWith(item.path)) {

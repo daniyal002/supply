@@ -2,11 +2,17 @@
 
 import { Layout, Menu } from "antd";
 import { useHeaderStore } from "../../../../store/headerStore";
-import { InboxOutlined, UnorderedListOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  BookOutlined,
+  InboxOutlined,
+  UnorderedListOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { isRole, protectedRoutes } from "@/helper/ProtectedRoutes";
 import { useEffect, useState } from "react";
-import style from "./Sider.module.scss"
+import style from "./Sider.module.scss";
+import { BookUser } from "lucide-react";
 
 const { Sider } = Layout;
 
@@ -45,16 +51,27 @@ const SiderL: React.FC = () => {
           push("/i");
         },
       },
+      {
+        key: "3",
+        icon: <BookOutlined />,
+        label: "Все заявки",
+        onClick: () => {
+          push("/adminOrder");
+        },
+      },
     ];
 
-    const protectedItems = items.filter(item =>
-      protectedRoutes.some(protectedI =>
-        (protectedI.key === item.key && protectedI.role.includes(role)) || protectedI.key !== item.key
-      )
+    const protectedItems = items.filter(
+      (item) =>
+        protectedRoutes.some((protectedI) => {
+          return (
+            (protectedI.key === item.key && protectedI.role.includes(role))
+          );
+        })
     );
 
     setMenuItems(protectedItems);
-  }, [push,login]);
+  }, [push, login]);
 
   if (pathname === "/login") {
     return null;
@@ -67,7 +84,9 @@ const SiderL: React.FC = () => {
       style={{
         boxShadow: "-4px 10px 15px 0.5px black",
       }}
-      className={!collapsed ? ` ${style.siderActive} ${style.sider}` : `${style.sider}`}
+      className={
+        !collapsed ? ` ${style.siderActive} ${style.sider}` : `${style.sider}`
+      }
     >
       <div className="demo-logo-vertical" />
       <Menu
