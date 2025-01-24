@@ -19,6 +19,7 @@ import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { IUser } from "@/interface/user";
 
 interface AdminOrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -178,6 +179,18 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       },
     },
     {
+      title:"Пользователь",
+      dataIndex:'user',
+      key: 'user',
+      showSorterTooltip: {title:"Сортировка по пользователю"},
+      sorter: (a: any, b: any) =>
+        a.user?.employee.buyer_name.localeCompare(b.user?.employee.buyer_name, "ru"),
+      responsive: ["lg"],
+      render: (user: IUser) => {
+        return user?.employee.buyer_name
+      }
+    },
+    {
       title: "Подразделение",
       dataIndex: "department",
       showSorterTooltip: {title:"Сортировка по подразделению"},
@@ -267,7 +280,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       },
     }}
   >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Заявок"} }}/>
+    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Заявок"} }} footer={()=> `Заявок: ${dataSource?.length as number > 0 ? dataSource?.length : 0}` }/>
     </ConfigProvider>
   );
 };

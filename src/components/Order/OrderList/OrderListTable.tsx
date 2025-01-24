@@ -267,7 +267,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       },
     }}
   >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Заявок"} }}/>
+    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Заявок"} }} footer={()=> `Заявок: ${dataSource?.length as number > 0 ? dataSource?.length : 0}` }/>
     </ConfigProvider>
   );
 };

@@ -2,6 +2,7 @@ import { IDepartment, IDepartmentOption } from "@/interface/department";
 import { IEmployee, IEmployeeOption } from "@/interface/employee";
 import { IProductTable, IProductTableRequest } from "@/interface/productTable";
 import { IProductGroup, IProductGroupOption } from "./product";
+import { IUser } from "./user";
 
 export interface IStatusOrder{
   order_status_id:number,
@@ -27,6 +28,7 @@ export interface IOrderItem {
     user_id?:number,
     current_step_container:number | null,
     in_route: boolean,
+    user?:IUser
   }
 
   export interface IOrderItemAddResponse{
