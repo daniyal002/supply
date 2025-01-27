@@ -12,7 +12,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { isRole, protectedRoutes } from "@/helper/ProtectedRoutes";
 import { useEffect, useState } from "react";
 import style from "./Sider.module.scss";
-import { BookUser } from "lucide-react";
 
 const { Sider } = Layout;
 
@@ -27,6 +26,7 @@ const SiderL: React.FC = () => {
   const pathname = usePathname();
 
   const collapsed = useHeaderStore((state) => state.collapsed);
+  const editCollapsed = useHeaderStore((state) => state.editCollapsed)
   const login = useHeaderStore((state) => state.login);
   const { push } = useRouter();
 
@@ -77,25 +77,21 @@ const SiderL: React.FC = () => {
     return null;
   }
   return (
-    <Sider
-      trigger={null}
-      collapsible
-      collapsed={collapsed}
-      style={{
-        boxShadow: "-4px 10px 15px 0.5px black",
-      }}
-      className={
-        !collapsed ? ` ${style.siderActive} ${style.sider}` : `${style.sider}`
-      }
-    >
-      <div className="demo-logo-vertical" />
-      <Menu
-        theme="light"
-        mode="inline"
-        defaultSelectedKeys={["1"]}
-        items={menuItems}
-      />
-    </Sider>
+    <>
+    <div
+    className={`${style.overlay} ${!collapsed ? style.overlayActive : ""}`}
+    onClick={() => editCollapsed(true)} // Закрывает сайдбар при клике на фон
+  />
+  <Sider
+    trigger={null}
+    collapsible
+    collapsed={collapsed}
+    className={!collapsed ? `${style.siderActive} ${style.sider}` : `${style.sider}`}
+  >
+    <div className="demo-logo-vertical" />
+    <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]} items={menuItems} />
+  </Sider>
+  </>
   );
 };
 

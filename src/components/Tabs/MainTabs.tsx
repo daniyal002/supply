@@ -24,7 +24,7 @@ export const MainTabs = () => {
       },
     ];
     return(
-        <div>
+        <div style={{padding:"0 10px"}}>
         <Tabs defaultActiveKey="1" items={items} />
       </div>
     )
