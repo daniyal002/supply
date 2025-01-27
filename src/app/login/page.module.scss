@@ -1,12 +1,14 @@
 .loginPage{
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    justify-content: center;
+    padding: 0 10px;
     gap: 10px;
     margin: 20px;
     max-width: 600px;
     width: 100%;
     margin: 0 auto;
+    height: 89vh;
 
     .loginLogo{
         text-transform: uppercase;
