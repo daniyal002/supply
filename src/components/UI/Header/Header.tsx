@@ -1,5 +1,13 @@
 "use client";
-import { Container, EllipsisVertical, LogOut, Menu } from "lucide-react";
+import {
+  Container,
+  EllipsisVertical,
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Waypoints,
+} from "lucide-react";
 import style from "./Header.module.scss";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -22,8 +30,7 @@ export default function Header() {
     }
   }, [GetMeData]);
 
-  const {mutate:logout} = useLogout()
- 
+  const { mutate: logout } = useLogout();
 
   if (pathname === "/login") {
     return null;
@@ -31,21 +38,36 @@ export default function Header() {
   return (
     <div className={style.header}>
       <div className={style.headerlogo}>
-          <Link href="/" className={style.headerlogoContainer}>
-            <Container size={40} color="#fff" />
-            <h1 className={style.headerLogoText}>Снабжение</h1>
-          </Link>
-        <Menu
-          size={20}
-          color="#678098"
-          onClick={() => editCollapsed(!collapsed)}
-        />
+        <Link href="/" className={style.headerlogoContainer}>
+          <Waypoints size={36} color="#fff" />
+          <h1 className={style.headerLogoText}>Снабжение</h1>
+        </Link>
+        {collapsed ? (
+          <PanelLeftOpen
+            size={30}
+            color="#fff"
+            onClick={() => editCollapsed(!collapsed)}
+            style={{cursor:'pointer', paddingRight:"5px"}}
+          />
+        ) : (
+          <PanelLeftClose
+            size={30}
+            color="#fff"
+            onClick={() => editCollapsed(!collapsed)}
+            style={{cursor:'pointer', paddingRight:"5px"}}
+          />
+        )}
       </div>
 
       <div className={style.headerButtons}>
         <p className={style.headerLoginChar}>{login[0]}</p>
         <p className={style.headerLogin}>{login}</p>
-        <LogOut size={32} color="#fff" cursor="pointer" onClick={() => logout()}/>
+        <LogOut
+          size={32}
+          color="#fff"
+          cursor="pointer"
+          onClick={() => logout()}
+        />
       </div>
     </div>
   );
