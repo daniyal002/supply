@@ -63,10 +63,6 @@ export default function ApprovalList() {
       <div className={style.orderListButton}>
 
       </div>
-      <p data-text={"Заявки на согласовании"} className={style.orderListText}>
-        Заявки на согласовании
-      </p>
-
         <ApprovalListTable OrderData={filteredOrderData} />
     </div>
   );
