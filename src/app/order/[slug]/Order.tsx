@@ -46,15 +46,19 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     watch,
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
-  const { getOrderByIdData } = useGetOrderById(orderid as string);
+  let orderIdFromGetOrderById = orderid
+  if(orderid?.startsWith('copy')){
+    orderIdFromGetOrderById = orderid.replace('copy', '')
+  }
+  const { getOrderByIdData } = useGetOrderById(orderIdFromGetOrderById as string);
   const [disabledOrder, setDisabledOrder] = useState<boolean>(false);
 
   useEffect(() => {
     if (orderid && getOrderByIdData) {
       if (
-        getOrderByIdData.current_step_container !== null ||
+        (getOrderByIdData.current_step_container !== null ||
         (getOrderByIdData.current_step_container == null &&
-          getOrderByIdData.in_route === false)
+          getOrderByIdData.in_route === false)) && !orderid.startsWith('copy')
       ) {
         setDisabledOrder(true);
       } else {
@@ -161,7 +165,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       };
       if (
         orderid !== "newOrder" &&
-        orderid !== `draft${orderid?.split("draft")[1]}` &&
+        orderid !== `copy${orderid?.split("copy")[1]}` &&
         getOrderByIdData
       ) {
         order.order_id = Number(orderid);
@@ -192,8 +196,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         product_group: undefined,
       });
     } else if (
-      orderid !== "newOrder" &&
-      orderid !== `draft${orderid?.split("draft")[1]}`
+      orderid !== "newOrder"
+      // orderid !== `copy${orderid?.split("copy")[1]}`
     ) {
       reset({
         order_id: getOrderByIdData?.order_id,
@@ -226,8 +230,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         <h1>
           {orderid === "newOrder"
             ? "Новая заявка"
-            : orderid === `draft${Number(orderid?.split("draft").join(""))}`
-            ? "Черновик"
+            : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+            ? "Копия"
             : `Заявка №-${getOrderByIdData?.order_number}`}
         </h1>
       ) : (
@@ -274,7 +278,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           {!disabledOrder && (
             <button type="submit" className={style.buttonOrderCreate}>
               {orderid === "newOrder" ||
-              orderid === `draft${Number(orderid?.split("draft").join(""))}`
+              orderid === `copy${Number(orderid?.split("copy").join(""))}`
                 ? "Создать"
                 : "Перезапуск"}
             </button>

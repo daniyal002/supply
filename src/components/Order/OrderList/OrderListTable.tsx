@@ -1,52 +1,63 @@
 "use client";
 
-import {
-  Button,
-  ConfigProvider,
-  Space,
-  Table,
-  TableColumnsType,
-} from "antd";
+import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { useDeleteOrderMutation, useResetOrderMutation } from "@/hook/orderHook";
+import {
+  useDeleteOrderMutation,
+  useResetOrderMutation,
+} from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
-import { EyeTwoTone, ReloadOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
+import {
+  EyeTwoTone,
+  ReloadOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { useState } from "react";
+import ContextMenu from "@/components/UI/ContextMenu/ContextMenu";
+import { useTabStore } from "../../../../store/tabStore";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
 }
 
 const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
-
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
   const StatusOption = OrderData
-  ? Array.from(
-      new Set(OrderData.map(order => order?.order_status?.order_status_id))
-    ).map(id => {
-      const orderStatus = OrderData.find(order => order?.order_status?.order_status_id === id)?.order_status;
-      return { value: String(orderStatus?.order_status_id), label: orderStatus?.order_status_name || '' };
-    })
-  : [];
+    ? Array.from(
+        new Set(OrderData.map((order) => order?.order_status?.order_status_id))
+      ).map((id) => {
+        const orderStatus = OrderData.find(
+          (order) => order?.order_status?.order_status_id === id
+        )?.order_status;
+        return {
+          value: String(orderStatus?.order_status_id),
+          label: orderStatus?.order_status_name || "",
+        };
+      })
+    : [];
 
-  const { mutate: resetOrderMutation } = useResetOrderMutation()
+  const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
+  const addTabOrders = useTabStore((state) => state.addTabOrders)
   const columns: TableColumnsType<IOrderItem> = [
     {
       title: "№",
       dataIndex: "order_number",
       key: "order_number",
-      showSorterTooltip: {title:"Сортировка по номеру"},
+      showSorterTooltip: { title: "Сортировка по номеру" },
       sorter: (a: any, b: any) =>
         a.order_number.localeCompare(b.order_number, "ru"),
-      defaultSortOrder: 'descend',
+      defaultSortOrder: "descend",
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -72,7 +83,9 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         }
       },
       render: (text) => {
-        const formattedOrderNumber = text ? text.toString().replace(/^0+/, '') : "";
+        const formattedOrderNumber = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
         return searchedColumn === "order_number" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -88,7 +101,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "Дата",
       dataIndex: "created_at",
-      showSorterTooltip: {title:"Сортировка по дате"},
+      showSorterTooltip: { title: "Сортировка по дате" },
       key: "created_at",
       sorter: (a: any, b: any) =>
         a.created_at.localeCompare(b.created_at, "ru"),
@@ -105,37 +118,37 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       },
     },
     {
-        title: "Статус",
-        showSorterTooltip: {title:"Сортировка по статусу"},
-        dataIndex: "order_status",
-        key: "order_status",
-        sorter: (a: any, b: any) =>
-          a.order_status.order_status_name.localeCompare(
-            b.order_status.order_status_name,
-            "ru"
-          ),
-        render: (order_status: IStatusOrder) => order_status?.order_status_name,
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => (
-          <StatusFilter
-            options={StatusOption}
-            setSelectedKeys={setSelectedKeys}
-            selectedKeys={selectedKeys.map(key => String(key))}
-            confirm={confirm}
-            clearFilters={() => clearFilters && clearFilters()}
-          />
+      title: "Статус",
+      showSorterTooltip: { title: "Сортировка по статусу" },
+      dataIndex: "order_status",
+      key: "order_status",
+      sorter: (a: any, b: any) =>
+        a.order_status.order_status_name.localeCompare(
+          b.order_status.order_status_name,
+          "ru"
         ),
-        onFilter: (value, record) =>
-          record.order_status.order_status_id === Number(value),
-      },
+      render: (order_status: IStatusOrder) => order_status?.order_status_name,
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <StatusFilter
+          options={StatusOption}
+          setSelectedKeys={setSelectedKeys}
+          selectedKeys={selectedKeys.map((key) => String(key))}
+          confirm={confirm}
+          clearFilters={() => clearFilters && clearFilters()}
+        />
+      ),
+      onFilter: (value, record) =>
+        record.order_status.order_status_id === Number(value),
+    },
     {
       title: "Сотрудник/Кабинет",
       dataIndex: "buyer",
-      showSorterTooltip: {title:"Сортировка по сотруднику"},
+      showSorterTooltip: { title: "Сортировка по сотруднику" },
       key: "buyer",
       sorter: (a: any, b: any) =>
         a.buyer.buyer_name.localeCompare(b.buyer.buyer_name, "ru"),
@@ -180,7 +193,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "Подразделение",
       dataIndex: "department",
-      showSorterTooltip: {title:"Сортировка по подразделению"},
+      showSorterTooltip: { title: "Сортировка по подразделению" },
       key: "department",
       sorter: (a: any, b: any) =>
         a.department_name.localeCompare(b.department_name, "ru"),
@@ -189,7 +202,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "ОМС/ПУ",
       dataIndex: "oms",
-      showSorterTooltip: {title:"Сортировка по ОМС/ПУ"},
+      showSorterTooltip: { title: "Сортировка по ОМС/ПУ" },
       key: "oms",
       // sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
       responsive: ["lg"],
@@ -201,7 +214,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       }) => (
         <CheckboxFilter
           setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map(key => String(key))}
+          selectedKeys={selectedKeys.map((key) => String(key))}
           confirm={confirm}
           clearFilters={() => clearFilters && clearFilters()}
         />
@@ -221,33 +234,37 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     {
       title: "Действия",
       key: "action",
-      showSorterTooltip: {title:"Действия"},
+      showSorterTooltip: { title: "Действия" },
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
-          {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
-          <Button onClick={() => setOrderId(String(record.order_id))} aria-label="Посмотреть заявку" title="Посмотреть заявку" >
-          <EyeTwoTone />
+          <Button
+            onClick={() => setOrderId(String(record.order_id))}
+            aria-label="Посмотреть заявку"
+            title="Посмотреть заявку"
+          >
+            <EyeTwoTone />
           </Button>
           {record.in_route && record.current_step_container !== null && (
             <Button
-            aria-label="Сбросить заявку"
-            title="Сбросить заявку"
-            type="primary"
-            danger
-            onClick={() =>
-              toast.error("Вы точно хотите сбросить заявку ?", {
-                style: {
-                  color: "red",
-                },
-                action: {
-                  label: "Сбросить",
-                  onClick: () => resetOrderMutation(record.order_id as number),
-                },
-              })
-            }
-          >
-            <ReloadOutlined />
-          </Button>
+              aria-label="Сбросить заявку"
+              title="Сбросить заявку"
+              type="primary"
+              danger
+              onClick={() =>
+                toast.error("Вы точно хотите сбросить заявку ?", {
+                  style: {
+                    color: "red",
+                  },
+                  action: {
+                    label: "Сбросить",
+                    onClick: () =>
+                      resetOrderMutation(record.order_id as number),
+                  },
+                })
+              }
+            >
+              <ReloadOutlined />
+            </Button>
           )}
         </Space>
       ),
@@ -259,15 +276,69 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     key: order.order_id, // Ensure each item has a unique key
   }));
 
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    orderId: number | null;
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+    orderId: null,
+  });
+
+  const handleContextMenu = (event: React.MouseEvent, record: IOrderItem) => {
+    event.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY,
+      orderId: record.order_id as number,
+    });
+  };
+
+  const handleCopyOrder = () => {
+    if (!contextMenu.orderId) return;
+
+    // Логика создания копии
+    toast.success("Копия заявки создана");
+    setOrderId(`copy${String(contextMenu.orderId)}`)
+
+    // Здесь вызовите вашу мутацию для копирования
+  };
+
   return (
     <ConfigProvider
-    theme={{
-      token: {
-        colorPrimary:"#678098"
-      },
-    }}
-  >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Заявок"} }} footer={()=> `Заявок: ${dataSource?.length as number > 0 ? dataSource?.length : 0}` }/>
+      theme={{
+        token: {
+          colorPrimary: "#678098",
+        },
+      }}
+    >
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        scroll={{ x: 200 }}
+        pagination={{ locale: { items_per_page: "/ Заявок" } }}
+        footer={() =>
+          `Заявок: ${
+            (dataSource?.length as number) > 0 ? dataSource?.length : 0
+          }`
+        }
+        onRow={(record) => ({
+          onContextMenu: (e) => handleContextMenu(e, record),
+        })}
+      />
+
+      <ContextMenu
+        x={contextMenu.x}
+        y={contextMenu.y}
+        visible={contextMenu.visible}
+        onClose={() => setContextMenu(prev => ({...prev, visible: false }))}
+        onCopy={handleCopyOrder}
+      />
+
     </ConfigProvider>
   );
 };
