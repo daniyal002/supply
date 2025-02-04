@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import { useLogout } from "@/hook/useAuth";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
+import DropdownMenu from "../DropdownMenu/DropdownMenu";
 export default function Header() {
   const setLogin = useHeaderStore((state) => state.setLogin);
   const login = useHeaderStore((state) => state.login);
@@ -47,27 +48,30 @@ export default function Header() {
             size={30}
             color="#fff"
             onClick={() => editCollapsed(!collapsed)}
-            style={{cursor:'pointer', paddingRight:"5px"}}
+            style={{ cursor: "pointer", paddingRight: "5px" }}
           />
         ) : (
           <PanelLeftClose
             size={30}
             color="#fff"
             onClick={() => editCollapsed(!collapsed)}
-            style={{cursor:'pointer', paddingRight:"5px"}}
+            style={{ cursor: "pointer", paddingRight: "5px" }}
           />
         )}
       </div>
 
-      <div className={style.headerButtons}>
-        <p className={style.headerLoginChar}>{login[0]}</p>
-        <p className={style.headerLogin}>{login}</p>
-        <LogOut
-          size={32}
-          color="#fff"
-          cursor="pointer"
-          onClick={() => logout()}
-        />
+      <div className={style.headerBellAndButtons}>
+        <DropdownMenu />
+        <div className={style.headerButtons}>
+          <p className={style.headerLoginChar}>{login[0]}</p>
+          <p className={style.headerLogin}>{login}</p>
+          <LogOut
+            size={32}
+            color="#fff"
+            cursor="pointer"
+            onClick={() => logout()}
+          />
+        </div>
       </div>
     </div>
   );

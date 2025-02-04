@@ -3,6 +3,7 @@ import Tab from "@/components/Tabs/Tabs";
 import ApprovalTabs from "@/components/Tabs/ApprovalTabs";
 import { Tabs, TabsProps } from "antd";
 import { useApprovalOrders } from "@/hook/orderHook";
+import Notification from "../Notification/Notification";
 
 export const MainTabs = () => {
     const { approvalOrders } = useApprovalOrders();
@@ -26,6 +27,7 @@ export const MainTabs = () => {
     return(
         <div style={{padding:"0 10px"}}>
         <Tabs defaultActiveKey="1" items={items} />
+        <Notification/>
       </div>
     )
   };

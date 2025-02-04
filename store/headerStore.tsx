@@ -1,4 +1,3 @@
-import { useGetMe } from "@/hook/userHook"
 import { create } from "zustand"
 interface IHeaderStore{
     login: string,
