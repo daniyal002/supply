@@ -22,6 +22,7 @@ import {
   LeftSquareFilled,
 } from "@ant-design/icons";
 import { useProductData } from "@/hook/productHook";
+import { MoveLeft } from "lucide-react";
 
 interface Props {
   orderid?: string;
@@ -246,11 +247,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         }
       >
         {toggle && (
-          <LeftSquareFilled
-            title="Назад"
-            onClick={() => setToggle(!toggle)}
-            className={style.toggleBackButton}
-          />
+          <p onClick={() => setToggle(!toggle)} className={style.toggleBackButton}><MoveLeft/> Назад</p>
         )}
 
         <SelectProductOrder
