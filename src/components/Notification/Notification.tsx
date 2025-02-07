@@ -5,9 +5,12 @@ import React, { useEffect } from 'react'
 import { toast, Toaster } from 'sonner';
 import { useNotificationStore } from '../../../store/notificationStore';
 import { authService } from '@/services/auth.service';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function Notification() {
     const refreshToken = getRefreshToken()
+    const queryClient = useQueryClient();
+
     const setNotifications = useNotificationStore((state) => state.setNotifications)
     useEffect(() => {
         const connectWebSocket = () => {
@@ -33,6 +36,9 @@ export default function Notification() {
             console.log(notification)
             if( notification.detail.type === 'info'){
                 setNotifications(notification.detail.data)
+            }
+            if( notification.detail.type === "new_order"){
+              queryClient.invalidateQueries({queryKey:['approvalOrders']})
             }
           };
 

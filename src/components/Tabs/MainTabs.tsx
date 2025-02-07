@@ -2,12 +2,9 @@
 import Tab from "@/components/Tabs/Tabs";
 import ApprovalTabs from "@/components/Tabs/ApprovalTabs";
 import { Tabs, TabsProps } from "antd";
-import { useApprovalOrders } from "@/hook/orderHook";
 import Notification from "../Notification/Notification";
 
 export const MainTabs = () => {
-    const { approvalOrders } = useApprovalOrders();
-
     const items: TabsProps["items"] = [
       {
         key: "1",
@@ -16,11 +13,7 @@ export const MainTabs = () => {
       },
       {
         key: "2",
-        label: (
-          <span className="approval-label" data-descr={approvalOrders?.length}>
-            Согласования
-          </span>
-        ),
+        label: "Согласования",
         children: <ApprovalTabs />,
       },
     ];
