@@ -2,7 +2,7 @@
 
 import { getAccessToken, getRefreshToken } from '@/services/auth-token.service';
 import React, { useEffect } from 'react'
-import { toast, Toaster } from 'sonner';
+import { Toaster } from 'sonner';
 import { useNotificationStore } from '../../../store/notificationStore';
 import { authService } from '@/services/auth.service';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,7 +16,6 @@ export default function Notification() {
         const connectWebSocket = () => {
           const accessToken = getAccessToken();
           if (!accessToken) {
-            console.error('No access token available');
             return;
           }
 
@@ -33,11 +32,10 @@ export default function Notification() {
 
           socket.onmessage = (event) => {
             const notification = JSON.parse(event.data);
-            console.log(notification)
             if( notification.detail.type === 'info'){
                 setNotifications(notification.detail.data)
             }
-            if( notification.detail.type === "new_order"){
+            if( notification.detail.type === "new_order" || notification.detail.type === "agreed" || notification.detail.type === "reject" ){
               queryClient.invalidateQueries({queryKey:['approvalOrders']})
             }
           };

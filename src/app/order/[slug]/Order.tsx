@@ -233,7 +233,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             ? "Новая заявка"
             : orderid === `copy${Number(orderid?.split("copy").join(""))}`
             ? "Копия"
-            : `Заявка №-${getOrderByIdData?.order_number}`}
+            : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
         </h1>
       ) : (
         <h1>Выбор товара</h1>

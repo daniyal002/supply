@@ -21,7 +21,7 @@ export default function Tab() {
     const existingPane = tabsOrders.find(pane => pane.key === newActiveKey);
 
     if (!existingPane) {
-      let lableOrderId  = orderId.startsWith("copy") ? `Копия по №${orderid?.split("copy").join("")}` : orderId
+      let lableOrderId  = orderId.startsWith("copy") ? `Копия по №${orderid?.split("copy").join("")}` : `Заявка № ${orderId}`
       const newTab = {
         label: lableOrderId,
         children: <Order type="Изменить" orderid={orderid} remove={remove} targetKey={newActiveKey} />,

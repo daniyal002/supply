@@ -61,7 +61,6 @@ export default function ApprovalTabs() {
       : null;
     if (id) {
       queryClient.invalidateQueries({ queryKey: ["getOrderById", id] });
-      console.log(id);
     }
   }, [activeKey]);
 
