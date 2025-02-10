@@ -1,26 +1,39 @@
-'use client'
-import Tab from "@/components/Tabs/Tabs";
+"use client";
 import ApprovalTabs from "@/components/Tabs/ApprovalTabs";
+import Tab from "@/components/Tabs/Tabs";
 import { Tabs, TabsProps } from "antd";
+import { useTabStore } from "../../../store/tabStore";
 import Notification from "../Notification/Notification";
 
 export const MainTabs = () => {
-    const items: TabsProps["items"] = [
-      {
-        key: "1",
-        label: "Заявки",
-        children: <Tab />,
-      },
-      {
-        key: "2",
-        label: "Согласования",
-        children: <ApprovalTabs />,
-      },
-    ];
-    return(
-        <div style={{padding:"0 10px"}}>
-        <Tabs defaultActiveKey="1" items={items} />
-        <Notification/>
-      </div>
-    )
+  const activeMainTabKey = useTabStore((state) => state.activeMainTabKey);
+  const setActiveMainTabKey = useTabStore((state) => state.setActiveMainTabKey);
+
+  const handleTabChange = (key: string) => {
+    setActiveMainTabKey(key); // Обновляем состояние при переключении вкладок
   };
+
+  const items: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "Заявки",
+      children: <Tab />,
+    },
+    {
+      key: "2",
+      label: "Согласования",
+      children: <ApprovalTabs />,
+    },
+  ];
+  return (
+    <div style={{ padding: "0 10px" }}>
+      <Tabs
+        defaultActiveKey={"1"}
+        items={items}
+        activeKey={activeMainTabKey}
+        onChange={handleTabChange}
+      />
+      <Notification />
+    </div>
+  );
+};

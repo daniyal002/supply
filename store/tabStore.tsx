@@ -35,6 +35,9 @@ interface ITabStore {
   activeTabAdminOrders: string;
   setActiveTabAdminOrders: (key: string) => void;
   deleteTabsAdminOrders: () => void;
+
+  activeMainTabKey:string,
+  setActiveMainTabKey: (key: string) => void;
 }
 
 export const useTabStore = create<ITabStore>()(
@@ -129,6 +132,9 @@ export const useTabStore = create<ITabStore>()(
             ],
             activeTabAdminOrders: "1",
           }),
+
+        activeMainTabKey: "1",
+        setActiveMainTabKey: (key) => set({activeMainTabKey:key})
 
     }),
     { name: "tabsOrders" }
