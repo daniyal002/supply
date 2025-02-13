@@ -44,6 +44,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       key: "order_number",
       sorter: (a: any, b: any) =>
         a.order_number.localeCompare(b.order_number, "ru"),
+      defaultSortOrder: "descend",
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -68,17 +69,21 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
           setTimeout(() => searchInput.current?.select(), 100);
         }
       },
-      render: (text) =>
-        searchedColumn === "order_number" ? (
+      render: (text) => {
+        const formattedOrderNumber = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
+        return searchedColumn === "order_number" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
             searchWords={[searchText]}
             autoEscape
-            textToHighlight={text ? text.toString() : ""}
+            textToHighlight={formattedOrderNumber}
           />
         ) : (
-          text
-        ),
+          formattedOrderNumber
+        );
+      },
     },
     {
       title: "Дата",

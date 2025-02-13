@@ -6,7 +6,6 @@ import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import {
-  useDeleteOrderMutation,
   useResetOrderMutation,
 } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
@@ -14,7 +13,6 @@ import {
   EyeTwoTone,
   ReloadOutlined,
   SearchOutlined,
-  SyncOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
