@@ -42,7 +42,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       title: "№",
       dataIndex: "order_number",
       key: "order_number",
-      sorter: (a: any, b: any) =>
+      sorter: (a: IOrderItem, b: IOrderItem) =>
         a.order_number.localeCompare(b.order_number, "ru"),
       defaultSortOrder: "descend",
       filterDropdown: (props) => (
@@ -89,8 +89,11 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       title: "Дата",
       dataIndex: "created_at",
       key: "created_at",
-      sorter: (a: any, b: any) =>
-        a.created_at.localeCompare(b.created_at, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) =>{
+        const nameA = a.created_at || "";
+        const nameB = b.created_at || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (text: string) => {
         const date = new Date(text);
         return date.toLocaleString("ru-RU", {
@@ -107,7 +110,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       title: "Статус",
       dataIndex: "order_status",
       key: "order_status",
-      sorter: (a: any, b: any) =>
+      sorter: (a: IOrderItem, b: IOrderItem) =>
         a.order_status.order_status_name.localeCompare(
           b.order_status.order_status_name,
           "ru"
@@ -134,8 +137,11 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       title: "Сотрудник/Кабинет",
       dataIndex: "buyer",
       key: "buyer",
-      sorter: (a: any, b: any) =>
-        a.buyer.buyer_name.localeCompare(b.buyer.buyer_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) =>{
+        const nameA = a.buyer?.buyer_name || "";
+        const nameB = b.buyer?.buyer_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (buyer: IEmployee) => buyer?.buyer_name,
       responsive: ["lg"],
     },
@@ -144,11 +150,11 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       dataIndex: "user",
       key: "user",
       showSorterTooltip: { title: "Сортировка по пользователю" },
-      sorter: (a: any, b: any) =>
-        a.user?.employee.buyer_name.localeCompare(
-          b.user?.employee.buyer_name,
-          "ru"
-        ),
+      sorter: (a: IOrderItem, b: IOrderItem) =>{
+        const nameA = a.user?.employee.buyer_name || "";
+        const nameB = b.user?.employee?.buyer_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       responsive: ["lg"],
       render: (user: IUser) => {
         return user?.employee.buyer_name;
@@ -158,8 +164,11 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       title: "Подразделение",
       dataIndex: "department",
       key: "department",
-      sorter: (a: any, b: any) =>
-        a.department_name.localeCompare(b.department_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.department?.department_name || "";
+        const nameB = b.department?.department_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (department: IDepartment) => department?.department_name,
     },
     {

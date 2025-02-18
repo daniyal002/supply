@@ -45,7 +45,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       dataIndex: "order_number",
       key: "order_number",
       showSorterTooltip: {title:"Сортировка по номеру"},
-      sorter: (a: any, b: any) =>
+      sorter: (a: IOrderItem, b: IOrderItem) =>
         a.order_number.localeCompare(b.order_number, "ru"),
       defaultSortOrder: 'descend',
       filterDropdown: (props) => (
@@ -91,8 +91,11 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       dataIndex: "created_at",
       showSorterTooltip: {title:"Сортировка по дате"},
       key: "created_at",
-      sorter: (a: any, b: any) =>
-        a.created_at.localeCompare(b.created_at, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) =>{
+        const nameA = a.created_at || "";
+        const nameB = b.created_at || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (text: string) => {
         const date = new Date(text);
         return date.toLocaleString("ru-RU", {
@@ -110,7 +113,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
         showSorterTooltip: {title:"Сортировка по статусу"},
         dataIndex: "order_status",
         key: "order_status",
-        sorter: (a: any, b: any) =>
+        sorter: (a: IOrderItem, b: IOrderItem) =>
           a.order_status.order_status_name.localeCompare(
             b.order_status.order_status_name,
             "ru"
@@ -138,8 +141,11 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       dataIndex: "buyer",
       showSorterTooltip: {title:"Сортировка по сотруднику"},
       key: "buyer",
-      sorter: (a: any, b: any) =>
-        a.buyer.buyer_name.localeCompare(b.buyer.buyer_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) =>{
+        const nameA = a.buyer?.buyer_name || "";
+        const nameB = b.buyer?.buyer_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       responsive: ["lg"],
       filterDropdown: (props) => (
         <SearchFilter
@@ -183,8 +189,11 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       dataIndex:'user',
       key: 'user',
       showSorterTooltip: {title:"Сортировка по пользователю"},
-      sorter: (a: any, b: any) =>
-        a.user?.employee.buyer_name.localeCompare(b.user?.employee.buyer_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) =>{
+        const nameA = a.user?.employee.buyer_name || "";
+        const nameB = b.user?.employee?.buyer_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       responsive: ["lg"],
       render: (user: IUser) => {
         return user?.employee.buyer_name
@@ -195,8 +204,11 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       dataIndex: "department",
       showSorterTooltip: {title:"Сортировка по подразделению"},
       key: "department",
-      sorter: (a: any, b: any) =>
-        a.department_name.localeCompare(b.department_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.department?.department_name || "";
+        const nameB = b.department?.department_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (department: IDepartment) => department?.department_name,
     },
     {

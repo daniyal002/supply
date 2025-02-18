@@ -30,7 +30,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       title: "Сотрудник",
       dataIndex: "buyer_name",
       key: "buyer_name",
-      sorter: (a: any, b: any) =>
+      sorter: (a: IStepHistory, b: IStepHistory) =>
         a.buyer_name.localeCompare(b.buyer_name, "ru"),
       filterDropdown: (props) => (
         <SearchFilter
@@ -68,7 +68,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       title: "Дата",
       dataIndex: "created_at",
       key: "created_at",
-      sorter: (a: any, b: any) =>
+      sorter: (a: IStepHistory, b: IStepHistory) =>
         a.created_at.localeCompare(b.created_at, "ru"),
       render: (text: string) => {
         const date = new Date(text);
@@ -86,7 +86,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
         title: "Статус",
         dataIndex: "status_name",
         key: "status_name",
-        sorter: (a: any, b: any) =>
+        sorter: (a: IStepHistory, b: IStepHistory) =>
           a.status_name.localeCompare(
             b.status_name,
             "ru"
@@ -113,7 +113,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       title: "Комментарий",
       dataIndex: "note",
       key: "note",
-      sorter: (a: any, b: any) =>
+      sorter: (a: IStepHistory, b: IStepHistory) =>
         a.note.localeCompare(b.note, "ru"),
     },
 
