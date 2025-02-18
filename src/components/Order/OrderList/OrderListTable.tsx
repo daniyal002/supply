@@ -5,15 +5,9 @@ import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import {
-  useResetOrderMutation,
-} from "@/hook/orderHook";
+import { useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
-import {
-  EyeTwoTone,
-  ReloadOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { EyeTwoTone, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
@@ -22,6 +16,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { useState } from "react";
 import ContextMenu from "@/components/UI/ContextMenu/ContextMenu";
 import { useTabStore } from "../../../../store/tabStore";
+import { IProductGroup } from "@/interface/product";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -46,14 +41,14 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
 
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
-  const addTabOrders = useTabStore((state) => state.addTabOrders)
+  const addTabOrders = useTabStore((state) => state.addTabOrders);
   const columns: TableColumnsType<IOrderItem> = [
     {
       title: "№",
       dataIndex: "order_number",
       key: "order_number",
       showSorterTooltip: { title: "Сортировка по номеру" },
-      sorter: (a: any, b: any) =>
+      sorter: (a: IOrderItem, b: IOrderItem) =>
         a.order_number.localeCompare(b.order_number, "ru"),
       defaultSortOrder: "descend",
       filterDropdown: (props) => (
@@ -101,8 +96,11 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       dataIndex: "created_at",
       showSorterTooltip: { title: "Сортировка по дате" },
       key: "created_at",
-      sorter: (a: any, b: any) =>
-        a.created_at.localeCompare(b.created_at, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.created_at || "";
+        const nameB = b.created_at || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (text: string) => {
         const date = new Date(text);
         return date.toLocaleString("ru-RU", {
@@ -120,7 +118,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       showSorterTooltip: { title: "Сортировка по статусу" },
       dataIndex: "order_status",
       key: "order_status",
-      sorter: (a: any, b: any) =>
+      sorter: (a: IOrderItem, b: IOrderItem) =>
         a.order_status.order_status_name.localeCompare(
           b.order_status.order_status_name,
           "ru"
@@ -148,8 +146,11 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       dataIndex: "buyer",
       showSorterTooltip: { title: "Сортировка по сотруднику" },
       key: "buyer",
-      sorter: (a: any, b: any) =>
-        a.buyer.buyer_name.localeCompare(b.buyer.buyer_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.buyer?.buyer_name || "";
+        const nameB = b.buyer?.buyer_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       responsive: ["lg"],
       filterDropdown: (props) => (
         <SearchFilter
@@ -193,9 +194,24 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       dataIndex: "department",
       showSorterTooltip: { title: "Сортировка по подразделению" },
       key: "department",
-      sorter: (a: any, b: any) =>
-        a.department_name.localeCompare(b.department_name, "ru"),
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.department?.department_name || "";
+        const nameB = b.department?.department_name || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
       render: (department: IDepartment) => department?.department_name,
+    },
+    {
+      title: "Категория",
+      dataIndex: "product_group",
+      showSorterTooltip: { title: "Сортировка по категориям" },
+      key: "product_group",
+      sorter: (a: IOrderItem, b: IOrderItem) =>
+        a.product_group.product_group_name.localeCompare(
+          b.product_group.product_group_name,
+          "ru"
+        ),
+      render: (productGroup: IProductGroup) => productGroup?.product_group_name,
     },
     {
       title: "ОМС/ПУ",
@@ -301,7 +317,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
 
     // Логика создания копии
     toast.success("Копия заявки создана");
-    setOrderId(`copy${String(contextMenu.orderId)}`)
+    setOrderId(`copy${String(contextMenu.orderId)}`);
 
     // Здесь вызовите вашу мутацию для копирования
   };
@@ -333,10 +349,9 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         x={contextMenu.x}
         y={contextMenu.y}
         visible={contextMenu.visible}
-        onClose={() => setContextMenu(prev => ({...prev, visible: false }))}
+        onClose={() => setContextMenu((prev) => ({ ...prev, visible: false }))}
         onCopy={handleCopyOrder}
       />
-
     </ConfigProvider>
   );
 };
