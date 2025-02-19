@@ -238,6 +238,9 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
             (dataSource?.length as number) > 0 ? dataSource?.length : 0
           }`
         }
+        onRow={(record) => ({
+          onDoubleClick: () => setApprovalOrderId(String(record.order_id))
+        })}
       />
     </ConfigProvider>
   );

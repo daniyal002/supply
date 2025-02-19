@@ -1,19 +1,21 @@
 "use client";
 
-import {
-  Button,
-  ConfigProvider,
-  Space,
-  Table,
-  TableColumnsType,
-} from "antd";
+import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { useDeleteOrderMutation, useResetOrderMutation } from "@/hook/orderHook";
+import {
+  useDeleteOrderMutation,
+  useResetOrderMutation,
+} from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../store/orderIdStore";
-import { EyeTwoTone, ReloadOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
+import {
+  EyeTwoTone,
+  ReloadOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
@@ -26,28 +28,33 @@ interface AdminOrderListProps {
 }
 
 const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
-
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
   const StatusOption = OrderData
-  ? Array.from(
-      new Set(OrderData.map(order => order?.order_status?.order_status_id))
-    ).map(id => {
-      const orderStatus = OrderData.find(order => order?.order_status?.order_status_id === id)?.order_status;
-      return { value: String(orderStatus?.order_status_id), label: orderStatus?.order_status_name || '' };
-    })
-  : [];
+    ? Array.from(
+        new Set(OrderData.map((order) => order?.order_status?.order_status_id))
+      ).map((id) => {
+        const orderStatus = OrderData.find(
+          (order) => order?.order_status?.order_status_id === id
+        )?.order_status;
+        return {
+          value: String(orderStatus?.order_status_id),
+          label: orderStatus?.order_status_name || "",
+        };
+      })
+    : [];
 
-  const { mutate: resetOrderMutation } = useResetOrderMutation()
+  const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setAdminOrderId = useOrderIdStore((state) => state.setAdminOrderId);
   const columns: TableColumnsType<IOrderItem> = [
     {
       title: "№",
       dataIndex: "order_number",
       key: "order_number",
-      showSorterTooltip: {title:"Сортировка по номеру"},
+      showSorterTooltip: { title: "Сортировка по номеру" },
       sorter: (a: IOrderItem, b: IOrderItem) =>
         a.order_number.localeCompare(b.order_number, "ru"),
-      defaultSortOrder: 'descend',
+      defaultSortOrder: "descend",
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -73,7 +80,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
         }
       },
       render: (text) => {
-        const formattedOrderNumber = text ? text.toString().replace(/^0+/, '') : "";
+        const formattedOrderNumber = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
         return searchedColumn === "order_number" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -89,9 +98,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
     {
       title: "Дата",
       dataIndex: "created_at",
-      showSorterTooltip: {title:"Сортировка по дате"},
+      showSorterTooltip: { title: "Сортировка по дате" },
       key: "created_at",
-      sorter: (a: IOrderItem, b: IOrderItem) =>{
+      sorter: (a: IOrderItem, b: IOrderItem) => {
         const nameA = a.created_at || "";
         const nameB = b.created_at || "";
         return nameA.localeCompare(nameB, "ru");
@@ -109,39 +118,39 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       },
     },
     {
-        title: "Статус",
-        showSorterTooltip: {title:"Сортировка по статусу"},
-        dataIndex: "order_status",
-        key: "order_status",
-        sorter: (a: IOrderItem, b: IOrderItem) =>
-          a.order_status.order_status_name.localeCompare(
-            b.order_status.order_status_name,
-            "ru"
-          ),
-        render: (order_status: IStatusOrder) => order_status?.order_status_name,
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => (
-          <StatusFilter
-            options={StatusOption}
-            setSelectedKeys={setSelectedKeys}
-            selectedKeys={selectedKeys.map(key => String(key))}
-            confirm={confirm}
-            clearFilters={() => clearFilters && clearFilters()}
-          />
+      title: "Статус",
+      showSorterTooltip: { title: "Сортировка по статусу" },
+      dataIndex: "order_status",
+      key: "order_status",
+      sorter: (a: IOrderItem, b: IOrderItem) =>
+        a.order_status.order_status_name.localeCompare(
+          b.order_status.order_status_name,
+          "ru"
         ),
-        onFilter: (value, record) =>
-          record.order_status.order_status_id === Number(value),
-      },
+      render: (order_status: IStatusOrder) => order_status?.order_status_name,
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <StatusFilter
+          options={StatusOption}
+          setSelectedKeys={setSelectedKeys}
+          selectedKeys={selectedKeys.map((key) => String(key))}
+          confirm={confirm}
+          clearFilters={() => clearFilters && clearFilters()}
+        />
+      ),
+      onFilter: (value, record) =>
+        record.order_status.order_status_id === Number(value),
+    },
     {
       title: "Сотрудник/Кабинет",
       dataIndex: "buyer",
-      showSorterTooltip: {title:"Сортировка по сотруднику"},
+      showSorterTooltip: { title: "Сортировка по сотруднику" },
       key: "buyer",
-      sorter: (a: IOrderItem, b: IOrderItem) =>{
+      sorter: (a: IOrderItem, b: IOrderItem) => {
         const nameA = a.buyer?.buyer_name || "";
         const nameB = b.buyer?.buyer_name || "";
         return nameA.localeCompare(nameB, "ru");
@@ -185,24 +194,24 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       },
     },
     {
-      title:"Пользователь",
-      dataIndex:'user',
-      key: 'user',
-      showSorterTooltip: {title:"Сортировка по пользователю"},
-      sorter: (a: IOrderItem, b: IOrderItem) =>{
+      title: "Пользователь",
+      dataIndex: "user",
+      key: "user",
+      showSorterTooltip: { title: "Сортировка по пользователю" },
+      sorter: (a: IOrderItem, b: IOrderItem) => {
         const nameA = a.user?.employee.buyer_name || "";
         const nameB = b.user?.employee?.buyer_name || "";
         return nameA.localeCompare(nameB, "ru");
       },
       responsive: ["lg"],
       render: (user: IUser) => {
-        return user?.employee.buyer_name
-      }
+        return user?.employee.buyer_name;
+      },
     },
     {
       title: "Подразделение",
       dataIndex: "department",
-      showSorterTooltip: {title:"Сортировка по подразделению"},
+      showSorterTooltip: { title: "Сортировка по подразделению" },
       key: "department",
       sorter: (a: IOrderItem, b: IOrderItem) => {
         const nameA = a.department?.department_name || "";
@@ -214,7 +223,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
     {
       title: "ОМС/ПУ",
       dataIndex: "oms",
-      showSorterTooltip: {title:"Сортировка по ОМС/ПУ"},
+      showSorterTooltip: { title: "Сортировка по ОМС/ПУ" },
       key: "oms",
       // sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
       responsive: ["lg"],
@@ -226,7 +235,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       }) => (
         <CheckboxFilter
           setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map(key => String(key))}
+          selectedKeys={selectedKeys.map((key) => String(key))}
           confirm={confirm}
           clearFilters={() => clearFilters && clearFilters()}
         />
@@ -246,33 +255,38 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
     {
       title: "Действия",
       key: "action",
-      showSorterTooltip: {title:"Действия"},
+      showSorterTooltip: { title: "Действия" },
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
           {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
-          <Button onClick={() => setAdminOrderId(String(record.order_id))} aria-label="Посмотреть заявку" title="Посмотреть заявку" >
-          <EyeTwoTone />
+          <Button
+            onClick={() => setAdminOrderId(String(record.order_id))}
+            aria-label="Посмотреть заявку"
+            title="Посмотреть заявку"
+          >
+            <EyeTwoTone />
           </Button>
           {record.in_route && record.current_step_container !== null && (
             <Button
-            aria-label="Сбросить заявку"
-            title="Сбросить заявку"
-            type="primary"
-            danger
-            onClick={() =>
-              toast.error("Вы точно хотите сбросить заявку ?", {
-                style: {
-                  color: "red",
-                },
-                action: {
-                  label: "Сбросить",
-                  onClick: () => resetOrderMutation(record.order_id as number),
-                },
-              })
-            }
-          >
-            <ReloadOutlined />
-          </Button>
+              aria-label="Сбросить заявку"
+              title="Сбросить заявку"
+              type="primary"
+              danger
+              onClick={() =>
+                toast.error("Вы точно хотите сбросить заявку ?", {
+                  style: {
+                    color: "red",
+                  },
+                  action: {
+                    label: "Сбросить",
+                    onClick: () =>
+                      resetOrderMutation(record.order_id as number),
+                  },
+                })
+              }
+            >
+              <ReloadOutlined />
+            </Button>
           )}
         </Space>
       ),
@@ -286,13 +300,26 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
 
   return (
     <ConfigProvider
-    theme={{
-      token: {
-        colorPrimary:"#678098"
-      },
-    }}
-  >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Заявок"} }} footer={()=> `Заявок: ${dataSource?.length as number > 0 ? dataSource?.length : 0}` }/>
+      theme={{
+        token: {
+          colorPrimary: "#678098",
+        },
+      }}
+    >
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        scroll={{ x: 200 }}
+        pagination={{ locale: { items_per_page: "/ Заявок" } }}
+        footer={() =>
+          `Заявок: ${
+            (dataSource?.length as number) > 0 ? dataSource?.length : 0
+          }`
+        }
+        onRow={(record) => ({
+          onDoubleClick: () => setAdminOrderId(String(record.order_id))
+        })}
+      />
     </ConfigProvider>
   );
 };

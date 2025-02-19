@@ -342,7 +342,9 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         }
         onRow={(record) => ({
           onContextMenu: (e) => handleContextMenu(e, record),
+          onDoubleClick: () => setOrderId(String(record.order_id))
         })}
+
       />
 
       <ContextMenu
