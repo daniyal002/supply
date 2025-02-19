@@ -34,6 +34,8 @@ export default function Notification() {
             const notification = JSON.parse(event.data);
             if( notification.detail.type === 'info'){
                 setNotifications(notification.detail.data)
+                queryClient.invalidateQueries({queryKey:['OrderUser']})
+
             }
             if( notification.detail.type === "new_order" || notification.detail.type === "agreed" || notification.detail.type === "reject" ){
               queryClient.invalidateQueries({queryKey:['approvalOrders']})
