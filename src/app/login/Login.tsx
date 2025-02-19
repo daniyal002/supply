@@ -6,6 +6,8 @@ import { useLogin } from "@/hook/useAuth";
 import { ILoginRequest } from "@/interface/auth";
 import { toast, Toaster } from "sonner";
 import { Alert } from "antd";
+import { useState } from "react";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 
 export function Login() {
   const {
@@ -15,6 +17,13 @@ export function Login() {
   } = useForm<ILoginRequest>({ mode: "onChange" });
   const { mutate, error } = useLogin();
   const onSubmit: SubmitHandler<ILoginRequest> = (data) => mutate(data);
+
+  const [showPassword, setShowPassword] = useState<boolean>(false); // Состояние для видимости пароля
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
 
   return (
     <>
@@ -37,14 +46,23 @@ export function Login() {
           <label htmlFor="password" className={style.formItemLabel}>
             Пароль
           </label>
-          <input
-            type="password"
-            placeholder="Пароль"
-            className={style.passwordInput}
-            {...register("password", {
-              required: { message: "Введите пароль", value: true },
-            })}
-          />
+          <div className={style.passwordInputContainer}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Пароль"
+              className={style.passwordInput}
+              {...register("password", {
+                required: { message: "Введите пароль", value: true },
+              })}
+            />
+            <button
+              type="button"
+              className={style.showPasswordButton}
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <EyeOutlined style={{fontSize:"25px"}}/> : <EyeInvisibleOutlined style={{fontSize:"25px"}} />}
+            </button>
+          </div>
           {errors.password && (
             <p className={style.error}>{errors.password.message}</p>
           )}

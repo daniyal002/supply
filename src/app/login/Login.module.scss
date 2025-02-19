@@ -1,13 +1,37 @@
-.formLogin{
+.formLogin {
     display: flex;
     flex-direction: column;
     gap: 20px;
 
-    .loginForgotPassword{
+    .passwordInputContainer {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .passwordInput {
+            flex: 1;
+        }
+
+        .showPasswordButton {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #fff; // Цвет текста кнопки
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .loginForgotPassword {
         display: flex;
         justify-content: flex-end;
     }
-    .loginForgotPasswordText{
+
+    .loginForgotPasswordText {
         color: #1677ff;
         text-align: left;
         background-color: #fff;
@@ -19,21 +43,23 @@
         cursor: pointer;
         transition: 0.5s;
 
-        &:hover{
+        &:hover {
             color: #3f6499;
         }
     }
 
-    .formItem{
+    .formItem {
         display: flex;
         flex-direction: column;
-        gap:10px;
+        gap: 10px;
 
-        .formItemLabel{
+        .formItemLabel {
             font-weight: 300;
         }
     }
-    .usernameInput, .passwordInput{
+
+    .usernameInput,
+    .passwordInput {
         // width: 100%;
         height: 50px;
         font-size: 25px;
@@ -44,12 +70,28 @@
         outline: none;
         color: #fff;
 
-        &::placeholder{
+        @media (max-width:370px) {
+            padding: 2px;
+
+        }
+
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:focus,
+        &:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #678098 inset !important; // Заменяем фон на белый (или любой другой цвет)
+            -webkit-text-fill-color: #fff !important; // Цвет текста
+            transition: background-color 5000s ease-in-out 0s; // Отключаем анимацию изменения фона
+            font-size: 25px !important;
+            color: #fff !important;
+        }
+
+        &::placeholder {
             color: #fff;
         }
     }
 
-    .loginSubmit{
+    .loginSubmit {
         // width: 100%;
         display: flex;
         justify-content: center;
@@ -64,14 +106,16 @@
         cursor: pointer;
         border-radius: 6px;
         transition: 0.5s;
-        &:hover{
-        background-color: #3e4c58;
+
+        &:hover {
+            background-color: #3e4c58;
 
         }
-        }
+    }
 
 }
-.error{
+
+.error {
     color: red;
     font-size: 12px;
     text-transform: uppercase;
