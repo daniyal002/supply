@@ -34,8 +34,8 @@ interface Props {
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
   const {isLoading} = useProductData()
-  const { mutate: createOrderMutation } = useCreateOrderMutation();
-  const { mutate: updateOrderMutation } = useUpdateOrderMutation();
+  const { mutate: createOrderMutation, isPending:createOrderIsPending } = useCreateOrderMutation();
+  const { mutate: updateOrderMutation, isPending:updateOrderIsPending } = useUpdateOrderMutation();
   const {
     register,
     handleSubmit,
@@ -276,8 +276,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             <button type="submit" className={style.buttonOrderCreate}>
               {orderid === "newOrder" ||
               orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                ? "Создать"
-                : "Перезапуск"}
+                ? createOrderIsPending ? "Создается..." : "Создать"
+                : updateOrderIsPending ? "Перезапускается..." : "Перезапуск"}
             </button>
           )}
         </form>

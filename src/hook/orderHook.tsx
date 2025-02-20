@@ -93,7 +93,7 @@ export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
   const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId);
 
-  const { mutate } = useMutation({
+  const { mutate,isPending } = useMutation({
     mutationKey: ["createOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.addOrder(data),
     onSuccess: (newOrder,variables) => {
@@ -111,15 +111,14 @@ export const useCreateOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate };
+  return { mutate,isPending };
 };
 
 export const useUpdateOrderMutation = () => {
   const queryClient = useQueryClient();
-  const { replace } = useRouter();
   const setOrderId = useOrderIdStore(state => state.setOrderId)
 
-  const { mutate } = useMutation({
+  const { mutate,isPending } = useMutation({
     mutationKey: ["updateOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.updateOrder(data),
     onSuccess: (newOrder, variables) => {
@@ -143,7 +142,7 @@ export const useUpdateOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate };
+  return { mutate,isPending };
 };
 
 export const useAgreedOrderMutation = () => {
