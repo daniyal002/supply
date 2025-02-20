@@ -89,6 +89,16 @@ export default function AdminPanel() {
         >
           Маршруты
         </button>
+        <button
+          onClick={() => push("/i/oneC")}
+          className={
+            isActive("/i/oneC")
+              ? `${style.adminButton} ${style.active}`
+              : style.adminButton
+          }
+        >
+          1C
+        </button>
       </div>
   );
 }
