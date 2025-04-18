@@ -1,44 +1,64 @@
 import { useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
-import ModalSelectProductOrder from "../SelectProductOrder/ModalSelectProductOrder/ModalSelectProductOrder";
 import { IOrderItemFormValues } from "@/interface/orderItem";
-import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import {
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
+import ModalCommentSelectProductOrder from "./ModalCommentSelectProductOrder/ModalCommentSelectProductOrder";
 
 interface Props {
-  productTableData:IProductTable[];
+  productTableData: IProductTable[];
   watch: UseFormWatch<IOrderItemFormValues>;
-  getValues:UseFormGetValues<IOrderItemFormValues>;
-  setValue:UseFormSetValue<IOrderItemFormValues>
+  getValues: UseFormGetValues<IOrderItemFormValues>;
+  setValue: UseFormSetValue<IOrderItemFormValues>;
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch}:Props) {
+export default function ProductOrder({
+  productTableData,
+  getValues,
+  setValue,
+  watch,
+}: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
-  const [productIndex,setProductIndex] = useState<number>()
+  const [orderProductId, setOrderProductId] = useState<number>();
+  const [productIndex, setProductIndex] = useState<number>();
+  const orderId = getValues("order_id");
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const deleteProduct = (productIndex:number) => {
-    const updatedProducts = getValues("order_products").filter((_, index) => index !== productIndex);
+  const deleteProduct = (productIndex: number) => {
+    const updatedProducts = getValues("order_products").filter(
+      (_, index) => index !== productIndex
+    );
     setValue("order_products", updatedProducts);
-  }
+  };
 
   return (
     <>
-      <ModalSelectProductOrder
+      <ModalCommentSelectProductOrder
         type="Изменить"
         isModalOpen={isModalOpen}
-       editProductId={productIndex as number}
-       productId={productId}
-       setIsModalOpen={setIsModalOpen}
-       getValues={getValues}
-       setValue={setValue}
-       watch={watch}
+        editProductId={productIndex as number}
+        productId={productId}
+        setIsModalOpen={setIsModalOpen}
+        orderProductId={orderProductId}
+        orderId={orderId as number}
       />
-      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct}/>
+      <ProductOrderTable
+        showModal={showModal}
+        productTableData={productTableData}
+        setProductId={setProductId}
+        setOrderProductId={setOrderProductId}
+        setProductIndex={setProductIndex}
+        deleteProduct={deleteProduct}
+        orderId={orderId as number}
+      />
     </>
   );
 }

@@ -65,7 +65,7 @@ export default function ApprovalOrder({
   ];
 
   const onChange = (key: string) => {
-    console.log(key);
+    // console.log(key);
   };
 
   const agreedOrder = (order_id:number) => {
@@ -224,7 +224,7 @@ export default function ApprovalOrder({
   }, [reset, type, orderid, getOrderByIdData]);
 
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
-    console.log(data);
+    // console.log(data);
   };
 
   return (

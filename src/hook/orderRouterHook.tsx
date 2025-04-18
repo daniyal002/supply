@@ -96,7 +96,6 @@ export const useCreateOrderRouteMutation = () => {
       },
       onError(error: AxiosError<IErrorResponse>) {
         message.error(error?.response?.data?.detail);
-        console.log(error?.response?.data)
       },
     });
     return { mutate };

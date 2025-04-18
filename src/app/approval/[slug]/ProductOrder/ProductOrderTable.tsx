@@ -1,25 +1,29 @@
-import { IBasicUnit } from "@/interface/basicUnit";
 import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import { IProductTable, IProductTableRequest } from "@/interface/productTable";
+import { IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { ExpandedRowContent } from "./ExpandedRowContent";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
   showModal: () => void;
+  setOrderProductId: (product: number) => void;
   setProductId: (product: number) => void;
   setProductIndex: (key: number) => void;
   deleteProduct: (key: number) => void;
+  orderId:number
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
   productTableData,
+  setOrderProductId,
   setProductId,
   showModal,
   setProductIndex,
   deleteProduct,
+  orderId
 }) => {
   const columns: TableColumnsType<IProductTable> = [
     {
@@ -71,44 +75,48 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "note",
       responsive: ["sm"],
     },
-    // {
-    //   title: "Действия",
-    //   key: "action",
-    //   render: (record: IProductTable) => (
-    //     <Space size="middle">
-    //       <div style={{display:"flex",flexWrap:"wrap",gap:"10px"}}>
-    //         <Button
-    //           onClick={() => {
-    //             setProductId(record.product.product_id as number);
-    //             showModal();
-    //             // @ts-ignore: Unreachable code error
-    //             setProductIndex(record.key);
-    //           }}
-    //         >
-    //           Изменить
-    //         </Button>
-    //         <Button
-    //           danger
-    //           type="primary"
-    //           onClick={() => {
-    //             // @ts-ignore: Unreachable code error
-    //             deleteProduct(record.key);
-    //           }}
-    //         >
-    //           Удалить
-    //         </Button>
-    //       </div>
-    //     </Space>
-    //   ),
-    // },
   ];
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
 
-  const dataSource = productTableData?.map((product, index) => ({
-    ...product,
-    key: index, // Ensure each item has a unique key
-  }));
+  // Обработчик раскрытия строки
+  const handleExpand = async (expanded: boolean, record: IProductTable) => {
+    const key = record.order_product_id as number;
+    setExpandedRowKeys(
+      (prev) =>
+        expanded
+          ? [...prev, key] // Добавляем ключ при раскрытии
+          : prev.filter((k) => k !== key) // Удаляем ключ при сворачивании
+    );
+  };
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Товаров"} }} footer={()=>("Всего: " + dataSource?.length)}/>;
+  return (
+    <Table
+      dataSource={productTableData}
+      columns={columns}
+      scroll={{ x: 200 }}
+      pagination={{ locale: { items_per_page: "/ Товаров" } }}
+      expandable={{
+        expandedRowKeys,
+        onExpand: handleExpand,
+        expandedRowRender: (record) =>
+          record.order_product_comment && (
+            <ExpandedRowContent
+              orderProductComments={record.order_product_comment}
+              product_id={record.product.product_id}
+              order_product_id={record.order_product_id as number}
+              setOrderProductId={setOrderProductId}
+              setProductId={setProductId}
+              setProductIndex={setProductIndex}
+              showModal={showModal}
+              orderId={orderId}
+
+            />
+          ),
+      }}
+      footer={() => "Всего: " + productTableData?.length}
+      rowKey="order_product_id"
+    />
+  );
 };
 
 export default ProductOrderTable;

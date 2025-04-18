@@ -59,8 +59,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const [buyerType, setBuyerType] = useState<string>();
 
   const onSubmit: SubmitHandler<IProductTableFormValues> = (data) => {
-    console.log(data);
-    console.log(editProductId);
     const unit = itemProductData?.directory_unit_measurement.find(
       (item) =>
         item.unit_measurement.unit_measurement_id ===
@@ -83,7 +81,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       buyers: doctors,
       unit_measurement: isNewProduct ? newUnitMesurement : unit,
     };
-    console.log(productTable);
 
     const products = getValues("order_products") || [];
 

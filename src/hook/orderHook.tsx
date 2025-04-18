@@ -1,12 +1,16 @@
 import { IErrorResponse } from "@/interface/error";
-import { IOrderItem, IOrderItemByIdResponse, IOrderItemRequest, IOrderItemRequestDelete } from "@/interface/orderItem";
+import {
+  IOrderItem,
+  IOrderItemRequest,
+  IOrderItemRequestDelete,
+} from "@/interface/orderItem";
 import { orderService } from "@/services/order.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import axios, { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
 import { useOrderIdStore } from "../../store/orderIdStore";
 import { useEffect } from "react";
+import { IOrderProductCommentsRequest } from "@/interface/orderProductComments";
 
 export const useGetOrderById = (id: string) => {
   const queryClient = useQueryClient();
@@ -58,72 +62,89 @@ export const useOrdersData = () => {
   return { ordersData, isLoading, error };
 };
 
-export const useApprovalOrders  = () => {
-  const { data: approvalOrders, isLoading, error } = useQuery({
+export const useApprovalOrders = () => {
+  const {
+    data: approvalOrders,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["approvalOrders"],
-    queryFn: orderService.getApprovalOrders,})
-    return {approvalOrders, isLoading, error}
-}
+    queryFn: orderService.getApprovalOrders,
+  });
+  return { approvalOrders, isLoading, error };
+};
 
-export const useOderStatusData = () =>{
-  const {data:oderStatusData, isLoading, error} = useQuery({
+export const useOderStatusData = () => {
+  const {
+    data: oderStatusData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["OrderStatus"],
     queryFn: orderService.getOrderStatus,
-    });
-    return {oderStatusData, isLoading, error};
-}
+  });
+  return { oderStatusData, isLoading, error };
+};
 
-export const useOrderStepHistory = (order_id:number) => {
-  const { data: orderStepHistory, isLoading, error } = useQuery({
+export const useOrderStepHistory = (order_id: number) => {
+  const {
+    data: orderStepHistory,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["OrderStepHistory"],
     queryFn: () => orderService.getOrderStepHistory(order_id),
-  })
+  });
   return { orderStepHistory, isLoading, error };
-}
+};
 
-export const useOrderRouteSteps = (order_id:number) => {
-  const { data: orderRouteSteps, isLoading, error } = useQuery({
+export const useOrderRouteSteps = (order_id: number) => {
+  const {
+    data: orderRouteSteps,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["OrderRouteSteps"],
     queryFn: () => orderService.getOrderRouteSteps(order_id),
-  })
+  });
   return { orderRouteSteps, isLoading, error };
-}
+};
 
 export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
-  const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId);
+  const setDraftOrderId = useOrderIdStore((state) => state.setDraftOrderId);
 
-  const { mutate,isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["createOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.addOrder(data),
-    onSuccess: (newOrder,variables) => {
-          setDraftOrderId("0"),
-          queryClient.setQueryData(
-            ["OrderUser"],
-            (oldData: IOrderItem[] | undefined) => {
-              if (!oldData) return [];
-              return [...oldData, newOrder.order];
-            }
-          );
-          message.success(newOrder.detail)
+    onSuccess: (newOrder, variables) => {
+      setDraftOrderId("0"),
+        queryClient.setQueryData(
+          ["OrderUser"],
+          (oldData: IOrderItem[] | undefined) => {
+            if (!oldData) return [];
+            return [...oldData, newOrder.order];
+          }
+        );
+      message.success(newOrder.detail);
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate,isPending };
+  return { mutate, isPending };
 };
 
 export const useUpdateOrderMutation = () => {
   const queryClient = useQueryClient();
-  const setOrderId = useOrderIdStore(state => state.setOrderId)
+  const setOrderId = useOrderIdStore((state) => state.setOrderId);
 
-  const { mutate,isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["updateOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.updateOrder(data),
     onSuccess: (newOrder, variables) => {
       // queryClient.invalidateQueries({queryKey:['OrderUser']})
-      setOrderId("0")
+      setOrderId("0");
       queryClient.setQueryData(
         ["OrderUser"],
         (oldData: IOrderItem[] | undefined) => {
@@ -136,59 +157,65 @@ export const useUpdateOrderMutation = () => {
           });
         }
       );
-      message.success("Заявка успешно обновлена !")
+      message.success("Заявка успешно обновлена !");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate,isPending };
+  return { mutate, isPending };
 };
 
 export const useAgreedOrderMutation = () => {
   const queryClient = useQueryClient();
 
-  const { mutate,isPending,isSuccess } = useMutation({
+  const { mutate, isPending, isSuccess } = useMutation({
     mutationKey: ["agreedOrder"],
-    mutationFn: (data:{order_id: number, note:string}) => orderService.agreedOrder(data.order_id,data.note),
+    mutationFn: (data: { order_id: number; note: string }) =>
+      orderService.agreedOrder(data.order_id, data.note),
     onSuccess: (agreedOrder, variables) => {
       queryClient.setQueryData(
         ["approvalOrders"],
         (oldData: IOrderItem[] | undefined) => {
           if (!oldData) return [];
-          return oldData.filter((order) => order.order_id !== variables.order_id);
+          return oldData.filter(
+            (order) => order.order_id !== variables.order_id
+          );
         }
       );
-      message.success("Заявка успешно согласована !")
+      message.success("Заявка успешно согласована !");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate,isPending,isSuccess };
+  return { mutate, isPending, isSuccess };
 };
 
 export const useRejectOrderMutation = () => {
   const queryClient = useQueryClient();
 
-  const { mutate,isPending,isSuccess   } = useMutation({
+  const { mutate, isPending, isSuccess } = useMutation({
     mutationKey: ["rejectOrder"],
-    mutationFn: (data:{order_id: number, note:string}) => orderService.rejectOrder(data.order_id,data.note),
+    mutationFn: (data: { order_id: number; note: string }) =>
+      orderService.rejectOrder(data.order_id, data.note),
     onSuccess: (rejectOrder, variables) => {
       queryClient.setQueryData(
         ["approvalOrders"],
         (oldData: IOrderItem[] | undefined) => {
           if (!oldData) return [];
-          return oldData.filter((order) => order.order_id !== variables.order_id);
+          return oldData.filter(
+            (order) => order.order_id !== variables.order_id
+          );
         }
       );
-      message.success("Заявка успешно отклонена !")
+      message.success("Заявка успешно отклонена !");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate,isPending,isSuccess };
+  return { mutate, isPending, isSuccess };
 };
 
 export const useDeleteOrderMutation = () => {
@@ -196,16 +223,19 @@ export const useDeleteOrderMutation = () => {
 
   const { mutate } = useMutation({
     mutationKey: ["deleteOrder"],
-    mutationFn: (data: IOrderItemRequestDelete) => orderService.deleteOrderById(data),
-    onSuccess: (newOrder,variables) => {
-        queryClient.setQueryData(
-          ["OrderUser"],
-          (oldData: IOrderItem[] | undefined) => {
-            if (!oldData) return [];
-            return oldData.filter((order) => order.order_id !== variables.order_id);
-          }
-        );
-      message.success("Заявка успешно удалена !")
+    mutationFn: (data: IOrderItemRequestDelete) =>
+      orderService.deleteOrderById(data),
+    onSuccess: (newOrder, variables) => {
+      queryClient.setQueryData(
+        ["OrderUser"],
+        (oldData: IOrderItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.filter(
+            (order) => order.order_id !== variables.order_id
+          );
+        }
+      );
+      message.success("Заявка успешно удалена !");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
@@ -221,7 +251,6 @@ export const useResetOrderMutation = () => {
     mutationKey: ["resetOrder"],
     mutationFn: (order_id: number) => orderService.resetOrder(order_id),
     onSuccess: (newOrder, variables) => {
-      console.log(newOrder.order, variables)
       queryClient.setQueryData(
         ["OrderUser"],
         (oldData: IOrderItem[] | undefined) => {
@@ -234,7 +263,92 @@ export const useResetOrderMutation = () => {
           });
         }
       );
-      message.success("Заявка успешно сброшена !")
+      message.success("Заявка успешно сброшена !");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useAddOrderProductCommentMutation = (orderId: number) => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["addOrderProductComment"],
+    mutationFn: (data: IOrderProductCommentsRequest) =>
+      orderService.addOrderProductComment(data),
+    onSuccess: (newComment, variables) => {
+      queryClient.setQueryData(
+        ["getOrderById", String(orderId)], // Ключ должен быть строкой
+        (oldData: IOrderItem | undefined) => {
+          // Исправлен тип на объект
+          if (!oldData) return oldData;
+
+          // Обновляем массив продуктов
+          const updatedProducts = oldData.order_products?.map((product) =>
+            product.order_product_id === variables.order_product_id
+              ? {
+                  ...product,
+                  order_product_comment: [
+                    newComment.detail, // Добавляем новый комментарий
+                    ...(product.order_product_comment || []),
+                  ],
+                }
+              : product
+          );
+          // Возвращаем обновленный заказ
+          return {
+            ...oldData,
+            order_products: updatedProducts,
+          };
+        }
+      );
+
+      message.success("Комментарий успешно добавлен!");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useDeleteOrderProductCommentMutation = (orderId: number) => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["deleteOrderProductComment"],
+    mutationFn: (data: { comment_id: number }) =>
+      orderService.deleteOrderProductComment(data),
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(
+        ["getOrderById", String(orderId)], // Ключ должен быть строкой
+        (oldData: IOrderItem | undefined) => {
+          // Исправлен тип на объект
+          if (!oldData) return oldData;
+          // Обновляем массив продуктов
+          const updatedProducts = oldData.order_products?.map((product) => {
+            return {
+              ...product,
+              order_product_comment: product.order_product_comment?.filter(
+                (pc) => pc.comment_id !== variables.comment_id
+              ),
+            };
+          });
+
+          // Возвращаем обновленный заказ
+          return {
+            ...oldData,
+            order_products: updatedProducts,
+          };
+        }
+      );
+
+      message.success("Комментарий успешно удален!");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);

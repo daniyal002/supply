@@ -44,9 +44,6 @@ export default function ParlorModal({
     );
 
     const itemFloorData = floorData?.find((floor) => floor.floor_id === data.floor?.value);
-    console.log("data",data);
-    console.log("itemDepartmentData",itemDepartmentData);
-    // console.log("itemFloorData",itemFloorData);
     const updateParlor: IParlor = {
       ...data,
       department: itemDepartmentData,
@@ -62,7 +59,6 @@ export default function ParlorModal({
   const itemParlorData = parlorData?.find((parlor) => parlor.parlor_id === parlorId);
 
   useEffect(() => {
-    console.log(itemParlorData);
     if (parlorId === undefined) {
       reset({
         parlor_name: undefined,

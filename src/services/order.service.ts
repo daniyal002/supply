@@ -11,6 +11,7 @@ import {
 import { IRouteInfoResponse } from "@/interface/routeInfo";
 import { IStepHistoryResponse } from "@/interface/stepHistory";
 import { saveApprovalCount } from "./auth-token.service";
+import { IOrderProductCommentsRequest } from "@/interface/orderProductComments";
 
 export const orderService = {
   async getOrderById(id: string) {
@@ -26,8 +27,8 @@ export const orderService = {
       "/order/get_approval_orders"
     );
 
-    if(response){
-      saveApprovalCount(response.data.detail.length.toString())
+    if (response) {
+      saveApprovalCount(response.data.detail.length.toString());
     }
     return response.data.detail;
   },
@@ -87,16 +88,18 @@ export const orderService = {
   },
 
   async agreedOrder(order_id: number, note: string) {
-    const response = await axiosWidthAuth.put<string>(
-      '/order/agreed_order',{order_id,note}
-    );
+    const response = await axiosWidthAuth.put<string>("/order/agreed_order", {
+      order_id,
+      note,
+    });
     return response.data;
   },
 
   async rejectOrder(order_id: number, note: string) {
-    const response = await axiosWidthAuth.put<string>(
-      '/order/reject_order',{order_id,note}
-    );
+    const response = await axiosWidthAuth.put<string>("/order/reject_order", {
+      order_id,
+      note,
+    });
     return response.data;
   },
   async deleteOrderById(data: IOrderItemRequestDelete) {
@@ -106,8 +109,28 @@ export const orderService = {
     );
     return response.data;
   },
-  async resetOrder(order_id:number){
-    const response = await axiosWidthAuth.put<IOrderItemAddResponse>('order/reset_order',{order_id:order_id})
-    return response.data
-  }
+
+  async resetOrder(order_id: number) {
+    const response = await axiosWidthAuth.put<IOrderItemAddResponse>(
+      "order/reset_order",
+      { order_id: order_id }
+    );
+    return response.data;
+  },
+
+  async addOrderProductComment(data: IOrderProductCommentsRequest) {
+    const response = await axiosWidthAuth.post(
+      "/order/add_order_product_comment",
+      data
+    );
+    return response.data;
+  },
+
+  async deleteOrderProductComment(data: {comment_id:number}) {
+    const response = await axiosWidthAuth.delete(
+      "/order/delete_order_product_comment",
+      {data:data}
+    );
+    return response.data;
+  },
 };
