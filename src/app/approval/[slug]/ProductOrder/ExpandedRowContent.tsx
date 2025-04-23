@@ -12,6 +12,7 @@ interface Props {
   showModal: () => void;
   setProductIndex: (key: number) => void;
   orderId: number;
+  is_cancel:boolean;
 }
 
 export const ExpandedRowContent = ({
@@ -23,6 +24,7 @@ export const ExpandedRowContent = ({
   setProductIndex,
   showModal,
   orderId,
+  is_cancel,
 }: Props) => {
   const dataSource: IOrderProductCommentsResponse[] = orderProductComments?.map(
     (product, index) => ({
@@ -36,6 +38,7 @@ export const ExpandedRowContent = ({
 
   return (
     <>
+    {!is_cancel && (
       <Button
         onClick={() => {
           setOrderProductId(order_product_id as number);
@@ -47,6 +50,8 @@ export const ExpandedRowContent = ({
       >
         Добавить комментарий
       </Button>
+    )}
+
       {!dataSource || dataSource?.length === 0 ? (
         <div>Данные не найдены</div>
       ) : (

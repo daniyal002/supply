@@ -10,7 +10,11 @@ import { message } from "antd";
 import axios, { AxiosError } from "axios";
 import { useOrderIdStore } from "../../store/orderIdStore";
 import { useEffect } from "react";
-import { IOrderProductCommentsRequest } from "@/interface/orderProductComments";
+import {
+  IOrderAddProductCancelCommentRequest,
+  IOrderDeleteProductCancelCommentRequest,
+  IOrderProductCommentsRequest,
+} from "@/interface/orderProductComments";
 
 export const useGetOrderById = (id: string) => {
   const queryClient = useQueryClient();
@@ -349,6 +353,84 @@ export const useDeleteOrderProductCommentMutation = (orderId: number) => {
       );
 
       message.success("Комментарий успешно удален!");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useAddOrderProductCancelCommentMutation = (orderId: number) => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["addOrderProductCancelComment"],
+    mutationFn: (data: IOrderAddProductCancelCommentRequest) =>
+      orderService.addOrderProductCancelComment(data),
+    onSuccess(data, variables) {
+      queryClient.setQueryData(
+        ["getOrderById", String(orderId)], // Ключ должен быть строкой
+        (oldData: IOrderItem | undefined) => {
+          // Исправлен тип на объект
+          if (!oldData) return oldData;
+          const updatedProducts = oldData.order_products?.map(
+            (product) =>
+              product.order_product_id === variables.order_product_id
+                ? {
+                    ...product,
+                    is_cancel: true,
+                    order_cancel_comment: data.detail,
+                  } // Update the matching product
+                : product // Keep other products unchanged
+          );
+
+          return {
+            ...oldData,
+            order_products: updatedProducts,
+          };
+        }
+      );
+
+      message.success("Вы успешно отклонили позицию.");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useDeleteOrderProductCancelCommentMutation = (orderId: number) => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["deleteOrderProductCancelComment"],
+    mutationFn: (data: IOrderDeleteProductCancelCommentRequest) =>
+      orderService.deleteOrderProductCancelComment(data),
+    onSuccess(_, variables) {
+      queryClient.setQueryData(
+        ["getOrderById", String(orderId)], // Ключ должен быть строкой
+        (oldData: IOrderItem | undefined) => {
+          // Исправлен тип на объект
+          if (!oldData) return oldData;
+          const updatedProducts = oldData.order_products?.map(
+            (product) =>
+              product.order_product_id === variables.order_product_id
+                ? { ...product, is_cancel: false, order_cancel_comment: {} } // Update the matching product
+                : product // Keep other products unchanged
+          );
+
+          return {
+            ...oldData,
+            order_products: updatedProducts,
+          };
+        }
+      );
+
+      message.success("Вы успешно активировали позицию.");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);

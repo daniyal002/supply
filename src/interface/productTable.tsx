@@ -1,6 +1,6 @@
 import { IBasicUnitOption } from "./basicUnit";
 import { IEmployeeFromParlorGetMe, IEmployeeOption } from "./employee";
-import { IOrderProductCommentsResponse } from "./orderProductComments";
+import { IOrderProductCancelCommentResponse, IOrderProductCommentsResponse } from "./orderProductComments";
 import { IProductUnit } from "./product";
 import { IUnit } from "./unit";
 
@@ -12,7 +12,9 @@ export interface IProductTable {
   unit_measurement: IUnit;
   product_quantity: number;
   buyers?: IEmployeeFromParlorGetMe[];
-  order_product_comment?:IOrderProductCommentsResponse[]
+  order_product_comment?: IOrderProductCommentsResponse[];
+  order_cancel_comment:IOrderProductCancelCommentResponse;
+  is_cancel?: boolean;
   note?: string;
 }
 

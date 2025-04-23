@@ -11,7 +11,12 @@ import {
 import { IRouteInfoResponse } from "@/interface/routeInfo";
 import { IStepHistoryResponse } from "@/interface/stepHistory";
 import { saveApprovalCount } from "./auth-token.service";
-import { IOrderProductCommentsRequest } from "@/interface/orderProductComments";
+import {
+  IOrderAddProductCancelCommentRequest,
+  IOrderAddProductCancelResponse,
+  IOrderDeleteProductCancelCommentRequest,
+  IOrderProductCommentsRequest,
+} from "@/interface/orderProductComments";
 
 export const orderService = {
   async getOrderById(id: string) {
@@ -126,10 +131,26 @@ export const orderService = {
     return response.data;
   },
 
-  async deleteOrderProductComment(data: {comment_id:number}) {
+  async deleteOrderProductComment(data: { comment_id: number }) {
     const response = await axiosWidthAuth.delete(
       "/order/delete_order_product_comment",
-      {data:data}
+      { data: data }
+    );
+    return response.data;
+  },
+
+  async addOrderProductCancelComment(data: IOrderAddProductCancelCommentRequest) {
+    const response = await axiosWidthAuth.post<IOrderAddProductCancelResponse>(
+      "/order/add_order_product_cancel_comment",
+      data
+    );
+    return response.data;
+  },
+
+  async deleteOrderProductCancelComment(data: IOrderDeleteProductCancelCommentRequest) {
+    const response = await axiosWidthAuth.delete<string>(
+      "/order/delete_order_product_cancel_comment",
+      { data: data }
     );
     return response.data;
   },

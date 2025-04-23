@@ -2,29 +2,42 @@ import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
 import { IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
 import { useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
+import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
+import style from "./ProductOrderTable.module.scss"
+import { InfoCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
   showModal: () => void;
+  showModalCancel: () => void;
   setOrderProductId: (product: number) => void;
+  setOrderProductIdCancel: (product: number) => void;
   setProductId: (product: number) => void;
+  setProductIdCancel: (product: number) => void;
   setProductIndex: (key: number) => void;
+  setProductIndexCancel: (key: number) => void;
   deleteProduct: (key: number) => void;
-  orderId:number
+  orderId: number;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
   productTableData,
   setOrderProductId,
+  setOrderProductIdCancel,
   setProductId,
+  setProductIdCancel,
   showModal,
+  showModalCancel,
   setProductIndex,
+  setProductIndexCancel,
   deleteProduct,
-  orderId
+  orderId,
 }) => {
+  const { mutate: deleteOrderProductCancelCommentMutation } =
+    useDeleteOrderProductCancelCommentMutation(orderId);
   const columns: TableColumnsType<IProductTable> = [
     {
       title: "Товар",
@@ -66,7 +79,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "buyers",
       key: "buyers",
       render: (buyers: IEmployeeFromParlorGetMe[]) =>
-         buyers.map((buyer) => buyer.buyer_name).join(", "),
+        buyers.map((buyer) => buyer.buyer_name).join(", "),
       responsive: ["sm"],
     },
     {
@@ -74,6 +87,45 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "note",
       key: "note",
       responsive: ["sm"],
+    },
+    {
+      title: "Действия",
+      key: "action",
+      width: "100px",
+      render: (_: any, record: IProductTable) => (
+        <Space size="middle">
+          {record.is_cancel ? (
+            <>
+            <Button
+              onClick={() =>
+                deleteOrderProductCancelCommentMutation({
+                  cancel_comment_id:
+                    record.order_cancel_comment.comment_cancel_id,
+                  order_product_id: record.order_product_id as number,
+                })
+              }
+            >
+              Активировать
+            </Button>
+            <Tooltip title={<span>{record.order_cancel_comment.comment}</span>}>
+            <InfoCircleFilled  style={{color:"#fff"}}/>
+            </Tooltip>
+            </>
+          ) : (
+            <Button
+              onClick={() => {
+                showModalCancel();
+                setProductIdCancel(record.product.product_id);
+                setOrderProductIdCancel(record.order_product_id as number);
+                // @ts-ignore: Unreachable code error
+                setProductIndexCancel(record.key);
+              }}
+            >
+              Отклонить
+            </Button>
+          )}
+        </Space>
+      ),
     },
   ];
   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
@@ -95,6 +147,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
+      rowClassName={(record) => record.is_cancel === true ? style.highlightRow : ''}
       expandable={{
         expandedRowKeys,
         onExpand: handleExpand,
@@ -109,10 +162,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               setProductIndex={setProductIndex}
               showModal={showModal}
               orderId={orderId}
-
+              is_cancel={record.is_cancel as boolean}
             />
           ),
       }}
+      rowHoverable={false}
       footer={() => "Всего: " + productTableData?.length}
       rowKey="order_product_id"
     />

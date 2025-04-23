@@ -8,6 +8,7 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import ModalCommentSelectProductOrder from "./ModalCommentSelectProductOrder/ModalCommentSelectProductOrder";
+import ModalCommentCancelSelectProductOrder from "./ModalCommentCancelSelectProductOrder/ModalCommentCancelSelectProductOrder";
 
 interface Props {
   productTableData: IProductTable[];
@@ -26,11 +27,22 @@ export default function ProductOrder({
   const [productId, setProductId] = useState<number>();
   const [orderProductId, setOrderProductId] = useState<number>();
   const [productIndex, setProductIndex] = useState<number>();
+
+  const [isModalOpenCancel, setIsModalOpenCancel] = useState<boolean>(false);
+  const [productIdCancel, setProductIdCancel] = useState<number>();
+  const [orderProductIdCancel, setOrderProductIdCancel] = useState<number>();
+  const [productIndexCancel, setProductIndexCancel] = useState<number>();
+
+
   const orderId = getValues("order_id");
 
   const showModal = () => {
     setIsModalOpen(true);
   };
+
+  const showModalCancel = () => {
+    setIsModalOpenCancel(true)
+  }
 
   const deleteProduct = (productIndex: number) => {
     const updatedProducts = getValues("order_products").filter(
@@ -50,12 +62,25 @@ export default function ProductOrder({
         orderProductId={orderProductId}
         orderId={orderId as number}
       />
+      <ModalCommentCancelSelectProductOrder
+       type="Изменить"
+       isModalOpen={isModalOpenCancel}
+       editProductId={productIndexCancel as number}
+       productId={productIdCancel}
+       setIsModalOpen={setIsModalOpenCancel}
+       orderProductId={orderProductIdCancel}
+       orderId={orderId as number}
+      />
       <ProductOrderTable
         showModal={showModal}
+        showModalCancel={showModalCancel}
         productTableData={productTableData}
         setProductId={setProductId}
+        setProductIdCancel={setProductIdCancel}
         setOrderProductId={setOrderProductId}
+        setOrderProductIdCancel={setOrderProductIdCancel}
         setProductIndex={setProductIndex}
+        setProductIndexCancel={setProductIndexCancel}
         deleteProduct={deleteProduct}
         orderId={orderId as number}
       />
