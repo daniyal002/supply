@@ -154,7 +154,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         expandedRowRender: (record) =>
           record.order_product_comment && (
             <ExpandedRowContent
-              orderProductComments={record.order_product_comment}
+            orderProductComments={record.order_product_comment}
+            productPreviousOrders={record.product_previous_orders}
               product_id={record.product.product_id}
               order_product_id={record.order_product_id as number}
               setOrderProductId={setOrderProductId}

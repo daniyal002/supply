@@ -1,5 +1,7 @@
+import { formatNotificationDate } from "@/helper/DataFormat";
 import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
+import { IProductPreviousOrders } from "@/interface/productTable";
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Collapse, ConfigProvider, Space, Table } from "antd";
 
@@ -7,6 +9,7 @@ interface Props {
   order_product_id: number;
   product_id: number;
   orderProductComments: IOrderProductCommentsResponse[];
+  productPreviousOrders: IProductPreviousOrders[];
   setOrderProductId: (order_product_id: number) => void;
   setProductId: (order_product_id: number) => void;
   showModal: () => void;
@@ -17,6 +20,7 @@ interface Props {
 
 export const ExpandedRowContent = ({
   orderProductComments,
+  productPreviousOrders,
   order_product_id,
   product_id,
   setOrderProductId,
@@ -26,12 +30,20 @@ export const ExpandedRowContent = ({
   orderId,
   is_cancel,
 }: Props) => {
-  const dataSource: IOrderProductCommentsResponse[] = orderProductComments?.map(
+  const dataSourceProductComments: IOrderProductCommentsResponse[] = orderProductComments?.map(
     (product, index) => ({
       ...product,
       key: index, // Ensure each item has a unique key
     })
   );
+
+  const dataSourceProductPreviousOrders: IProductPreviousOrders[] = productPreviousOrders?.map(
+    (product, index) => ({
+      ...product,
+      key: index, // Ensure each item has a unique key
+    })
+  );
+
 
   const { mutate: deleteOrderProductCommentMutation } =
     useDeleteOrderProductCommentMutation(orderId);
@@ -51,9 +63,9 @@ export const ExpandedRowContent = ({
         Добавить комментарий
       </Button>
     )}
-
-      {!dataSource || dataSource?.length === 0 ? (
-        <div>Данные не найдены</div>
+  <div style={{display:'flex', flexDirection:"column", gap:"10px"}}>
+      {!dataSourceProductComments || dataSourceProductComments?.length === 0 ? (
+        <div style={{margin:"12px 16px"}}>Данные не найдены</div>
       ) : (
         <Collapse
           items={[
@@ -71,7 +83,7 @@ export const ExpandedRowContent = ({
                   }}
                 >
                   <Table
-                    dataSource={dataSource}
+                    dataSource={dataSourceProductComments}
                     columns={[
                       {
                         title: "Сотрудник",
@@ -119,6 +131,59 @@ export const ExpandedRowContent = ({
           ]}
         />
       )}
+
+      {!dataSourceProductPreviousOrders || dataSourceProductPreviousOrders?.length === 0 ? (
+        <div style={{margin:"12px 16px"}}>Ранее этот товар этот не заказывали</div>
+      ) : (
+        <Collapse
+          items={[
+            {
+              key: "product-previous-orders-panel", // Уникальный ключ для панели
+              label: "Предыдущие заказы c первого числа текущего месяца", // Заголовок (можно оставить пустым)
+              children: (
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Table: {
+                        colorBgContainer: "#cadce8",
+                      },
+                    },
+                  }}
+                >
+                  <Table
+                    dataSource={dataSourceProductPreviousOrders}
+                    columns={[
+                      {
+                        title: "В Заявке",
+                        dataIndex: "order_id",
+                        key: "order_id",
+                      },
+                      {
+                        title: "Количество",
+                        dataIndex: "product_quantity",
+                        key: "product_quantity",
+                      },
+                      {
+                        title: "На кого",
+                        dataIndex: "buyer_name",
+                        key: "buyer_name",
+                      },
+                      {
+                        title: "Дата",
+                        dataIndex: "created_at",
+                        key: "created_at",
+                        render: (data:string) => formatNotificationDate(data)
+                      },
+                    ]}
+                    pagination={false}
+                  />
+                </ConfigProvider>
+              ),
+            },
+          ]}
+        />
+      )}
+</div>
     </>
   );
 };

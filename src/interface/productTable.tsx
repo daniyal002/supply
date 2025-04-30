@@ -1,6 +1,9 @@
 import { IBasicUnitOption } from "./basicUnit";
 import { IEmployeeFromParlorGetMe, IEmployeeOption } from "./employee";
-import { IOrderProductCancelCommentResponse, IOrderProductCommentsResponse } from "./orderProductComments";
+import {
+  IOrderProductCancelCommentResponse,
+  IOrderProductCommentsResponse,
+} from "./orderProductComments";
 import { IProductUnit } from "./product";
 import { IUnit } from "./unit";
 
@@ -13,7 +16,8 @@ export interface IProductTable {
   product_quantity: number;
   buyers?: IEmployeeFromParlorGetMe[];
   order_product_comment?: IOrderProductCommentsResponse[];
-  order_cancel_comment:IOrderProductCancelCommentResponse;
+  order_cancel_comment: IOrderProductCancelCommentResponse;
+  product_previous_orders: IProductPreviousOrders[];
   is_cancel?: boolean;
   note?: string;
 }
@@ -37,4 +41,15 @@ export interface IProductTableFormValues {
   product_quantity: number;
   buyers?: IEmployeeOption[];
   note?: string;
+}
+
+export interface IProductPreviousOrders {
+  created_at: string;
+  note: string;
+  order_product_id: number;
+  order_product_name: string;
+  product_quantity: number;
+  updated_at: string;
+  order_id:number;
+  buyer_name:string;
 }
