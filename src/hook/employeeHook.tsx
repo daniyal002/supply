@@ -22,7 +22,11 @@ export const useCreateEmployeeMutation = () => {
             data.parlors?.forEach(item=>{
                 parlorIds.push(item.parlor_id as number)
             })
-          return employeeService.addEmployee({employee:{buyer_name:data.buyer_name,buyer_type:data.buyer_type,post_id:data?.post?.post_id as number},parlor_ids:parlorIds})
+            const storageIds: number[] = []
+            data.storages?.forEach(item=>{
+              storageIds.push(item.storage_id as number)
+            })
+          return employeeService.addEmployee({employee:{buyer_name:data.buyer_name,buyer_type:data.buyer_type,post_id:data?.post?.post_id as number},parlor_ids:parlorIds,storage_ids:storageIds})
         },
         onSuccess: (newEmployee) => {
           message.success(`Сотрудник "${newEmployee.employee.buyer_name}" успешно создан`)
@@ -52,7 +56,11 @@ export const useUpdateEmployeeMutation = () => {
             data.parlors?.forEach(item=>{
                 parlorIds.push(item.parlor_id as number)
             })
-          return employeeService.updateEmployee({employee:{buyer_id:data.buyer_id,buyer_name:data.buyer_name,buyer_type:data.buyer_type,post_id:data?.post?.post_id as number},parlor_ids:parlorIds})
+            const storageIds: number[] = []
+            data.storages?.forEach(item=>{
+              storageIds.push(item.storage_id as number)
+            })
+          return employeeService.updateEmployee({employee:{buyer_id:data.buyer_id,buyer_name:data.buyer_name,buyer_type:data.buyer_type,post_id:data?.post?.post_id as number},parlor_ids:parlorIds,storage_ids:storageIds})
         },
         onSuccess: (updatedEmployee, variables) => {
           message.success(`Сотрудник "${variables.buyer_name}" успешно изменен`)

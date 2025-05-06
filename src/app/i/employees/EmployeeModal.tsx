@@ -11,6 +11,7 @@ import {
 } from "@/hook/employeeHook";
 import { IEmployee, IEmployeeFormValues } from "@/interface/employee";
 import { IPost } from "@/interface/post";
+import { useStorageData } from "@/hook/storageHook";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -40,12 +41,16 @@ export default function EmployeeModal({
 
   const { mutate: createEmployeeMutation } = useCreateEmployeeMutation();
   const { mutate: updateEmployeeMutation } = useUpdateEmployeeMutation();
+  const {storageData} = useStorageData()
 
   const watchBuyerType = watch("buyer_type")
 
   const onSubmit: SubmitHandler<IEmployeeFormValues> = (data) => {
     const itemParlorData = parlorData?.filter((parlor) =>
       data.parlor?.some((selectedParlor) => selectedParlor.value === parlor.parlor_id)
+    );
+    const itemStorageData = storageData?.filter((storage) =>
+      data.storages?.some((selectedStorage) => selectedStorage.value === storage.storage_id)
     );
 
     const itemPostData = postData?.find(
@@ -56,10 +61,12 @@ export default function EmployeeModal({
       buyer_type:data.buyer_type.value,
       parlors: itemParlorData,
       post: itemPostData as IPost,
+      storages: itemStorageData,
     };
     type === "Добавить"
       ? createEmployeeMutation(updateParlor)
       : updateEmployeeMutation(updateParlor);
+    console.log(updateParlor)
     reset();
     setIsModalOpen(false);
   };
@@ -76,6 +83,7 @@ export default function EmployeeModal({
         buyer_type: undefined,
         post: undefined,
         parlor: undefined,
+        storages:undefined
       });
     } else if (type === "Изменить" && itemEmployeeData) {
       reset({
@@ -89,6 +97,10 @@ export default function EmployeeModal({
         parlor: itemEmployeeData?.parlors?.map(parlor => ({
           value: parlor?.parlor_id,
           label: parlor.parlor_name,
+        })),
+        storages:itemEmployeeData.storages?.map(storage => ({
+          value:storage.storage_id,
+          label:storage.storage_name,
         }))
       });
     }
@@ -102,6 +114,11 @@ export default function EmployeeModal({
   const optionsPost = postData?.map((post) => ({
     value: post.post_id as number,
     label: post.post_name as string,
+  }));
+
+  const optionsStorage = storageData?.map((storage) => ({
+    value: storage.storage_id as number,
+    label: storage.storage_name as string,
   }));
 
   const optionBuyerType = [
@@ -191,6 +208,32 @@ export default function EmployeeModal({
         </div>
 
         {errors && <p className={style.error}>{errors.buyer_type?.message}</p>}
+
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Выберите склад</label>
+          <Controller
+            control={control}
+            name="storages"
+            rules={{
+              // required: { message: "Выберите склад", value: true },
+            }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={optionsStorage}
+                onChange={(value, option) =>
+                  // @ts-ignore: Unreachable code error
+                  field.onChange(option)
+                }
+                mode="multiple"
+                placeholder="Склад"
+              />
+            )}
+          />
+        </div>
+
+        {errors && <p className={style.error}>{errors.parlor?.message}</p>}
+
 
         {getValues("buyer_type.value") === "employee" && (
           <>

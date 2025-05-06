@@ -126,6 +126,7 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
         oms: data.oms || false,
+        storage_id:data.storage_id.value,
         // order_route_id: 4,
         order_status_id: 1,
         note: data.note,
@@ -190,6 +191,7 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
         oms: false,
         order_products: undefined,
         product_group: undefined,
+        storage_id:undefined
       });
     } else if (
       orderid !== "newOrder" &&
@@ -208,6 +210,10 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
         product_group: {
           value: getOrderByIdData?.product_group?.product_group_id,
           label: getOrderByIdData?.product_group?.product_group_name,
+        },
+        storage_id:{
+          value: getOrderByIdData?.storage?.storage_id,
+          label: getOrderByIdData?.storage?.storage_name
         },
         oms: getOrderByIdData?.oms,
         order_route_id: 1,

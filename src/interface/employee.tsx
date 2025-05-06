@@ -1,5 +1,6 @@
 import { IParlor, IParlorGetMe, IParlorOption } from "./parlor"
 import { IPost, IPostOption } from "./post"
+import { IStorage, IStorageOption } from "./storage"
 
 export interface IEmployee{
     buyer_id?:number
@@ -12,7 +13,9 @@ export interface IEmployee{
     note?: string
     post?:IPost,
     parlors:IParlor[] | undefined
-} 
+    storages:IStorage[] | undefined
+
+}
 
 
 export interface IEmployeeResponse{
@@ -32,6 +35,7 @@ export interface IEmployeeRequest{
     note?: string
     },
     parlor_ids:number[]
+    storage_ids:number[]
 }
 
 export interface IEmployeeAddResponse{
@@ -50,7 +54,9 @@ export interface IEmployeeGetMe{
     note?: string
     post:IPost,
     parlors:IParlorGetMe[] | undefined
-} 
+    storages:IStorage[] | undefined
+
+}
 
 export interface IEmployeeFromParlorGetMe{
         buyer_id: number,
@@ -76,6 +82,8 @@ export interface IEmployeeFormValues{
     note?: string
     post:IPostOption,
     parlor:IParlorOption[] | undefined
+    storages:IStorageOption[] | undefined
+
 }
 
 
