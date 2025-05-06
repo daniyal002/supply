@@ -158,7 +158,7 @@ export default function HeaderOrder({
 
                   onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
-                    setValue("department_id.value", value);
+                    setValue("storage_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
                     GetMeData?.employee?.storages?.find(storage => storage.storage_id === getValues('storage_id.value'))?.oms ? setValue('oms', true) : setValue('oms', false)

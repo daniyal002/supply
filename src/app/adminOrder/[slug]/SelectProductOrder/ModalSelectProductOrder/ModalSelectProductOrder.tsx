@@ -325,13 +325,14 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                   mode="multiple"
                   options={optionsEmployees}
                   placeholder="Врач"
-                  onChange={(value, option) => field.onChange(option)}
+                  onChange={(value, option) => {field.onChange(option); console.log(option)}}
+                  showSearch
                 >
-                  {optionsEmployees.map((option) => (
+                  {/* {optionsEmployees.map((option) => (
                     <Select.Option key={option.key} value={option.value}>
                       {option.label}
                     </Select.Option>
-                  ))}
+                  ))} */}
                 </Select>
               )}
             />

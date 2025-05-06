@@ -12,7 +12,6 @@ import style from "./ModalSelectProductOrder.module.scss";
 import { useAllMesument, useProductData } from "@/hook/productHook";
 import { IProductTableFormValues } from "@/interface/productTable";
 import { IOrderItemFormValues } from "@/interface/orderItem";
-import { useGetMe } from "@/hook/userHook";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 
@@ -171,7 +170,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         }
       })
       .map((employee) => ({
-        key: employee.buyer_id,
         value: employee.buyer_id,
         label: employee.buyer_name,
       }));
@@ -324,20 +322,17 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                   {...field}
                   mode="multiple"
                   options={optionsEmployees}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
                   placeholder="Врач"
-                  onChange={(value, option) => field.onChange(option)}
-                >
-                  {optionsEmployees.map((option) => (
-                    <Select.Option key={option.key} value={option.value}>
-                      {option.label}
-                    </Select.Option>
-                  ))}
-                </Select>
+                  onChange={(value,option) => field.onChange(option)} // Передаём только значение
+                  />
               )}
             />
-            {/* {errors.buyers && (
-              <p className={style.error}>{errors.buyers.message}</p>
-            )} */}
           </div>
         )}
         <div className={style.formItem}>

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import ModalSelectProductOrder from "./ModalSelectProductOrder/ModalSelectProductOrder";
-import { IProductResponse, IProductUnit } from "@/interface/product";
+import { IProductUnit } from "@/interface/product";
 import SelectProductOrderTableColumn from "./SelectProductOrderTable";
 import { useProductData } from "@/hook/productHook";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
-import { Button } from "antd";
 
 
 interface Props{
