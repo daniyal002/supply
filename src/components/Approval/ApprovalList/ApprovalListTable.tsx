@@ -48,6 +48,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по номеру"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="order_number"

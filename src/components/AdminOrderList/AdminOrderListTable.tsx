@@ -58,6 +58,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по номеру"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="order_number"
@@ -159,6 +160,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по сотруднику"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="buyer"

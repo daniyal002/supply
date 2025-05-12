@@ -38,6 +38,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
         filterDropdown: (props) => (
           <SearchFilter
             {...props}
+            placeholder="Поиск по пользователю"
             searchText={searchText}
             searchedColumn={searchedColumn}
             dataIndex="login"
@@ -86,6 +87,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
         filterDropdown: (props) => (
           <SearchFilter
             {...props}
+            placeholder="Поиск по сотруднику"
             searchText={searchText}
             searchedColumn={searchedColumn}
             dataIndex="buyer_name"

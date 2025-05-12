@@ -35,6 +35,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по сотруднику"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="buyer_name"

@@ -38,6 +38,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
       filterDropdown: (props:any) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по подразделению"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="department_name"

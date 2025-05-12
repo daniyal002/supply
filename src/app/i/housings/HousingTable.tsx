@@ -33,6 +33,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
       filterDropdown: (props:any) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по корпусу"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="housing_name"

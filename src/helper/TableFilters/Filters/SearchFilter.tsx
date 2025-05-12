@@ -15,6 +15,7 @@ interface SearchFilterProps extends FilterDropdownProps {
     dataIndex: string
   ) => void;
   handleReset: (clearFilters: () => void) => void;
+  placeholder:string
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -29,11 +30,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   searchInput,
   handleSearch,
   handleReset,
+  placeholder
 }) => (
   <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
     <Input
       ref={searchInput}
-      placeholder={`Поиск заявки`}
+      placeholder={placeholder}
       value={selectedKeys[0]}
       onChange={(e) =>
         setSelectedKeys(e.target.value ? [e.target.value] : [])

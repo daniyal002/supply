@@ -54,6 +54,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по номеру"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="order_number"
@@ -155,6 +156,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по сотруднику"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="buyer"

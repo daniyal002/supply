@@ -1,4 +1,12 @@
 export const filterBySearchText = (searchValue: string, dataIndex: string): boolean => {
-    const regex = new RegExp(searchValue.split('').join('.*?'), 'i');
-    return regex.test(dataIndex);
-  };
+  if (!searchValue) return true;
+
+  const searchWords = searchValue
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean); // удалим пустые строки
+
+  const target = dataIndex.toLowerCase();
+
+  return searchWords.every(word => target.includes(word));
+};

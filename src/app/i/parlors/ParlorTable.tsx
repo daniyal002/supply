@@ -36,6 +36,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по кабинету"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="parlor_name"

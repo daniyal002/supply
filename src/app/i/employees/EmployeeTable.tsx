@@ -37,6 +37,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по наименованию"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="buyer_name"

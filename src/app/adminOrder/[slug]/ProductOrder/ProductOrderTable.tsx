@@ -60,6 +60,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по товару"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="product_name"
@@ -102,6 +103,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по добавленному товару"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="order_product_name"
@@ -143,6 +145,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
+          placeholder="Поиск по ссылке"
           searchText={searchText}
           searchedColumn={searchedColumn}
           dataIndex="order_product_link"
