@@ -18,9 +18,6 @@ import { message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
-import {
-  LeftSquareFilled,
-} from "@ant-design/icons";
 import { useProductData } from "@/hook/productHook";
 import { MoveLeft } from "lucide-react";
 

@@ -3,36 +3,59 @@ import ModalSelectProductOrder from "./ModalSelectProductOrder/ModalSelectProduc
 import { IProductUnit } from "@/interface/product";
 import SelectProductOrderTableColumn from "./SelectProductOrderTable";
 import { useProductData } from "@/hook/productHook";
-import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import {
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 
-
-interface Props{
+interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
-  getValues:UseFormGetValues<IOrderItemFormValues>;
-  setValue:UseFormSetValue<IOrderItemFormValues>
-
+  getValues: UseFormGetValues<IOrderItemFormValues>;
+  setValue: UseFormSetValue<IOrderItemFormValues>;
 }
 
-export default function SelectProductOrder({watch,getValues,setValue}:Props) {
+export default function SelectProductOrder({
+  watch,
+  getValues,
+  setValue,
+}: Props) {
   const { productData } = useProductData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productId, setProductId] = useState<number>();
-  const productGroup = watch("product_group")
-  const [filterProductData,setFilterProductData] = useState<IProductUnit[]>(productData as IProductUnit[])
+  const productGroup = watch("product_group");
+  const [filterProductData, setFilterProductData] = useState<IProductUnit[]>(
+    productData as IProductUnit[]
+  );
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   useEffect(() => {
-    const filteredProductData = productData?.filter(product => product.product_group.product_group_id === getValues("product_group.value"));
-    if(filteredProductData){
-      setFilterProductData(filteredProductData);
-    }else{
+    const filteredProductDataInGroup = productData?.filter(
+      (product) =>
+        product.product_group.product_group_id ===
+        getValues("product_group.value")
+    );
+    const filteredProductDataNoGroup = productData?.filter(
+      (product) =>
+        product.product_group.product_group_id !==
+        getValues("product_group.value")
+    );
+
+    const finalfilteredProductData = [
+      ...(filteredProductDataInGroup || []),
+      ...(filteredProductDataNoGroup || []),
+    ];
+
+    if (finalfilteredProductData) {
+      setFilterProductData(finalfilteredProductData);
+    } else {
       setFilterProductData([]);
     }
-  }, [productData,productGroup]);
+  }, [productData, productGroup]);
   return (
     <>
       <ModalSelectProductOrder
@@ -46,7 +69,12 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
         editProductId={null}
         isNewProduct={false}
       />
-      <SelectProductOrderTableColumn productData={filterProductData ? filterProductData : []} setProductId={setProductId} showModal={showModal}/>
+      <SelectProductOrderTableColumn
+        productData={filterProductData ? filterProductData : []}
+        setProductId={setProductId}
+        showModal={showModal}
+        getValues={getValues}
+      />
     </>
   );
 }

@@ -1,41 +1,48 @@
-'use client';
+"use client";
 
 import { Button, Space, Table, TableColumnsType } from "antd";
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import { useMemo } from 'react';
+import { SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import { useEffect, useMemo, useState } from "react";
 import { IProductGroup, IProductUnit } from "@/interface/product";
 import { IBasicUnit } from "@/interface/basicUnit";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import { IOrderItemFormValues } from "@/interface/orderItem";
+import { UseFormGetValues } from "react-hook-form";
 
 interface ProductTableProps {
   productData: IProductUnit[];
   showModal: () => void;
   setProductId: (product: number) => void;
+  getValues: UseFormGetValues<IOrderItemFormValues>;
 }
 
-const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, showModal, setProductId }) => {
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+const SelectProductOrderTable: React.FC<ProductTableProps> = ({
+  productData,
+  showModal,
+  setProductId,
+  getValues,
+}) => {
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
-
-
-
-  const productGroup = productData?.map(product => ({
+  const productGroup = productData?.map((product) => ({
     text: product.product_group.product_group_name,
-    value: product.product_group.product_group_id
+    value: product.product_group.product_group_id,
   }));
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();
-    return productData?.filter((product) => {
-          if (productSet.has(product.unit_measurement.unit_measurement_id)) {
-            return false;
-          } else {
-            productSet.add(product.unit_measurement.unit_measurement_id);
-            return true;
-          }
+    return productData
+      ?.filter((product) => {
+        if (productSet.has(product.unit_measurement.unit_measurement_id)) {
+          return false;
+        } else {
+          productSet.add(product.unit_measurement.unit_measurement_id);
+          return true;
+        }
       })
       .map((product) => ({
         value: product.unit_measurement.unit_measurement_id,
@@ -49,7 +56,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "product_name",
       key: "product_name",
       width: "400px",
-      showSorterTooltip: {title:"Сортировка по товару"},
+      showSorterTooltip: { title: "Сортировка по товару" },
       sorter: (a, b) => a.product_name.localeCompare(b.product_name, "ru"),
       filterDropdown: (props) => (
         <SearchFilter
@@ -89,7 +96,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "product_group",
       key: "product_group",
       width: "350px",
-      showSorterTooltip: {title:"Сортировка по категории товаров"},
+      showSorterTooltip: { title: "Сортировка по категории товаров" },
       sorter: (a, b) =>
         a.product_group.product_group_name.localeCompare(
           b.product_group.product_group_name,
@@ -107,12 +114,9 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "product_article",
       key: "product_article",
       width: "350px",
-      showSorterTooltip: {title:"Сортировка по артикулу"},
+      showSorterTooltip: { title: "Сортировка по артикулу" },
       sorter: (a, b) =>
-        a?.product_article?.localeCompare(
-          b?.product_article ?? '',
-          "ru"
-        ) ?? 0,
+        a?.product_article?.localeCompare(b?.product_article ?? "", "ru") ?? 0,
       responsive: ["sm"],
       filterDropdown: (props) => (
         <SearchFilter
@@ -131,7 +135,8 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
-        const productName = record.product_article?.toString().toLowerCase() ?? '';
+        const productName =
+          record.product_article?.toString().toLowerCase() ?? "";
 
         return filterBySearchText(searchValue, productName);
       },
@@ -152,7 +157,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       dataIndex: "unit_measurement",
       key: "unit_measurement",
       width: "180px",
-      showSorterTooltip: {title:"Сортировка по ед. измерения"},
+      showSorterTooltip: { title: "Сортировка по ед. измерения" },
       sorter: (a, b) =>
         a.unit_measurement.unit_measurement_name.localeCompare(
           b.unit_measurement.unit_measurement_name,
@@ -169,7 +174,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       title: "Действия",
       key: "action",
       width: "100px",
-      showSorterTooltip: {title:"Действия"},
+      showSorterTooltip: { title: "Действия" },
       render: (_: any, record: IProductUnit) => (
         <Space size="middle">
           <Button
@@ -177,6 +182,10 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
               showModal();
               setProductId(record.product_id);
             }}
+            disabled={
+              record.product_group.product_group_id !==
+              getValues("product_group.value")
+            }
           >
             Добавить
           </Button>
@@ -190,7 +199,27 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
     key: product.product_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} size="large" scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Товаров"} }}  />;
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource.length
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource.length);
+  }, [productData]);
+
+  return (
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      size="large"
+      scroll={{ x: 200 }}
+      pagination={{ locale: { items_per_page: "/ Товаров" } }}
+      footer={() => `Товаров: ${currentFilters}`}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(extra.currentDataSource.length);
+      }}
+    />
+  );
 };
 
 export default SelectProductOrderTable;
