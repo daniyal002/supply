@@ -2,16 +2,20 @@
 
 import React, { useEffect } from "react";
 import style from "./Order.module.scss";
-import { useAgreedOrderMutation, useGetOrderById, useRejectOrderMutation } from "@/hook/orderHook";
-import { SubmitHandler, useForm } from "react-hook-form";
 import {
-  IOrderItemFormValues,
-} from "@/interface/orderItem";
+  useAgreedOrderMutation,
+  useGetOrderById,
+  useRejectOrderMutation,
+} from "@/hook/orderHook";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { IOrderItemFormValues } from "@/interface/orderItem";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import ApprovalHeaderOrder from "./ApprovalHeaderOrder";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { message, Spin, Tabs, TabsProps } from "antd";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
+import { useNotificationStore } from "../../../../store/notificationStore";
+import { useMarkAsReadNotification } from "@/hook/notificationHook";
 
 interface Props {
   orderid?: string;
@@ -36,31 +40,53 @@ export default function ApprovalOrder({
     control,
     handleSubmit,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
+  const notifications = useNotificationStore((state) => state.notifications);
+  const { mutate: markAsReadNotification } = useMarkAsReadNotification();
+
+  useEffect(() => {
+    const currentNotifications = notifications.filter(
+      (notification) => notification.data_id === Number(orderid)
+    );
+    if (currentNotifications)
+      currentNotifications.forEach((notification) => {
+        markAsReadNotification(notification?.notification_id);
+      });
+  }, []);
+
   const { getOrderByIdData } = useGetOrderById(orderid as string);
-  const {mutate:agreedOrderMutation,isPending:agreedOrderPending,isSuccess:agreedOrderSuccess} = useAgreedOrderMutation()
-  const {mutate:rejectOrderMutation,isPending:rejectOrderPending,isSuccess:rejectOrderSuccess} = useRejectOrderMutation()
-  const [note,  setnote] = React.useState('')
-  const items: TabsProps['items'] = [
+  const {
+    mutate: agreedOrderMutation,
+    isPending: agreedOrderPending,
+    isSuccess: agreedOrderSuccess,
+  } = useAgreedOrderMutation();
+  const {
+    mutate: rejectOrderMutation,
+    isPending: rejectOrderPending,
+    isSuccess: rejectOrderSuccess,
+  } = useRejectOrderMutation();
+  const [note, setnote] = React.useState("");
+  const items: TabsProps["items"] = [
     {
-      key: '1',
-      label: 'Выбранные товары',
-      children:  <ProductOrder
-      productTableData={getValues("order_products")}
-      getValues={getValues}
-      setValue={setValue}
-      watch={watch}
-    />,
+      key: "1",
+      label: "Выбранные товары",
+      children: (
+        <ProductOrder
+          productTableData={getValues("order_products")}
+          getValues={getValues}
+          setValue={setValue}
+          watch={watch}
+        />
+      ),
     },
     {
-      key: '2',
-      label: 'История согласования',
-      children: <OrderStepHistory order_id={Number(orderid)}/>
-      ,
+      key: "2",
+      label: "История согласования",
+      children: <OrderStepHistory order_id={Number(orderid)} />,
     },
     {
-      key: '3',
-      label: 'Маршрут',
-      children: <RouteInfo order_id={Number(orderid)}/>,
+      key: "3",
+      label: "Маршрут",
+      children: <RouteInfo order_id={Number(orderid)} />,
     },
   ];
 
@@ -68,23 +94,33 @@ export default function ApprovalOrder({
     // console.log(key);
   };
 
-  const agreedOrder = (order_id:number) => {
-    agreedOrderMutation({order_id,note},{onSuccess(){
-      remove(targetKey)
-    }})
-  }
+  const agreedOrder = (order_id: number) => {
+    agreedOrderMutation(
+      { order_id, note },
+      {
+        onSuccess() {
+          remove(targetKey);
+        },
+      }
+    );
+  };
 
-  const  rejectOrder = (order_id:number) => {
-    if(note  === ''){
-      message.warning("Введите комментарий")
-    }else if(note.length < 5){
-      message.warning("Введите корректный комментарий")
-    }else{
-      rejectOrderMutation({order_id,note},{onSuccess(){
-        remove(targetKey)
-      }})
+  const rejectOrder = (order_id: number) => {
+    if (note === "") {
+      message.warning("Введите комментарий");
+    } else if (note.length < 5) {
+      message.warning("Введите корректный комментарий");
+    } else {
+      rejectOrderMutation(
+        { order_id, note },
+        {
+          onSuccess() {
+            remove(targetKey);
+          },
+        }
+      );
     }
-  }
+  };
 
   // useEffect(() => {
   //   if (
@@ -229,40 +265,48 @@ export default function ApprovalOrder({
 
   return (
     <>
-   {(agreedOrderPending || rejectOrderPending)  && <Spin fullscreen={true}/>}
-    <div className={style.newOrder}>
-      <h1>Заявка на согласовании №: {orderid}</h1>
+      {(agreedOrderPending || rejectOrderPending) && <Spin fullscreen={true} />}
+      <div className={style.newOrder}>
+        <h1>Заявка на согласовании №: {orderid}</h1>
 
-      {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
-      <ApprovalHeaderOrder
-        register={register}
-        getValues={getValues}
-        watch={watch}
-        control={control}
-        errors={errors}
-        setValue={setValue}
-      />
-      {/* <button type="submit" className={style.buttonOrderCreate}>
+        {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
+        <ApprovalHeaderOrder
+          register={register}
+          getValues={getValues}
+          watch={watch}
+          control={control}
+          errors={errors}
+          setValue={setValue}
+        />
+        {/* <button type="submit" className={style.buttonOrderCreate}>
            Согласовать
           </button> */}
-      {/* </form> */}
-      <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        {/* </form> */}
+        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
 
-      <div className={style.commentAndButtons}>
-        <textarea placeholder="Комментарий" className={style.comment} value={note} onChange={(e)=>setnote(e.target.value)}/>
-      <div className={style.buttonGroup}>
-
-        <button className={style.buttonOrderApproval} onClick={() => agreedOrder(Number(orderid))}>Согласовать</button>
-        <button
-          className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
-          onClick={() => rejectOrder(Number(orderid))}
-          >
-          Отклонить
-        </button>
+        <div className={style.commentAndButtons}>
+          <textarea
+            placeholder="Комментарий"
+            className={style.comment}
+            value={note}
+            onChange={(e) => setnote(e.target.value)}
+          />
+          <div className={style.buttonGroup}>
+            <button
+              className={style.buttonOrderApproval}
+              onClick={() => agreedOrder(Number(orderid))}
+            >
+              Согласовать
+            </button>
+            <button
+              className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
+              onClick={() => rejectOrder(Number(orderid))}
+            >
+              Отклонить
+            </button>
           </div>
+        </div>
       </div>
-    </div>
-
     </>
   );
 }

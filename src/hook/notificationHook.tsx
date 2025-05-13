@@ -1,5 +1,6 @@
 import { notificationService } from "@/services/notification.service";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNotificationStore } from "../../store/notificationStore";
 
 export const useNotificationData = () => {
   const {
@@ -15,9 +16,14 @@ export const useNotificationData = () => {
 };
 
 export const useMarkAsReadNotification = () => {
+  const deleteNotification = useNotificationStore((state) => state.deleteNotification);
+
   const {mutate} = useMutation({
     mutationKey: ["markAsRead"],
-    mutationFn: notificationService.markAsReadNotification,
+    mutationFn: (notification_id:number) => notificationService.markAsReadNotification(notification_id),
+    onSuccess(data,variables){
+      deleteNotification(variables)
+    }
   })
 
   return { mutate}
