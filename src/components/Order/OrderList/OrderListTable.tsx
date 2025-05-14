@@ -292,6 +292,10 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
     key: order.order_id, // Ensure each item has a unique key
   }));
 
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
@@ -339,13 +343,16 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         pagination={{ locale: { items_per_page: "/ Заявок" } }}
         footer={() =>
           `Заявок: ${
-            (dataSource?.length as number) > 0 ? dataSource?.length : 0
+            currentFilters ? currentFilters : dataSource?.length
           }`
         }
         onRow={(record) => ({
           onContextMenu: (e) => handleContextMenu(e, record),
           onDoubleClick: () => setOrderId(String(record.order_id))
         })}
+        onChange={(pagination, filters, sorter, extra) => {
+          setCurrentFilters(extra.currentDataSource.length);
+        }}
 
       />
 

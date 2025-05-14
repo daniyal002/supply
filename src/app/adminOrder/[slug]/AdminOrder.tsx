@@ -14,7 +14,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message, Spin, Tabs } from "antd";
+import { FloatButton, message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -22,6 +22,7 @@ import {
   LeftSquareFilled,
 } from "@ant-design/icons";
 import { useProductData } from "@/hook/productHook";
+import { MoveLeft } from "lucide-react";
 
 interface Props {
   orderid?: string;
@@ -248,11 +249,18 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
         }
       >
         {toggle && (
-          <LeftSquareFilled
-            title="Назад"
-            onClick={() => setToggle(!toggle)}
-            className={style.toggleBackButton}
-          />
+         <FloatButton
+         onClick={() => setToggle(!toggle)}
+         icon={<MoveLeft size={32} style={{ paddingRight: "6px" }}/>}
+         type="primary"
+         style={{
+           insetInlineEnd: 80,
+           width: "45px",
+           height: "45px",
+           paddingRight: "5px",
+         }}
+
+       />
         )}
 
         <SelectProductOrder
@@ -286,14 +294,20 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
             </button>
           )}
         </form>
-        {!disabledOrder && getValues("product_group.value") && !toggle && (
-          <button
-            onClick={() => setToggle(!toggle)}
+        <button
+            onClick={() =>
+              disabledOrder
+                ? message.info(
+                    "Заявка в маршруте! Сбросьте заявку если хотите изменить."
+                  )
+                : getValues("product_group.value")
+                ? setToggle(!toggle)
+                : message.warning("Выберите категорию товара")
+            }
             className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
           >
             Подбор товара
           </button>
-        )}
 
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>

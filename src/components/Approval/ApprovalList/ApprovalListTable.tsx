@@ -12,6 +12,7 @@ import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { IUser } from "@/interface/user";
+import { useState } from "react";
 
 interface ApprovalListProps {
   OrderData: IOrderItem[] | undefined;
@@ -221,6 +222,10 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
     key: order.order_id, // Ensure each item has a unique key
   }));
 
+   const [currentFilters, setCurrentFilters] = useState<number>(
+      dataSource?.length as number
+    );
+
   return (
     <ConfigProvider
       theme={{
@@ -236,12 +241,16 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
         pagination={{ locale: { items_per_page: "/ Заявок" } }}
         footer={() =>
           `Заявок: ${
-            (dataSource?.length as number) > 0 ? dataSource?.length : 0
+            currentFilters ? currentFilters : dataSource?.length
           }`
         }
         onRow={(record) => ({
           onDoubleClick: () => setApprovalOrderId(String(record.order_id))
         })}
+        onChange={(pagination, filters, sorter, extra) => {
+          setCurrentFilters(extra.currentDataSource.length);
+        }}
+
       />
     </ConfigProvider>
   );

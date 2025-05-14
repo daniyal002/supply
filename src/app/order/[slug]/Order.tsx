@@ -14,12 +14,13 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message, Spin, Tabs } from "antd";
+import { FloatButton, message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useProductData } from "@/hook/productHook";
 import { MoveLeft } from "lucide-react";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
@@ -30,9 +31,11 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
-  const {isLoading} = useProductData()
-  const { mutate: createOrderMutation, isPending:createOrderIsPending } = useCreateOrderMutation();
-  const { mutate: updateOrderMutation, isPending:updateOrderIsPending } = useUpdateOrderMutation();
+  const { isLoading } = useProductData();
+  const { mutate: createOrderMutation, isPending: createOrderIsPending } =
+    useCreateOrderMutation();
+  const { mutate: updateOrderMutation, isPending: updateOrderIsPending } =
+    useUpdateOrderMutation();
   const {
     register,
     handleSubmit,
@@ -44,19 +47,22 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     watch,
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
-  let orderIdFromGetOrderById = orderid
-  if(orderid?.startsWith('copy')){
-    orderIdFromGetOrderById = orderid.replace('copy', '')
+  let orderIdFromGetOrderById = orderid;
+  if (orderid?.startsWith("copy")) {
+    orderIdFromGetOrderById = orderid.replace("copy", "");
   }
-  const { getOrderByIdData } = useGetOrderById(orderIdFromGetOrderById as string);
+  const { getOrderByIdData } = useGetOrderById(
+    orderIdFromGetOrderById as string
+  );
   const [disabledOrder, setDisabledOrder] = useState<boolean>(false);
 
   useEffect(() => {
     if (orderid && getOrderByIdData) {
       if (
         (getOrderByIdData.current_step_container !== null ||
-        (getOrderByIdData.current_step_container == null &&
-          getOrderByIdData.in_route === false)) && !orderid.startsWith('copy')
+          (getOrderByIdData.current_step_container == null &&
+            getOrderByIdData.in_route === false)) &&
+        !orderid.startsWith("copy")
       ) {
         setDisabledOrder(true);
       } else {
@@ -127,7 +133,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
-        storage_id:data.storage_id.value,
+        storage_id: data.storage_id.value,
         oms: data.oms || false,
         // order_route_id: 4,
         order_status_id: 1,
@@ -193,7 +199,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         oms: false,
         order_products: undefined,
         product_group: undefined,
-        storage_id:undefined
+        storage_id: undefined,
       });
     } else if (
       orderid !== "newOrder"
@@ -213,9 +219,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           value: getOrderByIdData?.product_group?.product_group_id,
           label: getOrderByIdData?.product_group?.product_group_name,
         },
-        storage_id:{
+        storage_id: {
           value: getOrderByIdData?.storage?.storage_id,
-          label: getOrderByIdData?.storage?.storage_name
+          label: getOrderByIdData?.storage?.storage_name,
         },
         oms: getOrderByIdData?.oms,
         order_route_id: 1,
@@ -228,74 +234,99 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
   return (
     <div className={style.order}>
-    {isLoading && <Spin fullscreen={true} className={style.spin} size="large"/> }
-    <div className={style.newOrder}>
-      {!toggle ? (
-        <h1>
-          {orderid === "newOrder"
-            ? "Новая заявка"
-            : orderid === `copy${Number(orderid?.split("copy").join(""))}`
-            ? "Копия"
-            : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
-        </h1>
-      ) : (
-        <h1>Выбор товара</h1>
+      {isLoading && (
+        <Spin fullscreen={true} className={style.spin} size="large" />
       )}
-
-      <div
-        className={
-          toggle
-            ? `${style.active} ${style.selectProductOrder}`
-            : style.selectProductOrder
-        }
-      >
-        {toggle && (
-          <p onClick={() => setToggle(!toggle)} className={style.toggleBackButton}><MoveLeft/> Назад</p>
+      <div className={style.newOrder}>
+        {!toggle ? (
+          <h1>
+            {orderid === "newOrder"
+              ? "Новая заявка"
+              : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+              ? "Копия"
+              : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
+          </h1>
+        ) : (
+          <h1>Выбор товара</h1>
         )}
 
-        <SelectProductOrder
-          watch={watch}
-          getValues={getValues}
-          setValue={setValue}
-        />
-      </div>
+        <div
+          className={
+            toggle
+              ? `${style.active} ${style.selectProductOrder}`
+              : style.selectProductOrder
+          }
+        >
+          {toggle && (
+            <FloatButton
+              onClick={() => setToggle(!toggle)}
+              icon={<MoveLeft size={32} style={{ paddingRight: "6px" }}/>}
+              type="primary"
+              style={{
+                insetInlineEnd: 80,
+                width: "45px",
+                height: "45px",
+                paddingRight: "5px",
+              }}
 
-      <div
-        className={
-          !toggle ? `${style.active} ${style.productOrder}` : style.productOrder
-        }
-      >
-        <form key={1} onSubmit={handleSubmit(onSubmit)}>
-          <HeaderOrder
-            control={control}
-            register={register}
+            />
+          )}
+
+          <SelectProductOrder
+            watch={watch}
             getValues={getValues}
             setValue={setValue}
-            watch={watch}
-            errors={errors}
-            disabledOrder={disabledOrder}
           />
-          {!disabledOrder && (
-            <button type="submit" className={style.buttonOrderCreate}>
-              {orderid === "newOrder" ||
-              orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                ? createOrderIsPending ? "Создается..." : "Создать"
-                : updateOrderIsPending ? "Перезапускается..." : "Перезапуск"}
-            </button>
-          )}
-        </form>
-        {!disabledOrder && getValues("product_group.value") && !toggle && (
+        </div>
+
+        <div
+          className={
+            !toggle
+              ? `${style.active} ${style.productOrder}`
+              : style.productOrder
+          }
+        >
+          <form key={1} onSubmit={handleSubmit(onSubmit)}>
+            <HeaderOrder
+              control={control}
+              register={register}
+              getValues={getValues}
+              setValue={setValue}
+              watch={watch}
+              errors={errors}
+              disabledOrder={disabledOrder}
+            />
+            {!disabledOrder && (
+              <button type="submit" className={style.buttonOrderCreate}>
+                {orderid === "newOrder" ||
+                orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                  ? createOrderIsPending
+                    ? "Создается..."
+                    : "Создать"
+                  : updateOrderIsPending
+                  ? "Перезапускается..."
+                  : "Перезапуск"}
+              </button>
+            )}
+          </form>
           <button
-            onClick={() => setToggle(!toggle)}
+            onClick={() =>
+              disabledOrder
+                ? message.info(
+                    "Заявка в маршруте! Сбросьте заявку если хотите изменить."
+                  )
+                : getValues("product_group.value")
+                ? setToggle(!toggle)
+                : message.warning("Выберите категорию товара")
+            }
             className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
           >
             Подбор товара
           </button>
-        )}
 
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+          <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        </div>
       </div>
-    </div>
     </div>
   );
 }

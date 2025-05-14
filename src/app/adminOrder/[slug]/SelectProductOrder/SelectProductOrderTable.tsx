@@ -11,6 +11,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues } from "react-hook-form";
+import style from './SelectProductOrderTable.module.scss'
 
 interface ProductTableProps {
   productData: IProductUnit[];
@@ -218,6 +219,8 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
+      rowClassName={(record) => getValues('order_products')?.find(product => product.product.product_id === record.product_id) ? style.highlightRow : ''}
+
     />
   );
 };
