@@ -311,34 +311,19 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             <Controller
               control={control}
               name="buyers"
-              rules={
-                {
-                  // required: {
-                  //   value: buyerType === "parlor" ? true : false,
-                  //   message: "Выберите врача",
-                  // },
-                }
-              }
               render={({ field }) => (
                 <Select
                   {...field}
                   mode="multiple"
                   options={optionsEmployees}
                   placeholder="Врач"
-                  onChange={(value, option) => {field.onChange(option); console.log(option)}}
+                  onChange={(value, option) => {field.onChange(option)}}
                   showSearch
                 >
-                  {/* {optionsEmployees.map((option) => (
-                    <Select.Option key={option.key} value={option.value}>
-                      {option.label}
-                    </Select.Option>
-                  ))} */}
+
                 </Select>
               )}
             />
-            {/* {errors.buyers && (
-              <p className={style.error}>{errors.buyers.message}</p>
-            )} */}
           </div>
         )}
         <div className={style.formItem}>

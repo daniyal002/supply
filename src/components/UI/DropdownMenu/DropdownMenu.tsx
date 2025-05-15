@@ -14,9 +14,6 @@ export default function DropdownMenu() {
   const { mutate: markAsReadNotification } = useMarkAsReadNotification();
   const setActiveMainTabKey = useTabStore((state) => state.setActiveMainTabKey);
 
-  useEffect(() => {
-    console.log(notifications);
-  }, [notifications]);
 
   const setApprovalOrderId = useApprovalStore(
     (state) => state.setApprovalOrderId

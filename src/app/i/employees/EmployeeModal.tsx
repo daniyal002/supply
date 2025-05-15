@@ -66,7 +66,6 @@ export default function EmployeeModal({
     type === "Добавить"
       ? createEmployeeMutation(updateParlor)
       : updateEmployeeMutation(updateParlor);
-    console.log(updateParlor)
     reset();
     setIsModalOpen(false);
   };
