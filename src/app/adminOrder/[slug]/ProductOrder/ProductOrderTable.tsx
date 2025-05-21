@@ -294,7 +294,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
-      footer={() => "Всего: " + (currentFilters ? currentFilters : dataSource?.length)}
+      footer={() => "Всего: " + (currentFilters ? currentFilters : dataSource?.length ? dataSource?.length : 0)}
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}

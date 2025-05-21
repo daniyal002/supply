@@ -152,6 +152,7 @@ export default function UserModal({
                 filterOption={(input, option) =>
                   (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                 }
+                showSearch
               />
             )}
           />

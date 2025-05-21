@@ -263,7 +263,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               icon={<MoveLeft size={32} style={{ paddingRight: "6px" }}/>}
               type="primary"
               style={{
-                insetInlineEnd: 80,
+                insetInlineStart: 80,
                 width: "45px",
                 height: "45px",
                 paddingRight: "5px",
