@@ -250,7 +250,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
         onChange={(pagination, filters, sorter, extra) => {
           setCurrentFilters(extra.currentDataSource.length);
         }}
-
+        locale={{emptyText:"Нет заявок"}}
       />
     </ConfigProvider>
   );

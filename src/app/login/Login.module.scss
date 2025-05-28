@@ -79,15 +79,21 @@
         &:-webkit-autofill:hover,
         &:-webkit-autofill:focus,
         &:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 1000px #678098 inset !important; // Заменяем фон на белый (или любой другой цвет)
-            -webkit-text-fill-color: #fff !important; // Цвет текста
-            transition: background-color 5000s ease-in-out 0s; // Отключаем анимацию изменения фона
+            -webkit-box-shadow: 0 0 0 1000px #678098 inset !important;
+            -webkit-text-fill-color: #fff !important;
+            -webkit-column-rule-color: #fff !important;
+            -webkit-text-stroke-color: #fff !important;
+            color: #fff !important; /* Добавлено */
             font-size: 25px !important;
-            color: #fff !important;
+            transition: background-color 5000s ease-in-out 0s !important;
         }
 
         &::placeholder {
             color: #fff;
+        }
+        &:-webkit-autofill::selection {
+            background: transparent;
+            color: #fff !important;
         }
     }
 

@@ -220,7 +220,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         setCurrentFilters(extra.currentDataSource.length);
       }}
       rowClassName={(record) => getValues('order_products')?.find(product => product.product.product_id === record.product_id) ? style.highlightRow : ''}
-      // rowHoverable={false}
+      locale={{emptyText:"Нет товаров"}}
     />
   );
 };

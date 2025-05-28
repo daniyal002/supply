@@ -6,6 +6,6 @@ export interface IRouteInfoResponse {
 
 export interface IRouteStepsInfo {
   step_container_id: number;
-  buyer_name: string;
+  approvers: string;
   step_number: number;
 }

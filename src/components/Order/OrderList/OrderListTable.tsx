@@ -353,7 +353,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         onChange={(pagination, filters, sorter, extra) => {
           setCurrentFilters(extra.currentDataSource.length);
         }}
-
+        locale={{emptyText:"Нет заявок"}}
       />
 
       <ContextMenu

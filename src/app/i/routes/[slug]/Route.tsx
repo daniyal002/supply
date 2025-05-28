@@ -44,13 +44,13 @@ export default function Route({ routeId }: Props) {
         route_id:orderRouteByIdData.route_id,
         steps: orderRouteByIdData.steps.map(orderRoute => ({
           route_id:orderRoute.route_id,
-          // step_id:orderRoute.step_id,
-          employee_id: orderRoute.employee.buyer_id,
+          step_id:orderRoute.step_id,
           free_or_paid:orderRoute.free_or_paid,
           step_number:orderRoute.step_number,
-          status_agreed_id:orderRoute.status_agreed_id.order_status_id,
-          status_reject_id:orderRoute.status_reject_id.order_status_id,
-          product_group_ids:orderRoute.product_group_ids.map(pg => pg.product_group_id),
+          status_agreed_id:orderRoute.status_agreed.order_status_id,
+          status_reject_id:orderRoute.status_reject.order_status_id,
+          product_group_ids:orderRoute.product_groups.map(pg => pg.product_group_id),
+          approver_employee_ids:orderRoute.approvers.map(approver => approver.employee_id)
         }))
       })
     }else{
@@ -135,12 +135,14 @@ export default function Route({ routeId }: Props) {
 
           <Form.Item label="Согласующий сотрудник">
             <Controller
-              name={`steps.${index}.employee_id`}
+              name={`steps.${index}.approver_employee_ids`}
               control={control}
               render={({ field }) => (
                 <Select
                   {...field}
                   showSearch
+                  mode="multiple"
+                  placeholder="Выберите сотрудников для текущего шага"
                   filterOption={(input, option) =>
                     (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
                   }
@@ -256,12 +258,12 @@ export default function Route({ routeId }: Props) {
         type="dashed"
         onClick={() =>
           append({
-            employee_id: 0,
             step_number: fields.length + 1,
             free_or_paid: "free",
             status_reject_id: 0,
             status_agreed_id: 0,
             product_group_ids: [],
+            approver_employee_ids:[],
           })
         }
         className={styles.addButton}

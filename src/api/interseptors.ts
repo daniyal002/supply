@@ -50,7 +50,7 @@ axiosWidthAuth.interceptors.response.use(
 
     // Проверяем статус 401 или 403
     if (
-      (error?.response?.status === 401 || error?.response?.status === 403) &&
+      (error?.response?.status === 401) &&
       !originalRequest._isRetry
     ) {
       originalRequest._isRetry = true;

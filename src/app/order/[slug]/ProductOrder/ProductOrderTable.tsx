@@ -298,6 +298,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
+      locale={{emptyText:"Нет товаров"}}
     />
   );
 };

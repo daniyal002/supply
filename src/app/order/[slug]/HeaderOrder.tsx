@@ -137,7 +137,7 @@ export default function HeaderOrder({
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>Выберите склад</label>
+            <label className={style.formItemLabel}>Склад</label>
             <Controller
               control={control}
               name="storage_id"
@@ -176,7 +176,7 @@ export default function HeaderOrder({
 
         <div className={style.EmployeeDepartmentCategory}>
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>Выберите сотрудника</label>
+            <label className={style.formItemLabel}>Cотрудник/Кабинет</label>
             <Controller
               control={control}
               name="employee_id"
@@ -200,7 +200,7 @@ export default function HeaderOrder({
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
                   }}
-                  placeholder="Сотрудник"
+                  placeholder="Сотрудник/Кабинет"
                   className={style.formItemSelect}
                 />
               )}
@@ -212,7 +212,7 @@ export default function HeaderOrder({
 
           <div className={style.formItem}>
             <label className={style.formItemLabel}>
-              Выберите подразделение
+              Подразделение
             </label>
             <Controller
               control={control}
@@ -247,7 +247,7 @@ export default function HeaderOrder({
 
           <div className={style.formItem}>
             <label className={style.formItemLabel}>
-              Выберите категорию товара
+              Категория товара
             </label>
             <Controller
               control={control}
