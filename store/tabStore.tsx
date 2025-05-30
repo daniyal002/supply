@@ -1,5 +1,6 @@
 import AdminOrderList from "@/components/AdminOrderList/AdminOrderList";
 import ApprovalList from "@/components/Approval/ApprovalList/ApprovalList";
+import DraftOrderList from "@/components/Order/OrderDraftLitst/DraftOrderList";
 import OrderList from "@/components/Order/OrderList/OrderList";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
@@ -19,6 +20,14 @@ interface ITabStore {
   activeTabOrders: string;
   setActiveTabOrders: (key: string) => void;
   deleteTabsOrders: () => void;
+
+  tabsDraftOrders: Tab[];
+  addTabDraftOrders: (tab: Tab) => void;
+  removeTabDraftOrders: (key: string) => void;
+  setTabsDraftOrders: (tabs: Tab[]) => void;
+  activeTabDraftOrders: string;
+  setActiveTabDraftOrders: (key: string) => void;
+  deleteTabsDraftOrders: () => void;
 
   tabsApproval: Tab[];
   addTabApproval: (tab: Tab) => void;
@@ -72,6 +81,36 @@ export const useTabStore = create<ITabStore>()(
           ],
           activeTabOrders: "1",
         }),
+
+        tabsDraftOrders: [
+          {
+            label: "Главная",
+            children: <DraftOrderList />,
+            key: "1",
+            closable: false,
+          },
+        ],
+        addTabDraftOrders: (tab) =>
+          set((state) => ({ tabsDraftOrders: [...state.tabsDraftOrders, tab] })),
+        removeTabDraftOrders: (key) =>
+          set((state) => ({
+            tabsDraftOrders: state.tabsDraftOrders.filter((tab) => tab.key !== key),
+          })),
+        setTabsDraftOrders: (tabs) => set({ tabsDraftOrders: tabs }),
+        activeTabDraftOrders: "1",
+        setActiveTabDraftOrders: (key) => set({ activeTabDraftOrders: key }),
+        deleteTabsDraftOrders: () =>
+          set({
+            tabsDraftOrders: [
+              {
+                label: "Главная",
+                children: <DraftOrderList />,
+                key: "1",
+                closable: false,
+              },
+            ],
+            activeTabDraftOrders: "1",
+          }),
 
       tabsApproval: [
         {

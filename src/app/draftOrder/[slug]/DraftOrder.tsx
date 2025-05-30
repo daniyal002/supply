@@ -1,37 +1,48 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import style from "./Order.module.scss";
+import style from "./DraftOrder.module.scss";
 import {
   useCreateOrderMutation,
-  useGetOrderById,
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IDraftOrderItemRequest, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
-import HeaderOrder from "./HeaderOrder";
+import {
+  IDraftOrderItemRequest,
+  IOrderDraftItemFormValues,
+  IOrderItemFormValues,
+  IOrderItemRequest,
+} from "@/interface/orderItem";
+import HeaderOrder from "./DraftHeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { FloatButton, message, Spin, Tabs } from "antd";
-import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
-import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useProductData } from "@/hook/productHook";
 import { MoveLeft } from "lucide-react";
 import ModalSaveOrder from "./ModalSaveOrder/ModalSaveOrder";
-import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
-import { useOrderIdStore } from "../../../../store/orderIdStore";
+import {
+  useDeleteDraftOrderByIdMutation,
+  useGetOrderDraftById,
+  useSaveDraftOrderMutation,
+  useUpdateDraftOrderMutation,
+} from "@/hook/orderTempHook";
 
 interface Props {
-  orderid?: string;
+  draftOrderid?: string;
   type: "Добавить" | "Изменить";
   targetKey?: string;
   remove?: any;
 }
 
-export default function Order({ orderid, type, remove, targetKey }: Props) {
+export default function DraftOrder({
+  draftOrderid,
+  type,
+  remove,
+  targetKey,
+}: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
   const { mutate: createOrderMutation, isPending: createOrderIsPending } =
@@ -40,8 +51,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     useUpdateOrderMutation();
   const { mutate: saveOrderMutation, isPending: saveOrderIsPending } =
     useSaveDraftOrderMutation();
-  const { mutate: updateDraftOrderMutation, isPending: updateDraftOrderIsPending } =
-    useUpdateDraftOrderMutation()
+  const {
+    mutate: updateDraftOrderMutation,
+    isPending: updateDraftOrderIsPending,
+  } = useUpdateDraftOrderMutation();
   const {
     register,
     handleSubmit,
@@ -52,30 +65,16 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     setValue,
     watch,
     resetField,
-  } = useForm<IOrderItemFormValues>({ mode: "onChange" });
-  let orderIdFromGetOrderById = orderid;
-  if (orderid?.startsWith("copy")) {
-    orderIdFromGetOrderById = orderid.replace("copy", "");
+  } = useForm<IOrderDraftItemFormValues>({ mode: "onChange" });
+  let orderIdFromGetOrderById = draftOrderid;
+  if (draftOrderid?.startsWith("copy")) {
+    orderIdFromGetOrderById = draftOrderid.replace("copy", "");
   }
-  const { getOrderByIdData } = useGetOrderById(
+  const { getOrderByIdData } = useGetOrderDraftById(
     orderIdFromGetOrderById as string
   );
-  const [disabledOrder, setDisabledOrder] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (orderid && getOrderByIdData) {
-      if (
-        (getOrderByIdData.current_step_container !== null ||
-          (getOrderByIdData.current_step_container == null &&
-            getOrderByIdData.in_route === false)) &&
-        !orderid.startsWith("copy")
-      ) {
-        setDisabledOrder(true);
-      } else {
-        setDisabledOrder(false);
-      }
-    }
-  }, [getOrderByIdData]);
+  const {mutate:deleteDraftOrderByIdMutation,isPending:DeleteDraftOrderByIisPending} = useDeleteDraftOrderByIdMutation()
 
   const items: TabsProps["items"] = [
     {
@@ -87,19 +86,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           getValues={getValues}
           setValue={setValue}
           watch={watch}
-          disabledOrder={disabledOrder}
+          disabledOrder={false}
         />
       ),
-    },
-    {
-      key: "2",
-      label: "История согласования",
-      children: <OrderStepHistory order_id={Number(orderid)} />,
-    },
-    {
-      key: "3",
-      label: "Маршрут",
-      children: <RouteInfo order_id={Number(orderid)} />,
     },
   ];
 
@@ -136,7 +125,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
   const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
     if (data.order_products && data.order_products.length > 0) {
-      const order: IOrderItemRequest = {
+      const order: IDraftOrderItemRequest = {
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
@@ -175,19 +164,13 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         }),
       };
       if (
-        orderid !== "newOrder" &&
-        orderid !== `copy${orderid?.split("copy")[1]}` &&
+        draftOrderid !== "newOrder" &&
+        draftOrderid !== `copy${draftOrderid?.split("copy")[1]}` &&
         getOrderByIdData
       ) {
-        order.order_id = Number(orderid);
-        updateOrderMutation(order, {
-          onSuccess() {
-            remove(targetKey);
-          },
-        });
-      } else {
         createOrderMutation(order, {
           onSuccess() {
+            deleteDraftOrderByIdMutation({order_temp_id:Number(draftOrderid)})
             remove(targetKey);
           },
         });
@@ -197,16 +180,15 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   };
 
-    const setDraftNewOrderId = useOrderIdStore((state) => state.setDraftNewOrderId);
-    const draftNewOrderId = useOrderIdStore((state) => state.draftNewOrderId);
-
-    useEffect(()=>{
-      console.log(draftNewOrderId)
-    },[draftNewOrderId])
-
-
   const saveOrder = () => {
-    if (getValues().order_products && getValues().order_products.length > 0 && getValues().department_id && getValues().employee_id && getValues().storage_id && getValues().product_group) {
+    if (
+      getValues().order_products &&
+      getValues().order_products.length > 0 &&
+      getValues().department_id &&
+      getValues().employee_id &&
+      getValues().storage_id &&
+      getValues().product_group
+    ) {
       const order: IDraftOrderItemRequest = {
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
@@ -243,24 +225,17 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         }),
       };
 
-      if(draftNewOrderId && draftNewOrderId !== "0"){
-        updateDraftOrderMutation({...order,order_temp_id:Number(draftNewOrderId)})
-      }else{
-        saveOrderMutation(order,{onSuccess(data){
-          if(data.order.order_temp_id){
-            setDraftNewOrderId(data.order.order_temp_id.toString())
-            console.log(draftNewOrderId)
-          }
-        }})
-      }
-
+      updateDraftOrderMutation({
+        ...order,
+        order_temp_id: Number(draftOrderid),
+      });
     } else {
       message.warning("Заполните шапку и товары!");
     }
   };
 
   useEffect(() => {
-    if (orderid === undefined) {
+    if (draftOrderid === undefined) {
       reset({
         employee_id: undefined,
         department_id: undefined,
@@ -270,11 +245,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         storage_id: undefined,
       });
     } else if (
-      orderid !== "newOrder"
+      draftOrderid !== "newOrder"
       // orderid !== `copy${orderid?.split("copy")[1]}`
     ) {
       reset({
-        order_id: getOrderByIdData?.order_id,
+        order_temp_id: getOrderByIdData?.order_temp_id,
         employee_id: {
           value: getOrderByIdData?.buyer?.buyer_id,
           label: getOrderByIdData?.buyer?.buyer_name,
@@ -298,7 +273,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         order_products: getOrderByIdData?.order_products,
       });
     }
-  }, [reset, type, orderid, getOrderByIdData]);
+  }, [reset, type, draftOrderid, getOrderByIdData]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -312,7 +287,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
 
     // Устанавливаем новый таймер, если модальное окно закрыто и toggle false
-    if (!isModalOpen && !toggle && getValues('order_products')?.length > 0) {
+    if (!isModalOpen && !toggle && getValues("order_products")?.length > 0) {
       timeoutRef.current = setTimeout(() => {
         setIsModalOpen(true);
       }, 900000);
@@ -341,11 +316,14 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       <div className={style.newOrder}>
         {!toggle ? (
           <h1>
-            {orderid === "newOrder"
+            {draftOrderid === "newOrder"
               ? "Новая заявка"
-              : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+              : draftOrderid ===
+                `copy${Number(draftOrderid?.split("copy").join(""))}`
               ? "Копия"
-              : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
+              : `Черновик №-${getOrderByIdData?.order_temp_id
+                  ?.toString()
+                  .replace(/^0+/, "")}`}
           </h1>
         ) : (
           <h1>Выбор товара</h1>
@@ -394,47 +372,29 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               setValue={setValue}
               watch={watch}
               errors={errors}
-              disabledOrder={disabledOrder}
+              disabledOrder={false}
             />
 
             <div className={style.footerButtonGroup}>
+                <button type="submit" className={style.buttonOrderCreate}>
+                  {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
+                </button>
 
-            {!disabledOrder && (
-              <button type="submit" className={style.buttonOrderCreate}>
-                {orderid === "newOrder" ||
-                orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                  ? createOrderIsPending
-                    ? "Создается..."
-                    : "Создать"
-                  : updateOrderIsPending
-                  ? "Перезапускается..."
-                  : "Перезапуск"}
-              </button>
-            )}
-
-            {!disabledOrder && orderid === "newOrder"
-                  && (
-              <button
-                type="button"
-                className={style.buttonOrderSave}
-                onClick={() => saveOrder()}
-              >
-                { saveOrderIsPending
-                    ? "Сохраняется..."
-                    : "Сохранить"
-                  }
-              </button>
-            )}
+                <button
+                  type="button"
+                  className={style.buttonOrderSave}
+                  onClick={() => saveOrder()}
+                >
+                  {saveOrderIsPending
+                      ? "Сохраняется..."
+                      : "Сохранить"
+                    }
+                </button>
             </div>
-
           </form>
           <button
             onClick={() =>
-              disabledOrder
-                ? message.info(
-                    "Заявка в маршруте! Сбросьте заявку если хотите изменить."
-                  )
-                : getValues("product_group.value")
+               getValues("product_group.value")
                 ? setToggle(!toggle)
                 : message.warning("Выберите категорию товара")
             }

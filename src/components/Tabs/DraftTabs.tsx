@@ -2,52 +2,51 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ConfigProvider, Tabs } from "antd";
-import Order from "@/app/order/[slug]/Order";
 import { useOrderIdStore } from "../../../store/orderIdStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTabStore } from "../../../store/tabStore";
+import DraftOrder from "@/app/draftOrder/[slug]/DraftOrder";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
-export default function Tab() {
-  const { tabsOrders, addTabOrders, removeTabOrders, setTabsOrders,activeTabOrders,setActiveTabOrders } = useTabStore();
-  const orderId = useOrderIdStore(state => state.orderId);
-  const setOrderId = useOrderIdStore(state => state.setOrderId);
-  const setDraftNewOrderId = useOrderIdStore(state => state.setDraftNewOrderId);
+export default function DraftTabs() {
+  const { tabsDraftOrders, addTabDraftOrders, removeTabDraftOrders, setTabsDraftOrders,activeTabDraftOrders,setActiveTabDraftOrders } = useTabStore();
+  const draftOrderId = useOrderIdStore(state => state.draftOrderId);
+  const setDraftOrderId = useOrderIdStore(state => state.setDraftOrderId);
   const queryClient = useQueryClient();
 
   const edit = (orderid: string) => {
     const newActiveKey = `order-${orderid}`;
-    const existingPane = tabsOrders.find(pane => pane.key === newActiveKey);
+    const existingPane = tabsDraftOrders.find(pane => pane.key === newActiveKey);
 
     if (!existingPane) {
-      let lableOrderId  = orderId.startsWith("copy") ? `Копия по №${orderid?.split("copy").join("")}` : `Заявка № ${orderId}`
+      let lableOrderId  = draftOrderId.startsWith("copy") ? `Копия по №${orderid?.split("copy").join("")}` : `Черновик № ${draftOrderId}`
       const newTab = {
         label: lableOrderId,
-        children: <Order type="Изменить" orderid={orderid} remove={remove} targetKey={newActiveKey} />,
+        children: <DraftOrder type="Изменить" draftOrderid={orderid} remove={remove} targetKey={newActiveKey} />,
         key: newActiveKey,
         closable:true,
       };
-      addTabOrders(newTab); // Добавляем вкладку в глобальное состояние
+      addTabDraftOrders(newTab); // Добавляем вкладку в глобальное состояние
     }
 
     setActiveKey(newActiveKey);
   };
 
   useEffect(() => {
-    setTabsOrders(tabsOrders); // Синхронизируем вкладки при монтировании
-  }, [tabsOrders]);
+    setTabsDraftOrders(tabsDraftOrders); // Синхронизируем вкладки при монтировании
+  }, [tabsDraftOrders]);
 
 
 
   useEffect(() => {
-    if ((orderId !== "0" && orderId !== "newOrder") && orderId) {
-      edit(orderId);
+    if ((draftOrderId !== "0" && draftOrderId !== "newOrder") && draftOrderId) {
+      edit(draftOrderId);
     }
-  }, [orderId]);
+  }, [draftOrderId]);
 
 
-  const [activeKey, setActiveKey] = useState(tabsOrders[0].key);
+  const [activeKey, setActiveKey] = useState(tabsDraftOrders[0].key);
   const newTabIndex = useRef(1);
 
   useEffect(() => {
@@ -60,27 +59,27 @@ export default function Tab() {
 
   const onChange = (newActiveKey: string) => {
     setActiveKey(newActiveKey);
-    setActiveTabOrders(newActiveKey)
+    setActiveTabDraftOrders(newActiveKey)
   };
 
 
   const add = () => {
     const newActiveKey = `newTab`;
-    const existingPane = tabsOrders.find(pane => pane.key === newActiveKey); // Используем tabsOrders из Zustand store
+    const existingPane = tabsDraftOrders.find(pane => pane.key === newActiveKey); // Используем tabsOrders из Zustand store
 
     if (!existingPane) {
         const newTab = {
             label: "Новая заявка",
-            children: <Order type="Добавить" orderid="newOrder" remove={remove} targetKey={newActiveKey} />,
+            children: <DraftOrder type="Добавить" draftOrderid="newOrder" remove={remove} targetKey={newActiveKey} />,
             key: newActiveKey,
             closable: true,
         };
 
         // Добавляем новую вкладку в Zustand store
-        addTabOrders(newTab);
+        addTabDraftOrders(newTab);
     }
 
-    setOrderId("newOrder");
+    setDraftOrderId("newOrder");
     setActiveKey(newActiveKey);
 };
 
@@ -90,17 +89,17 @@ const remove = (targetKey: TargetKey) => {
     let lastIndex = -1;
 
     // Находим индекс удаляемой вкладки
-    tabsOrders.forEach((item, i) => {
+    tabsDraftOrders.forEach((item, i) => {
         if (item.key === targetKey) {
             lastIndex = i - 1; // Запоминаем индекс предыдущей вкладки
         }
     });
 
     // Удаляем вкладку из Zustand store
-    removeTabOrders(targetKey as string);
+    removeTabDraftOrders(targetKey as string);
 
     // Обновляем активный ключ
-    const newPanes = tabsOrders.filter((item) => item.key !== targetKey);
+    const newPanes = tabsDraftOrders.filter((item) => item.key !== targetKey);
     if (newPanes.length && newActiveKey === targetKey) {
         if (lastIndex >= 0) {
             newActiveKey = newPanes[lastIndex].key; // Устанавливаем предыдущую вкладку как активную
@@ -110,8 +109,7 @@ const remove = (targetKey: TargetKey) => {
     }
 
     setActiveKey(newActiveKey); // Обновляем активный ключ
-    setOrderId("0"); // Сбрасываем orderId
-    setDraftNewOrderId("0"); // Сбрасываем draftOrderId
+    setDraftOrderId("0"); // Сбрасываем draftOrderId
 };
 
   const onEdit = (
@@ -130,14 +128,15 @@ const remove = (targetKey: TargetKey) => {
   return (
     <ConfigProvider theme={{token:{colorPrimary:"#678098"}}}>
       <Tabs
+        hideAdd
         type="editable-card"
         onChange={onChange}
         activeKey={activeKey}
         onEdit={onEdit}
-        items={tabsOrders} // Используем вкладки из глобального состояния
+        items={tabsDraftOrders} // Используем вкладки из глобального состояния
         style={{ padding: "0 10px" }}
         destroyInactiveTabPane={false}
-        defaultActiveKey={activeTabOrders}
+        defaultActiveKey={activeTabDraftOrders}
       />
     </ConfigProvider>
 

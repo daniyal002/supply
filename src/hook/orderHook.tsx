@@ -116,12 +116,14 @@ export const useOrderRouteSteps = (order_id: number) => {
 
 export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
+  const setDraftNewOrderId = useOrderIdStore((state) => state.setDraftNewOrderId);
   const setDraftOrderId = useOrderIdStore((state) => state.setDraftOrderId);
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["createOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.addOrder(data),
     onSuccess: (newOrder, variables) => {
+      setDraftNewOrderId("0"),
       setDraftOrderId("0"),
         queryClient.setQueryData(
           ["OrderUser"],

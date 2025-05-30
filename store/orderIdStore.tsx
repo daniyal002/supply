@@ -8,6 +8,8 @@ interface IOrderIdStore {
     setAdminOrderId: (adminOrderId: string) => void;
     draftOrderId: string;
     setDraftOrderId: (draftOrderId: string) => void;
+    draftNewOrderId: string;
+    setDraftNewOrderId: (draftNewOrderId: string) => void;
     targetKey: string;
     setTargetKey: (targetKey: string) => void;
 }
@@ -26,6 +28,10 @@ export const useOrderIdStore = create<IOrderIdStore>()(
         draftOrderId: "0",
         setDraftOrderId: (draftOrderId) => {
             set({ draftOrderId:draftOrderId });
+        },
+        draftNewOrderId: "0",
+        setDraftNewOrderId: (draftNewOrderId) => {
+            set({ draftNewOrderId:draftNewOrderId });
         },
         targetKey: "0",
         setTargetKey: (targetKey) => {

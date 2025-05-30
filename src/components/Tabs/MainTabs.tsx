@@ -4,6 +4,7 @@ import Tab from "@/components/Tabs/Tabs";
 import { Tabs, TabsProps } from "antd";
 import { useTabStore } from "../../../store/tabStore";
 import Notification from "../Notification/Notification";
+import DraftTabs from "./DraftTabs";
 
 export const MainTabs = () => {
   const activeMainTabKey = useTabStore((state) => state.activeMainTabKey);
@@ -21,6 +22,11 @@ export const MainTabs = () => {
     },
     {
       key: "2",
+      label: "Черновики",
+      children: <DraftTabs />,
+    },
+    {
+      key: "3",
       label: "Согласования",
       children: <ApprovalTabs />,
     },
