@@ -183,13 +183,24 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       }));
     } else {
       return (
-        itemProductData?.directory_unit_measurement?.map((item) => ({
-          value: item.unit_measurement.unit_measurement_id,
-          label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
-        })) || []
+        itemProductData?.directory_unit_measurement?.reduce(
+          (acc, item) => {
+            const id = item.unit_measurement.unit_measurement_id;
+            const existing = acc.find((opt) => opt.value === id);
+            if (!existing) {
+              acc.push({
+                value: id as number,
+                label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
+              });
+            }
+            return acc;
+          },
+          [] as { value: number; label: string }[]
+        ) || []
       );
     }
   }, [isNewProduct, allMesument, itemProductData]);
+
 
   return (
     <Modal
@@ -291,9 +302,9 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               <Select
                 {...field}
                 options={optionsUnit}
-                onChange={(value, option) =>
+                onChange={(value, option) =>{
                   // @ts-ignore: Unreachable code error
-                  field.onChange({ value, label: option.label })
+                  field.onChange({ value, label: option.label })}
                 }
                 placeholder="Единица измерения"
               />

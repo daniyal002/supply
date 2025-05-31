@@ -38,20 +38,20 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       ?.filter((product) => {
         if (
           productSet.has(
-            product.unit_measurement.unit_measurement.unit_measurement_id
+            product?.unit_measurement?.unit_measurement?.unit_measurement_id
           )
         ) {
           return false;
         } else {
           productSet.add(
-            product.unit_measurement.unit_measurement.unit_measurement_id
+            product?.unit_measurement?.unit_measurement?.unit_measurement_id
           );
           return true;
         }
       })
       .map((product) => ({
-        value: product.unit_measurement.unit_measurement.unit_measurement_id,
-        text: product.unit_measurement.unit_measurement.unit_measurement_name,
+        value: product?.unit_measurement?.unit_measurement?.unit_measurement_id,
+        text: product?.unit_measurement?.unit_measurement?.unit_measurement_name,
       }));
   }, [productTableData]);
 

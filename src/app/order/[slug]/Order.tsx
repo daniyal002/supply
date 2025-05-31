@@ -200,9 +200,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     const setDraftNewOrderId = useOrderIdStore((state) => state.setDraftNewOrderId);
     const draftNewOrderId = useOrderIdStore((state) => state.draftNewOrderId);
 
-    useEffect(()=>{
-      console.log(draftNewOrderId)
-    },[draftNewOrderId])
 
 
   const saveOrder = () => {
@@ -249,7 +246,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         saveOrderMutation(order,{onSuccess(data){
           if(data.order.order_temp_id){
             setDraftNewOrderId(data.order.order_temp_id.toString())
-            console.log(draftNewOrderId)
           }
         }})
       }
