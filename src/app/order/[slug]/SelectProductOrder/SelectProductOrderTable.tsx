@@ -29,11 +29,6 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
-  const productGroup = productData?.map((product) => ({
-    text: product.product_group.product_group_name,
-    value: product.product_group.product_group_id,
-  }));
-
   const unitGroup = useMemo(() => {
     const productSet = new Set();
     return productData
@@ -48,6 +43,23 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       .map((product) => ({
         value: product.unit_measurement.unit_measurement_id,
         text: product.unit_measurement.unit_measurement_name,
+      }));
+  }, [productData]);
+
+  const productGroup = useMemo(() => {
+    const productSet = new Set();
+    return productData
+      ?.filter((product) => {
+        if (productSet.has(product.product_group.product_group_id)) {
+          return false;
+        } else {
+          productSet.add(product.product_group.product_group_id);
+          return true;
+        }
+      })
+      .map((product) => ({
+        value: product.product_group.product_group_id,
+        text: product.product_group.product_group_name,
       }));
   }, [productData]);
 

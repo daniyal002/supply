@@ -28,7 +28,7 @@ export default function DropdownMenu() {
     e.stopPropagation(); // Останавливаем всплытие события
     markAsReadNotification(notificationId);
     if (notificationText.toLowerCase().includes("согласовании")) {
-      setActiveMainTabKey("2");
+      setActiveMainTabKey("3");
       setApprovalOrderId(String(data_id));
     }
   };
