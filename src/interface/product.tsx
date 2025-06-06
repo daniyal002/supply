@@ -30,6 +30,7 @@ export interface IProductUnit{
     product_group: IProductGroup
     directory_unit_measurement:IUnit[]
     product_article?:string
+    product_kod_1c:string
 }
 
 export interface IProductResponse{

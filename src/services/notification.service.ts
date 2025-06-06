@@ -18,4 +18,10 @@ export const notificationService = {
 
         return response.data;
       },
+
+      async markAsReadAllNotifications(){
+        const response = await axiosWidthAuth.post<string>("/notify/mark_as_read_all_notifications")
+
+        return response.data
+      }
 }

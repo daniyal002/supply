@@ -28,3 +28,17 @@ export const useMarkAsReadNotification = () => {
 
   return { mutate}
 }
+
+export const useMarkAsReadAllNotification = () => {
+  const deleteAllNotification = useNotificationStore((state) => state.deleteAllNotification);
+
+  const {mutate} = useMutation({
+    mutationKey: ["markAsRead"],
+    mutationFn: notificationService.markAsReadAllNotifications,
+    onSuccess(){
+      deleteAllNotification()
+    }
+  })
+
+  return { mutate}
+}

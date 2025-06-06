@@ -4,7 +4,10 @@ import { Bell } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNotificationStore } from "../../../../store/notificationStore";
 import { formatNotificationDate } from "@/helper/DataFormat";
-import { useMarkAsReadNotification } from "@/hook/notificationHook";
+import {
+  useMarkAsReadAllNotification,
+  useMarkAsReadNotification,
+} from "@/hook/notificationHook";
 import { useTabStore } from "../../../../store/tabStore";
 import { useApprovalStore } from "../../../../store/approvalStore";
 
@@ -12,8 +15,8 @@ export default function DropdownMenu() {
   const notifications = useNotificationStore((state) => state.notifications);
   const [items, setItems] = useState<MenuProps["items"]>([]);
   const { mutate: markAsReadNotification } = useMarkAsReadNotification();
+  const { mutate: markAsReadAllNotification } = useMarkAsReadAllNotification();
   const setActiveMainTabKey = useTabStore((state) => state.setActiveMainTabKey);
-
 
   const setApprovalOrderId = useApprovalStore(
     (state) => state.setApprovalOrderId
@@ -34,10 +37,9 @@ export default function DropdownMenu() {
   };
 
   const readAllNotification = () => {
-    if (notifications)
-      notifications.forEach((notification) => {
-        markAsReadNotification(notification.notification_id);
-      });
+    if (notifications) {
+      markAsReadAllNotification();
+    }
   };
 
   useEffect(() => {
@@ -85,23 +87,28 @@ export default function DropdownMenu() {
         trigger={["click"]}
         destroyPopupOnHide={false}
         dropdownRender={(menu) => (
-          <div style={{
-            backgroundColor: "#fff",
-            boxShadow: "0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",
-            borderRadius: "8px",
-            maxHeight: "200px", // Ограничиваем высоту
-            display: "flex",
-            flexDirection: "column", // Располагаем элементы вертикально
-          }}>
+          <div
+            style={{
+              backgroundColor: "#fff",
+              boxShadow:
+                "0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",
+              borderRadius: "8px",
+              maxHeight: "200px", // Ограничиваем высоту
+              display: "flex",
+              flexDirection: "column", // Располагаем элементы вертикально
+            }}
+          >
             {/* Контейнер для прокрутки уведомлений */}
-            <div style={{
-              flex: 1, // Занимает всё доступное пространство
-              overflowY: "auto", // Включаем вертикальный скролл
-              padding: "8px 0", // Внутренний отступ
-            }}>
+            <div
+              style={{
+                flex: 1, // Занимает всё доступное пространство
+                overflowY: "auto", // Включаем вертикальный скролл
+                padding: "8px 0", // Внутренний отступ
+              }}
+            >
               {React.cloneElement(
                 menu as React.ReactElement<{ style: React.CSSProperties }>,
-                { style: { boxShadow: "none", border: "none" } },
+                { style: { boxShadow: "none", border: "none" } }
               )}
             </div>
 

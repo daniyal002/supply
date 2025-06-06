@@ -9,8 +9,9 @@ import {
   UseFormRegister,
   UseFormSetValue,
   UseFormWatch,
+  useWatch,
 } from "react-hook-form";
-import { IOrderItemFormValues } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
@@ -40,6 +41,12 @@ export default function HeaderOrder({
 
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
+
+    const orderType = useWatch({ control, name: 'order_type' });
+  const storageId = useWatch({ control, name: 'storage_id' });
+  const employeeId = useWatch({ control, name: 'employee_id' });
+  const departmentId = useWatch({ control, name: 'department_id' });
+
 
 
   useEffect(() => {
@@ -90,11 +97,10 @@ export default function HeaderOrder({
     label: storage.storage_name,
   }));
 
-  // const optionsStorage = storageData?.map((storage) => ({
-  //   value: storage.storage_id,
-  //   label: storage.storage_name,
-  // }));
-
+  const optionsOrderTypes: { value: string; label: string }[] = [
+    { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+    { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+  ];
   const departmentSet = new Set();
   const optionsDepartment = GetMeData?.employee?.parlors
     ?.flatMap((parlor) =>
@@ -121,6 +127,40 @@ export default function HeaderOrder({
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
+        <div className={style.formItem}>
+            <label className={style.formItemLabel}>Тип</label>
+            <Controller
+              control={control}
+              name="order_type"
+              rules={{
+                required: { message: "Выберите тип", value: true },
+              }}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  disabled={disabledOrder}
+                  options={optionsOrderTypes}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+
+                  onChange={(value, option) => {
+                    // @ts-ignore: Unreachable code error
+                    field.onChange({ value: value, label: option.label });
+                  }}
+                  placeholder="Тип"
+                  className={style.formItemSelect}
+                />
+              )}
+            />
+            {errors && (
+              <p className={style.error}>{errors.order_type?.message}</p>
+            )}
+          </div>
+
           <div className={`${style.Checkbox}`}>
             <label className={style.formItemLabel}>ОМС</label>
             <Controller

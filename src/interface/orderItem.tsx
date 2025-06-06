@@ -5,6 +5,11 @@ import { IProductGroup, IProductGroupOption } from "./product";
 import { IUser } from "./user";
 import { IStorage, IStorageOption } from "./storage";
 
+export enum EnumOrderTypes {
+  'PURCHASE' = 'purchase',
+  'WAREHOUSE' = 'warehouse',
+}
+
 export interface IStatusOrder{
   order_status_id:number,
   order_status_name:string,
@@ -17,6 +22,7 @@ export interface IStatusOrderResponse{
 export interface IOrderItem {
     order_id?:number;
     order_number: string;
+    order_type:EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
     created_at?: string;
     updated_at? : string;
     order_status:IStatusOrder;
@@ -43,6 +49,7 @@ export interface IOrderItem {
     buyer: IEmployee | undefined;
     oms:true | false,
     department:IDepartment | undefined;
+    order_type:EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
     storage:IStorage | undefined;
     product_group:IProductGroup,
     order_products?:IProductTable[],
@@ -66,6 +73,7 @@ export interface IOrderItem {
     order_id?:number
     order_number?: string,
     oms: boolean,
+    order_type:EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
     order_status_id: number,
     employee_id: number,
     department_id: number,
@@ -79,6 +87,7 @@ export interface IOrderItem {
     order_temp_id?:number
     order_number?: string,
     oms: boolean,
+    order_type:EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
     order_status_id: number,
     employee_id: number,
     department_id: number,
@@ -103,6 +112,7 @@ export interface IOrderItem {
     order_number?: string,
     oms: boolean,
     user_id?: number,
+    order_type:IOrderTypesOption;
     order_status_id: number,
     order_route_id: number,
     employee_id: IEmployeeOption,
@@ -113,12 +123,15 @@ export interface IOrderItem {
     order_products: IProductTable[]
   }
 
+
+
   export interface IOrderDraftItemFormValues{
     order_temp_id?:number
     order_number?: string,
     oms: boolean,
     user_id?: number,
     order_status_id: number,
+    order_type:IOrderTypesOption;
     order_route_id: number,
     employee_id: IEmployeeOption,
     department_id: IDepartmentOption,
@@ -141,4 +154,9 @@ export interface IOrderItem {
 
   export interface IOrderDraftItemByIdResponse{
     detail:IDraftOrderItem
+  }
+
+  export interface IOrderTypesOption {
+      value: EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
+      label: string;
   }

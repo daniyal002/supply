@@ -12,6 +12,7 @@ import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearch
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues } from "react-hook-form";
 import style from './SelectProductOrderTable.module.scss'
+import { RemainProduct } from "../../../../components/UI/RemainProduct/RemainProduct";
 
 interface ProductTableProps {
   productData: IProductUnit[];
@@ -207,6 +208,22 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
     },
   ];
 
+  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
+
+const handleExpand = (expanded:boolean, record:IProductUnit) => {
+  const key = record.product_kod_1c;
+  let newExpandedRowKeys = [...expandedRowKeys];
+
+  if (expanded) {
+    newExpandedRowKeys.push(key);
+  } else {
+    newExpandedRowKeys = newExpandedRowKeys.filter(k => k !== key);
+  }
+
+  setExpandedRowKeys(newExpandedRowKeys);
+};
+
+
   const dataSource = productData?.map((product) => ({
     ...product,
     key: product.product_id, // Ensure each item has a unique key
@@ -226,6 +243,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       columns={columns}
       size="large"
       scroll={{ x: 200 }}
+      rowKey={(record) => record.product_kod_1c}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
       footer={() => `Товаров: ${currentFilters}`}
       onChange={(pagination, filters, sorter, extra) => {
@@ -233,6 +251,15 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       }}
       rowClassName={(record) => getValues('order_products')?.find(product => product.product.product_id === record.product_id) ? style.highlightRow : ''}
       locale={{emptyText:"Нет товаров"}}
+      expandable={{
+              expandedRowKeys,
+              onExpand: handleExpand,
+              expandedRowRender: (record) => {
+                return <div className={style.remainContainer}>
+                <RemainProduct product_kod_1c={record.product_kod_1c} expandedRowKeys={expandedRowKeys}/>
+              </div>
+              },
+            }}
     />
   );
 };

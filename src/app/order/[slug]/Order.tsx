@@ -40,7 +40,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     useUpdateOrderMutation();
   const { mutate: saveOrderMutation, isPending: saveOrderIsPending } =
     useSaveDraftOrderMutation();
-  const { mutate: updateDraftOrderMutation, isPending: updateDraftOrderIsPending } =
+  const { mutate: updateDraftOrderMutation } =
     useUpdateDraftOrderMutation()
   const {
     register,
@@ -138,6 +138,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
+        order_type:data.order_type.value,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
@@ -208,6 +209,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
+        order_type:getValues().order_type.value,
         oms: getValues().oms || false,
         order_status_id: 8,
         note: getValues().note,
@@ -264,6 +266,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         order_products: undefined,
         product_group: undefined,
         storage_id: undefined,
+        order_type:undefined,
       });
     } else if (
       orderid !== "newOrder"
@@ -292,6 +295,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         order_status_id: getOrderByIdData?.order_status?.order_status_id,
         note: getOrderByIdData?.note,
         order_products: getOrderByIdData?.order_products,
+        order_type:{
+          value:getOrderByIdData?.order_type,
+          label: getOrderByIdData?.order_type === "purchase" ? "Заявка на закупку" : "Заявка на склад"
+        }
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);

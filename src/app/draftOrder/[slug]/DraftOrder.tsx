@@ -128,6 +128,7 @@ export default function DraftOrder({
       const order: IDraftOrderItemRequest = {
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
+        order_type:data.order_type.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         // order_route_id: 4,
@@ -194,6 +195,7 @@ export default function DraftOrder({
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
         oms: getValues().oms || false,
+        order_type:getValues().order_type.value,
         order_status_id: 8,
         note: getValues().note,
         product_group_id: getValues().product_group.value,
@@ -225,6 +227,7 @@ export default function DraftOrder({
         }),
       };
 
+      console.log(order)
       updateDraftOrderMutation({
         ...order,
         order_temp_id: Number(draftOrderid),
@@ -243,6 +246,7 @@ export default function DraftOrder({
         order_products: undefined,
         product_group: undefined,
         storage_id: undefined,
+        order_type:undefined,
       });
     } else if (
       draftOrderid !== "newOrder"
@@ -271,7 +275,11 @@ export default function DraftOrder({
         order_status_id: getOrderByIdData?.order_status?.order_status_id,
         note: getOrderByIdData?.note,
         order_products: getOrderByIdData?.order_products,
-      });
+        order_type:{
+          value:getOrderByIdData?.order_type,
+          label: getOrderByIdData?.order_type === "purchase" ? "Заявка на закупку" : "Заявка на склад"
+        }
+    });
     }
   }, [reset, type, draftOrderid, getOrderByIdData]);
 
