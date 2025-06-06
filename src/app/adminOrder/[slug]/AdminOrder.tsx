@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import style from "./Order.module.scss";
 import {
   useCreateOrderMutation,
@@ -8,7 +8,7 @@ import {
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
+import { IDraftOrderItemRequest, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
@@ -18,11 +18,11 @@ import { FloatButton, message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
-import {
-  LeftSquareFilled,
-} from "@ant-design/icons";
 import { useProductData } from "@/hook/productHook";
 import { MoveLeft } from "lucide-react";
+import ModalSaveOrder from "./ModalSaveOrder/ModalSaveOrder";
+import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
+import { useOrderIdStore } from "../../../../store/orderIdStore";
 
 interface Props {
   orderid?: string;
@@ -31,11 +31,17 @@ interface Props {
   remove?: any;
 }
 
-export default function AdminOrder({ orderid, type, remove, targetKey }: Props) {
+export default function Order({ orderid, type, remove, targetKey }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
-  const {isLoading} = useProductData()
-  const { mutate: createOrderMutation } = useCreateOrderMutation();
-  const { mutate: updateOrderMutation } = useUpdateOrderMutation();
+  const { isLoading } = useProductData();
+  const { mutate: createOrderMutation, isPending: createOrderIsPending } =
+    useCreateOrderMutation();
+  const { mutate: updateOrderMutation, isPending: updateOrderIsPending } =
+    useUpdateOrderMutation();
+  const { mutate: saveOrderMutation, isPending: saveOrderIsPending } =
+    useSaveDraftOrderMutation();
+  const { mutate: updateDraftOrderMutation } =
+    useUpdateDraftOrderMutation()
   const {
     register,
     handleSubmit,
@@ -47,15 +53,22 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
     watch,
     resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
-  const { getOrderByIdData } = useGetOrderById(orderid as string);
+  let orderIdFromGetOrderById = orderid;
+  if (orderid?.startsWith("copy")) {
+    orderIdFromGetOrderById = orderid.replace("copy", "");
+  }
+  const { getOrderByIdData } = useGetOrderById(
+    orderIdFromGetOrderById as string
+  );
   const [disabledOrder, setDisabledOrder] = useState<boolean>(false);
 
   useEffect(() => {
     if (orderid && getOrderByIdData) {
       if (
-        getOrderByIdData.current_step_container !== null ||
-        (getOrderByIdData.current_step_container == null &&
-          getOrderByIdData.in_route === false)
+        (getOrderByIdData.current_step_container !== null ||
+          (getOrderByIdData.current_step_container == null &&
+            getOrderByIdData.in_route === false)) &&
+        !orderid.startsWith("copy")
       ) {
         setDisabledOrder(true);
       } else {
@@ -125,9 +138,10 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
+        order_type:data.order_type.value,
         employee_id: data.employee_id.value,
+        storage_id: data.storage_id.value,
         oms: data.oms || false,
-        storage_id:data.storage_id.value,
         // order_route_id: 4,
         order_status_id: 1,
         note: data.note,
@@ -163,7 +177,7 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
       };
       if (
         orderid !== "newOrder" &&
-        orderid !== `draft${orderid?.split("draft")[1]}` &&
+        orderid !== `copy${orderid?.split("copy")[1]}` &&
         getOrderByIdData
       ) {
         order.order_id = Number(orderid);
@@ -184,6 +198,65 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
     }
   };
 
+    const setDraftNewOrderId = useOrderIdStore((state) => state.setDraftNewOrderId);
+    const draftNewOrderId = useOrderIdStore((state) => state.draftNewOrderId);
+
+
+
+  const saveOrder = () => {
+    if (getValues().order_products && getValues().order_products.length > 0 && getValues().department_id && getValues().employee_id && getValues().storage_id && getValues().product_group) {
+      const order: IDraftOrderItemRequest = {
+        department_id: getValues().department_id.value,
+        employee_id: getValues().employee_id.value,
+        storage_id: getValues().storage_id.value,
+        order_type:getValues().order_type.value,
+        oms: getValues().oms || false,
+        order_status_id: 8,
+        note: getValues().note,
+        product_group_id: getValues().product_group.value,
+        products: getValues().order_products.map((product) => {
+          const productData = product.product || {}; // Если product не существует, используем пустой объект
+          const hasOrderProductName = !!product.order_product_name;
+          const hasProductId = !!productData.product_id;
+          return {
+            product_id: hasOrderProductName
+              ? NaN
+              : hasProductId
+              ? productData.product_id
+              : NaN,
+            order_product_name: hasProductId
+              ? ""
+              : hasOrderProductName
+              ? product.order_product_name
+              : "",
+            order_product_link: hasProductId
+              ? ""
+              : hasOrderProductName
+              ? product.order_product_link
+              : "",
+            product_quantity: product.product_quantity,
+            unit_measurement_id: 8,
+            note: product.note,
+            employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
+          };
+        }),
+      };
+
+      if(draftNewOrderId && draftNewOrderId !== "0"){
+        updateDraftOrderMutation({...order,order_temp_id:Number(draftNewOrderId)})
+      }else{
+        saveOrderMutation(order,{onSuccess(data){
+          if(data.order.order_temp_id){
+            setDraftNewOrderId(data.order.order_temp_id.toString())
+          }
+        }})
+      }
+
+    } else {
+      message.warning("Заполните шапку и товары!");
+    }
+  };
+
   useEffect(() => {
     if (orderid === undefined) {
       reset({
@@ -192,11 +265,12 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
         oms: false,
         order_products: undefined,
         product_group: undefined,
-        storage_id:undefined
+        storage_id: undefined,
+        order_type:undefined,
       });
     } else if (
-      orderid !== "newOrder" &&
-      orderid !== `draft${orderid?.split("draft")[1]}`
+      orderid !== "newOrder"
+      // orderid !== `copy${orderid?.split("copy")[1]}`
     ) {
       reset({
         order_id: getOrderByIdData?.order_id,
@@ -212,89 +286,152 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
           value: getOrderByIdData?.product_group?.product_group_id,
           label: getOrderByIdData?.product_group?.product_group_name,
         },
-        storage_id:{
+        storage_id: {
           value: getOrderByIdData?.storage?.storage_id,
-          label: getOrderByIdData?.storage?.storage_name
+          label: getOrderByIdData?.storage?.storage_name,
         },
         oms: getOrderByIdData?.oms,
         order_route_id: 1,
         order_status_id: getOrderByIdData?.order_status?.order_status_id,
         note: getOrderByIdData?.note,
         order_products: getOrderByIdData?.order_products,
+        order_type:{
+          value:getOrderByIdData?.order_type,
+          label: getOrderByIdData?.order_type === "purchase" ? "Заявка на закупку" : "Заявка на склад"
+        }
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Если toggle === true — сбрасываем таймер
+    if (toggle && timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+      return;
+    }
+
+    // Устанавливаем новый таймер, если модальное окно закрыто и toggle false
+    if (!isModalOpen && !toggle && getValues('order_products')?.length > 0) {
+      timeoutRef.current = setTimeout(() => {
+        setIsModalOpen(true);
+      }, 900000);
+    }
+
+    // Очистка при размонтировании или повторном вызове эффекта
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [isModalOpen, toggle]);
+
   return (
     <div className={style.order}>
-    {isLoading && <Spin fullscreen={true} className={style.spin} size="large"/> }
-    <div className={style.newOrder}>
-      {!toggle ? (
-        <h1>
-          {orderid === "newOrder"
-            ? "Новая заявка"
-            : orderid === `draft${Number(orderid?.split("draft").join(""))}`
-            ? "Черновик"
-            : `Заявка №-${getOrderByIdData?.order_number}`}
-        </h1>
-      ) : (
-        <h1>Выбор товара</h1>
+      <ModalSaveOrder
+        setIsModalOpen={setIsModalOpen}
+        isModalOpen={isModalOpen}
+        getValues={getValues}
+        saveOrder={saveOrder}
+      />
+      {isLoading && (
+        <Spin fullscreen={true} className={style.spin} size="large" />
       )}
-
-      <div
-        className={
-          toggle
-            ? `${style.active} ${style.selectProductOrder}`
-            : style.selectProductOrder
-        }
-      >
-        {toggle && (
-         <FloatButton
-         onClick={() => setToggle(!toggle)}
-         icon={<MoveLeft size={32} style={{ paddingRight: "6px" }}/>}
-         type="primary"
-         style={{
-           insetInlineEnd: 80,
-           width: "45px",
-           height: "45px",
-           paddingRight: "5px",
-         }}
-
-       />
+      <div className={style.newOrder}>
+        {!toggle ? (
+          <h1>
+            {orderid === "newOrder"
+              ? "Новая заявка"
+              : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+              ? "Копия"
+              : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
+          </h1>
+        ) : (
+          <h1>Выбор товара</h1>
         )}
 
-        <SelectProductOrder
-          watch={watch}
-          getValues={getValues}
-          setValue={setValue}
-        />
-      </div>
+        <div
+          className={
+            toggle
+              ? `${style.active} ${style.selectProductOrder}`
+              : style.selectProductOrder
+          }
+        >
+          {toggle && (
+            <FloatButton
+              onClick={() => setToggle(!toggle)}
+              icon={<MoveLeft size={32} style={{ paddingRight: "6px" }} />}
+              type="primary"
+              style={{
+                insetInlineStart: 80,
+                width: "45px",
+                height: "45px",
+                paddingRight: "5px",
+              }}
+            />
+          )}
 
-      <div
-        className={
-          !toggle ? `${style.active} ${style.productOrder}` : style.productOrder
-        }
-      >
-        <form key={1} onSubmit={handleSubmit(onSubmit)}>
-          <HeaderOrder
-            control={control}
-            register={register}
+          <SelectProductOrder
+            watch={watch}
             getValues={getValues}
             setValue={setValue}
-            watch={watch}
-            errors={errors}
-            disabledOrder={disabledOrder}
           />
-          {!disabledOrder && (
-            <button type="submit" className={style.buttonOrderCreate}>
-              {orderid === "newOrder" ||
-              orderid === `draft${Number(orderid?.split("draft").join(""))}`
-                ? "Создать"
-                : "Перезапуск"}
-            </button>
-          )}
-        </form>
-        <button
+        </div>
+
+        <div
+          className={
+            !toggle
+              ? `${style.active} ${style.productOrder}`
+              : style.productOrder
+          }
+        >
+          <form key={1} onSubmit={handleSubmit(onSubmit)}>
+            <HeaderOrder
+              control={control}
+              register={register}
+              getValues={getValues}
+              setValue={setValue}
+              watch={watch}
+              errors={errors}
+              disabledOrder={disabledOrder}
+            />
+
+            <div className={style.footerButtonGroup}>
+
+            {!disabledOrder && (
+              <button type="submit" className={style.buttonOrderCreate}>
+                {orderid === "newOrder" ||
+                orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                  ? createOrderIsPending
+                    ? "Создается..."
+                    : "Создать"
+                  : updateOrderIsPending
+                  ? "Перезапускается..."
+                  : "Перезапуск"}
+              </button>
+            )}
+
+            {!disabledOrder && orderid === "newOrder"
+                  && (
+              <button
+                type="button"
+                className={style.buttonOrderSave}
+                onClick={() => saveOrder()}
+              >
+                { saveOrderIsPending
+                    ? "Сохраняется..."
+                    : "Сохранить"
+                  }
+              </button>
+            )}
+            </div>
+
+          </form>
+          <button
             onClick={() =>
               disabledOrder
                 ? message.info(
@@ -309,9 +446,9 @@ export default function AdminOrder({ orderid, type, remove, targetKey }: Props) 
             Подбор товара
           </button>
 
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+          <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        </div>
       </div>
-    </div>
     </div>
   );
 }
