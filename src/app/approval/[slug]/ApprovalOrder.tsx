@@ -256,6 +256,10 @@ export default function ApprovalOrder({
       order_status_id: getOrderByIdData?.order_status?.order_status_id,
       note: getOrderByIdData?.note,
       order_products: getOrderByIdData?.order_products,
+      order_type:{
+        value:getOrderByIdData?.order_type,
+        label: getOrderByIdData?.order_type === "purchase" ? "Заявка на закупку" : "Заявка на склад"
+      }
     });
   }, [reset, type, orderid, getOrderByIdData]);
 

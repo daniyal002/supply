@@ -227,7 +227,6 @@ export default function DraftOrder({
         }),
       };
 
-      console.log(order)
       updateDraftOrderMutation({
         ...order,
         order_temp_id: Number(draftOrderid),

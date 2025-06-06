@@ -6,18 +6,18 @@ const { Text } = Typography;
 
 interface Props {
   product_kod_1c: string;
-  expandedRowKeys:string[];
+  expandedRowKeys?:string[];
 }
 
 export const RemainProduct: React.FC<Props> = ({ product_kod_1c,expandedRowKeys }) => {
   const { remainProductById, isError, isLoading,refetch } = useRemainProductById(product_kod_1c);
 
   useEffect(() => {
+    if(expandedRowKeys)
     if(expandedRowKeys.includes(product_kod_1c)){
         refetch();
     }
 
-    console.log(expandedRowKeys.includes(product_kod_1c))
   }, [product_kod_1c, refetch,expandedRowKeys]);
 
   if (isLoading) {

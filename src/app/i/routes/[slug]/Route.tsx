@@ -9,6 +9,7 @@ import { useDepartmentData } from '@/hook/departmentHook';
 import { useOderStatusData } from '@/hook/orderHook';
 import { useProductGroupData } from '@/hook/productHook';
 import { useCreateOrderRouteMutation, useOrderRouteByIdData, useUpdateOrderRouteMutation } from '@/hook/orderRouterHook';
+import { EnumOrderTypes } from '@/interface/orderItem';
 
 const { Option } = Select;
 
@@ -25,9 +26,9 @@ export default function Route({ routeId }: Props) {
   const { mutate:updateOrderRouteMutation } = useUpdateOrderRouteMutation();
   const { orderRouteByIdData } = useOrderRouteByIdData(Number(routeId));
 
-  const { control, handleSubmit, watch,reset } = useForm<IAddRouterRequest>({ mode: "onChange" });
+  const { control, handleSubmit, watch,reset, formState: { errors }, } = useForm<IAddRouterRequest>({ mode: "onChange" });
 
-  const { fields, append, update, remove } = useFieldArray({
+  const { fields, append, update, remove,  } = useFieldArray({
     control,
     name: 'steps',
   });
@@ -42,6 +43,7 @@ export default function Route({ routeId }: Props) {
         route_name: orderRouteByIdData.route_name,
         department_id:orderRouteByIdData.department?.department_id,
         route_id:orderRouteByIdData.route_id,
+        order_route_type:orderRouteByIdData.order_route_type,
         steps: orderRouteByIdData.steps.map(orderRoute => ({
           route_id:orderRoute.route_id,
           step_id:orderRoute.step_id,
@@ -114,6 +116,32 @@ export default function Route({ routeId }: Props) {
             </Select>
           )}
         />
+      </Form.Item>
+
+      <Form.Item label="Тип">
+        <Controller
+          name="order_route_type"
+          control={control}
+          rules={{
+            required: { message: "Выберите тип", value: true },
+          }}
+          render={({ field }) => (
+            <Select {...field} placeholder="Выберите тип">
+              <Option value={EnumOrderTypes.PURCHASE}
+              >
+                  Заявка на закупку
+              </Option>
+
+              <Option value={EnumOrderTypes.WAREHOUSE}
+              >
+                  Заявка на склад
+              </Option>
+            </Select>
+          )}
+        />
+        {errors && (
+              <p className={styles.error}>{errors.order_route_type?.message}</p>
+            )}
       </Form.Item>
 
       {fields.map((item, index) => (

@@ -10,8 +10,7 @@ import {
   UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
-import { IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
-import { useGetMe } from "@/hook/userHook";
+import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
@@ -96,9 +95,47 @@ export default function ApprovalHeaderOrder({
       value: parlor.department?.department_id,
       label: parlor.department?.department_name,
     }));
+
+     const optionsOrderTypes: { value: string; label: string }[] = [
+        { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+        { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+      ];
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
+      <div className={style.formItem}>
+            <label className={style.formItemLabel}>Тип</label>
+            <Controller
+              control={control}
+              name="order_type"
+              rules={{
+                required: { message: "Выберите тип", value: true },
+              }}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  disabled
+                  options={optionsOrderTypes}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+
+                  onChange={(value, option) => {
+                    // @ts-ignore: Unreachable code error
+                    field.onChange({ value: value, label: option.label });
+                  }}
+                  placeholder="Тип"
+                  className={style.formItemSelect}
+                />
+              )}
+            />
+            {errors && (
+              <p className={style.error}>{errors.order_type?.message}</p>
+            )}
+          </div>
         <div className={`${style.Checkbox}`}>
           <label className={style.formItemLabel}>ОМС</label>
           <Controller

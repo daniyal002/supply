@@ -1,10 +1,12 @@
 import { IDepartment } from "./department"
+import { EnumOrderTypes } from "./orderItem"
 import { IOrderRouteStepRequest, IOrderRouteStepResponse } from "./orderRouteStep"
 
 export interface IOrderRouteRequest{
     route_id?:number
     route_name:string
     department_id:number
+    order_route_type: EnumOrderTypes.PURCHASE | EnumOrderTypes.WAREHOUSE
 }
 
 export interface IOrderRouteResponse{
@@ -15,12 +17,14 @@ export interface IOrderRouteResponseDetail{
     route_id?:number
     route_name:string
     department?:IDepartment
+    order_route_type: EnumOrderTypes.PURCHASE | EnumOrderTypes.WAREHOUSE
 }
 
 export interface IAddRouterRequest {
     route_id?:number;
     route_name: string;
     department_id: number;
+    order_route_type: EnumOrderTypes.PURCHASE | EnumOrderTypes.WAREHOUSE
     steps: IOrderRouteStepRequest[]
 }
 
@@ -29,6 +33,7 @@ export  interface IOrderRouteByIdResponse {
         route_id?:number
         route_name:string
         department?:IDepartment
+        order_route_type: EnumOrderTypes.PURCHASE | EnumOrderTypes.WAREHOUSE
         steps:IOrderRouteStepResponse[]
     }
 }

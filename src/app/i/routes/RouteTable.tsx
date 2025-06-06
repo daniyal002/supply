@@ -1,10 +1,8 @@
 'use client';
 
-import { IPost } from "@/interface/post";
 import { Button, Space, Table } from "antd";
 import { toast } from "sonner";
-import { useDeletePostMutation } from "@/hook/postHook";
-import { IOrderRouteRequest, IOrderRouteResponse, IOrderRouteResponseDetail } from "@/interface/orderRoute";
+import { IOrderRouteResponseDetail } from "@/interface/orderRoute";
 import { IDepartment } from "@/interface/department";
 import { useDeleteOrderRouteMutation } from "@/hook/orderRouterHook";
 import Link from "next/link";

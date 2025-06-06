@@ -8,6 +8,7 @@ import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss"
 import { InfoCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
+import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -56,8 +57,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "unit_measurement",
       sorter: {
         compare: (a: any, b: any) =>
-          a.unit_measurement?.unit_measurement.name.localeCompare(
-            b.unit_measurement?.unit_measurement.name.name,
+          a.unit_measurement?.unit_measurement.unit_measurement_name.localeCompare(
+            b.unit_measurement?.unit_measurement.unit_measurement_name,
             "ru"
           ),
       },
@@ -153,6 +154,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         onExpand: handleExpand,
         expandedRowRender: (record) =>
           record.order_product_comment && (
+            <>
             <ExpandedRowContent
             orderProductComments={record.order_product_comment}
             productPreviousOrders={record.product_previous_orders}
@@ -165,6 +167,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               orderId={orderId}
               is_cancel={record.is_cancel as boolean}
             />
+            <RemainProduct product_kod_1c={record.product.product_kod_1c}/>
+            </>
           ),
       }}
       rowHoverable={false}

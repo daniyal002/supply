@@ -3,7 +3,7 @@
 import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
-import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import { useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
@@ -38,6 +38,11 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         };
       })
     : [];
+
+    const optionsOrderTypes: { value: string; label: string }[] = [
+        { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+        { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+      ];
 
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
@@ -202,6 +207,34 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
         return nameA.localeCompare(nameB, "ru");
       },
       render: (department: IDepartment) => department?.department_name,
+    },
+    {
+      title: "Тип заявки",
+      dataIndex: "order_type",
+      showSorterTooltip: { title: "Сортировка по типу заявки" },
+      key: "order_type",
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.order_type;
+        const nameB = b.order_type;
+        return nameA.localeCompare(nameB, "ru");
+      },
+      render: (orderType:string) => orderType === 'warehouse' ? "На склад" : "На закупку",
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <StatusFilter
+          options={optionsOrderTypes}
+          setSelectedKeys={setSelectedKeys}
+          selectedKeys={selectedKeys.map((key) => String(key))}
+          confirm={confirm}
+          clearFilters={() => clearFilters && clearFilters()}
+        />
+      ),
+      onFilter: (value, record) =>
+        record.order_type === value,
     },
     {
       title: "Категория",

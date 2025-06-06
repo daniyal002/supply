@@ -2,7 +2,7 @@
 
 import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
 import { IEmployee } from "@/interface/employee";
-import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import { EyeTwoTone, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -34,6 +34,11 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
         };
       })
     : [];
+
+    const optionsOrderTypes: { value: string; label: string }[] = [
+            { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+            { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+          ];
 
   const setApprovalOrderId = useApprovalStore(
     (state) => state.setApprovalOrderId
@@ -172,6 +177,34 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
         return nameA.localeCompare(nameB, "ru");
       },
       render: (department: IDepartment) => department?.department_name,
+    },
+    {
+      title: "Тип заявки",
+      dataIndex: "order_type",
+      showSorterTooltip: { title: "Сортировка по типу заявки" },
+      key: "order_type",
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.order_type;
+        const nameB = b.order_type;
+        return nameA.localeCompare(nameB, "ru");
+      },
+      render: (orderType:string) => orderType === 'warehouse' ? "На склад" : "На закупку",
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <StatusFilter
+          options={optionsOrderTypes}
+          setSelectedKeys={setSelectedKeys}
+          selectedKeys={selectedKeys.map((key) => String(key))}
+          confirm={confirm}
+          clearFilters={() => clearFilters && clearFilters()}
+        />
+      ),
+      onFilter: (value, record) =>
+        record.order_type === value,
     },
     {
       title: "ОМС/ПУ",
