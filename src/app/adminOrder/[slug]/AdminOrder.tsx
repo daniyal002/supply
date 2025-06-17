@@ -8,7 +8,7 @@ import {
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IDraftOrderItemRequest, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
+import { EnumOrderTypes, IDraftOrderItemRequest, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
@@ -138,7 +138,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
-        order_type:data.order_type.value,
+        order_type:EnumOrderTypes.WAREHOUSE,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
@@ -209,7 +209,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
-        order_type:getValues().order_type.value,
+        order_type:EnumOrderTypes.WAREHOUSE,
         oms: getValues().oms || false,
         order_status_id: 8,
         note: getValues().note,

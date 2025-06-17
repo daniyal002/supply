@@ -8,6 +8,7 @@ import {
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
+  EnumOrderTypes,
   IDraftOrderItemRequest,
   IOrderDraftItemFormValues,
   IOrderItemFormValues,
@@ -128,7 +129,7 @@ export default function DraftOrder({
       const order: IDraftOrderItemRequest = {
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
-        order_type:data.order_type.value,
+        order_type:EnumOrderTypes.WAREHOUSE,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         // order_route_id: 4,
@@ -195,7 +196,7 @@ export default function DraftOrder({
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
         oms: getValues().oms || false,
-        order_type:getValues().order_type.value,
+        order_type:EnumOrderTypes.WAREHOUSE,
         order_status_id: 8,
         note: getValues().note,
         product_group_id: getValues().product_group.value,

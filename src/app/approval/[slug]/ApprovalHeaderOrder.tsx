@@ -103,7 +103,7 @@ export default function ApprovalHeaderOrder({
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
-      <div className={style.formItem}>
+      {/* <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
               control={control}
@@ -135,7 +135,7 @@ export default function ApprovalHeaderOrder({
             {errors && (
               <p className={style.error}>{errors.order_type?.message}</p>
             )}
-          </div>
+          </div> */}
         <div className={`${style.Checkbox}`}>
           <label className={style.formItemLabel}>ОМС</label>
           <Controller

@@ -42,7 +42,6 @@ export default function HeaderOrder({
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
 
-  const orderType = useWatch({ control, name: 'order_type' });
 const storageId = useWatch({ control, name: 'storage_id' });
 const employeeId = useWatch({ control, name: 'employee_id' });
 const departmentId = useWatch({ control, name: 'department_id' });
@@ -128,7 +127,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
 
-        <div className={style.formItem}>
+        {/* <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
               control={control}
@@ -160,7 +159,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
             {errors && (
               <p className={style.error}>{errors.order_type?.message}</p>
             )}
-          </div>
+          </div> */}
 
           <div className={`${style.Checkbox}`}>
             <label className={style.formItemLabel}>ОМС</label>
@@ -188,7 +187,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
               render={({ field }) => (
                 <Select
                   {...field}
-                  disabled={disabledOrder || !orderType}
+                  disabled={disabledOrder}
                   options={optionsStorage}
                   showSearch
                   filterOption={(input, option) =>
