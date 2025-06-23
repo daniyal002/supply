@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType, TableProps } from "antd";
 import { toast } from "sonner";
 import { IParlor } from "@/interface/parlor";
 import { IEmployee } from "@/interface/employee";
@@ -11,6 +11,7 @@ import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import { useEffect } from "react";
 
 interface EmployeeTableProps {
   employeeData: IEmployee[] | undefined;
@@ -19,7 +20,39 @@ interface EmployeeTableProps {
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) => {
   const { mutate: deleteEmployeeMutation } = useDeleteEmployeeMutation();
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { searchText, searchedColumn,setSearchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === "а")) {
+        e.preventDefault();
+
+        setSearchedColumn("buyer_name");
+
+        // Ищем кнопку фильтра по колонке "buyer_name"
+        const filterButton = document.querySelector(
+          `.ant-dropdown-trigger.ant-table-filter-trigger`
+        ) as HTMLButtonElement;
+
+        if (filterButton) {
+          filterButton.click(); // имитируем клик
+
+          // Через небольшую задержку ставим фокус на инпут
+          setTimeout(() => {
+            searchInput.current?.focus();
+          }, 200);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const columns: TableColumnsType<IEmployee> = [
     {
@@ -129,7 +162,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
     key: employee.buyer_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Сотрудников"} }}/>;
+  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Сотрудников"} }}  />;
 };
 
 export default EmployeeTable;

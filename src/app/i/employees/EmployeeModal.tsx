@@ -177,6 +177,10 @@ export default function EmployeeModal({
                 }
                 mode="multiple"
                 placeholder="Кабинет"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                showSearch
               />
             )}
           />

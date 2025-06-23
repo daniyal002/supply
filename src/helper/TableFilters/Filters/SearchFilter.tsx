@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Input, InputRef, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 
 interface SearchFilterProps extends FilterDropdownProps {
@@ -31,7 +30,24 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   handleSearch,
   handleReset,
   placeholder
-}) => (
+}) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+
+        // Просто вызываем close(), чтобы закрыть фильтр
+        close();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [close]); // <-- важно добавить close в зависимости
+  return (
   <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
     <Input
       ref={searchInput}
@@ -75,5 +91,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     </Space>
   </div>
 );
+}
 
 export default SearchFilter;

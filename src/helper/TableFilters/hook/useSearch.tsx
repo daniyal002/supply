@@ -27,5 +27,6 @@ export const useSearch = () => {
     searchInput,
     handleSearch,
     handleReset,
+    setSearchedColumn
   };
 };
