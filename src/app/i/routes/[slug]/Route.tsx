@@ -127,21 +127,15 @@ export default function Route({ routeId }: Props) {
           }}
           render={({ field }) => (
             <Select {...field} placeholder="Выберите тип">
-              <Option value={EnumOrderTypes.PURCHASE}
-              >
-                  Заявка на закупку
-              </Option>
+              <Option value={EnumOrderTypes.PURCHASE}>Заявка на закупку</Option>
 
-              <Option value={EnumOrderTypes.WAREHOUSE}
-              >
-                  Заявка на склад
-              </Option>
+              <Option value={EnumOrderTypes.WAREHOUSE}>Заявка на склад</Option>
             </Select>
           )}
         />
         {errors && (
-              <p className={styles.error}>{errors.order_route_type?.message}</p>
-            )}
+          <p className={styles.error}>{errors.order_route_type?.message}</p>
+        )}
       </Form.Item>
 
       {fields.map((item, index) => (
@@ -172,7 +166,9 @@ export default function Route({ routeId }: Props) {
                   mode="multiple"
                   placeholder="Выберите сотрудников для текущего шага"
                   filterOption={(input, option) =>
-                    (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                    (option?.children ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
                   }
                 >
                   {employeeData?.map((employee) => (
@@ -261,22 +257,45 @@ export default function Route({ routeId }: Props) {
             <Controller
               name={`steps.${index}.product_group_ids`}
               control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  mode="multiple"
-                  placeholder="Выберите группу продуктов"
-                >
-                  {productGroupData?.map((productGroup) => (
-                    <Option
-                      key={productGroup.product_group_id}
-                      value={productGroup.product_group_id}
+              render={({ field }) => {
+                const allIds =
+                  productGroupData?.map((pg) => pg.product_group_id) || [];
+
+                const handleSelectAll = () => {
+                  // Если все уже выбраны — очищаем, иначе выбираем все
+                  const isAllSelected = field.value?.length === allIds.length;
+                  field.onChange(isAllSelected ? [] : allIds);
+                };
+
+                return (
+                  <div
+                    style={{ display: "flex", gap: 8, alignItems: "center" }}
+                  >
+                    <Select
+                      {...field}
+                      mode="multiple"
+                      placeholder="Выберите группу продуктов"
+                      value={field.value || []} // защита от undefined
+                      style={{ flexGrow: 1 }}
                     >
-                      {productGroup.product_group_name}
-                    </Option>
-                  ))}
-                </Select>
-              )}
+                      {productGroupData?.map((productGroup) => (
+                        <Option
+                          key={productGroup.product_group_id}
+                          value={productGroup.product_group_id}
+                        >
+                          {productGroup.product_group_name}
+                        </Option>
+                      ))}
+                    </Select>
+
+                    <Button type="link" onClick={handleSelectAll}>
+                      {field.value?.length === allIds.length
+                        ? "Очистить"
+                        : "Выбрать всё"}
+                    </Button>
+                  </div>
+                );
+              }}
             />
           </Form.Item>
         </div>
@@ -291,7 +310,7 @@ export default function Route({ routeId }: Props) {
             status_reject_id: 0,
             status_agreed_id: 0,
             product_group_ids: [],
-            approver_employee_ids:[],
+            approver_employee_ids: [],
           })
         }
         className={styles.addButton}
