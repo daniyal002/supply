@@ -1,104 +1,63 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import style from "./AdminPanel.module.scss";
+import { ApartmentOutlined, CalculatorOutlined, CompassOutlined, HomeOutlined, IdcardOutlined, MenuFoldOutlined, MenuUnfoldOutlined, ShopOutlined, TeamOutlined, UserOutlined, UserSwitchOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+
+const menuItems = [
+  { path: "/i/users", label: "Пользователи", icon: <UserOutlined /> },
+  { path: "/i/roles", label: "Роли", icon: <TeamOutlined /> },
+  { path: "/i/employees", label: "Сотрудники", icon: <IdcardOutlined /> },
+  { path: "/i/parlors", label: "Кабинеты", icon: <HomeOutlined /> },
+  { path: "/i/departments", label: "Подразделения", icon: <ApartmentOutlined /> },
+  { path: "/i/housings", label: "Корпуса", icon: <ShopOutlined /> },
+  { path: "/i/posts", label: "Должности", icon: <UserSwitchOutlined /> },
+  { path: "/i/routes", label: "Маршруты", icon: <CompassOutlined /> },
+  { path: "/i/oneC", label: "1C", icon: <CalculatorOutlined /> },
+];
 
 export default function AdminPanel() {
-  const { push } = useRouter();
   const pathname = usePathname();
-  const isActive = (path: string) => pathname === path;
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Определяем, мобильное ли устройство
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth <= 768) {
+        setCollapsed(true); // Сворачиваем по умолчанию на мобильных
+      }
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
-      <div className={style.adminButtons}>
-        <button
-          onClick={() => push("/i/users")}
-          className={
-            isActive("/i/users")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Пользователи
-        </button>
-        <button
-          onClick={() => push("/i/roles")}
-          className={
-            isActive("/i/roles")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Роли
-        </button>
-        <button
-          onClick={() => push("/i/employees")}
-          className={
-            isActive("/i/employees")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Сотрудники
-        </button>
-        <button
-          onClick={() => push("/i/parlors")}
-          className={
-            isActive("/i/parlors")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Кабинеты
-        </button>
-        <button
-          onClick={() => push("/i/departments")}
-          className={
-            isActive("/i/departments")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Подразделение
-        </button>
-        <button
-          onClick={() => push("/i/housings")}
-          className={
-            isActive("/i/housings")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Корпуса
-        </button>
-        <button
-          onClick={() => push("/i/posts")}
-          className={
-            isActive("/i/posts")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Должности
-        </button>
-        <button
-          onClick={() => push("/i/routes")}
-          className={
-            isActive("/i/routes")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          Маршруты
-        </button>
-        <button
-          onClick={() => push("/i/oneC")}
-          className={
-            isActive("/i/oneC")
-              ? `${style.adminButton} ${style.active}`
-              : style.adminButton
-          }
-        >
-          1C
-        </button>
-      </div>
+    <aside className={`${style.sidebar} ${collapsed ? style.collapsed : ""}`}>
+      {!collapsed && <div className={style.logo}>🛠 Админка</div>}
+
+      <nav className={style.menu}>
+        {menuItems.map((item) => (
+          <Link
+            key={item.path}
+            href={item.path}
+            className={`${style.menuItem} ${pathname === item.path ? style.active : ""}`}
+          >
+            <span className={style.icon}>{item.icon}</span>
+            {!collapsed && <span className={style.label}>{item.label}</span>}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Кнопка сворачивания */}
+      <button className={style.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
+        {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+      </button>
+    </aside>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import AdminPanel from "./AdminPanel";
-
+import styles from './layout.module.scss'
 export const metadata: Metadata = {
   title: "Админ-панель",
 };
@@ -11,9 +11,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
+    <div className={styles.adminLayout}>
       <AdminPanel />
-      {children}
+      <div className={styles.adminContent}>{children}</div>
     </div>
   );
 }

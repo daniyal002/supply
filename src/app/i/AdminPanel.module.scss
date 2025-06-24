@@ -1,32 +1,88 @@
-.adminButtons{
+.sidebar {
+    background-color: #f8f8f8;
+    height: 100vh;
+    position: sticky;
+    top: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap:10px;
-    margin: 20px 0;
-    justify-content: center;
+    flex-direction: column;
+    padding: 20px 10px;
+    border-right: 1px solid #e6e6e6;
+    transition: all 0.3s ease;
+    width: 250px;
+    min-width: 250px;
 
-    .adminButton{
-        max-width: 116px;
-        width: 100%;
-        padding: 10px 5px;
-        border: 2px solid #d9d9d9;
-        border-radius: 6px;
-        cursor: pointer;
-        background-color: #fff;
-        font-size: 14px;
-        transition: 0.5s;
-        &:hover{
-        border: 2px solid #1677ff;
-        color: #1677ff;
-        }
+    &.collapsed {
+      width: 60px;
+      min-width: 60px;
+      padding: 10px 5px;
+
+      .logo {
+        display: none;
+      }
+
+      .label {
+        display: none;
+      }
     }
-    .active{
-        background-color: #1677ff;
-        color: #fff;
-        border: 2px solid #1677ff;
-        &:hover{
-            border: 2px solid #d9d9d9;
-            color: #fff;
-            }
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #1a1a1a;
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+  }
+
+  .menuItem {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: #e6f7ff;
+      color: #1677ff;
     }
-}
+
+    &.active {
+      background-color: #1677ff;
+      color: white;
+      font-weight: bold;
+    }
+  }
+
+  .icon {
+    margin-right: 10px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .toggleBtn {
+    margin-top: auto;
+    align-self: flex-end;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #595959;
+    padding: 10px;
+    border-radius: 50%;
+    transition: background 0.3s;
+
+    &:hover {
+      background-color: #e6e6e6;
+    }
+  }
