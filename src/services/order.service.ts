@@ -6,6 +6,7 @@ import {
   IOrderItemRequest,
   IOrderItemRequestDelete,
   IOrderItemResponse,
+  IOrderTo1CRequest,
   IStatusOrderResponse,
 } from "@/interface/orderItem";
 import { IRouteInfoResponse } from "@/interface/routeInfo";
@@ -154,4 +155,9 @@ export const orderService = {
     );
     return response.data;
   },
+
+  async forceSubmitOrderTo1c(data:IOrderTo1CRequest){
+    const response = await axiosWidthAuth.post<string>('/order/force_submit_order_to_1c',data)
+    return response.data
+  }
 };

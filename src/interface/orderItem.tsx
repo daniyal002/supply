@@ -160,3 +160,8 @@ export interface IOrderItem {
       value: EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
       label: string;
   }
+
+  export interface IOrderTo1CRequest {
+    order_id: number;
+    note?: string;
+  }

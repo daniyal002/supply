@@ -7,6 +7,7 @@ import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import {
   useDeleteOrderMutation,
+  useForceSubmitOrderTo1cMutation,
   useResetOrderMutation,
 } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../store/orderIdStore";
@@ -14,6 +15,7 @@ import {
   EyeTwoTone,
   ReloadOutlined,
   SearchOutlined,
+  SendOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -30,6 +32,9 @@ interface AdminOrderListProps {
 const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
+
+    const {mutate:forceSubmitOrderTo1c} = useForceSubmitOrderTo1cMutation()
+
   const StatusOption = OrderData
     ? Array.from(
         new Set(OrderData.map((order) => order?.order_status?.order_status_id))
@@ -260,13 +265,20 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
       showSorterTooltip: { title: "Действия" },
       render: (_: any, record: IOrderItem) => (
         <Space size="middle">
-          {/* <Link href={`/order/${record.order_id}`}>Изменить</Link> */}
           <Button
             onClick={() => setAdminOrderId(String(record.order_id))}
             aria-label="Посмотреть заявку"
             title="Посмотреть заявку"
           >
             <EyeTwoTone />
+          </Button>
+
+          <Button
+            onClick={() => forceSubmitOrderTo1c({order_id:record.order_id as number})}
+            aria-label="Отправить в 1С УНФ"
+            title="Отправить в 1С УНФ"
+          >
+            <SendOutlined />
           </Button>
           {record.in_route && record.current_step_container !== null && (
             <Button

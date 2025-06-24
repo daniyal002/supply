@@ -3,6 +3,7 @@ import {
   IOrderItem,
   IOrderItemRequest,
   IOrderItemRequestDelete,
+  IOrderTo1CRequest,
 } from "@/interface/orderItem";
 import { orderService } from "@/services/order.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -433,6 +434,22 @@ export const useDeleteOrderProductCancelCommentMutation = (orderId: number) => {
       );
 
       message.success("Вы успешно активировали позицию.");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useForceSubmitOrderTo1cMutation = () => {
+  const { mutate } = useMutation({
+    mutationKey: ["forceSubmitOrderTo1c"],
+    mutationFn: (data: IOrderTo1CRequest) =>
+      orderService.forceSubmitOrderTo1c(data),
+    onSuccess() {
+      message.success("Вы успешно отправили заявку в 1С УНФ.");
     },
     onError(error: AxiosError<IErrorResponse>) {
       message.error(error?.response?.data?.detail);
