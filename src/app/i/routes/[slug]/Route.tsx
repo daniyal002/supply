@@ -10,6 +10,8 @@ import { useOderStatusData } from '@/hook/orderHook';
 import { useProductGroupData } from '@/hook/productHook';
 import { useCreateOrderRouteMutation, useOrderRouteByIdData, useUpdateOrderRouteMutation } from '@/hook/orderRouterHook';
 import { EnumOrderTypes } from '@/interface/orderItem';
+import { MoveLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const { Option } = Select;
 
@@ -34,6 +36,8 @@ export default function Route({ routeId }: Props) {
   });
 
   const watchSteps = watch('steps');
+
+  const {back} = useRouter()
 
 
 
@@ -90,6 +94,7 @@ export default function Route({ routeId }: Props) {
       <div className={styles.formHeader}>
         <h2>Настройка маршрута</h2>
       </div>
+      <MoveLeft size={32} onClick={() => back()} className={styles.back}/>
 
       <Form.Item label="Название маршрута">
         <Controller
