@@ -6,6 +6,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import Header from "@/components/UI/Header/Header";
 import SiderL from "@/components/UI/Sider/Sider";
 import style from "./layout.module.scss"
+import MainLayout from "@/components/UI/MainLayout/MainLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,13 +31,15 @@ export default function RootLayout({
       <AntdRegistry>
         <QueryClientContextProvider>
           <body className={inter.className}>
-            <Header />
+            {/* <Header />
             <div  className={style.layout}>
             <SiderL />
             <main className="main">
-            {children}
             </main>
-            </div>
+            </div> */}
+            <MainLayout>
+            {children}
+            </MainLayout>
           </body>
         </QueryClientContextProvider>
       </AntdRegistry>

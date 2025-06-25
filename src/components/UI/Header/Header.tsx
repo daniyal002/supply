@@ -33,9 +33,7 @@ export default function Header() {
 
   const { mutate: logout } = useLogout();
 
-  if (pathname === "/login") {
-    return null;
-  }
+
   return (
     <div className={style.header}>
       <div className={style.headerlogo}>

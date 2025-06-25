@@ -57,6 +57,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   if (orderid?.startsWith("copy")) {
     orderIdFromGetOrderById = orderid.replace("copy", "");
   }
+
+  useEffect(()=>{
+    console.log(getValues("order_products"))
+  },[getValues("order_products")])
+
   const { getOrderByIdData } = useGetOrderById(
     orderIdFromGetOrderById as string
   );

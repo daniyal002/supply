@@ -302,7 +302,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
 
   // Обработчик раскрытия строки
   const handleExpand = async (expanded: boolean, record: IProductTable) => {
-    const key = record.order_product_id as number;
+   // @ts-ignore: Unreachable code error
+    const key = record.key as number;
     setExpandedRowKeys(
       (prev) =>
         expanded
@@ -311,36 +312,48 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     );
   };
 
+  const dataSource = productTableData?.map((product,index) => ({
+    ...product,
+    key:index, // Ensure each item has a unique key
+  }));
+
   return (
     <Table
-      dataSource={productTableData}
+      dataSource={dataSource}
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
-      footer={() => "Всего: " + (currentFilters ? currentFilters : productTableData?.length ? productTableData?.length : 0)}
+      footer={() =>
+        "Всего: " +
+        (currentFilters
+          ? currentFilters
+          : dataSource?.length
+          ? dataSource?.length
+          : 0)
+      }
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
-      rowKey="order_product_id"
-      rowClassName={(record) => record.is_cancel === true ? style.highlightRow : ''}
-      locale={{emptyText:"Нет товаров"}}
+      rowClassName={(record) =>
+        record.is_cancel === true ? style.highlightRow : ""
+      }
+      locale={{ emptyText: "Нет товаров" }}
       expandable={{
-              expandedRowKeys,
-              onExpand: handleExpand,
-              expandedRowRender: (record) =>
-                record.order_product_comment && (
-                  <>
-                  <ExpandedRowContent
-                  orderProductComments={record.order_product_comment}
-                  productPreviousOrders={record.product_previous_orders}
-                    orderId={orderId}
-                  />
-                  <RemainProduct product_kod_1c={record.product.product_kod_1c}/>
-                  </>
-                ),
-            }}
-      rowHoverable={false}
+        expandedRowKeys,
+        onExpand: handleExpand,
+        expandedRowRender: (record) => (
+          <>
+              <ExpandedRowContent
+                orderProductComments={record.order_product_comment || []}
+                productPreviousOrders={record.product_previous_orders}
+                orderId={orderId}
+              />
 
+            <RemainProduct product_kod_1c={record.product.product_kod_1c} />
+          </>
+        ),
+      }}
+      rowHoverable={false}
     />
   );
 };

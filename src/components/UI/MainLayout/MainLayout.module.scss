@@ -1,0 +1,38 @@
+.header{
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 1px 1px 10px 1px #C0C0C0;
+
+
+    .headerLogin{
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        @media screen and (max-width:767px) {
+            display: none;
+        }
+    }
+    .headerLoginChar{
+        color: #678098;
+        font-size: 18px;
+        font-weight: 600;
+
+    }
+
+    .headerBellAndButtons{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 25px;
+    }
+    .headerButtons{
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 10px;
+        background-color: #678098;
+    }
+
+}

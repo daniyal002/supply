@@ -82,14 +82,7 @@ const SiderL: React.FC = () => {
     className={`${style.overlay} ${!collapsed ? style.overlayActive : ""}`}
     onClick={() => editCollapsed(true)} // Закрывает сайдбар при клике на фон
   />
-  {/* <Sider
-    trigger={null}
-    collapsible
-    collapsed={collapsed}
-    className={!collapsed ? `${style.siderActive} ${style.sider}` : `${style.sider}`}
-  >
-    <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]} items={menuItems} />
-  </Sider> */}
+
   <Sider
   trigger={null}
   collapsible
