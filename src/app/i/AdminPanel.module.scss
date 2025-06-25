@@ -1,6 +1,6 @@
 .sidebar {
-    background-color: #f8f8f8;
-    height: 100vh;
+    background-color: #ffffff;
+    height: 100%;
     position: sticky;
     top: 0;
     display: flex;
@@ -81,8 +81,5 @@
     padding: 10px;
     border-radius: 50%;
     transition: background 0.3s;
-
-    &:hover {
-      background-color: #e6e6e6;
-    }
+    outline: none;
   }

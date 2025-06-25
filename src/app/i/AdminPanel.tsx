@@ -40,7 +40,10 @@ export default function AdminPanel() {
   return (
     <aside className={`${style.sidebar} ${collapsed ? style.collapsed : ""}`}>
       {!collapsed && <div className={style.logo}>🛠 Админка</div>}
-
+      {/* Кнопка сворачивания */}
+      <button className={style.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
+        {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+      </button>
       <nav className={style.menu}>
         {menuItems.map((item) => (
           <Link
@@ -53,11 +56,6 @@ export default function AdminPanel() {
           </Link>
         ))}
       </nav>
-
-      {/* Кнопка сворачивания */}
-      <button className={style.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
-        {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      </button>
     </aside>
   );
 }
