@@ -25,11 +25,16 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
       title: "ID",
       dataIndex: "post_id",
       key: "post_id",
+      sorter: (a:any, b:any) => a.post_id - b.post_id,
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Должность",
       dataIndex: "post_name",
       key: "post_name",
+      sorter: (a: any, b: any) =>
+        a.post_name.localeCompare(b.post_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по должности" },
       filterDropdown: (props:any) => (
         <SearchFilter
           {...props}

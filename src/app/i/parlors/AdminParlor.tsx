@@ -6,6 +6,7 @@ import ParlorTable from "./ParlorTable";
 import ParlorModal from "./ParlorModal";
 import { useState } from "react";
 import { useParlorData } from "@/hook/parlorHook";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminParlor() {
   const { parlorData } = useParlorData();
@@ -35,7 +36,13 @@ export default function AdminParlor() {
         setIsModalOpen={setIsModalOpen}
         parlorId={parlorId}
       />
-      <Button onClick={onAdd}>Добавить кабинет</Button>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      />
       <ParlorTable parlorData={parlorData} onEdit={onEdit} />
     </div>
   );

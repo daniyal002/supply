@@ -6,6 +6,7 @@ import PostTable from "./RoleTable";
 import RoleModal from "./RoleModal";
 import { useState } from "react";
 import { useRoleData } from "@/hook/roleHook";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminRole() {
   const { roleData } = useRoleData();
@@ -35,7 +36,14 @@ export default function AdminRole() {
         setIsModalOpen={setIsModalOpen}
         roleId={roleId}
       />
-      <Button onClick={onAdd}>Добавить роль</Button>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      />
+
       <PostTable roleData={roleData} onEdit={onEdit} />
     </div>
   );

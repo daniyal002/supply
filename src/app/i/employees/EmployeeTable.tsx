@@ -60,6 +60,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       dataIndex: 'buyer_id',
       key: 'buyer_id',
       sorter: (a:any, b:any) => a.buyer_id - b.buyer_id,
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
 
     {
@@ -67,6 +68,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       dataIndex: 'buyer_name',
       key: 'buyer_name',
       sorter: (a: any, b: any) => a.buyer_name.localeCompare(b.buyer_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по наименованию" },
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -105,6 +107,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       dataIndex: 'buyer_type',
       key: 'buyer_type',
       sorter: (a: any, b: any) => a.buyer_type.localeCompare(b.buyer_type, 'ru'),
+      showSorterTooltip: { title: "Сортировка по виду" },
       render:(buyerType) => buyerType === "employee" ? "Сотрудник" : "Кабинет",
       filters: [{
         text: "Сотрудник",
@@ -125,6 +128,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
           b.parlors?.[0]?.parlor_name ?? '',
           'ru'
         ),
+      showSorterTooltip: { title: "Сортировка по кабинету" },
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -176,6 +180,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       dataIndex: 'post',
       key: 'post',
       sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по должности" },
       render: (post: IPost) => post?.post_name // Or any other suitable React element
     },
     {

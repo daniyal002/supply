@@ -6,6 +6,7 @@ import UserModal from "./UserModal";
 import { useState } from "react";
 import { useUserData } from "@/hook/userHook";
 import UserTable from "./UserTable";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminUser() {
   const { userData } = useUserData();
@@ -35,7 +36,13 @@ export default function AdminUser() {
         setIsModalOpen={setIsModalOpen}
         userId={userId}
       />
-      <Button onClick={onAdd}>Добавить пользователя</Button>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      />
       <UserTable userData={userData} onEdit={onEdit} />
     </div>
   );

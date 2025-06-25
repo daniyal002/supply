@@ -6,6 +6,7 @@ import HousingTable from "./HousingTable";
 import HousingModal from "./HousingModal";
 import { useState } from "react";
 import { useHousingData } from "@/hook/housingHook";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminHousing() {
   const { housingsData } = useHousingData();
@@ -35,7 +36,13 @@ export default function AdminHousing() {
         setIsModalOpen={setIsModalOpen}
         housingId={housingId}
       />
-      <Button onClick={onAdd}>Добавить корпус</Button>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      />
       <HousingTable housingsData={housingsData} onEdit={onEdit} />
     </div>
   );

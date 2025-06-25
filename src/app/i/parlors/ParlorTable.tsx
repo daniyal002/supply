@@ -27,6 +27,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
       dataIndex: 'parlor_id',
       key: 'parlor_id',
       sorter: (a:any, b:any) => a.id - b.id,
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
 
     {
@@ -34,6 +35,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
       dataIndex: 'parlor_name',
       key: 'parlor_name',
       sorter: (a: any, b: any) => a.parlor_name.localeCompare(b.parlor_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по кабинету" },
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -73,6 +75,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
       key: 'department',
       sorter: (a: any, b: any) =>
         a.department.department_name.localeCompare(b.department.department_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по подразделению" },
       render: (department: IDepartment) => department?.department_name,
       filters: useMemo(() => {
         if (!parlorData) return [];

@@ -27,12 +27,15 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
       title: "ID",
       dataIndex: "department_id",
       key: "department_id",
+      sorter: (a:any, b:any) => a.department_id - b.department_id,
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Подразделение",
       dataIndex: "department_name",
       key: "department_name",
       sorter: (a:any, b:any) => a.department_name.localeCompare(b.department_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по подразделению" },
       filterDropdown: (props:any) => (
         <SearchFilter
           {...props}
@@ -71,6 +74,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
       dataIndex: 'housing',
       key: 'housing',
       sorter: (a: any, b: any) => a.housing?.housing_name.localeCompare(b.housing?.housing_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по корпусу" },
       render: (housing:IHousing) => housing?.housing_name,
       filters: useMemo(() => {
               if (!departmentData) return [];

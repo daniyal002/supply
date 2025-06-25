@@ -6,6 +6,7 @@ import DepartmentTable from "./DepartmentTable";
 import DepartmentModal from "./DepartmentModal";
 import { useState } from "react";
 import { useDepartmentData } from "@/hook/departmentHook";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminDepartment() {
   const { departmentData } = useDepartmentData();
@@ -35,7 +36,13 @@ export default function AdminDepartment() {
         setIsModalOpen={setIsModalOpen}
         departmentId={departmentId}
       />
-      <Button onClick={onAdd}>Добавить подразделение</Button>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      />
       <DepartmentTable departmentData={departmentData} onEdit={onEdit} />
     </div>
   );

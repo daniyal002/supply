@@ -6,6 +6,7 @@ import EmployeeModal from "./EmployeeModal";
 import { useState } from "react";
 import { useEmployeeData } from "@/hook/employeeHook";
 import EmployeeTable from "./EmployeeTable";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminEmployee() {
   const { employeeData } = useEmployeeData();
@@ -35,7 +36,13 @@ export default function AdminEmployee() {
         setIsModalOpen={setIsModalOpen}
         employeeId={employeeId}
       />
-      <Button onClick={onAdd}>Добавить сотрудника</Button>
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      />
       <EmployeeTable employeeData={employeeData} onEdit={onEdit} />
     </div>
   );

@@ -20,11 +20,16 @@ const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
       title: "ID",
       dataIndex: "role_id",
       key: "role_id",
+      sorter: (a:any, b:any) => a.role_id - b.role_id,
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Роль",
       dataIndex: "role_name",
       key: "role_name",
+      sorter: (a: any, b: any) =>
+        a.role_name.localeCompare(b.role_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по ролям" },
     },
     {
       title: "Действия",

@@ -28,12 +28,14 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
       dataIndex: "route_id",
       key: "route_id",
       sorter: (a:IOrderRouteResponseDetail, b:IOrderRouteResponseDetail) => Number(a?.route_id) - Number(b?.route_id),
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Маршрут",
       dataIndex: "route_name",
       key: "route_name",
       sorter: (a:IOrderRouteResponseDetail, b:IOrderRouteResponseDetail) => a.route_name.localeCompare(b.route_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по маршрутам" },
       filterDropdown: (props:any) => (
         <SearchFilter
           {...props}
@@ -74,6 +76,7 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
       key: "department",
       sorter: (a: any, b: any) =>
         a.department?.department_name.localeCompare(b.department?.department_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по подразделению" },
       render: (department:IDepartment) => department?.department_name,
       filters: useMemo(() => {
               if (!routeData) return [];

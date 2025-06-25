@@ -1,7 +1,7 @@
 'use client';
 
 import { IPost } from "@/interface/post";
-import { Button, Space, Table } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IHousing } from "@/interface/housing";
 import { useDeleteHousingMutation } from "@/hook/housingHook";
@@ -20,16 +20,20 @@ interface PostTableProps {
 const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
   const { mutate: deletePostMutation } = useDeleteHousingMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
-  const columns = [
+  const columns: TableColumnsType<IHousing> = [
     {
       title: "ID",
       dataIndex: "housing_id",
       key: "housing_id",
+      sorter: (a:any, b:any) => a.housing_id - b.housing_id,
+      showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Корпус",
       dataIndex: "housing_name",
       key: "housing_name",
+      sorter: (a:any, b:any) => a.housing_name.localeCompare(b.housing_name, 'ru'),
+      showSorterTooltip: { title: "Сортировка по корпусу" },
       filterDropdown: (props:any) => (
         <SearchFilter
           {...props}
