@@ -10,6 +10,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { useMemo } from "react";
 
 interface PostTableProps {
   parlorData: IParlor[] | undefined;
@@ -70,8 +71,31 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
       title: 'Подразделение',
       dataIndex: 'department',
       key: 'department',
-      sorter: (a: any, b: any) => a.department.department_name.localeCompare(b.department.department_name, 'ru'),
-      render: (department:IDepartment) => department?.department_name
+      sorter: (a: any, b: any) =>
+        a.department.department_name.localeCompare(b.department.department_name, 'ru'),
+      render: (department: IDepartment) => department?.department_name,
+      filters: useMemo(() => {
+        if (!parlorData) return [];
+
+        const uniqueDepartments = Array.from(
+          new Map(
+            parlorData
+              .filter(p => p.department && p.department.department_id) // Фильтруем сразу по наличию department_id
+              .map(parlor => [
+                parlor.department!.department_id,
+                {
+                  text: parlor.department!.department_name,
+                  value: parlor.department!.department_id as number, // Явно приводим к number
+                },
+              ])
+          ).values()
+        );
+
+        return uniqueDepartments
+          .sort((a, b) => a.text.localeCompare(b.text, 'ru'));
+      }, [parlorData]),
+      onFilter: (value, record) =>
+        record.department?.department_id === value,
     },
     {
       title: "Действия",
@@ -85,7 +109,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
             type="primary"
             danger
             onClick={() =>
-              toast.error("Вы точно хотите удалить должность ?", {
+              toast.error("Вы точно хотите удалить кабинет ?", {
                 style: {
                   color: "red",
                 },
