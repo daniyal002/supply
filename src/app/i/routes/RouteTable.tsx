@@ -1,11 +1,17 @@
 'use client';
 
-import { Button, Space, Table } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IOrderRouteResponseDetail } from "@/interface/orderRoute";
 import { IDepartment } from "@/interface/department";
 import { useDeleteOrderRouteMutation } from "@/hook/orderRouterHook";
 import Link from "next/link";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { SearchOutlined } from "@ant-design/icons";
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import { Key, useMemo } from "react";
+import Highlighter from "react-highlight-words";
 
 interface RouteTableProps {
   routeData: IOrderRouteResponseDetail[] | undefined;
@@ -14,22 +20,83 @@ interface RouteTableProps {
 
 const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
 const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
-  const columns = [
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+
+  const columns:TableColumnsType<IOrderRouteResponseDetail> = [
     {
       title: "ID",
       dataIndex: "route_id",
       key: "route_id",
+      sorter: (a:IOrderRouteResponseDetail, b:IOrderRouteResponseDetail) => Number(a?.route_id) - Number(b?.route_id),
     },
     {
       title: "Маршрут",
       dataIndex: "route_name",
       key: "route_name",
+      sorter: (a:IOrderRouteResponseDetail, b:IOrderRouteResponseDetail) => a.route_name.localeCompare(b.route_name, 'ru'),
+      filterDropdown: (props:any) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по маршруту"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="route_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value:boolean|Key, record:IOrderRouteResponseDetail) => {
+        const searchValue = (value as string).toLowerCase();
+        const route_name = record.route_name.toString().toLowerCase();
+
+        return filterBySearchText(searchValue, route_name);
+      },
+      render: (text:string) =>
+        searchedColumn === "route_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
+
     },
     {
       title: "Подразделение",
       dataIndex: "department",
       key: "department",
-      render: (department:IDepartment) => department?.department_name
+      sorter: (a: any, b: any) =>
+        a.department?.department_name.localeCompare(b.department?.department_name, 'ru'),
+      render: (department:IDepartment) => department?.department_name,
+      filters: useMemo(() => {
+              if (!routeData) return [];
+
+              const uniqueDepartments = Array.from(
+                new Map(
+                  routeData
+                    .filter(r => r.department && r.department.department_id) // Фильтруем сразу по наличию department_id
+                    .map(route => [
+                      route.department!.department_id,
+                      {
+                        text: route.department!.department_name,
+                        value: route.department!.department_id as number, // Явно приводим к number
+                      },
+                    ])
+                ).values()
+              );
+
+              return uniqueDepartments
+                .sort((a, b) => a.text.localeCompare(b.text, 'ru'));
+            }, [routeData]),
+            onFilter: (value, record) =>
+              record.department?.department_id === value,
     },
     {
       title: "Действия",

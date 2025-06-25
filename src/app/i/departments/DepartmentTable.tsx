@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Space, Table } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IDepartment } from "@/interface/department";
 import { useDeleteDepartmentMutation } from "@/hook/departmentHook";
@@ -22,7 +22,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
 
 
-  const columns = [
+  const columns:TableColumnsType<IDepartment> = [
     {
       title: "ID",
       dataIndex: "department_id",
@@ -65,7 +65,6 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
         ) : (
           text
         ),
-
     },
     {
       title: 'Корпус',
@@ -79,7 +78,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
               const uniqueDepartments = Array.from(
                 new Map(
                   departmentData
-                    .filter(d => d.housing && d.housing.housing_id) // Фильтруем сразу по наличию department_id
+                    .filter(d => d.housing && d.housing.housing_id) // Фильтруем сразу по наличию housing_id
                     .map(department => [
                       department.housing!.housing_id,
                       {
