@@ -105,7 +105,16 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       dataIndex: 'buyer_type',
       key: 'buyer_type',
       sorter: (a: any, b: any) => a.buyer_type.localeCompare(b.buyer_type, 'ru'),
-      render:(buyerType) => buyerType === "employee" ? "Сотрудник" : "Кабинет"
+      render:(buyerType) => buyerType === "employee" ? "Сотрудник" : "Кабинет",
+      filters: [{
+        text: "Сотрудник",
+        value: "employee"
+      },{
+        text:"Кабинет",
+        value:"parlor"
+      }] as { text: string; value: string }[],
+      onFilter: (value, record) =>
+        record.buyer_type === value,
     },
     {
       title: 'Кабинет',
@@ -116,10 +125,52 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
           b.parlors?.[0]?.parlor_name ?? '',
           'ru'
         ),
-      render: (parlors: IParlor[]) => parlors?.map((parlor, index) => (
-        <div key={index}>{parlor?.parlor_name}</div>
-      ))
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по кабинету"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="parlors"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        return Boolean(record.parlors?.some((parlor: IParlor) =>
+          parlor.parlor_name.toLowerCase().includes(searchValue)
+        ));
+      },
+      render: (parlors: IParlor[]) => {
+        if (!parlors || parlors.length === 0) return null;
+
+        return parlors.map((parlor, index) => {
+          const shouldHighlight = searchedColumn === 'parlors' &&
+            parlor.parlor_name.toLowerCase().includes(searchText.toLowerCase());
+
+          return (
+            <div key={index}>
+              {shouldHighlight ? (
+                <Highlighter
+                  highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                  searchWords={[searchText]}
+                  autoEscape
+                  textToHighlight={parlor.parlor_name}
+                />
+              ) : (
+                parlor.parlor_name
+              )}
+            </div>
+          );
+        });
+      },
     },
+
     {
       title: 'Должность',
       dataIndex: 'post',
