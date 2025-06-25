@@ -1,14 +1,18 @@
 import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import { IProductTable, IProductTableRequest } from "@/interface/productTable";
+import { IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Space, Table, TableColumnsType } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { useMemo, useState } from "react";
+import { ExpandedRowContent } from "./ExpandedRowContent";
+import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
+import style from "./ProductOrderTable.module.scss"
+
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -18,6 +22,8 @@ interface productOrderTableProps {
   deleteProduct: (key: number) => void;
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
+  orderId: number;
+
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -28,6 +34,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   deleteProduct,
   setIsNewProduct,
   disabledOrder,
+  orderId
+
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -247,6 +255,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
 
       render: (record: IProductTable) => (
         <Space size="middle">
+          {record.is_cancel && (
+            <Tooltip title={<span>{record.order_cancel_comment.comment}</span>}>
+              <InfoCircleFilled  style={{color:"#fff"}}/>
+              </Tooltip>
+          )}
+
           {!disabledOrder && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               <Button
@@ -279,26 +293,54 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     },
   ];
 
-  const dataSource = productTableData?.map((product, index) => ({
-    ...product,
-    key: index, // Ensure each item has a unique key
-  }));
 
   const [currentFilters, setCurrentFilters] = useState<number>(
-    dataSource?.length as number
+    productTableData?.length as number
   );
+
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+
+  // Обработчик раскрытия строки
+  const handleExpand = async (expanded: boolean, record: IProductTable) => {
+    const key = record.order_product_id as number;
+    setExpandedRowKeys(
+      (prev) =>
+        expanded
+          ? [...prev, key] // Добавляем ключ при раскрытии
+          : prev.filter((k) => k !== key) // Удаляем ключ при сворачивании
+    );
+  };
 
   return (
     <Table
-      dataSource={dataSource}
+      dataSource={productTableData}
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
-      footer={() => "Всего: " + (currentFilters ? currentFilters : dataSource?.length ? dataSource?.length : 0)}
+      footer={() => "Всего: " + (currentFilters ? currentFilters : productTableData?.length ? productTableData?.length : 0)}
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
+      rowKey="order_product_id"
+      rowClassName={(record) => record.is_cancel === true ? style.highlightRow : ''}
       locale={{emptyText:"Нет товаров"}}
+      expandable={{
+              expandedRowKeys,
+              onExpand: handleExpand,
+              expandedRowRender: (record) =>
+                record.order_product_comment && (
+                  <>
+                  <ExpandedRowContent
+                  orderProductComments={record.order_product_comment}
+                  productPreviousOrders={record.product_previous_orders}
+                    orderId={orderId}
+                  />
+                  <RemainProduct product_kod_1c={record.product.product_kod_1c}/>
+                  </>
+                ),
+            }}
+      rowHoverable={false}
+
     />
   );
 };

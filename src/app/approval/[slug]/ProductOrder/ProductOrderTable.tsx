@@ -7,7 +7,7 @@ import { useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss"
-import { InfoCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleFilled } from "@ant-design/icons";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 
 interface productOrderTableProps {
@@ -129,6 +129,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       ),
     },
   ];
+
   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
 
   // Обработчик раскрытия строки

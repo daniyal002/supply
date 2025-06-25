@@ -39,24 +39,40 @@ export default function ProductOrder({productTableData,getValues,setValue,watch,
     setValue("order_products", updatedProducts);
   }
 
+  const orderId = getValues("order_id");
+
 
   return (
     <>
       <ModalSelectProductOrder
         type={type}
         isModalOpen={isModalOpen}
-       editProductId={productIndex as number}
-       productId={productId}
-       setIsModalOpen={setIsModalOpen}
-       getValues={getValues}
-       setValue={setValue}
-       watch={watch}
-       isNewProduct={isNewProduct}
+        editProductId={productIndex as number}
+        productId={productId}
+        setIsModalOpen={setIsModalOpen}
+        getValues={getValues}
+        setValue={setValue}
+        watch={watch}
+        isNewProduct={isNewProduct}
       />
       {!disabledOrder && (
-        <Button onClick={() => showModalIsNewProduct()} style={{width:"100%", marginBottom:"10px"}}>Добавить новый товар</Button>
+        <Button
+          onClick={() => showModalIsNewProduct()}
+          style={{ width: "100%", marginBottom: "10px" }}
+        >
+          Добавить новый товар
+        </Button>
       )}
-      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct} setIsNewProduct={setIsNewProduct} disabledOrder={disabledOrder }/>
+      <ProductOrderTable
+        showModal={showModal}
+        productTableData={productTableData}
+        setProductId={setProductId}
+        setProductIndex={setProductIndex}
+        deleteProduct={deleteProduct}
+        setIsNewProduct={setIsNewProduct}
+        disabledOrder={disabledOrder}
+        orderId={orderId as number}
+      />
     </>
   );
 }
