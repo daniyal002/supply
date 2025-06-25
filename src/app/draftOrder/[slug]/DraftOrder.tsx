@@ -157,9 +157,8 @@ export default function DraftOrder({
               ? product.order_product_link
               : "",
             product_quantity: product.product_quantity,
-            // unit_measurement_id: product.unit_measurement.unit_measurement
-            //   .unit_measurement_id as number,
-            unit_measurement_id: 8,
+            unit_measurement_id: product.unit_measurement.unit_measurement
+              .unit_measurement_id as number,
             note: product.note,
             employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
           };
