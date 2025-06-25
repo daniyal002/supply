@@ -10,8 +10,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { Key } from "react";
-import { useHousingData } from "@/hook/housingHook";
+import { Key, useMemo } from "react";
 
 interface PostTableProps {
   departmentData: IDepartment[] | undefined;
@@ -21,7 +20,6 @@ interface PostTableProps {
 const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) => {
   const { mutate: deleteDepartmentMutation } = useDeleteDepartmentMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
-  const {housingsData} = useHousingData()
 
 
   const columns = [
@@ -75,10 +73,26 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
       key: 'housing',
       sorter: (a: any, b: any) => a.housing?.housing_name.localeCompare(b.housing?.housing_name, 'ru'),
       render: (housing:IHousing) => housing?.housing_name,
-      filters: housingsData?.map(housing => ({
-        text: housing.housing_name,
-        value: housing.housing_id
-      })) as { text: string; value: number }[],
+      filters: useMemo(() => {
+              if (!departmentData) return [];
+
+              const uniqueDepartments = Array.from(
+                new Map(
+                  departmentData
+                    .filter(d => d.housing && d.housing.housing_id) // Фильтруем сразу по наличию department_id
+                    .map(department => [
+                      department.housing!.housing_id,
+                      {
+                        text: department.housing!.housing_name,
+                        value: department.housing!.housing_id as number, // Явно приводим к number
+                      },
+                    ])
+                ).values()
+              );
+
+              return uniqueDepartments
+                .sort((a, b) => a.text.localeCompare(b.text, 'ru'));
+            }, [departmentData]),
       onFilter: (value: boolean | Key, record: IDepartment) =>
         record.housing?.housing_id === Number(value),
     },
