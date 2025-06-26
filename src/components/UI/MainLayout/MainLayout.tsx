@@ -2,13 +2,21 @@
 
 import React, { useEffect, useState } from "react";
 import {
+    ApartmentOutlined,
   BookOutlined,
+  CalculatorOutlined,
+  CompassOutlined,
+  HomeOutlined,
+  IdcardOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ShopOutlined,
+  TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
+  UserSwitchOutlined,
 } from "@ant-design/icons";
-import { Button, ConfigProvider, Layout, Menu, theme } from "antd";
+import { Button, ConfigProvider, Layout, Menu, Table, Input, Spin, Tooltip, theme } from "antd";
 import { LogOut } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
@@ -19,14 +27,19 @@ import { db } from "@/db/db";
 import { useRouter } from "next/navigation";
 import { protectedRoutes, isRole } from "@/helper/ProtectedRoutes";
 
+
 const { Header, Sider, Content } = Layout;
 
 type MenuItem = {
   key: string;
   icon: React.ReactNode;
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
+  children?: MenuItem[];
+
 };
+
+
 
 const MainLayout = ({
   children,
@@ -62,7 +75,63 @@ const MainLayout = ({
         key: "2",
         icon: <UserOutlined />,
         label: "Админ-панель",
-        onClick: () => push("/i"),
+        // onClick: () => push("/i"),
+        children: [
+          {
+            key: "4",
+            label: "Пользователи",
+            icon: <UserOutlined />,
+            onClick: () => push("/i/users"),
+          },
+          {
+            key: "5",
+            label: "Роли",
+            icon: <TeamOutlined />,
+            onClick: () => push("/i/roles"),
+          },
+          {
+            key: "6",
+            label: "Сотрудники",
+            icon: <IdcardOutlined />,
+            onClick: () => push("/i/employees"),
+          },
+          {
+            key: "7",
+            label: "Кабинеты",
+            icon: <HomeOutlined />,
+            onClick: () => push("/i/parlors"),
+          },
+          {
+            key: "8",
+            label: "Подразделения",
+            icon: <ApartmentOutlined />,
+            onClick: () => push("/i/departments"),
+          },
+          {
+            key: "9",
+            label: "Корпуса",
+            icon: <ShopOutlined />,
+            onClick: () => push("/i/housings"),
+          },
+          {
+            key: "10",
+            label: "Должности",
+            icon: <UserSwitchOutlined />,
+            onClick: () => push("/i/posts"),
+          },
+          {
+            key: "11",
+            label: "Маршруты",
+            icon: <CompassOutlined />,
+            onClick: () => push("/i/routes"),
+          },
+          {
+            key: "12",
+            label: "1C",
+            icon: <CalculatorOutlined />,
+            onClick: () => push("/i/oneC"),
+          },
+        ],
       },
       {
         key: "3",
@@ -90,79 +159,115 @@ const MainLayout = ({
   }, [GetMeData]);
 
   return (
-    <ConfigProvider>
-      <Layout>
-        <Sider trigger={null} collapsible collapsed={collapsed} theme="light">
-          <ConfigProvider
-            theme={{
-              components: {
-                Menu: {
-                  itemSelectedColor: "#fff",
-                  itemSelectedBg: "#678098",
-                },
+    <Layout style={{ minHeight: "100vh", background: "#678098" }}>
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        theme="dark"
+        className={style.sider}
+        style={{
+          transition: "width 0.3s ease",
+          overflow: "hidden",
+          background: "#678098",
+          height: "100vh", // Устанавливаем высоту на 100vh
+          overflowY: "auto", // Добавляем прокрутку при необходимости
+        }}
+      >
+        <ConfigProvider
+          theme={{
+            components: {
+              Menu: {
+                itemSelectedColor: "#fff",
+                itemSelectedBg: "#ffffff4f",
+                itemHoverBg: "#ffffff4f", // Цвет при hover
+                itemActiveBg: "#678098", // Цвет при активном состоянии
+                itemColor: "#fff", // Цвет текста
+                itemHoverColor: "#fff", // Цвет текста при hover
               },
-            }}
-          >
-            <Menu
-              theme="light"
-              mode="inline"
-              defaultSelectedKeys={["1"]}
-              items={menuItems}
-              style={{ maxHeight: "100vh", overflowY: "auto" }}
-            />
-          </ConfigProvider>
-        </Sider>
-        <Layout style={{ background: "#fff" }}>
-          <Header
+            },
+          }}
+        >
+          <Menu
+            // theme="dark"
+            mode="inline"
+            defaultSelectedKeys={["1"]}
+            items={menuItems}
             style={{
-              padding: 0,
-              background: colorBgContainer,
-              lineHeight: "0",
+              maxHeight: "100vh",
+              overflowY: "auto",
+              background: "#678098",
             }}
-            className={style.header}
-          >
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: "16px",
-                width: 64,
-                height: 64,
-              }}
-            />
+          />
+        </ConfigProvider>
+      </Sider>
+      <Layout style={{ background: "#fff" }}>
+        <Header
+          style={{
+            padding: 0,
+            background: colorBgContainer,
+            lineHeight: "0",
+          }}
+          className={style.header}
+        >
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              fontSize: "16px",
+              width: 64,
+              height: 64,
+            }}
+          />
 
-            <div className={style.headerBellAndButtons}>
-              <DropdownMenu />
-              <div className={style.headerButtons}>
+          <div className={style.headerBellAndButtons}>
+            <DropdownMenu />
+            <div className={style.headerButtons}>
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Button: {
+                      colorPrimaryBorderHover: "red",
+                      colorPrimaryHover: "#678098",
+                      colorPrimary: "#678098",
+                      colorPrimaryActive: "#678098",
+                      colorPrimaryTextHover: "#678098",
+                    },
+                  },
+                }}
+              >
                 <Button
                   icon={<p>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
                 />
-                <p className={style.headerLogin}>{login}</p>
+              </ConfigProvider>
+
+              <p className={style.headerLogin}>{login}</p>
+              <Tooltip title="Выход">
                 <LogOut
                   size={32}
                   color="#fff"
                   cursor="pointer"
                   onClick={() => logout()}
                 />
-              </div>
+              </Tooltip>
             </div>
-          </Header>
-          <Content
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
-              background: "#fff",
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            {children}
-          </Content>
-        </Layout>
+          </div>
+        </Header>
+        <Content
+          style={{
+            margin: "24px 16px",
+            padding: 24,
+            minHeight: "calc(100vh - 64px)", // Вычитаем высоту хедера (64px)
+            background: "#fff",
+            borderRadius: borderRadiusLG,
+          }}
+        >
+          {children}
+        </Content>
       </Layout>
-    </ConfigProvider>
+    </Layout>
   );
 };
 

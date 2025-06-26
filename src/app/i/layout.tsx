@@ -20,7 +20,7 @@ export default function RootLayout({
         },
       }}
     >
-      <AdminPanel />
+      {/* <AdminPanel /> */}
       <div className={styles.adminContent}>{children}</div>
       </ConfigProvider>
     </div>

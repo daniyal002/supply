@@ -335,7 +335,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         setCurrentFilters(extra.currentDataSource.length);
       }}
       rowClassName={(record) =>
-        record.is_cancel === true ? style.highlightRow : ""
+        record?.is_cancel === true ? style.highlightRow : ""
       }
       locale={{ emptyText: "Нет товаров" }}
       expandable={{
@@ -344,12 +344,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         expandedRowRender: (record) => (
           <>
               <ExpandedRowContent
-                orderProductComments={record.order_product_comment || []}
-                productPreviousOrders={record.product_previous_orders}
+                orderProductComments={record?.order_product_comment || []}
+                productPreviousOrders={record?.product_previous_orders}
                 orderId={orderId}
               />
 
-            <RemainProduct product_kod_1c={record.product.product_kod_1c} />
+            <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />
           </>
         ),
       }}
