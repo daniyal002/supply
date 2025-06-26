@@ -9,6 +9,8 @@ import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { useMemo, useState } from "react";
+import { ExpandedRowContent } from "./ExpandedRowContent";
+import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -18,6 +20,7 @@ interface productOrderTableProps {
   deleteProduct: (key: number) => void;
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
+  orderId:number;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -28,6 +31,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   deleteProduct,
   setIsNewProduct,
   disabledOrder,
+  orderId
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -279,6 +283,21 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     },
   ];
 
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+
+  // Обработчик раскрытия строки
+  const handleExpand = async (expanded: boolean, record: IProductTable) => {
+   // @ts-ignore: Unreachable code error
+    const key = record.key as number;
+    setExpandedRowKeys(
+      (prev) =>
+        expanded
+          ? [...prev, key] // Добавляем ключ при раскрытии
+          : prev.filter((k) => k !== key) // Удаляем ключ при сворачивании
+    );
+  };
+
+
   const dataSource = productTableData?.map((product, index) => ({
     ...product,
     key: index, // Ensure each item has a unique key
@@ -299,6 +318,22 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         setCurrentFilters(extra.currentDataSource.length);
       }}
       locale={{emptyText:"Нет товаров"}}
+       expandable={{
+              expandedRowKeys,
+              onExpand: handleExpand,
+              expandedRowRender: (record) => (
+                <>
+                    <ExpandedRowContent
+                      orderProductComments={record?.order_product_comment || []}
+                      productPreviousOrders={record?.product_previous_orders}
+                      orderId={orderId}
+                    />
+
+                  <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />
+                </>
+              ),
+            }}
+            rowHoverable={false}
     />
   );
 };

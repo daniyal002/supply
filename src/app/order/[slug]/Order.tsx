@@ -14,12 +14,11 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Button, FloatButton, message, Spin, Tabs } from "antd";
+import { Button, message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useProductData } from "@/hook/productHook";
-import { MoveLeft } from "lucide-react";
 import ModalSaveOrder from "./ModalSaveOrder/ModalSaveOrder";
 import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
@@ -58,9 +57,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     orderIdFromGetOrderById = orderid.replace("copy", "");
   }
 
-  useEffect(() => {
-    console.log(getValues("order_products"));
-  }, [getValues("order_products")]);
 
   const { getOrderByIdData } = useGetOrderById(
     orderIdFromGetOrderById as string
@@ -107,7 +103,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     } else {
       setOrderType(undefined);
     }
-  }, [getValues("order_products")]); // Не включаем orderType в зависимости
+  }, [getValues("order_products")]);
 
   const items: TabsProps["items"] = [
     {

@@ -19,7 +19,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FloatButton, message, Spin, Tabs } from "antd";
+import { Button, FloatButton, message, Spin, Tabs } from "antd";
 import { TabsProps } from "antd/lib";
 import { useProductData } from "@/hook/productHook";
 import { MoveLeft } from "lucide-react";
@@ -30,6 +30,7 @@ import {
   useSaveDraftOrderMutation,
   useUpdateDraftOrderMutation,
 } from "@/hook/orderTempHook";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 interface Props {
   draftOrderid?: string;
@@ -46,15 +47,13 @@ export default function DraftOrder({
 }: Props) {
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
-  const { mutate: createOrderMutation, isPending: createOrderIsPending } =
+  const { mutate: createOrderMutation } =
     useCreateOrderMutation();
-  const { mutate: updateOrderMutation, isPending: updateOrderIsPending } =
-    useUpdateOrderMutation();
-  const { mutate: saveOrderMutation, isPending: saveOrderIsPending } =
+
+  const { isPending: saveOrderIsPending } =
     useSaveDraftOrderMutation();
   const {
     mutate: updateDraftOrderMutation,
-    isPending: updateDraftOrderIsPending,
   } = useUpdateDraftOrderMutation();
   const {
     register,
@@ -77,6 +76,33 @@ export default function DraftOrder({
 
   const {mutate:deleteDraftOrderByIdMutation,isPending:DeleteDraftOrderByIisPending} = useDeleteDraftOrderByIdMutation()
 
+  const [orderType, setOrderType] = useState<
+      "purchase" | "warehouse" | undefined
+    >(undefined);
+
+    useEffect(() => {
+      const products = getValues("order_products");
+
+      if (Array.isArray(products)) {
+        const hasPurchase = products.some(
+          (product) => product.order_product_link
+        );
+        const hasWarehouseOnly = products.every(
+          (product) => !product.order_product_link
+        );
+
+        if (hasPurchase) {
+          setOrderType("purchase");
+        } else if (hasWarehouseOnly && products.length > 0) {
+          setOrderType("warehouse");
+        } else {
+          setOrderType(undefined);
+        }
+      } else {
+        setOrderType(undefined);
+      }
+    }, [getValues("order_products")]);
+
   const items: TabsProps["items"] = [
     {
       key: "1",
@@ -88,6 +114,7 @@ export default function DraftOrder({
           setValue={setValue}
           watch={watch}
           disabledOrder={false}
+          orderType={orderType}
         />
       ),
     },
@@ -344,17 +371,23 @@ export default function DraftOrder({
           }
         >
           {toggle && (
-            <FloatButton
-              onClick={() => setToggle(!toggle)}
-              icon={<MoveLeft size={32} style={{ paddingRight: "6px" }} />}
-              type="primary"
-              style={{
-                insetInlineStart: 80,
-                width: "45px",
-                height: "45px",
-                paddingRight: "5px",
-              }}
-            />
+            <Button
+            type="primary"
+            ghost
+            icon={<ArrowLeftOutlined />}
+            onClick={() => setToggle(!toggle)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "start",
+              marginTop: 10,
+              marginBottom: 10,
+              fontWeight: 500,
+              width:"100px"
+            }}
+          >
+            Назад
+          </Button>
           )}
 
           <SelectProductOrder
@@ -400,11 +433,19 @@ export default function DraftOrder({
             </div>
           </form>
           <button
-            onClick={() =>
-               getValues("product_group.value")
-                ? setToggle(!toggle)
-                : message.warning("Выберите категорию товара")
-            }
+            onClick={() => {
+              if (!getValues("product_group.value")) {
+                message.warning("Выберите категорию товара");
+              } else {
+                if (orderType === "purchase") {
+                  message.warning(
+                    "Вы не можете выбрать товары, пока есть новые товары"
+                  );
+                } else {
+                  setToggle(!toggle);
+                }
+              }
+            }}
             className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
           >
             Подбор товара

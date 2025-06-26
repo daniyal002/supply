@@ -3,12 +3,16 @@ import { IProduct } from "@/interface/product";
 import { IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss"
-import { InfoCircleFilled } from "@ant-design/icons";
+import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import Highlighter from "react-highlight-words";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -39,22 +43,181 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
 }) => {
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
+     const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+        useSearch();
+
+         const unitGroup = useMemo(() => {
+            const productSet = new Set();
+            return productTableData
+              ?.filter((product) => {
+                if (
+                  productSet.has(
+                    product?.unit_measurement?.unit_measurement?.unit_measurement_id
+                  )
+                ) {
+                  return false;
+                } else {
+                  productSet.add(
+                    product?.unit_measurement?.unit_measurement?.unit_measurement_id
+                  );
+                  return true;
+                }
+              })
+              .map((product) => ({
+                value: product?.unit_measurement?.unit_measurement?.unit_measurement_id,
+                text: product?.unit_measurement?.unit_measurement?.unit_measurement_name,
+              }));
+          }, [productTableData]);
+
   const columns: TableColumnsType<IProductTable> = [
     {
       title: "Товар",
       dataIndex: "product",
       key: "product",
+      showSorterTooltip: { title: "Сортировка по товару" },
       sorter: {
         compare: (a: any, b: any) =>
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
       },
-      render: (product: IProduct) => product?.product_name,
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по товару"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="product_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productName = record.product.product_name
+          .toString()
+          .toLowerCase();
+
+        return filterBySearchText(searchValue, productName);
+      },
+      render: (text: IProduct) =>
+        searchedColumn === "product_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={
+              text?.product_name ? text?.product_name.toString() : ""
+            }
+          />
+        ) : (
+          text?.product_name
+        ),
     },
+
+    {
+      title: "Добавленный товар",
+      dataIndex: "order_product_name",
+      key: "order_product_name",
+      showSorterTooltip: { title: "Сортировка по добавленному товару" },
+      sorter: {
+        compare: (a: any, b: any) =>
+          a?.product?.order_product_name?.localeCompare(
+            b?.product?.order_product_name,
+            "ru"
+          ),
+      },
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по добавленному товару"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="order_product_name"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productName = record?.order_product_name
+          ?.toString()
+          .toLowerCase();
+
+        return filterBySearchText(searchValue, productName as string);
+      },
+      render: (text: string) =>
+        searchedColumn === "order_product_name" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
+    },
+    {
+      title: "Ссылка товар",
+      dataIndex: "order_product_link",
+      key: "order_product_link",
+      showSorterTooltip: { title: "Сортировка по ссылке товара" },
+      sorter: {
+        compare: (a: any, b: any) =>
+          a?.product?.order_product_link?.localeCompare(
+            b?.product?.order_product_link,
+            "ru"
+          ),
+      },
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по ссылке"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="order_product_link"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const productLink = record?.order_product_link
+          ?.toString()
+          .toLowerCase();
+
+        return filterBySearchText(searchValue, productLink as string);
+      },
+      render: (text: string) =>
+        searchedColumn === "order_product_link" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        ),
+    },
+
 
     {
       title: "Ед. измерения",
       dataIndex: "unit_measurement",
       key: "unit_measurement",
+      showSorterTooltip: { title: "Сортировка по ед. измерения" },
       sorter: {
         compare: (a: any, b: any) =>
           a.unit_measurement?.unit_measurement.unit_measurement_name.localeCompare(
@@ -65,11 +228,15 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       render: (unit_measurement: IUnit) =>
         unit_measurement?.unit_measurement?.unit_measurement_name,
       responsive: ["sm"],
+      filters: unitGroup as { text: string; value: number }[],
+      onFilter: (value, record) =>
+        record.unit_measurement.unit_measurement.unit_measurement_id === value,
     },
     {
       title: "Количество",
       dataIndex: "product_quantity",
       key: "product_quantity",
+      showSorterTooltip: { title: "Сортировка по количеству" },
       sorter: {
         compare: (a: any, b: any) => a.count - b.count,
       },
