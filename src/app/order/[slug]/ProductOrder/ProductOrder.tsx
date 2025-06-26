@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
 import ModalSelectProductOrder from "../SelectProductOrder/ModalSelectProductOrder/ModalSelectProductOrder";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
-import { Button } from "antd";
+import { Button, message } from "antd";
 
 interface Props {
   productTableData:IProductTable[];
@@ -12,9 +12,10 @@ interface Props {
   getValues:UseFormGetValues<IOrderItemFormValues>;
   setValue:UseFormSetValue<IOrderItemFormValues>
   disabledOrder:boolean
+  orderType:"purchase" | "warehouse" | undefined
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder}:Props) {
+export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder,orderType}:Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
   const [productIndex,setProductIndex] = useState<number | null>()
@@ -57,7 +58,17 @@ export default function ProductOrder({productTableData,getValues,setValue,watch,
       />
       {!disabledOrder && (
         <Button
-          onClick={() => showModalIsNewProduct()}
+          onClick={() => {
+            if (orderType === "warehouse") {
+              message.warning(
+                "Вы не можете добавить новый товар, пока есть товары из подбора"
+              );
+            } else if (!getValues("product_group.value")) {
+              message.warning("Выберите категорию товара");
+            } else {
+              showModalIsNewProduct();
+            }
+          }}
           style={{ width: "100%", marginBottom: "10px" }}
         >
           Добавить новый товар

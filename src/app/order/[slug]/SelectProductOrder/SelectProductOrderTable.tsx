@@ -238,6 +238,7 @@ const handleExpand = (expanded:boolean, record:IProductUnit) => {
   }, [productData]);
 
   return (
+
     <Table
       dataSource={dataSource}
       columns={columns}

@@ -6,6 +6,7 @@ import Order from "@/app/order/[slug]/Order";
 import { useOrderIdStore } from "../../../store/orderIdStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTabStore } from "../../../store/tabStore";
+import { PlusCircleFilled } from "@ant-design/icons";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
@@ -133,6 +134,7 @@ const remove = (targetKey: TargetKey) => {
         type="editable-card"
         onChange={onChange}
         activeKey={activeKey}
+        addIcon={<div style={{display:"flex", gap:"10px"}}><p>Создать заявку</p></div>}
         onEdit={onEdit}
         items={tabsOrders} // Используем вкладки из глобального состояния
         style={{ padding: "0 10px" }}
