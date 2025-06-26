@@ -46,7 +46,7 @@ const MainLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const {
     token: { colorBgContainer, borderRadiusLG },
