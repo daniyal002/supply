@@ -16,7 +16,7 @@ import {
   UserOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import { Button, ConfigProvider, Layout, Menu, Table, Input, Spin, Tooltip, theme } from "antd";
+import { Button, ConfigProvider, Layout, Menu, Tooltip, theme } from "antd";
 import { LogOut } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
@@ -24,7 +24,7 @@ import { useHeaderStore } from "../../../../store/headerStore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useLogout } from "@/hook/useAuth";
 import { db } from "@/db/db";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { protectedRoutes, isRole } from "@/helper/ProtectedRoutes";
 
 
@@ -58,6 +58,8 @@ const MainLayout = ({
 
   const { push } = useRouter();
   const { mutate: logout } = useLogout();
+
+  const path = usePathname()
 
   // Получаем роль из токена
   const userRole = isRole();
@@ -157,6 +159,11 @@ const MainLayout = ({
       setLogin(GetMeData?.login);
     }
   }, [GetMeData]);
+
+  if(path === '/login'){
+    return (<>{children}</>)
+  }
+
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#678098" }}>
