@@ -71,6 +71,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       key: "created_at",
       sorter: (a: IStepHistory, b: IStepHistory) =>
         a.created_at.localeCompare(b.created_at, "ru"),
+      defaultSortOrder: "ascend",
       render: (text: string) => {
         const date = new Date(text);
         return date.toLocaleString("ru-RU", {
