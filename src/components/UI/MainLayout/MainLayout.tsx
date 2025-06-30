@@ -219,12 +219,15 @@ const MainLayout = ({
                 itemActiveBg: "#678098",
                 itemColor: "#fff",
                 itemHoverColor: "#fff",
+                darkSubMenuItemBg:"#678098",
+                popupBg:"#678098"
               },
             },
           }}
         >
           <Menu
             mode="inline"
+            theme="light"
             defaultSelectedKeys={["1"]}
             items={menuItems}
             style={{
