@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button, Space, Table, TableColumnsType, TableProps } from "antd";
 import { toast } from "sonner";
@@ -18,15 +18,23 @@ interface EmployeeTableProps {
   onEdit: (id: number) => void;
 }
 
-const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) => {
+const EmployeeTable: React.FC<EmployeeTableProps> = ({
+  employeeData,
+  onEdit,
+}) => {
   const { mutate: deleteEmployeeMutation } = useDeleteEmployeeMutation();
-  const { searchText, searchedColumn,setSearchedColumn, searchInput, handleSearch, handleReset } = useSearch();
-
+  const {
+    searchText,
+    searchedColumn,
+    setSearchedColumn,
+    searchInput,
+    handleSearch,
+    handleReset,
+  } = useSearch();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === "а")) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "а")) {
         e.preventDefault();
 
         setSearchedColumn("buyer_name");
@@ -56,18 +64,19 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
 
   const columns: TableColumnsType<IEmployee> = [
     {
-      title: 'ID',
-      dataIndex: 'buyer_id',
-      key: 'buyer_id',
-      sorter: (a:any, b:any) => a.buyer_id - b.buyer_id,
+      title: "ID",
+      dataIndex: "buyer_id",
+      key: "buyer_id",
+      sorter: (a: any, b: any) => a.buyer_id - b.buyer_id,
       showSorterTooltip: { title: "Сортировка по ID" },
     },
 
     {
-      title: 'Наименование',
-      dataIndex: 'buyer_name',
-      key: 'buyer_name',
-      sorter: (a: any, b: any) => a.buyer_name.localeCompare(b.buyer_name, 'ru'),
+      title: "Наименование",
+      dataIndex: "buyer_name",
+      key: "buyer_name",
+      sorter: (a: any, b: any) =>
+        a.buyer_name.localeCompare(b.buyer_name, "ru"),
       showSorterTooltip: { title: "Сортировка по наименованию" },
       filterDropdown: (props) => (
         <SearchFilter
@@ -103,30 +112,34 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
         ),
     },
     {
-      title: 'Вид',
-      dataIndex: 'buyer_type',
-      key: 'buyer_type',
-      sorter: (a: any, b: any) => a.buyer_type.localeCompare(b.buyer_type, 'ru'),
+      title: "Вид",
+      dataIndex: "buyer_type",
+      key: "buyer_type",
+      sorter: (a: any, b: any) =>
+        a.buyer_type.localeCompare(b.buyer_type, "ru"),
       showSorterTooltip: { title: "Сортировка по виду" },
-      render:(buyerType) => buyerType === "employee" ? "Сотрудник" : "Кабинет",
-      filters: [{
-        text: "Сотрудник",
-        value: "employee"
-      },{
-        text:"Кабинет",
-        value:"parlor"
-      }] as { text: string; value: string }[],
-      onFilter: (value, record) =>
-        record.buyer_type === value,
+      render: (buyerType) =>
+        buyerType === "employee" ? "Сотрудник" : "Кабинет",
+      filters: [
+        {
+          text: "Сотрудник",
+          value: "employee",
+        },
+        {
+          text: "Кабинет",
+          value: "parlor",
+        },
+      ] as { text: string; value: string }[],
+      onFilter: (value, record) => record.buyer_type === value,
     },
     {
-      title: 'Кабинет',
-      dataIndex: 'parlors',
-      key: 'parlors',
+      title: "Кабинет",
+      dataIndex: "parlors",
+      key: "parlors",
       sorter: (a: any, b: any) =>
-        (a.parlors?.[0]?.parlor_name ?? '').localeCompare(
-          b.parlors?.[0]?.parlor_name ?? '',
-          'ru'
+        (a.parlors?.[0]?.parlor_name ?? "").localeCompare(
+          b.parlors?.[0]?.parlor_name ?? "",
+          "ru"
         ),
       showSorterTooltip: { title: "Сортировка по кабинету" },
       filterDropdown: (props) => (
@@ -146,15 +159,18 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
-        return Boolean(record.parlors?.some((parlor: IParlor) =>
-          parlor.parlor_name.toLowerCase().includes(searchValue)
-        ));
+        return Boolean(
+          record.parlors?.some((parlor: IParlor) =>
+            parlor.parlor_name.toLowerCase().includes(searchValue)
+          )
+        );
       },
       render: (parlors: IParlor[]) => {
         if (!parlors || parlors.length === 0) return null;
 
         return parlors.map((parlor, index) => {
-          const shouldHighlight = searchedColumn === 'parlors' &&
+          const shouldHighlight =
+            searchedColumn === "parlors" &&
             parlor.parlor_name.toLowerCase().includes(searchText.toLowerCase());
 
           return (
@@ -176,19 +192,23 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
     },
 
     {
-      title: 'Должность',
-      dataIndex: 'post',
-      key: 'post',
-      sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
+      title: "Должность",
+      dataIndex: "post",
+      key: "post",
+      sorter: (a: any, b: any) =>
+        a?.post?.post_name?.localeCompare(b?.post?.post_name, "ru"),
       showSorterTooltip: { title: "Сортировка по должности" },
-      render: (post: IPost) => post?.post_name // Or any other suitable React element
+      render: (post: IPost) => post?.post_name, // Or any other suitable React element
     },
     {
       title: "Действия",
       key: "action",
       render: (_: any, record: IEmployee) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.buyer_id as number)}>
+          <Button
+            type="dashed"
+            onClick={() => onEdit(record.buyer_id as number)}
+          >
             Изменить
           </Button>
           <Button
@@ -218,7 +238,14 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employeeData, onEdit }) =
     key: employee.buyer_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Сотрудников"} }}  />;
+  return (
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      pagination={{ locale: { items_per_page: "/ Сотрудников" } }}
+      scroll={{ x: 200 }}
+    />
+  );
 };
 
 export default EmployeeTable;

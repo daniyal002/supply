@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import AdminPanel from "./AdminPanel";
-import styles from './layout.module.scss'
 import { ConfigProvider } from "antd";
 export const metadata: Metadata = {
   title: "Админ-панель",
@@ -12,7 +10,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={styles.adminLayout}>
     <ConfigProvider
       theme={{
         token: {
@@ -20,9 +17,7 @@ export default function RootLayout({
         },
       }}
     >
-      {/* <AdminPanel /> */}
-      <div className={styles.adminContent}>{children}</div>
+      <div>{children}</div>
       </ConfigProvider>
-    </div>
   );
 }

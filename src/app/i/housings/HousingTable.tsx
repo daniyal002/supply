@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { IPost } from "@/interface/post";
 import { Button, Space, Table, TableColumnsType } from "antd";
@@ -19,22 +19,24 @@ interface PostTableProps {
 
 const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
   const { mutate: deletePostMutation } = useDeleteHousingMutation();
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
   const columns: TableColumnsType<IHousing> = [
     {
       title: "ID",
       dataIndex: "housing_id",
       key: "housing_id",
-      sorter: (a:any, b:any) => a.housing_id - b.housing_id,
+      sorter: (a: any, b: any) => a.housing_id - b.housing_id,
       showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Корпус",
       dataIndex: "housing_name",
       key: "housing_name",
-      sorter: (a:any, b:any) => a.housing_name.localeCompare(b.housing_name, 'ru'),
+      sorter: (a: any, b: any) =>
+        a.housing_name.localeCompare(b.housing_name, "ru"),
       showSorterTooltip: { title: "Сортировка по корпусу" },
-      filterDropdown: (props:any) => (
+      filterDropdown: (props: any) => (
         <SearchFilter
           {...props}
           placeholder="Поиск по корпусу"
@@ -49,13 +51,13 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
       filterIcon: (filtered: boolean) => (
         <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
       ),
-      onFilter: (value:boolean|Key, record:IHousing) => {
+      onFilter: (value: boolean | Key, record: IHousing) => {
         const searchValue = (value as string).toLowerCase();
         const housing_name = record.housing_name.toString().toLowerCase();
 
         return filterBySearchText(searchValue, housing_name);
       },
-      render: (text:string) =>
+      render: (text: string) =>
         searchedColumn === "housing_name" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -72,7 +74,10 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
       key: "action",
       render: (_: any, record: IHousing) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.housing_id as number)}>
+          <Button
+            type="dashed"
+            onClick={() => onEdit(record.housing_id as number)}
+          >
             Изменить
           </Button>
           <Button
@@ -102,7 +107,14 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
     key: housing.housing_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Корпусов"} }}/>;
+  return (
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      pagination={{ locale: { items_per_page: "/ Корпусов" } }}
+      scroll={{ x: 200 }}
+    />
+  );
 };
 
 export default HousingTable;

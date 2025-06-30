@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
@@ -19,22 +19,24 @@ interface PostTableProps {
 
 const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
   const { mutate: deleteParlorMutation } = useDeleteParlorMutation();
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
   const columns: TableColumnsType<IParlor> = [
     {
-      title: 'ID',
-      dataIndex: 'parlor_id',
-      key: 'parlor_id',
-      sorter: (a:any, b:any) => a.id - b.id,
+      title: "ID",
+      dataIndex: "parlor_id",
+      key: "parlor_id",
+      sorter: (a: any, b: any) => a.id - b.id,
       showSorterTooltip: { title: "Сортировка по ID" },
     },
 
     {
-      title: 'Кабинет',
-      dataIndex: 'parlor_name',
-      key: 'parlor_name',
-      sorter: (a: any, b: any) => a.parlor_name.localeCompare(b.parlor_name, 'ru'),
+      title: "Кабинет",
+      dataIndex: "parlor_name",
+      key: "parlor_name",
+      sorter: (a: any, b: any) =>
+        a.parlor_name.localeCompare(b.parlor_name, "ru"),
       showSorterTooltip: { title: "Сортировка по кабинету" },
       filterDropdown: (props) => (
         <SearchFilter
@@ -70,11 +72,14 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
         ),
     },
     {
-      title: 'Подразделение',
-      dataIndex: 'department',
-      key: 'department',
+      title: "Подразделение",
+      dataIndex: "department",
+      key: "department",
       sorter: (a: any, b: any) =>
-        a.department.department_name.localeCompare(b.department.department_name, 'ru'),
+        a.department.department_name.localeCompare(
+          b.department.department_name,
+          "ru"
+        ),
       showSorterTooltip: { title: "Сортировка по подразделению" },
       render: (department: IDepartment) => department?.department_name,
       filters: useMemo(() => {
@@ -83,8 +88,8 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
         const uniqueDepartments = Array.from(
           new Map(
             parlorData
-              .filter(p => p.department && p.department.department_id) // Фильтруем сразу по наличию department_id
-              .map(parlor => [
+              .filter((p) => p.department && p.department.department_id) // Фильтруем сразу по наличию department_id
+              .map((parlor) => [
                 parlor.department!.department_id,
                 {
                   text: parlor.department!.department_name,
@@ -94,18 +99,21 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
           ).values()
         );
 
-        return uniqueDepartments
-          .sort((a, b) => a.text.localeCompare(b.text, 'ru'));
+        return uniqueDepartments.sort((a, b) =>
+          a.text.localeCompare(b.text, "ru")
+        );
       }, [parlorData]),
-      onFilter: (value, record) =>
-        record.department?.department_id === value,
+      onFilter: (value, record) => record.department?.department_id === value,
     },
     {
       title: "Действия",
       key: "action",
       render: (_: any, record: IParlor) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.parlor_id as number)}>
+          <Button
+            type="dashed"
+            onClick={() => onEdit(record.parlor_id as number)}
+          >
             Изменить
           </Button>
           <Button
@@ -135,7 +143,14 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
     key: parlor.parlor_id, // Ensure each item has a unique key
   }));
 
-  return <Table dataSource={dataSource} columns={columns} pagination={{locale:{items_per_page:"/ Кабинетов"} }}/>;
+  return (
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      pagination={{ locale: { items_per_page: "/ Кабинетов" } }}
+      scroll={{ x: 200 }}
+    />
+  );
 };
 
 export default ParlorTable;

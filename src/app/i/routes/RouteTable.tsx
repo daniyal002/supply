@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
@@ -19,24 +19,27 @@ interface RouteTableProps {
 }
 
 const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
-const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { mutate: deleteOrderRouteMutation } = useDeleteOrderRouteMutation();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
-  const columns:TableColumnsType<IOrderRouteResponseDetail> = [
+  const columns: TableColumnsType<IOrderRouteResponseDetail> = [
     {
       title: "ID",
       dataIndex: "route_id",
       key: "route_id",
-      sorter: (a:IOrderRouteResponseDetail, b:IOrderRouteResponseDetail) => Number(a?.route_id) - Number(b?.route_id),
+      sorter: (a: IOrderRouteResponseDetail, b: IOrderRouteResponseDetail) =>
+        Number(a?.route_id) - Number(b?.route_id),
       showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Маршрут",
       dataIndex: "route_name",
       key: "route_name",
-      sorter: (a:IOrderRouteResponseDetail, b:IOrderRouteResponseDetail) => a.route_name.localeCompare(b.route_name, 'ru'),
+      sorter: (a: IOrderRouteResponseDetail, b: IOrderRouteResponseDetail) =>
+        a.route_name.localeCompare(b.route_name, "ru"),
       showSorterTooltip: { title: "Сортировка по маршрутам" },
-      filterDropdown: (props:any) => (
+      filterDropdown: (props: any) => (
         <SearchFilter
           {...props}
           placeholder="Поиск по маршруту"
@@ -51,13 +54,13 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
       filterIcon: (filtered: boolean) => (
         <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
       ),
-      onFilter: (value:boolean|Key, record:IOrderRouteResponseDetail) => {
+      onFilter: (value: boolean | Key, record: IOrderRouteResponseDetail) => {
         const searchValue = (value as string).toLowerCase();
         const route_name = record.route_name.toString().toLowerCase();
 
         return filterBySearchText(searchValue, route_name);
       },
-      render: (text:string) =>
+      render: (text: string) =>
         searchedColumn === "route_name" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -68,47 +71,47 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
         ) : (
           text
         ),
-
     },
     {
       title: "Подразделение",
       dataIndex: "department",
       key: "department",
       sorter: (a: any, b: any) =>
-        a.department?.department_name.localeCompare(b.department?.department_name, 'ru'),
+        a.department?.department_name.localeCompare(
+          b.department?.department_name,
+          "ru"
+        ),
       showSorterTooltip: { title: "Сортировка по подразделению" },
-      render: (department:IDepartment) => department?.department_name,
+      render: (department: IDepartment) => department?.department_name,
       filters: useMemo(() => {
-              if (!routeData) return [];
+        if (!routeData) return [];
 
-              const uniqueDepartments = Array.from(
-                new Map(
-                  routeData
-                    .filter(r => r.department && r.department.department_id) // Фильтруем сразу по наличию department_id
-                    .map(route => [
-                      route.department!.department_id,
-                      {
-                        text: route.department!.department_name,
-                        value: route.department!.department_id as number, // Явно приводим к number
-                      },
-                    ])
-                ).values()
-              );
+        const uniqueDepartments = Array.from(
+          new Map(
+            routeData
+              .filter((r) => r.department && r.department.department_id) // Фильтруем сразу по наличию department_id
+              .map((route) => [
+                route.department!.department_id,
+                {
+                  text: route.department!.department_name,
+                  value: route.department!.department_id as number, // Явно приводим к number
+                },
+              ])
+          ).values()
+        );
 
-              return uniqueDepartments
-                .sort((a, b) => a.text.localeCompare(b.text, 'ru'));
-            }, [routeData]),
-            onFilter: (value, record) =>
-              record.department?.department_id === value,
+        return uniqueDepartments.sort((a, b) =>
+          a.text.localeCompare(b.text, "ru")
+        );
+      }, [routeData]),
+      onFilter: (value, record) => record.department?.department_id === value,
     },
     {
       title: "Действия",
       key: "action",
       render: (_: any, record: IOrderRouteResponseDetail) => (
         <Space size="middle">
-          <Link href={`/i/routes/${record.route_id}`}>
-            Изменить
-          </Link>
+          <Link href={`/i/routes/${record.route_id}`}>Изменить</Link>
           <Button
             type="primary"
             danger
@@ -119,8 +122,11 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
                 },
                 action: {
                   label: "Удалить",
-                  onClick: () => deleteOrderRouteMutation({route_id:record.route_id as number, route_name:record.route_name}),
-
+                  onClick: () =>
+                    deleteOrderRouteMutation({
+                      route_id: record.route_id as number,
+                      route_name: record.route_name,
+                    }),
                 },
               })
             }
@@ -136,7 +142,14 @@ const {mutate:deleteOrderRouteMutation} = useDeleteOrderRouteMutation()
     ...route,
     key: route.route_id, // Ensure each item has a unique key
   }));
-  return <Table dataSource={dataSource} columns={columns} pagination={{ locale:{items_per_page:"/ Маршрутов"} }}/>;
+  return (
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      pagination={{ locale: { items_per_page: "/ Маршрутов" } }}
+      scroll={{ x: 200 }}
+    />
+  );
 };
 
 export default RouteTable;
