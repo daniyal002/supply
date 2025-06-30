@@ -30,10 +30,7 @@ export const authService = {
             removeRefreshTokenFromStorage();
             await deleteGetMe(); // Предполагается, что это асинхронная функция
 
-            console.log("Logout successful");
           } catch (error) {
-            console.error("Logout failed", error);
-
             // Всё равно очищаем данные локально, даже если запрос не прошёл
             removeAccessTokenFromStorage();
             removeRefreshTokenFromStorage();
