@@ -22,10 +22,26 @@ export const authService = {
 
 
     async logout(){
-        await axiosWidthAuth.post('/auth/logout')
-        removeAccessTokenFromStorage()
-        removeRefreshTokenFromStorage()
-        deleteGetMe()
+        try {
+            const response = await axiosWidthAuth.post("/auth/logout");
+
+            // Если ответ успешный, просто очищаем токены и данные пользователя
+            removeAccessTokenFromStorage();
+            removeRefreshTokenFromStorage();
+            await deleteGetMe(); // Предполагается, что это асинхронная функция
+
+            console.log("Logout successful");
+          } catch (error) {
+            console.error("Logout failed", error);
+
+            // Всё равно очищаем данные локально, даже если запрос не прошёл
+            removeAccessTokenFromStorage();
+            removeRefreshTokenFromStorage();
+            await deleteGetMe();
+
+            // Можно также показать пользователю уведомление об ошибке
+            // message.error('Не удалось выйти. Попробуйте позже.');
+          }
     },
 
     async refresh(body:IRefreshRequest){
