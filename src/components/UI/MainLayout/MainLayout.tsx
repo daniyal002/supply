@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    ApartmentOutlined,
+  ApartmentOutlined,
   BookOutlined,
   CalculatorOutlined,
   CompassOutlined,
@@ -16,7 +16,15 @@ import {
   UserOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import { Button, ConfigProvider, Layout, Menu, Tooltip, theme } from "antd";
+import {
+  Button,
+  ConfigProvider,
+  Layout,
+  Menu,
+  Tooltip,
+  message,
+  theme,
+} from "antd";
 import { LogOut } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
@@ -27,7 +35,6 @@ import { db } from "@/db/db";
 import { usePathname, useRouter } from "next/navigation";
 import { protectedRoutes, isRole } from "@/helper/ProtectedRoutes";
 
-
 const { Header, Sider, Content } = Layout;
 
 type MenuItem = {
@@ -36,10 +43,7 @@ type MenuItem = {
   label: string;
   onClick?: () => void;
   children?: MenuItem[];
-
 };
-
-
 
 const MainLayout = ({
   children,
@@ -47,7 +51,10 @@ const MainLayout = ({
   children: React.ReactNode;
 }>) => {
   const [collapsed, setCollapsed] = useState(true);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -58,8 +65,7 @@ const MainLayout = ({
 
   const { push } = useRouter();
   const { mutate: logout } = useLogout();
-
-  const path = usePathname()
+  const path = usePathname();
 
   // Получаем роль из токена
   const userRole = isRole();
@@ -77,7 +83,6 @@ const MainLayout = ({
         key: "2",
         icon: <UserOutlined />,
         label: "Админ-панель",
-        // onClick: () => push("/i"),
         children: [
           {
             key: "4",
@@ -143,7 +148,6 @@ const MainLayout = ({
       },
     ];
 
-    // Фильтруем по ролям
     const filteredItems = items.filter((item) =>
       protectedRoutes.some(
         (route) =>
@@ -160,25 +164,49 @@ const MainLayout = ({
     }
   }, [GetMeData]);
 
-  if(path === '/login'){
-    return (<>{children}</>)
-  }
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setMobileMenuOpen(false); // Сброс при изменении размера экрана
+    };
 
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const toggleCollapsed = () => {
+    if (isMobile) {
+      setMobileMenuOpen(!isMobileMenuOpen);
+    } else {
+      setCollapsed(!collapsed);
+    }
+  };
+
+  if (path === "/login") {
+    return <>{children}</>;
+  }
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#678098" }}>
       <Sider
         trigger={null}
-        collapsible
-        collapsed={collapsed}
+        collapsible={!isMobile}
+        collapsed={isMobile ? !isMobileMenuOpen : collapsed}
         theme="dark"
         className={style.sider}
         style={{
-          transition: "width 0.3s ease",
-          overflow: "hidden",
+          position: isMobile ? "fixed" : "relative",
+          zIndex: isMobile ? 1000 : "auto",
+          width: isMobile ? 250 : undefined,
+          height: isMobile ? "100vh" : undefined,
+          top: 0,
+          left: 0,
+          transition: "all 0.3s ease",
           background: "#678098",
-          height: "100vh", // Устанавливаем высоту на 100vh
-          overflowY: "auto", // Добавляем прокрутку при необходимости
+          overflowY: "auto",
+          display: isMobile ? (isMobileMenuOpen ? "block" : "none") : "block",
         }}
       >
         <ConfigProvider
@@ -187,16 +215,15 @@ const MainLayout = ({
               Menu: {
                 itemSelectedColor: "#fff",
                 itemSelectedBg: "#ffffff4f",
-                itemHoverBg: "#ffffff4f", // Цвет при hover
-                itemActiveBg: "#678098", // Цвет при активном состоянии
-                itemColor: "#fff", // Цвет текста
-                itemHoverColor: "#fff", // Цвет текста при hover
+                itemHoverBg: "#ffffff4f",
+                itemActiveBg: "#678098",
+                itemColor: "#fff",
+                itemHoverColor: "#fff",
               },
             },
           }}
         >
           <Menu
-            // theme="dark"
             mode="inline"
             defaultSelectedKeys={["1"]}
             items={menuItems}
@@ -208,6 +235,23 @@ const MainLayout = ({
           />
         </ConfigProvider>
       </Sider>
+
+      {/* Overlay для мобильных */}
+      {isMobile && isMobileMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 999,
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
       <Layout style={{ background: "#fff" }}>
         <Header
           style={{
@@ -219,8 +263,14 @@ const MainLayout = ({
         >
           <Button
             type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
+            icon={
+              isMobile && isMobileMenuOpen ? (
+                <MenuFoldOutlined />
+              ) : (
+                <MenuUnfoldOutlined />
+              )
+            }
+            onClick={toggleCollapsed}
             style={{
               fontSize: "16px",
               width: 64,
@@ -247,6 +297,9 @@ const MainLayout = ({
                 <Button
                   icon={<p>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
+                  onClick={() =>
+                    message.info("Пока еще не придумали функционал для этой кнопки")
+                  }
                 />
               </ConfigProvider>
 
@@ -266,7 +319,7 @@ const MainLayout = ({
           style={{
             margin: "24px 16px",
             padding: 24,
-            minHeight: "calc(100vh - 64px)", // Вычитаем высоту хедера (64px)
+            minHeight: "calc(100vh - 64px)",
             background: "#fff",
             borderRadius: borderRadiusLG,
           }}
