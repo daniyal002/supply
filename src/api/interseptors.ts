@@ -10,7 +10,7 @@ import { message } from "antd";
 import axios, { type CreateAxiosDefaults } from "axios";
 
 const options: CreateAxiosDefaults = {
-  baseURL: "http://192.168.30.153:8000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://192.168.30.153:8000",
   headers: {
     "Content-Type": "application/json",
   },

@@ -24,7 +24,7 @@ dist
 .env
 .env.local
 .env.development
-.env.production
+; .env.production
 .env.test
 
 # Игнорируем тестовые файлы
