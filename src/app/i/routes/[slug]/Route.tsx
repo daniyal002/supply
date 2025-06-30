@@ -92,7 +92,7 @@ export default function Route({ routeId }: Props) {
       style={{ padding: "20px" }}
     >
       <div className={styles.formHeader}>
-        <h2>Настройка маршрута</h2>
+        <h2>{orderRouteByIdData ? `Редактирование маршрута (${orderRouteByIdData.route_name})` : 'Создание нового маршрута'}</h2>
       </div>
       <MoveLeft size={32} onClick={() => back()} className={styles.back}/>
 

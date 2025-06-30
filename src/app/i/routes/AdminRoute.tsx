@@ -8,6 +8,7 @@ import { useState } from "react";
 import { IOrderRouteRequest } from "@/interface/orderRoute";
 import Link from "next/link";
 import { useOrderRouteData } from "@/hook/orderRouterHook";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default function AdminRoute() {
 
@@ -33,7 +34,15 @@ export default function AdminRoute() {
     <div>
       <Toaster />
 
-      <Link href="routes/newRoute">Добавить Маршрут</Link>
+      <Link href="routes/newRoute"><Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        onClick={onAdd}
+        style={{ marginBottom: "10px" }}
+      /></Link>
+
+
       <RouteTable routeData={orderRouteData} onEdit={onEdit} />
     </div>
   );
