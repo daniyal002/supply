@@ -19,9 +19,11 @@ import { useDeleteDraftOrderByIdMutation } from "@/hook/orderTempHook";
 
 interface OrderListProps {
   OrderData: IDraftOrderItem[] | undefined;
+  loading:boolean
+
 }
 
-const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
+const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
   const StatusOption = OrderData
@@ -314,6 +316,7 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
           setCurrentFilters(extra.currentDataSource.length);
         }}
         locale={{emptyText:"Нет черновиков"}}
+        loading={loading}
       />
 
 

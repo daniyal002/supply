@@ -16,9 +16,10 @@ import { useState } from "react";
 
 interface ApprovalListProps {
   OrderData: IOrderItem[] | undefined;
+  loading:boolean;
 }
 
-const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
+const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
   const StatusOption = OrderData
@@ -284,6 +285,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData }) => {
           setCurrentFilters(extra.currentDataSource.length);
         }}
         locale={{emptyText:"Нет заявок"}}
+        loading={loading}
       />
     </ConfigProvider>
   );

@@ -20,9 +20,10 @@ import { IProductGroup } from "@/interface/product";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
+  loading:boolean
 }
 
-const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
+const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
   const StatusOption = OrderData
@@ -39,10 +40,10 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
       })
     : [];
 
-    const optionsOrderTypes: { value: string; label: string }[] = [
-        { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
-        { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
-      ];
+    // const optionsOrderTypes: { value: string; label: string }[] = [
+    //     { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+    //     { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+    //   ];
 
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
@@ -359,6 +360,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData }) => {
           setCurrentFilters(extra.currentDataSource.length);
         }}
         locale={{emptyText:"Нет заявок"}}
+        loading={loading}
       />
 
       <ContextMenu

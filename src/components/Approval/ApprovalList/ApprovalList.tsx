@@ -16,7 +16,7 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function ApprovalList() {
-  const { approvalOrders } = useApprovalOrders();
+  const { approvalOrders,isLoading } = useApprovalOrders();
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     approvalOrders as IOrderItem[]
   );
@@ -69,7 +69,7 @@ export default function ApprovalList() {
           format="DD.MM.YYYY"
         />
       </ConfigProvider>
-      <ApprovalListTable OrderData={filteredOrderData} />
+      <ApprovalListTable OrderData={filteredOrderData} loading={isLoading} />
     </div>
   );
 }

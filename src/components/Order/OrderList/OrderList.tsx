@@ -15,7 +15,7 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function OrderList() {
-  const { orderUserData } = useOrderUserData();
+  const { orderUserData,isLoading } = useOrderUserData();
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     orderUserData as IOrderItem[]
   );
@@ -69,7 +69,7 @@ export default function OrderList() {
         />
       </ConfigProvider>
 
-      <OrderListTable OrderData={filteredOrderData} />
+      <OrderListTable OrderData={filteredOrderData} loading={isLoading} />
     </div>
   );
 }
