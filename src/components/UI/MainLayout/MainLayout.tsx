@@ -320,8 +320,8 @@ const MainLayout = ({
         </Header>
         <Content
           style={{
-            margin: "24px 16px",
-            padding: 24,
+            margin: "15px",
+            // padding: 24,
             minHeight: "calc(100vh - 64px)",
             background: "#fff",
             borderRadius: borderRadiusLG,
