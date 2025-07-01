@@ -28,6 +28,8 @@ export default function DraftTabs() {
         closable:true,
       };
       addTabDraftOrders(newTab); // Добавляем вкладку в глобальное состояние
+    }else{
+      setActiveKey(newActiveKey)
     }
 
     setActiveKey(newActiveKey);
@@ -43,6 +45,7 @@ export default function DraftTabs() {
     if ((draftOrderId !== "0" && draftOrderId !== "newOrder") && draftOrderId) {
       edit(draftOrderId);
     }
+    setDraftOrderId("0")
   }, [draftOrderId]);
 
 

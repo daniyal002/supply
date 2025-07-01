@@ -27,6 +27,8 @@ export default function AdminOrderTab() {
         closable:true,
       };
       addTabAdminOrders(newTab); // Добавляем вкладку в глобальное состояние
+    }else{
+      setActiveKey(newActiveKey)
     }
 
     setActiveKey(newActiveKey);
@@ -42,6 +44,7 @@ export default function AdminOrderTab() {
     if ((adminOrderId !== "0" && adminOrderId !== "newOrder") && adminOrderId) {
       edit(adminOrderId);
     }
+    setAdminOrderId("0")
   }, [adminOrderId]);
 
 

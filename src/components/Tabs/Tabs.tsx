@@ -6,7 +6,6 @@ import Order from "@/app/order/[slug]/Order";
 import { useOrderIdStore } from "../../../store/orderIdStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTabStore } from "../../../store/tabStore";
-import { PlusCircleFilled } from "@ant-design/icons";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
@@ -30,6 +29,8 @@ export default function Tab() {
         closable:true,
       };
       addTabOrders(newTab); // Добавляем вкладку в глобальное состояние
+    }else{
+      setActiveKey(newActiveKey)
     }
 
     setActiveKey(newActiveKey);
@@ -45,6 +46,7 @@ export default function Tab() {
     if ((orderId !== "0" && orderId !== "newOrder") && orderId) {
       edit(orderId);
     }
+    setOrderId("0")
   }, [orderId]);
 
 

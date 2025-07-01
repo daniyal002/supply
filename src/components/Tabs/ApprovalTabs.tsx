@@ -36,6 +36,8 @@ export default function ApprovalTabs() {
         closable:true
       };
       addTabApproval(newTab); // Добавляем вкладку в глобальное состояние
+    }else{
+      setActiveKey(newActiveKey)
     }
 
     setActiveKey(newActiveKey);
@@ -50,6 +52,7 @@ export default function ApprovalTabs() {
     if (approvalOrderId !== "0" && approvalOrderId) {
       edit(approvalOrderId);
     }
+    setApprovalOrderId("0")
   }, [approvalOrderId]);
 
   const [activeKey, setActiveKey] = useState(tabsApproval[0].key);
