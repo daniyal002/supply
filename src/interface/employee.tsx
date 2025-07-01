@@ -14,7 +14,7 @@ export interface IEmployee{
     post?:IPost,
     parlors:IParlor[] | undefined
     storages:IStorage[] | undefined
-
+    is_archive?: boolean,
 }
 
 
@@ -33,6 +33,7 @@ export interface IEmployeeRequest{
     phone?: string,
     internal_phone?: string,
     note?: string
+    is_archive?: boolean,
     },
     parlor_ids:number[]
     storage_ids:number[]
@@ -65,11 +66,6 @@ export interface IEmployeeFromParlorGetMe{
         buyer_post: string,
         buyer_role: string
 }
-// export interface IDoctorParlor{
-//     key:number,
-//     employee_id:number,
-//     parlor_id:number
-// }
 
 export interface IEmployeeFormValues{
     buyer_id?:number
@@ -83,6 +79,8 @@ export interface IEmployeeFormValues{
     post:IPostOption,
     parlor:IParlorOption[] | undefined
     storages:IStorageOption[] | undefined
+    is_archive?: boolean,
+
 
 }
 

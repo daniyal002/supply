@@ -1,6 +1,7 @@
 export interface IHousing{
     housing_id?:number,
     housing_name:string
+    is_archive?: boolean,
 }
 
 export interface IHousingResponse{

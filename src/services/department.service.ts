@@ -20,5 +20,10 @@ export const departmentService = {
     async deleteDepartmentById(data:IDepartmentRequest){
         const response = await axiosWidthAuth.delete<string>('department/delete_department',{data:data},)
         return response.data
+    },
+
+    async archiveDepartmentById(data:IDepartmentRequest){
+        const response = await axiosWidthAuth.put<string>('department/archive_department',data,)
+        return response.data
     }
 }

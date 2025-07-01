@@ -6,7 +6,7 @@ import ParlorTable from "./ParlorTable";
 import ParlorModal from "./ParlorModal";
 import { useState } from "react";
 import { useParlorData } from "@/hook/parlorHook";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminParlor() {
   const { parlorData } = useParlorData();
@@ -14,6 +14,9 @@ export default function AdminParlor() {
   const [parlorId, setParlorId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setParlorId(undefined);
@@ -36,6 +39,7 @@ export default function AdminParlor() {
         setIsModalOpen={setIsModalOpen}
         parlorId={parlorId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,7 +47,15 @@ export default function AdminParlor() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-      <ParlorTable parlorData={parlorData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <ParlorTable parlorData={parlorData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

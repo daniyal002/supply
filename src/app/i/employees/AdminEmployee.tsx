@@ -6,7 +6,7 @@ import EmployeeModal from "./EmployeeModal";
 import { useState } from "react";
 import { useEmployeeData } from "@/hook/employeeHook";
 import EmployeeTable from "./EmployeeTable";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminEmployee() {
   const { employeeData } = useEmployeeData();
@@ -14,6 +14,9 @@ export default function AdminEmployee() {
   const [employeeId, setEmployeeId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setEmployeeId(undefined);
@@ -36,6 +39,7 @@ export default function AdminEmployee() {
         setIsModalOpen={setIsModalOpen}
         employeeId={employeeId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,7 +47,15 @@ export default function AdminEmployee() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-      <EmployeeTable employeeData={employeeData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <EmployeeTable employeeData={employeeData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

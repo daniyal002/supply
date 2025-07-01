@@ -20,5 +20,10 @@ export const employeeService = {
     async deleteEmployeeById(data:IEmployee){
         const response = await axiosWidthAuth.delete<string>('employee/delete_employee',{data:data},)
         return response.data
-    }
+    },
+
+    async archiveEmployee(data:IEmployee){
+        const response = await axiosWidthAuth.put<string>('employee/archive_employee',data)
+        return response.data
+    },
 }

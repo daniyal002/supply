@@ -20,5 +20,10 @@ export const postService = {
     async deletePostById(data:IPost){
         const response = await axiosWidthAuth.delete<string>('post/delete_post',{data:data},)
         return response.data
-    }
+    },
+
+    async archivePost(data:IPost){
+        const response = await axiosWidthAuth.put<string>('post/archive_post',data)
+        return response.data
+    },
 }

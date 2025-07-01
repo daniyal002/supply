@@ -4,7 +4,7 @@ import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IOrderRouteResponseDetail } from "@/interface/orderRoute";
 import { IDepartment } from "@/interface/department";
-import { useDeleteOrderRouteMutation } from "@/hook/orderRouterHook";
+import { useArchiveOrderRouteMutation, useDeleteOrderRouteMutation } from "@/hook/orderRouterHook";
 import Link from "next/link";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -16,10 +16,12 @@ import Highlighter from "react-highlight-words";
 interface RouteTableProps {
   routeData: IOrderRouteResponseDetail[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean;
 }
 
-const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
+const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
   const { mutate: deleteOrderRouteMutation } = useDeleteOrderRouteMutation();
+  const {mutate: archiveOrderRouteMutation} = useArchiveOrderRouteMutation()
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
@@ -133,6 +135,9 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
           >
             Удалить
           </Button>
+          <Button onClick={() => archiveOrderRouteMutation({route_id:record.route_id as number})}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -141,7 +146,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, onEdit }) => {
   const dataSource = routeData?.map((route) => ({
     ...route,
     key: route.route_id, // Ensure each item has a unique key
-  }));
+  })).filter((route) => route.is_archive === isArchive);
   return (
     <Table
       dataSource={dataSource}

@@ -38,6 +38,7 @@ export interface IOrderItem {
     in_route: boolean,
     user?:IUser
     order_author_name?:string
+    is_archive?:boolean
   }
 
   export interface IDraftOrderItem {
@@ -58,6 +59,8 @@ export interface IOrderItem {
     current_step_container:number | null,
     in_route: boolean,
     user?:IUser
+    is_archive?:boolean
+
   }
 
   export interface IOrderItemAddResponse{
@@ -123,6 +126,7 @@ export interface IOrderItem {
     product_group:IProductGroupOption,
     note: string,
     order_products: IProductTable[]
+    is_archive?:boolean
   }
 
 
@@ -141,6 +145,7 @@ export interface IOrderItem {
     product_group:IProductGroupOption,
     note: string,
     order_products: IProductTable[]
+    is_archive?:boolean
   }
 
   export interface IOrderItemResponse{
@@ -166,4 +171,9 @@ export interface IOrderItem {
   export interface IOrderTo1CRequest {
     order_id: number;
     note?: string;
+  }
+
+  export interface IOrderArchiveRequest {
+    order_id: number;
+    archive_note: string;
   }

@@ -87,3 +87,28 @@ export const useDeleteHousingMutation = () => {
   });
   return { mutate };
 };
+
+export const useArchiveHousingMutation = () => {
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationKey: ["archiveHousing"],
+    mutationFn: (data: IHousing) => housingService.archiveHousing(data),
+    onSuccess: (updatedHousing, variables) => {
+      message.success(`Корпус "${variables.housing_name}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)
+
+      queryClient.setQueryData(
+        ["Housings"],
+        (oldData: IHousing[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((housing) =>
+            housing.housing_id === variables.housing_id ? {...variables, is_archive:!variables.is_archive} : housing
+          );
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};

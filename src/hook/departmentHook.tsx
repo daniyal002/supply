@@ -102,3 +102,33 @@ export const useDeleteDepartmentMutation = () => {
   });
   return { mutate };
 };
+
+export const useArchiveDepartmentMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["archiveDepartment"],
+    mutationFn: (data: IDepartment) =>
+      departmentService.archiveDepartmentById({
+        department_id: data.department_id,
+        department_name: data.department_name,
+        housing_id: data.housing?.housing_id as number,
+      }),
+    onSuccess: (updatedDepartment, variables) => {
+      message.success(`Подразделение "${variables.department_name}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)
+      queryClient.setQueryData(
+        ["Departments"],
+        (oldData: IDepartment[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((department) =>
+            department.department_id === variables.department_id ? {...variables, is_archive:!variables.is_archive} : department
+          );
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};

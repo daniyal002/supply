@@ -6,7 +6,7 @@ import UserModal from "./UserModal";
 import { useState } from "react";
 import { useUserData } from "@/hook/userHook";
 import UserTable from "./UserTable";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminUser() {
   const { userData } = useUserData();
@@ -14,6 +14,9 @@ export default function AdminUser() {
   const [userId, setUserId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setUserId(undefined);
@@ -36,6 +39,7 @@ export default function AdminUser() {
         setIsModalOpen={setIsModalOpen}
         userId={userId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,7 +47,15 @@ export default function AdminUser() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-      <UserTable userData={userData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <UserTable userData={userData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

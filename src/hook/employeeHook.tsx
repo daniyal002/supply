@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { employeeService } from '@/services/employee.service';
-import { IEmployee } from '@/interface/employee';
+import { IEmployee, IEmployeeRequest } from '@/interface/employee';
 import { IErrorResponse } from '@/interface/error';
 import axios, { AxiosError } from 'axios';
 import { message } from 'antd';
@@ -105,4 +105,38 @@ export const useDeleteEmployeeMutation = () => {
       }
   })
     return {mutate}
+};
+
+export const useArchiveEmployeeMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["archiveEmployee"],
+    mutationFn: (data: IEmployee) => employeeService.archiveEmployee(data),
+    onSuccess: (updatedEmployee, variables) => {
+      message.success(
+        `Пользователь "${variables.buyer_name}" ${
+          variables.is_archive
+            ? "успешно разархивиривано"
+            : "успешно архивировано"
+        }`
+      );
+
+      queryClient.setQueryData(
+        ["Employees"],
+        (oldData: IEmployee[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((employee) =>
+            employee.buyer_id === variables.buyer_id
+              ? { ...variables, is_archive: !variables.is_archive }
+              : employee
+          );
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
 };

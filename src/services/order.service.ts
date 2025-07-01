@@ -1,5 +1,6 @@
 import { axiosWidthAuth } from "@/api/interseptors";
 import {
+  IOrderArchiveRequest,
   IOrderItem,
   IOrderItemAddResponse,
   IOrderItemByIdResponse,
@@ -158,6 +159,11 @@ export const orderService = {
 
   async forceSubmitOrderTo1c(data:IOrderTo1CRequest){
     const response = await axiosWidthAuth.post<string>('/order/force_submit_order_to_1c',data)
+    return response.data
+  },
+
+  async archiveOrder(data:IOrderArchiveRequest){
+    const response = await axiosWidthAuth.put<string>('/order/archive_order',data)
     return response.data
   }
 };

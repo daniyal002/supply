@@ -32,17 +32,29 @@ export const orderRouteService = {
     return response.data;
   },
 
-  async updateOrderRoute(data: IAddRouterRequest){
-    const response = await axiosWidthAuth.put<IOrderRouteResponseDetail>('route/update_route',data)
-    return response.data
+  async updateOrderRoute(data: IAddRouterRequest) {
+    const response = await axiosWidthAuth.put<IOrderRouteResponseDetail>(
+      "route/update_route",
+      data
+    );
+    return response.data;
   },
 
-  async deleteOrderRoute(data:IOrderRouteDeleteRequest){
+  async deleteOrderRoute(data: IOrderRouteDeleteRequest) {
     if (!isNaN(Number(data.route_id)) && Number(data.route_id) > 0) {
       const response = await axiosWidthAuth.delete<string>(
-        "route/delete_order_route",{data}
-        );
-        return response.data
-  }
-  }
+        "route/delete_order_route",
+        { data }
+      );
+      return response.data;
+    }
+  },
+
+  async archiveOrderRoute(data: {route_id:number}) {
+    const response = await axiosWidthAuth.put<string>(
+      "route/archive_order_route",
+      data
+    );
+    return response.data;
+  },
 };

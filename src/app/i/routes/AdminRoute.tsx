@@ -8,7 +8,7 @@ import { useState } from "react";
 import { IOrderRouteRequest } from "@/interface/orderRoute";
 import Link from "next/link";
 import { useOrderRouteData } from "@/hook/orderRouterHook";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminRoute() {
 
@@ -17,6 +17,9 @@ export default function AdminRoute() {
   const [postId, setPostId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setPostId(undefined);
@@ -33,6 +36,7 @@ export default function AdminRoute() {
   return (
     <div>
       <Toaster />
+      <div style={{display:'flex', gap:'10px'}}>
 
       <Link href="routes/newRoute"><Button
         type="primary"
@@ -41,9 +45,17 @@ export default function AdminRoute() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       /></Link>
+       <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
 
 
-      <RouteTable routeData={orderRouteData} onEdit={onEdit} />
+      <RouteTable routeData={orderRouteData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

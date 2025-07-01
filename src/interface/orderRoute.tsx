@@ -18,6 +18,7 @@ export interface IOrderRouteResponseDetail{
     route_name:string
     department?:IDepartment
     order_route_type: EnumOrderTypes.PURCHASE | EnumOrderTypes.WAREHOUSE
+    is_archive?: boolean,
 }
 
 export interface IAddRouterRequest {
@@ -26,6 +27,7 @@ export interface IAddRouterRequest {
     department_id: number;
     order_route_type: EnumOrderTypes.PURCHASE | EnumOrderTypes.WAREHOUSE
     steps: IOrderRouteStepRequest[]
+    is_archive?: boolean,
 }
 
 export  interface IOrderRouteByIdResponse {

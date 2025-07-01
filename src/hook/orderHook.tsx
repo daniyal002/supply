@@ -1,5 +1,6 @@
 import { IErrorResponse } from "@/interface/error";
 import {
+  IOrderArchiveRequest,
   IOrderItem,
   IOrderItemRequest,
   IOrderItemRequestDelete,
@@ -457,4 +458,33 @@ export const useForceSubmitOrderTo1cMutation = () => {
   });
 
   return { mutate };
+};
+
+export const useArchiveOrderMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["archiveOrder"],
+    mutationFn: (data: IOrderArchiveRequest) => orderService.archiveOrder(data),
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(
+        ["Orders"],
+        (oldData: IOrderItem[] | undefined) => {
+          console.log(oldData)
+          if (!oldData) return [];
+          return oldData.map((order) => {
+            if (order.order_id === variables.order_id) {
+              message.success(`Заявка успешно ${order.is_archive ? "разархивирована" : "архивирована"} !`);
+              return {...order, is_archive:!order.is_archive};
+            }
+            return order;
+          });
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate, isPending };
 };

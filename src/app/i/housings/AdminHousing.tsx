@@ -6,7 +6,7 @@ import HousingTable from "./HousingTable";
 import HousingModal from "./HousingModal";
 import { useState } from "react";
 import { useHousingData } from "@/hook/housingHook";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminHousing() {
   const { housingsData } = useHousingData();
@@ -14,6 +14,9 @@ export default function AdminHousing() {
   const [housingId, setHousingId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setHousingId(undefined);
@@ -36,6 +39,7 @@ export default function AdminHousing() {
         setIsModalOpen={setIsModalOpen}
         housingId={housingId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,7 +47,15 @@ export default function AdminHousing() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-      <HousingTable housingsData={housingsData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <HousingTable housingsData={housingsData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

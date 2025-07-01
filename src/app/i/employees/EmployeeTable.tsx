@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { IParlor } from "@/interface/parlor";
 import { IEmployee } from "@/interface/employee";
 import { IPost } from "@/interface/post";
-import { useDeleteEmployeeMutation } from "@/hook/employeeHook";
+import { useArchiveEmployeeMutation, useDeleteEmployeeMutation } from "@/hook/employeeHook";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
@@ -16,13 +16,16 @@ import { useEffect } from "react";
 interface EmployeeTableProps {
   employeeData: IEmployee[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean
 }
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employeeData,
   onEdit,
+  isArchive
 }) => {
   const { mutate: deleteEmployeeMutation } = useDeleteEmployeeMutation();
+  const {mutate:archiveEmployeeMutation} = useArchiveEmployeeMutation()
   const {
     searchText,
     searchedColumn,
@@ -228,6 +231,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           >
             Удалить
           </Button>
+          <Button onClick={() => archiveEmployeeMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -236,7 +242,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const dataSource = employeeData?.map((employee) => ({
     ...employee,
     key: employee.buyer_id, // Ensure each item has a unique key
-  }));
+  })).filter((employee) => employee.is_archive === isArchive);
 
   return (
     <Table

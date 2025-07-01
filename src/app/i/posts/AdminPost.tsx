@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 import PostTable from "./PostTable";
 import PostModal from "./PostModal";
 import { useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminPost() {
   const { postData } = usePostData();
@@ -14,6 +14,9 @@ export default function AdminPost() {
   const [postId, setPostId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setPostId(undefined);
@@ -36,6 +39,7 @@ export default function AdminPost() {
         setIsModalOpen={setIsModalOpen}
         postId={postId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,7 +47,15 @@ export default function AdminPost() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-      <PostTable postData={postData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <PostTable postData={postData} onEdit={onEdit} isArchive={isArchive} />
     </div>
   );
 }

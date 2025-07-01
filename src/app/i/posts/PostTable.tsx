@@ -3,7 +3,7 @@
 import { IPost } from "@/interface/post";
 import { Button, Space, Table } from "antd";
 import { toast } from "sonner";
-import { useDeletePostMutation } from "@/hook/postHook";
+import { useArchivePostMutation, useDeletePostMutation } from "@/hook/postHook";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
@@ -14,10 +14,12 @@ import Highlighter from "react-highlight-words";
 interface PostTableProps {
   postData: IPost[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean;
 }
 
-const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
+const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) => {
   const { mutate: deletePostMutation } = useDeletePostMutation();
+  const {mutate: archivePostMutation} = useArchivePostMutation()
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
 
   const columns = [
@@ -93,6 +95,9 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
           >
             Удалить
           </Button>
+          <Button onClick={() => archivePostMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -101,7 +106,7 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit }) => {
   const dataSource = postData?.map((post) => ({
     ...post,
     key: post.post_id, // Ensure each item has a unique key
-  }));
+  })).filter((post) => post.is_archive === isArchive);
 
   return (
     <Table

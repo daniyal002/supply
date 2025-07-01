@@ -82,3 +82,27 @@ export const useDeleteRoleMutation = () => {
   });
   return { mutate };
 };
+
+
+export const useArchiveRoleMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["archiveRole"],
+    mutationFn: (data: IRole) => roleService.archiveRole(data),
+    onSuccess: (updatedRole, variables) => {
+      message.success(`Роль "${variables.role_name}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)
+      // Update the specific post in the 'Posts' query cache
+      queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.map((role) =>
+          role.role_id === variables.role_id ? {...variables, is_archive:!variables.is_archive} : role
+        );
+      });
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};

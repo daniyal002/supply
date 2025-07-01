@@ -20,5 +20,10 @@ export const parlorService = {
     async deleteParlorById(data:IParlorRequest){
         const response = await axiosWidthAuth.delete<string>('parlor/delete_parlor',{data:data},)
         return response.data
-    }
+    },
+
+    async archiveParlor(data:IParlorRequest){
+        const response = await axiosWidthAuth.put<string>('parlor/archive_parlor',data)
+        return response.data
+    },
 }

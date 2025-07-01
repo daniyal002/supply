@@ -20,5 +20,10 @@ export const roleService = {
     async deleteRoleById(data:IRole){
         const response = await axiosWidthAuth.delete<string>('role/delete_role',{data:data},)
         return response.data
-    }
+    },
+
+    async archiveRole(data:IRole){
+        const response = await axiosWidthAuth.put<string>('role/archive_role',data)
+        return response.data
+    },
 }

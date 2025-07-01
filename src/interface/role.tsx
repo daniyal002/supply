@@ -1,6 +1,7 @@
 export interface IRole{
     role_id?:number,
     role_name:string
+    is_archive?: boolean,
 }
 
 export interface IRoleResponse{

@@ -100,3 +100,36 @@ export const useCreateOrderRouteMutation = () => {
     });
     return { mutate };
   };
+
+  export const useArchiveOrderRouteMutation = () => {
+    const queryClient = useQueryClient();
+    const { mutate } = useMutation({
+      mutationKey: ["archiveOrderRoute"],
+      mutationFn: (data: { route_id: number }) =>
+        orderRouteService.archiveOrderRoute(data),
+      onSuccess: (_, variables) => {
+        queryClient.setQueryData(
+          ["newOrderRoute"],
+          (oldData: IOrderRouteResponseDetail[] | undefined) => {
+            if (!oldData) return [];
+            return oldData.map((orderRoute) => {
+              if (orderRoute.route_id === variables.route_id) {
+                message.success(
+                  `Маршрут "${orderRoute.route_name}" ${
+                    orderRoute.is_archive
+                      ? "успешно разархивириван"
+                      : "успешно архивирован"
+                  }`
+                );
+
+                return { ...orderRoute, is_archive: !orderRoute.is_archive };
+              } else {
+                return orderRoute;
+              }
+            });
+          }
+        );
+      },
+    });
+    return { mutate };
+  };

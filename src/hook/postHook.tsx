@@ -78,3 +78,26 @@ export const useDeletePostMutation = () => {
   });
   return { mutate };
 };
+
+export const useArchivePostMutation = () => {
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationKey: ["archivePost"],
+    mutationFn: (data: IPost) => postService.archivePost(data),
+    onSuccess: (updatedPost, variables) => {
+      message.success(`Должность "${variables.post_name}" ${variables.is_archive ? "успешно разархивиривана" : "успешно архивирована"}`)
+
+      // Update the specific post in the 'Posts' query cache
+      queryClient.setQueryData(["Posts"], (oldData: IPost[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.map((post) =>
+          post.post_id === variables.post_id ? {...variables, is_archive:!variables.is_archive} : post
+        );
+      });
+    },
+    onError: (error: AxiosError<IErrorResponse>) => {
+      message.error(error.response?.data.detail)
+    },
+  });
+  return { mutate };
+};

@@ -1,6 +1,8 @@
 export interface IPost{
     post_id?:number,
     post_name:string
+    is_archive?: boolean,
+
 }
 
 export interface IPostResponse{

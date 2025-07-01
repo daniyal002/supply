@@ -4,7 +4,7 @@ import { IPost } from "@/interface/post";
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IHousing } from "@/interface/housing";
-import { useDeleteHousingMutation } from "@/hook/housingHook";
+import { useArchiveHousingMutation, useDeleteHousingMutation } from "@/hook/housingHook";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
 import { Key } from "react";
@@ -15,12 +15,14 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 interface PostTableProps {
   housingsData: IHousing[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean
 }
 
-const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
+const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchive }) => {
   const { mutate: deletePostMutation } = useDeleteHousingMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
+    const {mutate:archiveHousingMutation} = useArchiveHousingMutation()
   const columns: TableColumnsType<IHousing> = [
     {
       title: "ID",
@@ -97,6 +99,9 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
           >
             Удалить
           </Button>
+          <Button onClick={() => archiveHousingMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -105,7 +110,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit }) => {
   const dataSource = housingsData?.map((housing) => ({
     ...housing,
     key: housing.housing_id, // Ensure each item has a unique key
-  }));
+  })).filter((housing) => housing.is_archive === isArchive);;
 
   return (
     <Table

@@ -4,7 +4,7 @@ import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IDepartment } from "@/interface/department";
 import { IParlor } from "@/interface/parlor";
-import { useDeleteParlorMutation } from "@/hook/parlorHook";
+import { useArchiveParlorMutation, useDeleteParlorMutation } from "@/hook/parlorHook";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
@@ -12,13 +12,15 @@ import Highlighter from "react-highlight-words";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { useMemo } from "react";
 
-interface PostTableProps {
+interface ParlorTableProps {
   parlorData: IParlor[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean
 }
 
-const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
+const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive }) => {
   const { mutate: deleteParlorMutation } = useDeleteParlorMutation();
+  const {mutate:archiveParlorMutation} = useArchiveParlorMutation()
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
@@ -133,6 +135,9 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
           >
             Удалить
           </Button>
+          <Button onClick={() => archiveParlorMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -141,7 +146,7 @@ const ParlorTable: React.FC<PostTableProps> = ({ parlorData, onEdit }) => {
   const dataSource = parlorData?.map((parlor) => ({
     ...parlor,
     key: parlor.parlor_id, // Ensure each item has a unique key
-  }));
+  })).filter((parlor) => parlor.is_archive === isArchive);
 
   return (
     <Table

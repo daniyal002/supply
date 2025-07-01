@@ -13,7 +13,7 @@ export const userService = {
         if(response.data){
             saveGetMe(response.data)
         }
-        return response.data 
+        return response.data
     },
 
     async addUser(data:IUserRequest){
@@ -28,6 +28,11 @@ export const userService = {
 
     async deleteUserById(data:IUserRequest){
         const response = await axiosWidthAuth.delete<string>('user/delete_user',{data:data},)
+        return response.data
+    },
+
+    async archiveUserById(data:IUserRequest){
+        const response = await axiosWidthAuth.put<string>('user/archive_user',data,)
         return response.data
     }
 }

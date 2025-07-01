@@ -7,6 +7,8 @@ export interface IUser{
     password:string,
     role:IRole | undefined,
     employee:IEmployee,
+    is_archive?: boolean,
+
 }
 
 export interface IUserResponse{
@@ -19,6 +21,8 @@ export interface IUserRequest{
     password:string,
     role_id:number,
     employee_id:number,
+    is_archive?: boolean,
+
 }
 
 export interface IUserAddResponse{
@@ -40,4 +44,5 @@ export interface IUserFormValues{
     password:string,
     role:IRoleOption
     employee:IEmployeeOption,
+    is_archive?: boolean,
 }

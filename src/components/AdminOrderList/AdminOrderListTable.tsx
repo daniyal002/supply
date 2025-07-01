@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
+import { Button, ConfigProvider, Input, Popconfirm, PopconfirmProps, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import {
+  useArchiveOrderMutation,
   useDeleteOrderMutation,
   useForceSubmitOrderTo1cMutation,
   useResetOrderMutation,
@@ -13,6 +14,7 @@ import {
 import { useOrderIdStore } from "../../../store/orderIdStore";
 import {
   EyeTwoTone,
+  FileZipOutlined,
   ReloadOutlined,
   SearchOutlined,
   SendOutlined,
@@ -24,16 +26,19 @@ import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { IUser } from "@/interface/user";
+import { MouseEvent, useEffect, useState } from "react";
 
 interface AdminOrderListProps {
   OrderData: IOrderItem[] | undefined;
+  isArchive:boolean
 }
 
-const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
+const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchive }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
     const {mutate:forceSubmitOrderTo1c} = useForceSubmitOrderTo1cMutation()
+    const {mutate:archiveOrderMutation} = useArchiveOrderMutation()
 
   const StatusOption = OrderData
     ? Array.from(
@@ -51,6 +56,20 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
 
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setAdminOrderId = useOrderIdStore((state) => state.setAdminOrderId);
+
+  const [archiveNote, setArchiveNote] = useState<string>()
+
+
+  const handleConfirm = (order_id: number) => {
+    archiveOrderMutation({ order_id, archive_note: String(archiveNote) });
+    setArchiveNote(''); // Очистить поле
+
+  };
+
+  const handleCancel = () => {
+    setArchiveNote(''); // Очистить поле при отмене
+  };
+
   const columns: TableColumnsType<IOrderItem> = [
     {
       title: "№",
@@ -274,7 +293,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
           </Button>
 
           <Button
-            onClick={() => forceSubmitOrderTo1c({order_id:record.order_id as number})}
+            onClick={() =>
+              forceSubmitOrderTo1c({ order_id: record.order_id as number })
+            }
             aria-label="Отправить в 1С УНФ"
             title="Отправить в 1С УНФ"
           >
@@ -302,15 +323,35 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData }) => {
               <ReloadOutlined />
             </Button>
           )}
+
+          <Popconfirm
+            title={record.is_archive ? "Разархивировать ?" : "Архивировать ?"}
+            description={() => record.is_archive ? "" : (
+              <Input
+                placeholder="Введите причину архивации"
+                value={archiveNote}
+                onChange={(e) => setArchiveNote(e.target.value)}
+              />
+            )}
+            onConfirm={() => handleConfirm(record.order_id as number)} // Обернули в функцию
+            onCancel={handleCancel}
+            okText="Да"
+            cancelText="Нет"
+          >
+            <Button danger>
+              <FileZipOutlined />
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
+
   const dataSource = OrderData?.map((order) => ({
     ...order,
     key: order.order_id, // Ensure each item has a unique key
-  }));
+  })).filter((order) => order.is_archive === isArchive);;
 
   return (
     <ConfigProvider

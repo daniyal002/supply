@@ -109,3 +109,31 @@ export const useDeleteUserMutation = () => {
   });
   return { mutate };
 };
+
+export const useArchiveUserMutation = () => {
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationKey: ["archiveUser"],
+    mutationFn: (data: IUser) =>
+      userService.archiveUserById({
+        user_id: data.user_id,
+        login: data.login,
+        password: data.password,
+        employee_id: data.employee.buyer_id as number,
+        role_id: data.role?.role_id as number,
+      }),
+    onSuccess: (updatedEmployee, variables) => {
+      message.success(`Пользователь "${variables.login}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)
+      queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.map((users) =>
+          users.user_id === variables.user_id ? {...variables, is_archive:!variables.is_archive} : users
+        );
+      });
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};

@@ -7,6 +7,8 @@ export interface IParlor{
     parlor_name:string,
     department:IDepartment | undefined
     floor?: IFloor | undefined
+    is_archive?: boolean,
+
 }
 
 export interface IParlorRespone{
@@ -18,6 +20,8 @@ export interface IParlorRequest{
     parlor_name:string,
     department_id:number
     floor_id?: number
+    is_archive?: boolean,
+
 }
 
 export interface IParlorAddResponse{

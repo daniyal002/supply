@@ -2,11 +2,11 @@
 
 import { Button } from "antd";
 import { Toaster } from "sonner";
-import PostTable from "./RoleTable";
+import RoleTable from "./RoleTable";
 import RoleModal from "./RoleModal";
 import { useState } from "react";
 import { useRoleData } from "@/hook/roleHook";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminRole() {
   const { roleData } = useRoleData();
@@ -14,6 +14,9 @@ export default function AdminRole() {
   const [roleId, setRoleId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
 
   const onAdd = () => {
     setRoleId(undefined);
@@ -36,6 +39,7 @@ export default function AdminRole() {
         setIsModalOpen={setIsModalOpen}
         roleId={roleId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,8 +47,15 @@ export default function AdminRole() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-
-      <PostTable roleData={roleData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <RoleTable roleData={roleData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

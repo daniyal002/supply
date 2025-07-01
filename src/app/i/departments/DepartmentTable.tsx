@@ -3,7 +3,7 @@
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IDepartment } from "@/interface/department";
-import { useDeleteDepartmentMutation } from "@/hook/departmentHook";
+import { useArchiveDepartmentMutation, useDeleteDepartmentMutation } from "@/hook/departmentHook";
 import { IHousing } from "@/interface/housing";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
@@ -20,6 +20,7 @@ interface PostTableProps {
 
 const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isArchive = false }) => {
   const { mutate: deleteDepartmentMutation } = useDeleteDepartmentMutation();
+  const {mutate:archiveDepartmentMutation} = useArchiveDepartmentMutation()
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
 
 
@@ -124,6 +125,9 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
             }
           >
             Удалить
+          </Button>
+          <Button onClick={() => archiveDepartmentMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
           </Button>
         </Space>
       ),

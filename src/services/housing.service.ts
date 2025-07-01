@@ -20,5 +20,10 @@ export const housingService = {
     async deleteHousingById(data:IHousing){
         const response = await axiosWidthAuth.delete<string>('housing/delete_housing/',{data:data},)
         return response.data
-    }
+    },
+
+    async archiveHousing(data:IHousing){
+        const response = await axiosWidthAuth.put<string>('housing/archive_housing',data)
+        return response.data
+    },
 }

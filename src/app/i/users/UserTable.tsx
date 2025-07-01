@@ -3,7 +3,7 @@
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IUser } from "@/interface/user";
-import { useDeleteUserMutation } from "@/hook/userHook";
+import { useArchiveUserMutation, useDeleteUserMutation } from "@/hook/userHook";
 import { IEmployee } from "@/interface/employee";
 import { IRole } from "@/interface/role";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
@@ -16,13 +16,16 @@ import { useRoleData } from "@/hook/roleHook";
 interface userTableProps {
   userData: IUser[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean
 }
 
-const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
+const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) => {
   const { mutate: deleteUserMutation } = useDeleteUserMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
   const { roleData } = useRoleData();
+
+  const {mutate:archiveUserMutation} = useArchiveUserMutation()
 
   const columns: TableColumnsType<IUser> = [
     {
@@ -150,6 +153,9 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
           >
             Удалить
           </Button>
+          <Button onClick={() => archiveUserMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -158,7 +164,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit }) => {
   const dataSource = userData?.map((user) => ({
     ...user,
     key: user.user_id, // Ensure each item has a unique key
-  }));
+  })).filter((user) => user.is_archive === isArchive);
 
   return (
     <Table

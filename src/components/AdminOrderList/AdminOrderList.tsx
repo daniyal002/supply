@@ -5,11 +5,12 @@ import { useOrdersData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { ConfigProvider, DatePicker } from "antd";
+import { Button, ConfigProvider, DatePicker } from "antd";
 import moment from "moment";
 import locale from 'antd/locale/ru_RU';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
+import { BookFilled } from "@ant-design/icons";
 dayjs.locale('ru_RU');
 
 const { RangePicker } = DatePicker;
@@ -45,6 +46,9 @@ export default function AdminOrderList() {
     setFilteredOrderData(ordersData as IOrderItem[]);
   }, [ordersData]);
 
+  const [isArchive,setIsArchive] = useState<boolean>(false)
+
+
   return (
     <div className={style.orderList}>
       <Toaster />
@@ -59,7 +63,15 @@ export default function AdminOrderList() {
       />
       </ConfigProvider>
 
-      <OrderListTable OrderData={filteredOrderData} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+
+      <OrderListTable OrderData={filteredOrderData} isArchive={isArchive}/>
     </div>
   );
 }

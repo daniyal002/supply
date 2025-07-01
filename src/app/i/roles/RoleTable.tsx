@@ -1,19 +1,19 @@
 'use client';
 
-import { IPost } from "@/interface/post";
 import { Button, Space, Table } from "antd";
 import { toast } from "sonner";
-import { useDeletePostMutation } from "@/hook/postHook";
 import { IRole } from "@/interface/role";
-import { useDeleteRoleMutation } from "@/hook/roleHook";
+import { useArchiveRoleMutation, useDeleteRoleMutation } from "@/hook/roleHook";
 
-interface PostTableProps {
+interface RoleTableProps {
   roleData: IRole[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean
 }
 
-const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
+const RoleTable: React.FC<RoleTableProps> = ({ roleData, onEdit,isArchive }) => {
   const { mutate: deleteRoleMutation } = useDeleteRoleMutation();
+  const {mutate:archiveRoleMutation} = useArchiveRoleMutation()
 
   const columns = [
     {
@@ -56,6 +56,9 @@ const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
           >
             Удалить
           </Button>
+          <Button onClick={() => archiveRoleMutation(record)}>
+            {record.is_archive ? "Разархивировать" : "Архивировать"}
+          </Button>
         </Space>
       ),
     },
@@ -64,7 +67,7 @@ const RoleTable: React.FC<PostTableProps> = ({ roleData, onEdit }) => {
   const dataSource = roleData?.map((role) => ({
     ...role,
     key: role.role_id, // Ensure each item has a unique key
-  }));
+  })).filter((role) => role.is_archive === isArchive);;
 
   return (
     <Table

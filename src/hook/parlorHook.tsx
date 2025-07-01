@@ -105,3 +105,34 @@ export const useDeleteParlorMutation = () => {
   });
   return { mutate };
 };
+
+export const useArchiveParlorMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["archiveParlor"],
+    mutationFn: (data: IParlor) =>
+      parlorService.archiveParlor({
+        parlor_id: data.parlor_id,
+        parlor_name: data.parlor_name,
+        department_id: data.department?.department_id as number,
+        floor_id: data.floor?.floor_id as number,
+      }),
+    onSuccess: (updatedParlor, variables) => {
+      message.success(`Кабинет "${variables.parlor_name}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)
+      queryClient.setQueryData(
+        ["Parlors"],
+        (oldData: IParlor[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((parlor) =>
+            parlor.parlor_id === variables.parlor_id ? {...variables, is_archive:!variables.is_archive} : parlor
+          );
+        }
+      );
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate };
+};
