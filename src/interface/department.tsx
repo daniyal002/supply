@@ -2,7 +2,8 @@ import { HousingOption, IHousing } from "./housing"
 
 export interface IDepartment{
     department_id?:number,
-    department_name: string 
+    department_name: string,
+    is_archive?: boolean,
     housing:IHousing | undefined
 }
 
@@ -12,7 +13,7 @@ export interface IDepartmentResponse{
 
 export interface IDepartmentRequest{
     department_id?:number,
-    department_name: string 
+    department_name: string
     housing_id:number
 }
 

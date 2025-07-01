@@ -1,31 +1,35 @@
 .headerOrder {
   display: flex;
   flex-direction: column;
+  gap: 20px;
 
   .headerOrderSelect {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 
     @media screen and (max-width: 560px) {
       flex-direction: column;
-      align-items: center;
     }
 
 
     flex-wrap: wrap;
     column-gap: 20px;
-    row-gap: 6px;
-    padding: 20px 0;
+    row-gap: 20px;
+    // padding: 20px 0;
     align-items: flex-start;
 
     .CheckboxStorage {
       display: flex;
-      align-items: start;
+      align-items: start !important;
       flex-wrap: wrap;
       column-gap: 20px;
       row-gap: 6px;
-      padding: 20px 0;
+      // padding: 20px 0;
       align-items: flex-start;
+
+      @media screen and (max-width:638px) {
+        width: 100%;
+      }
     }
 
     .EmployeeDepartmentCategory {
@@ -34,7 +38,7 @@
       flex-wrap: wrap;
       column-gap: 20px;
       row-gap: 6px;
-      padding: 20px 0;
+      // padding: 20px 0;
       align-items: flex-start;
     }
 
@@ -56,6 +60,10 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
+
+      @media screen and (max-width:638px) {
+        width: 100%;
+      }
 
       .formItemLabel {
         font-size: 16px;
@@ -114,7 +122,6 @@
         border-radius: 6px;
         font-size: 16px;
         outline: none;
-        width: 95%;
         resize: none;
 
         &:focus {

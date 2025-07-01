@@ -37,6 +37,7 @@ export interface IOrderItem {
     current_step_container:number | null,
     in_route: boolean,
     user?:IUser
+    order_author_name?:string
   }
 
   export interface IDraftOrderItem {
@@ -112,6 +113,7 @@ export interface IOrderItem {
     order_number?: string,
     oms: boolean,
     user_id?: number,
+    order_author_name?:string,
     order_type:IOrderTypesOption;
     order_status_id: number,
     order_route_id: number,

@@ -60,6 +60,11 @@
       background-color: #606f7e;
       box-shadow: 1px 1px 1px 0.5px #678098;
     }
+
+    @media screen and (max-width:500px) {
+    width: 50%;
+
+    }
   }
 
   .buttonOrderSave {
@@ -81,6 +86,10 @@
       background-color: #606f7e;
       box-shadow: 1px 1px 1px 0.5px #678098;
     }
+    @media screen and (max-width:500px) {
+      width: 50%;
+
+      }
   }
 
   .toggleBtn {
@@ -100,13 +109,9 @@
       box-shadow: 1px 1px 1px 0.5px #678098;
     }
 
-    @media (max-width:599px) {
-    width: 30%;
+    @media (max-width:820px) {
+    width: 100%;
     }
-    @media (max-width:412px) {
-    width: 40%;
-    }
-
   }
 
   .toggleBackButton{

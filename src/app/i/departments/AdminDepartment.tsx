@@ -6,14 +6,16 @@ import DepartmentTable from "./DepartmentTable";
 import DepartmentModal from "./DepartmentModal";
 import { useState } from "react";
 import { useDepartmentData } from "@/hook/departmentHook";
-import { PlusOutlined } from "@ant-design/icons";
+import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminDepartment() {
   const { departmentData } = useDepartmentData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [departmentId, setDepartmentId] = useState<number>();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [isArchive,setIsArchive] = useState<boolean>(false)
 
   const onAdd = () => {
     setDepartmentId(undefined);
@@ -36,6 +38,7 @@ export default function AdminDepartment() {
         setIsModalOpen={setIsModalOpen}
         departmentId={departmentId}
       />
+      <div style={{display:'flex', gap:'10px'}}>
       <Button
         type="primary"
         shape="circle"
@@ -43,7 +46,15 @@ export default function AdminDepartment() {
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
       />
-      <DepartmentTable departmentData={departmentData} onEdit={onEdit} />
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<BookFilled />}
+        onClick={() => setIsArchive(!isArchive)}
+        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+      />
+      </div>
+      <DepartmentTable departmentData={departmentData} onEdit={onEdit} isArchive={isArchive}/>
     </div>
   );
 }

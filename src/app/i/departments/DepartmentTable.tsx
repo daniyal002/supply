@@ -15,9 +15,10 @@ import { Key, useMemo } from "react";
 interface PostTableProps {
   departmentData: IDepartment[] | undefined;
   onEdit: (id: number) => void;
+  isArchive:boolean
 }
 
-const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) => {
+const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isArchive = false }) => {
   const { mutate: deleteDepartmentMutation } = useDeleteDepartmentMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
 
@@ -132,7 +133,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit }) =
   const dataSource = departmentData?.map((department) => ({
     ...department,
     key: department.department_id, // Ensure each item has a unique key
-  }));
+  })).filter((depatment) => depatment.is_archive === isArchive);
 
   return (
     <Table

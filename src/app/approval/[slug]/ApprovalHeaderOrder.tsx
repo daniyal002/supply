@@ -36,6 +36,7 @@ export default function ApprovalHeaderOrder({
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false)
 
+
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products")
 
@@ -55,6 +56,7 @@ export default function ApprovalHeaderOrder({
       }))
     )
   );
+
 
   const employeeSet = new Set();
   const optionsEmployee =
@@ -230,6 +232,27 @@ export default function ApprovalHeaderOrder({
           {errors && (
             <p className={style.error}>{errors.department_id?.message}</p>
           )}
+        </div>
+
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Автор</label>
+          <Controller
+            control={control}
+            name="order_author_name"
+            render={({ field }) => (
+              <Select
+              {...field}
+              disabled
+              options={[{value:getValues('order_author_name'), title:getValues('order_author_name')}]}
+              onChange={(value, option) =>
+                // @ts-ignore: Unreachable code error
+                field.onChange({ value: value, label: option.label })
+              }
+              placeholder="Автор"
+              className={style.formItemSelect}
+            />
+            )}
+          />
         </div>
       </div>
       <div className={style.headerOrderTextArea}>
