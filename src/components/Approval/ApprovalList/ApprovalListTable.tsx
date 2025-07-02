@@ -2,7 +2,7 @@
 
 import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
 import { IEmployee } from "@/interface/employee";
-import { EnumOrderTypes, IOrderItem, IStatusOrder } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import { EyeTwoTone, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -13,6 +13,7 @@ import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { IUser } from "@/interface/user";
 import { useState } from "react";
+import { IOrderStatus } from "@/interface/orderStatus";
 
 interface ApprovalListProps {
   OrderData: IOrderItem[] | undefined;
@@ -24,14 +25,14 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
     useSearch();
   const StatusOption = OrderData
     ? Array.from(
-        new Set(OrderData.map((order) => order?.order_status?.order_status_id))
+        new Set(OrderData.map((order) => order?.order_status?.status_id))
       ).map((id) => {
         const orderStatus = OrderData.find(
-          (order) => order?.order_status?.order_status_id === id
+          (order) => order?.order_status?.status_id === id
         )?.order_status;
         return {
-          value: String(orderStatus?.order_status_id),
-          label: orderStatus?.order_status_name || "",
+          value: String(orderStatus?.status_id),
+          label: orderStatus?.status_name || "",
         };
       })
     : [];
@@ -119,11 +120,24 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
       dataIndex: "order_status",
       key: "order_status",
       sorter: (a: IOrderItem, b: IOrderItem) =>
-        a.order_status.order_status_name.localeCompare(
-          b.order_status.order_status_name,
+        a.order_status.status_name.localeCompare(
+          b.order_status.status_name,
           "ru"
         ),
-      render: (order_status: IStatusOrder) => order_status?.order_status_name,
+      render: (order_status: IOrderStatus) => (
+        <p
+          style={{
+            backgroundColor: order_status.status_color,
+            color: "#fff",
+            padding: "10px",
+            textAlign: "center",
+            textTransform: "uppercase",
+            borderRadius: "5px",
+          }}
+        >
+          {order_status?.status_name}
+        </p>
+      ),
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -139,7 +153,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
         />
       ),
       onFilter: (value, record) =>
-        record.order_status.order_status_id === Number(value),
+        record.order_status.status_id === Number(value),
     },
     {
       title: "Сотрудник/Кабинет",

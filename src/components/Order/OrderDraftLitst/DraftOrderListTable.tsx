@@ -3,9 +3,8 @@
 import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
-import { IDraftOrderItem, IOrderItem, IStatusOrder } from "@/interface/orderItem";
+import { IDraftOrderItem, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
-import { useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { DeleteFilled, EyeTwoTone, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -16,6 +15,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { useState } from "react";
 import { IProductGroup } from "@/interface/product";
 import { useDeleteDraftOrderByIdMutation } from "@/hook/orderTempHook";
+import { IOrderStatus } from "@/interface/orderStatus";
 
 interface OrderListProps {
   OrderData: IDraftOrderItem[] | undefined;
@@ -28,14 +28,14 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
     useSearch();
   const StatusOption = OrderData
     ? Array.from(
-        new Set(OrderData.map((order) => order?.order_status?.order_status_id))
+        new Set(OrderData.map((order) => order?.order_status?.status_id))
       ).map((id) => {
         const orderStatus = OrderData.find(
-          (order) => order?.order_status?.order_status_id === id
+          (order) => order?.order_status?.status_id === id
         )?.order_status;
         return {
-          value: String(orderStatus?.order_status_id),
-          label: orderStatus?.order_status_name || "",
+          value: String(orderStatus?.status_id),
+          label: orderStatus?.status_name || "",
         };
       })
     : [];
@@ -119,11 +119,24 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
       dataIndex: "order_status",
       key: "order_status",
       sorter: (a: IOrderItem, b: IOrderItem) =>
-        a.order_status.order_status_name.localeCompare(
-          b.order_status.order_status_name,
+        a.order_status.status_name.localeCompare(
+          b.order_status.status_name,
           "ru"
         ),
-      render: (order_status: IStatusOrder) => order_status?.order_status_name,
+        render: (order_status: IOrderStatus) => (
+          <p
+            style={{
+              backgroundColor: order_status.status_color,
+              color: "#fff",
+              padding: "10px",
+              textAlign: "center",
+              textTransform: "uppercase",
+              borderRadius: "5px",
+            }}
+          >
+            {order_status?.status_name}
+          </p>
+        ),
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -139,7 +152,7 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
         />
       ),
       onFilter: (value, record) =>
-        record.order_status.order_status_id === Number(value),
+        record.order_status.status_id === Number(value),
     },
     {
       title: "Сотрудник/Кабинет",

@@ -1,9 +1,18 @@
 "use client";
 
-import { Button, ConfigProvider, Input, Popconfirm, PopconfirmProps, Space, Table, TableColumnsType } from "antd";
+import {
+  Button,
+  ConfigProvider,
+  Input,
+  Popconfirm,
+  PopconfirmProps,
+  Space,
+  Table,
+  TableColumnsType,
+} from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
-import { IOrderItem, IStatusOrder } from "@/interface/orderItem";
+import { IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import {
   useArchiveOrderMutation,
@@ -27,29 +36,33 @@ import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { IUser } from "@/interface/user";
 import { MouseEvent, useEffect, useState } from "react";
+import { IOrderStatus } from "@/interface/orderStatus";
 
 interface AdminOrderListProps {
   OrderData: IOrderItem[] | undefined;
-  isArchive:boolean
+  isArchive: boolean;
 }
 
-const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchive }) => {
+const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
+  OrderData,
+  isArchive,
+}) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
-    const {mutate:forceSubmitOrderTo1c} = useForceSubmitOrderTo1cMutation()
-    const {mutate:archiveOrderMutation} = useArchiveOrderMutation()
+  const { mutate: forceSubmitOrderTo1c } = useForceSubmitOrderTo1cMutation();
+  const { mutate: archiveOrderMutation } = useArchiveOrderMutation();
 
   const StatusOption = OrderData
     ? Array.from(
-        new Set(OrderData.map((order) => order?.order_status?.order_status_id))
+        new Set(OrderData.map((order) => order?.order_status?.status_id))
       ).map((id) => {
         const orderStatus = OrderData.find(
-          (order) => order?.order_status?.order_status_id === id
+          (order) => order?.order_status?.status_id === id
         )?.order_status;
         return {
-          value: String(orderStatus?.order_status_id),
-          label: orderStatus?.order_status_name || "",
+          value: String(orderStatus?.status_id),
+          label: orderStatus?.status_name || "",
         };
       })
     : [];
@@ -57,17 +70,15 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchi
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setAdminOrderId = useOrderIdStore((state) => state.setAdminOrderId);
 
-  const [archiveNote, setArchiveNote] = useState<string>()
-
+  const [archiveNote, setArchiveNote] = useState<string>();
 
   const handleConfirm = (order_id: number) => {
     archiveOrderMutation({ order_id, archive_note: String(archiveNote) });
-    setArchiveNote(''); // Очистить поле
-
+    setArchiveNote(""); // Очистить поле
   };
 
   const handleCancel = () => {
-    setArchiveNote(''); // Очистить поле при отмене
+    setArchiveNote(""); // Очистить поле при отмене
   };
 
   const columns: TableColumnsType<IOrderItem> = [
@@ -148,11 +159,24 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchi
       dataIndex: "order_status",
       key: "order_status",
       sorter: (a: IOrderItem, b: IOrderItem) =>
-        a.order_status.order_status_name.localeCompare(
-          b.order_status.order_status_name,
+        a.order_status.status_name.localeCompare(
+          b.order_status.status_name,
           "ru"
         ),
-      render: (order_status: IStatusOrder) => order_status?.order_status_name,
+      render: (order_status: IOrderStatus) => (
+        <p
+          style={{
+            backgroundColor: order_status.status_color,
+            color: "#fff",
+            padding: "10px",
+            textAlign: "center",
+            textTransform: "uppercase",
+            borderRadius: "5px",
+          }}
+        >
+          {order_status?.status_name}
+        </p>
+      ),
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -168,7 +192,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchi
         />
       ),
       onFilter: (value, record) =>
-        record.order_status.order_status_id === Number(value),
+        record.order_status.status_id === Number(value),
     },
     {
       title: "Сотрудник/Кабинет",
@@ -326,13 +350,17 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchi
 
           <Popconfirm
             title={record.is_archive ? "Разархивировать ?" : "Архивировать ?"}
-            description={() => record.is_archive ? "" : (
-              <Input
-                placeholder="Введите причину архивации"
-                value={archiveNote}
-                onChange={(e) => setArchiveNote(e.target.value)}
-              />
-            )}
+            description={() =>
+              record.is_archive ? (
+                ""
+              ) : (
+                <Input
+                  placeholder="Введите причину архивации"
+                  value={archiveNote}
+                  onChange={(e) => setArchiveNote(e.target.value)}
+                />
+              )
+            }
             onConfirm={() => handleConfirm(record.order_id as number)} // Обернули в функцию
             onCancel={handleCancel}
             okText="Да"
@@ -347,11 +375,10 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchi
     },
   ];
 
-
   const dataSource = OrderData?.map((order) => ({
     ...order,
     key: order.order_id, // Ensure each item has a unique key
-  })).filter((order) => order.is_archive === isArchive);;
+  })).filter((order) => order.is_archive === isArchive);
 
   return (
     <ConfigProvider
@@ -372,7 +399,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({ OrderData, isArchi
           }`
         }
         onRow={(record) => ({
-          onDoubleClick: () => setAdminOrderId(String(record.order_id))
+          onDoubleClick: () => setAdminOrderId(String(record.order_id)),
         })}
       />
     </ConfigProvider>

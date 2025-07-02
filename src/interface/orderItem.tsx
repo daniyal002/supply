@@ -4,19 +4,20 @@ import { IProductTable, IProductTableRequest } from "@/interface/productTable";
 import { IProductGroup, IProductGroupOption } from "./product";
 import { IUser } from "./user";
 import { IStorage, IStorageOption } from "./storage";
+import { IOrderStatus } from "./orderStatus";
 
 export enum EnumOrderTypes {
   'PURCHASE' = 'purchase',
   'WAREHOUSE' = 'warehouse',
 }
 
-export interface IStatusOrder{
-  order_status_id:number,
-  order_status_name:string,
-}
+// export interface IStatusOrder{
+//   order_status_id:number,
+//   order_status_name:string,
+// }
 
 export interface IStatusOrderResponse{
-  detail:IStatusOrder[]
+  detail:IOrderStatus[]
 }
 
 export interface IOrderItem {
@@ -25,7 +26,7 @@ export interface IOrderItem {
     order_type:EnumOrderTypes.WAREHOUSE | EnumOrderTypes.PURCHASE;
     created_at?: string;
     updated_at? : string;
-    order_status:IStatusOrder;
+    order_status:IOrderStatus;
     note?:string,
     buyer: IEmployee | undefined;
     oms:true | false,
@@ -46,7 +47,7 @@ export interface IOrderItem {
     order_number: string;
     created_at?: string;
     updated_at? : string;
-    order_status:IStatusOrder;
+    order_status:IOrderStatus;
     note?:string,
     buyer: IEmployee | undefined;
     oms:true | false,
