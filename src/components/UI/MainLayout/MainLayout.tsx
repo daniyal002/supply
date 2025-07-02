@@ -138,6 +138,12 @@ const MainLayout = ({
             icon: <CalculatorOutlined />,
             onClick: () => push("/i/oneC"),
           },
+          {
+            key: "13",
+            label: "Статусы заявок",
+            icon: <CalculatorOutlined />,
+            onClick: () => push("/i/orderStatus"),
+          },
         ],
       },
       {
