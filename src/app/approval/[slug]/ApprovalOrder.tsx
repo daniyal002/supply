@@ -253,7 +253,7 @@ export default function ApprovalOrder({
       },
       oms: getOrderByIdData?.oms,
       order_route_id: 1,
-      order_status_id: getOrderByIdData?.order_status?.order_status_id,
+      order_status_id: getOrderByIdData?.order_status?.status_id,
       note: getOrderByIdData?.note,
       order_products: getOrderByIdData?.order_products,
       order_type:{
