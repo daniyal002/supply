@@ -53,8 +53,8 @@ export default function Route({ routeId }: Props) {
           step_id:orderRoute.step_id,
           free_or_paid:orderRoute.free_or_paid,
           step_number:orderRoute.step_number,
-          status_agreed_id:orderRoute.status_agreed.order_status_id,
-          status_reject_id:orderRoute.status_reject.order_status_id,
+          status_agreed_id:orderRoute.status_agreed.status_id,
+          status_reject_id:orderRoute.status_reject.status_id,
           product_group_ids:orderRoute.product_groups.map(pg => pg.product_group_id),
           approver_employee_ids:orderRoute.approvers.map(approver => approver.employee_id)
         }))
@@ -220,25 +220,6 @@ export default function Route({ routeId }: Props) {
             />
           </Form.Item>
 
-          <Form.Item label="Статус отклонения">
-            <Controller
-              name={`steps.${index}.status_reject_id`}
-              control={control}
-              render={({ field }) => (
-                <Select {...field}>
-                  {oderStatusData?.map((status) => (
-                    <Option
-                      key={status.order_status_id}
-                      value={status.order_status_id}
-                    >
-                      {status.order_status_name}
-                    </Option>
-                  ))}
-                </Select>
-              )}
-            />
-          </Form.Item>
-
           <Form.Item label="Статус согласования">
             <Controller
               name={`steps.${index}.status_agreed_id`}
@@ -247,10 +228,29 @@ export default function Route({ routeId }: Props) {
                 <Select {...field}>
                   {oderStatusData?.map((status) => (
                     <Option
-                      key={status.order_status_id}
-                      value={status.order_status_id}
+                      key={status.status_id}
+                      value={status.status_id}
                     >
-                      {status.order_status_name}
+                      {status.status_name}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            />
+          </Form.Item>
+
+          <Form.Item label="Статус отклонения">
+            <Controller
+              name={`steps.${index}.status_reject_id`}
+              control={control}
+              render={({ field }) => (
+                <Select {...field}>
+                  {oderStatusData?.map((status) => (
+                    <Option
+                      key={status.status_id}
+                      value={status.status_id}
+                    >
+                      {status.status_name}
                     </Option>
                   ))}
                 </Select>

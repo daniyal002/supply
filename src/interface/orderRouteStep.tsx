@@ -1,4 +1,4 @@
-import { IStatusOrder } from "./orderItem";
+import { IOrderStatus } from "./orderStatus";
 import { IProductGroup } from "./product";
 
 export interface IOrderRouteStepRequest {
@@ -30,8 +30,8 @@ export interface IOrderRouteStepResponse {
 //   employee: IEmployee;
   step_number: number;
   free_or_paid: "free" | "paid";
-  status_reject: IStatusOrder;
-  status_agreed: IStatusOrder;
+  status_reject: IOrderStatus;
+  status_agreed: IOrderStatus;
   product_groups: IProductGroup[];
   approvers: IOrderRouteStepApprovers[];
 }
