@@ -41,6 +41,20 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
       })
     : [];
 
+    const CategoryOption = OrderData
+    ? Array.from(
+        new Set(OrderData.map((order) => order?.product_group?.product_group_id))
+      ).map((id) => {
+        const orderCategory = OrderData.find(
+          (order) => order?.product_group?.product_group_id === id
+        )?.product_group;
+        return {
+          value: String(orderCategory?.product_group_id),
+          label: orderCategory?.product_group_name || "",
+        };
+      })
+    : [];
+
     // const optionsOrderTypes: { value: string; label: string }[] = [
     //     { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
     //     { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
@@ -233,6 +247,22 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
           b.product_group.product_group_name,
           "ru"
         ),
+        filterDropdown: ({
+          setSelectedKeys,
+          selectedKeys,
+          confirm,
+          clearFilters,
+        }) => (
+          <StatusFilter
+            options={CategoryOption}
+            setSelectedKeys={setSelectedKeys}
+            selectedKeys={selectedKeys.map((key) => String(key))}
+            confirm={confirm}
+            clearFilters={() => clearFilters && clearFilters()}
+          />
+        ),
+        onFilter: (value, record) =>
+          record.product_group.product_group_id === Number(value),
       render: (productGroup: IProductGroup) => productGroup?.product_group_name,
     },
     {

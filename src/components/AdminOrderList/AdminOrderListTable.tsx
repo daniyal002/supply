@@ -37,6 +37,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { IUser } from "@/interface/user";
 import { MouseEvent, useEffect, useState } from "react";
 import { IOrderStatus } from "@/interface/orderStatus";
+import { IProductGroup } from "@/interface/product";
 
 interface AdminOrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -63,6 +64,20 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
         return {
           value: String(orderStatus?.status_id),
           label: orderStatus?.status_name || "",
+        };
+      })
+    : [];
+
+    const CategoryOption = OrderData
+    ? Array.from(
+        new Set(OrderData.map((order) => order?.product_group?.product_group_id))
+      ).map((id) => {
+        const orderCategory = OrderData.find(
+          (order) => order?.product_group?.product_group_id === id
+        )?.product_group;
+        return {
+          value: String(orderCategory?.product_group_id),
+          label: orderCategory?.product_group_name || "",
         };
       })
     : [];
@@ -269,6 +284,34 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
         return nameA.localeCompare(nameB, "ru");
       },
       render: (department: IDepartment) => department?.department_name,
+    },
+    {
+      title: "Категория",
+      dataIndex: "product_group",
+      showSorterTooltip: { title: "Сортировка по категориям" },
+      key: "product_group",
+      sorter: (a: IOrderItem, b: IOrderItem) =>
+        a.product_group.product_group_name.localeCompare(
+          b.product_group.product_group_name,
+          "ru"
+        ),
+        filterDropdown: ({
+          setSelectedKeys,
+          selectedKeys,
+          confirm,
+          clearFilters,
+        }) => (
+          <StatusFilter
+            options={CategoryOption}
+            setSelectedKeys={setSelectedKeys}
+            selectedKeys={selectedKeys.map((key) => String(key))}
+            confirm={confirm}
+            clearFilters={() => clearFilters && clearFilters()}
+          />
+        ),
+        onFilter: (value, record) =>
+          record.product_group.product_group_id === Number(value),
+      render: (productGroup: IProductGroup) => productGroup?.product_group_name,
     },
     {
       title: "ОМС/ПУ",

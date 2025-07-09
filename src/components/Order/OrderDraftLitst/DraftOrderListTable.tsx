@@ -40,6 +40,20 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
       })
     : [];
 
+    const CategoryOption = OrderData
+    ? Array.from(
+        new Set(OrderData.map((order) => order?.product_group?.product_group_id))
+      ).map((id) => {
+        const orderCategory = OrderData.find(
+          (order) => order?.product_group?.product_group_id === id
+        )?.product_group;
+        return {
+          value: String(orderCategory?.product_group_id),
+          label: orderCategory?.product_group_name || "",
+        };
+      })
+    : [];
+
   const { mutate: deleteDraftOrderByIdMutation } = useDeleteDraftOrderByIdMutation();
   const setDraftOrderId = useOrderIdStore((state) => state.setDraftOrderId);
   const columns: TableColumnsType<IDraftOrderItem> = [
@@ -220,11 +234,27 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
       dataIndex: "product_group",
       showSorterTooltip: { title: "Сортировка по категориям" },
       key: "product_group",
-      sorter: (a: IDraftOrderItem, b: IDraftOrderItem) =>
+      sorter: (a: IOrderItem, b: IOrderItem) =>
         a.product_group.product_group_name.localeCompare(
           b.product_group.product_group_name,
           "ru"
         ),
+        filterDropdown: ({
+          setSelectedKeys,
+          selectedKeys,
+          confirm,
+          clearFilters,
+        }) => (
+          <StatusFilter
+            options={CategoryOption}
+            setSelectedKeys={setSelectedKeys}
+            selectedKeys={selectedKeys.map((key) => String(key))}
+            confirm={confirm}
+            clearFilters={() => clearFilters && clearFilters()}
+          />
+        ),
+        onFilter: (value, record) =>
+          record.product_group.product_group_id === Number(value),
       render: (productGroup: IProductGroup) => productGroup?.product_group_name,
     },
     {
