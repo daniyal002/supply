@@ -7,6 +7,12 @@ import {
 import { IProductUnit } from "./product";
 import { IUnit } from "./unit";
 
+export interface IOrderProductStatus{
+  product_status_id?:number;
+  product_status_name?:string;
+  product_status_color?:string
+}
+
 export interface IProductTable {
   order_product_id: number | undefined;
   product: IProductUnit;
@@ -20,6 +26,7 @@ export interface IProductTable {
   product_previous_orders: IProductPreviousOrders[];
   is_cancel?: boolean;
   note?: string;
+  order_product_status?:IOrderProductStatus
 }
 
 export interface IProductTableRequest {

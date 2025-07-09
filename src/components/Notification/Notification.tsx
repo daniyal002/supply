@@ -19,7 +19,7 @@ export default function Notification() {
             return;
           }
 
-          const socket = new WebSocket(`ws://192.168.30.153:8000/notify/ws?token=${accessToken}`);
+          const socket = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/notify/ws?token=${accessToken}`);
 
           socket.onopen = () => {
             console.log("WebSocket connection established");

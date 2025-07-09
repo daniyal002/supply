@@ -1,6 +1,6 @@
 import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import { IProductTable } from "@/interface/productTable";
+import { IOrderProductStatus, IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
 import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
@@ -248,6 +248,24 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "note",
       key: "note",
       responsive: ["sm"],
+    },
+    {
+      title: "Статус товара",
+      dataIndex: "order_product_status",
+      key: "order_product_status",
+      // responsive: ["sm"],
+      render: (order_product_status:IOrderProductStatus) => <p
+      style={{
+        backgroundColor: order_product_status?.product_status_name,
+        color: "#fff",
+        padding: "10px",
+        textAlign: "center",
+        textTransform: "uppercase",
+        borderRadius: "5px",
+      }}
+    >
+      {order_product_status?.product_status_name}
+    </p>
     },
     {
       title: "Действия",
