@@ -223,16 +223,18 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name: hasProductId
-              ? ""
-              : hasOrderProductName
-              ? product.order_product_name
-              : "",
-            order_product_link: hasProductId
-              ? ""
-              : hasOrderProductName
-              ? product.order_product_link
-              : "",
+            // order_product_name: hasProductId
+            //   ? ""
+            //   : hasOrderProductName
+            //   ? product.order_product_name
+            //   : "",
+            // order_product_link: hasProductId
+            //   ? ""
+            //   : hasOrderProductName
+            //   ? product.order_product_link
+            //   : "",
+            order_product_name:product?.order_product_name,
+            order_product_link:product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: 8,
             note: product.note,
