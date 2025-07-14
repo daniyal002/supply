@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ConfigProvider, Tabs } from "antd";
+import {  Tabs } from "antd";
 import { useOrderIdStore } from "../../../store/orderIdStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTabStore } from "../../../store/tabStore";
@@ -128,7 +128,6 @@ const remove = (targetKey: TargetKey) => {
 
 
   return (
-    <ConfigProvider theme={{token:{colorPrimary:"#678098"}}}>
       <Tabs
         type="editable-card"
         onChange={onChange}
@@ -139,7 +138,5 @@ const remove = (targetKey: TargetKey) => {
         destroyInactiveTabPane={false}
         defaultActiveKey={activeTabAdminOrders}
       />
-    </ConfigProvider>
-
   );
 }

@@ -27,7 +27,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
       style={{ width: 188, marginBottom: 8, display: 'block' }}
     />
 
-    <Button onClick={() => {clearFilters(); confirm();} } size="small" style={{ width: 90 }}>
+    <Button type="primary" onClick={() => {clearFilters(); confirm();} } size="small" style={{ width: 90 }}>
       Сбросить
     </Button>
   </div>

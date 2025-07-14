@@ -14,7 +14,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FloatButton, message, Spin, Tabs } from "antd";
+import { Button, FloatButton, message, Spin, Tabs } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -23,6 +23,7 @@ import { MoveLeft } from "lucide-react";
 import ModalSaveOrder from "./ModalSaveOrder/ModalSaveOrder";
 import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
@@ -363,17 +364,23 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           }
         >
           {toggle && (
-            <FloatButton
-              onClick={() => setToggle(!toggle)}
-              icon={<MoveLeft size={32} style={{ paddingRight: "6px" }} />}
-              type="primary"
-              style={{
-                insetInlineStart: 80,
-                width: "45px",
-                height: "45px",
-                paddingRight: "5px",
-              }}
-            />
+            <Button
+            type="primary"
+            // ghost
+            icon={<ArrowLeftOutlined />}
+            onClick={() => setToggle(!toggle)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "start",
+              marginTop: 10,
+              marginBottom: 10,
+              fontWeight: 500,
+              width:"100px"
+            }}
+          >
+            Назад
+          </Button>
           )}
 
           <SelectProductOrder

@@ -1,12 +1,12 @@
 "use client";
 
-import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IDraftOrderItem, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
-import { DeleteFilled, EyeTwoTone, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteFilled, EyeTwoTone, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
@@ -338,13 +338,7 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
 
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#678098",
-        },
-      }}
-    >
+
       <Table
         dataSource={dataSource}
         columns={columns}
@@ -361,9 +355,6 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
         locale={{emptyText:"Нет черновиков"}}
         loading={loading}
       />
-
-
-    </ConfigProvider>
   );
 };
 

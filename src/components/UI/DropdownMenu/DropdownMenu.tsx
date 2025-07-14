@@ -1,4 +1,4 @@
-import { Badge, Button, ConfigProvider, Divider, Dropdown, Space } from "antd";
+import { Badge, Button, Divider, Dropdown, Space, theme } from "antd";
 import { MenuProps } from "antd/lib";
 import { Bell } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -10,6 +10,7 @@ import {
 } from "@/hook/notificationHook";
 import { useTabStore } from "../../../../store/tabStore";
 import { useApprovalStore } from "../../../../store/approvalStore";
+import { BellOutlined } from "@ant-design/icons";
 
 export default function DropdownMenu() {
   const notifications = useNotificationStore((state) => state.notifications);
@@ -57,31 +58,32 @@ export default function DropdownMenu() {
                     notification.data_id
                   )
                 }
-              >
+              ><p>
+
                 {`${
                   notification.notification_message
                 } - ${formatNotificationDate(notification.created_at)}`}
+              </p>
+
               </div>
             ),
           }))
         : [
             {
               key: "no-data",
-              label: "Нет новых уведомлений",
+              label: (<p>Нет новых уведомлений</p>),
               disabled: true,
             },
           ]
     );
   }, [notifications]);
 
+  const {
+    token: { Layout,Badge:BadgeToken},
+  } = theme.useToken();
+
+
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#678098",
-        },
-      }}
-    >
       <Dropdown
         menu={{ items }}
         trigger={["click"]}
@@ -89,7 +91,7 @@ export default function DropdownMenu() {
         dropdownRender={(menu) => (
           <div
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: Layout?.headerBg,
               boxShadow:
                 "0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",
               borderRadius: "8px",
@@ -120,7 +122,8 @@ export default function DropdownMenu() {
                   <Button
                     type="primary"
                     onClick={() => readAllNotification()}
-                    style={{ width: "100%" }} // Растягиваем кнопку на всю ширину
+                    //@ts-ignore
+                    style={{ width: "100%"}} // Растягиваем кнопку на всю ширину
                   >
                     Прочитать все уведомления
                   </Button>
@@ -135,7 +138,6 @@ export default function DropdownMenu() {
             count={notifications.length}
             size="small"
             style={{
-              backgroundColor: "#678098",
               boxShadow: "none",
               marginTop: 1,
               marginRight: 2,
@@ -143,17 +145,15 @@ export default function DropdownMenu() {
             }}
             offset={[5, -5]}
           >
-            <Bell
-              color={"#678098"}
-              size={30}
+            <BellOutlined
               style={{
                 cursor: "pointer",
                 transition: "all 0.3s",
+                fontSize:"32px"
               }}
             />
           </Badge>
         </Space>
       </Dropdown>
-    </ConfigProvider>
   );
 }

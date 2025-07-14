@@ -5,9 +5,8 @@ import { useApprovalOrders } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { ConfigProvider, DatePicker } from "antd";
+import {  DatePicker } from "antd";
 import moment from "moment";
-import locale from "antd/locale/ru_RU";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 
@@ -56,10 +55,7 @@ export default function ApprovalList() {
   return (
     <div className={style.orderList}>
       <Toaster />
-      <ConfigProvider
-        locale={locale}
-        theme={{ token: { colorPrimary: "#678098" } }}
-      >
+
         <RangePicker
           //@ts-ignore
           value={dateRange}
@@ -68,7 +64,6 @@ export default function ApprovalList() {
           style={{ marginBottom: 16 }}
           format="DD.MM.YYYY"
         />
-      </ConfigProvider>
       <ApprovalListTable OrderData={filteredOrderData} loading={isLoading} />
     </div>
   );

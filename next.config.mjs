@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental:{appDocumentPreloading:true},
+    experimental:{appDocumentPreloading:true,viewTransition:true},
     reactStrictMode:false,
 };
 

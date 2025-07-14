@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { IEmployee } from "@/interface/employee";
 import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
@@ -318,13 +318,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
     );
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#678098",
-        },
-      }}
-    >
+
       <Table
         dataSource={dataSource}
         columns={columns}
@@ -344,7 +338,6 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
         locale={{emptyText:"Нет заявок"}}
         loading={loading}
       />
-    </ConfigProvider>
   );
 };
 

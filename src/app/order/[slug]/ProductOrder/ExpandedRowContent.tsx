@@ -2,8 +2,7 @@ import { formatNotificationDate } from "@/helper/DataFormat";
 import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
-import { CloseOutlined } from "@ant-design/icons";
-import { Collapse, ConfigProvider, Space, Table } from "antd";
+import { Collapse, Space, Table } from "antd";
 
 interface Props {
   orderProductComments: IOrderProductCommentsResponse[];
@@ -47,15 +46,6 @@ export const ExpandedRowContent = ({
               key: "comments-panel", // Уникальный ключ для панели
               label: "Комментарии к товару", // Заголовок (можно оставить пустым)
               children: (
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Table: {
-                        colorBgContainer: "#cadce8",
-                      },
-                    },
-                  }}
-                >
                   <Table
                     dataSource={dataSourceProductComments}
                     columns={[
@@ -82,7 +72,6 @@ export const ExpandedRowContent = ({
                     ]}
                     pagination={false}
                   />
-                </ConfigProvider>
               ),
             },
           ]}
@@ -98,15 +87,7 @@ export const ExpandedRowContent = ({
               key: "product-previous-orders-panel", // Уникальный ключ для панели
               label: "Предыдущие заказы c первого числа текущего месяца", // Заголовок (можно оставить пустым)
               children: (
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Table: {
-                        colorBgContainer: "#cadce8",
-                      },
-                    },
-                  }}
-                >
+
                   <Table
                     dataSource={dataSourceProductPreviousOrders}
                     columns={[
@@ -134,7 +115,6 @@ export const ExpandedRowContent = ({
                     ]}
                     pagination={false}
                   />
-                </ConfigProvider>
               ),
             },
           ]}

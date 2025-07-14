@@ -3,10 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.scss";
 import QueryClientContextProvider from "./QueryClientContextProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import Header from "@/components/UI/Header/Header";
-import SiderL from "@/components/UI/Sider/Sider";
-import style from "./layout.module.scss"
 import MainLayout from "@/components/UI/MainLayout/MainLayout";
+import AntdConfigProvider from "./AntdConfigProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,17 +28,13 @@ export default function RootLayout({
       </head>
       <AntdRegistry>
         <QueryClientContextProvider>
+        <AntdConfigProvider>
           <body className={inter.className}>
-            {/* <Header />
-            <div  className={style.layout}>
-            <SiderL />
-            <main className="main">
-            </main>
-            </div> */}
             <MainLayout>
             {children}
             </MainLayout>
           </body>
+            </AntdConfigProvider>
         </QueryClientContextProvider>
       </AntdRegistry>
     </html>

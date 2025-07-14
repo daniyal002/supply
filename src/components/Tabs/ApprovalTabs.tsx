@@ -1,7 +1,7 @@
 "use client";
 
-import React, { memo, useEffect, useRef, useState } from "react";
-import { ConfigProvider, Tabs } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import {Tabs } from "antd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useApprovalStore } from "../../../store/approvalStore";
 import ApprovalOrder from "@/app/approval/[slug]/ApprovalOrder";
@@ -111,7 +111,6 @@ export default function ApprovalTabs() {
   };
 
   return (
-    <ConfigProvider theme={{ token: { colorPrimary: "#678098" } }}>
       <Tabs
         hideAdd
         type="editable-card"
@@ -123,6 +122,5 @@ export default function ApprovalTabs() {
         destroyInactiveTabPane={false}
         defaultActiveKey={activeTabApproval}
       />
-    </ConfigProvider>
   );
 }

@@ -1,13 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import OrderListTable from "./DraftOrderListTable";
-import { useOrderUserData } from "@/hook/orderHook";
 import style from "./DraftOrderList.module.scss";
 import { toast, Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { Button, ConfigProvider, DatePicker } from "antd";
+import { Button, DatePicker } from "antd";
 import moment from "moment";
-import locale from "antd/locale/ru_RU";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { useDeleteDraftOrderAllMutation, useDraftOrderUserData } from "@/hook/orderTempHook";
@@ -70,10 +68,6 @@ export default function DraftOrderList() {
                 })
               }>Удалить все черновики</Button>
       <Toaster />
-      <ConfigProvider
-        locale={locale}
-        theme={{ token: { colorPrimary: "#678098" } }}
-      >
         <RangePicker
           //@ts-ignore
           value={dateRange}
@@ -82,7 +76,6 @@ export default function DraftOrderList() {
           style={{ marginBottom: 16 }}
           format="DD.MM.YYYY"
         />
-      </ConfigProvider>
       <OrderListTable OrderData={filteredOrderData} loading={isLoading} />
     </div>
   );

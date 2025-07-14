@@ -2,10 +2,8 @@
 
 import {
   Button,
-  ConfigProvider,
   Input,
   Popconfirm,
-  PopconfirmProps,
   Space,
   Table,
   TableColumnsType,
@@ -16,7 +14,6 @@ import { IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import {
   useArchiveOrderMutation,
-  useDeleteOrderMutation,
   useForceSubmitOrderTo1cMutation,
   useResetOrderMutation,
 } from "@/hook/orderHook";
@@ -27,7 +24,6 @@ import {
   ReloadOutlined,
   SearchOutlined,
   SendOutlined,
-  SyncOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
@@ -35,7 +31,7 @@ import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { IUser } from "@/interface/user";
-import { MouseEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IProductGroup } from "@/interface/product";
 
@@ -424,13 +420,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
   })).filter((order) => order.is_archive === isArchive);
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#678098",
-        },
-      }}
-    >
+
       <Table
         dataSource={dataSource}
         columns={columns}
@@ -445,7 +435,6 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
           onDoubleClick: () => setAdminOrderId(String(record.order_id)),
         })}
       />
-    </ConfigProvider>
   );
 };
 

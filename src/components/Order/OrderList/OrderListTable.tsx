@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ConfigProvider, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { IOrderItem } from "@/interface/orderItem";
@@ -379,13 +379,8 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#678098",
-        },
-      }}
-    >
+
+    <>
       <Table
         dataSource={dataSource}
         columns={columns}
@@ -414,7 +409,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         onClose={() => setContextMenu((prev) => ({ ...prev, visible: false }))}
         onCopy={handleCopyOrder}
       />
-    </ConfigProvider>
+      </>
   );
 };
 

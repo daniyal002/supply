@@ -10,7 +10,9 @@ import {
   IdcardOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  MoonOutlined,
   ShopOutlined,
+  SunOutlined,
   TagsOutlined,
   TeamOutlined,
   UnorderedListOutlined,
@@ -19,7 +21,6 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
-  ConfigProvider,
   Layout,
   Menu,
   Tooltip,
@@ -35,6 +36,7 @@ import { useLogout } from "@/hook/useAuth";
 import { db } from "@/db/db";
 import { usePathname, useRouter } from "next/navigation";
 import { protectedRoutes, isRole } from "@/helper/ProtectedRoutes";
+import { useThemeStore } from "../../../../store/themeStore";
 
 const { Header, Sider, Content } = Layout;
 
@@ -57,7 +59,7 @@ const MainLayout = ({
   const [isMobile, setIsMobile] = useState(false);
 
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { borderRadiusLG,Layout:LayoutToken },
   } = theme.useToken();
 
   const setLogin = useHeaderStore((state) => state.setLogin);
@@ -191,17 +193,24 @@ const MainLayout = ({
     }
   };
 
+  const {setSupplyTheme,supplyTheme} = useThemeStore()
+
+  const editTheme = () => {
+    supplyTheme === "light" ? setSupplyTheme("dark") : setSupplyTheme("light")
+
+  }
+
   if (path === "/login") {
     return <>{children}</>;
   }
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#678098" }}>
+
+    <Layout style={{ minHeight: "100vh", backgroundColor: LayoutToken?.headerBg}}>
       <Sider
         trigger={null}
         collapsible={!isMobile}
         collapsed={isMobile ? !isMobileMenuOpen : collapsed}
-        theme="dark"
         className={style.sider}
         style={{
           position: isMobile ? "fixed" : "relative",
@@ -211,27 +220,11 @@ const MainLayout = ({
           top: 0,
           left: 0,
           transition: "all 0.3s ease",
-          background: "#678098",
           overflowY: "auto",
           display: isMobile ? (isMobileMenuOpen ? "block" : "none") : "block",
         }}
       >
-        <ConfigProvider
-          theme={{
-            components: {
-              Menu: {
-                itemSelectedColor: "#fff",
-                itemSelectedBg: "#ffffff4f",
-                itemHoverBg: "#ffffff4f",
-                itemActiveBg: "#678098",
-                itemColor: "#fff",
-                itemHoverColor: "#fff",
-                darkSubMenuItemBg:"#678098",
-                popupBg:"#678098"
-              },
-            },
-          }}
-        >
+
           <Menu
             mode="inline"
             theme="light"
@@ -240,10 +233,8 @@ const MainLayout = ({
             style={{
               maxHeight: "100vh",
               overflowY: "auto",
-              background: "#678098",
             }}
           />
-        </ConfigProvider>
       </Sider>
 
       {/* Overlay для мобильных */}
@@ -262,11 +253,10 @@ const MainLayout = ({
         />
       )}
 
-      <Layout style={{ background: "#fff" }}>
+      <Layout style={{ background: LayoutToken?.headerBg }}>
         <Header
           style={{
             padding: 0,
-            background: colorBgContainer,
             lineHeight: "0",
           }}
           className={style.header}
@@ -275,9 +265,9 @@ const MainLayout = ({
             type="text"
             icon={
               isMobile && isMobileMenuOpen ? (
-                <MenuFoldOutlined />
+                <MenuFoldOutlined style={{color:supplyTheme === 'light' ? "#000" : "#fff"}}/>
               ) : (
-                <MenuUnfoldOutlined />
+                <MenuUnfoldOutlined style={{color:supplyTheme === 'light' ? "#000" : "#fff"}}/>
               )
             }
             onClick={toggleCollapsed}
@@ -289,21 +279,11 @@ const MainLayout = ({
           />
 
           <div className={style.headerBellAndButtons}>
+          <Button onClick={() => editTheme()}>
+            {supplyTheme === "light" ? <SunOutlined /> : <MoonOutlined /> }
+            </Button>
             <DropdownMenu />
-            <div className={style.headerButtons}>
-              <ConfigProvider
-                theme={{
-                  components: {
-                    Button: {
-                      colorPrimaryBorderHover: "red",
-                      colorPrimaryHover: "#678098",
-                      colorPrimary: "#678098",
-                      colorPrimaryActive: "#678098",
-                      colorPrimaryTextHover: "#678098",
-                    },
-                  },
-                }}
-              >
+            <div className={style.headerButtons} style={{backgroundColor:LayoutToken?.siderBg}}>
                 <Button
                   icon={<p>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
@@ -311,8 +291,6 @@ const MainLayout = ({
                     message.info("Пока еще не придумали функционал для этой кнопки")
                   }
                 />
-              </ConfigProvider>
-
               <p className={style.headerLogin}>{login}</p>
               <Tooltip title="Выход">
                 <LogOut
@@ -328,9 +306,8 @@ const MainLayout = ({
         <Content
           style={{
             margin: "15px",
-            // padding: 24,
             minHeight: "calc(100vh - 64px)",
-            background: "#fff",
+            background: LayoutToken?.headerBg,
             borderRadius: borderRadiusLG,
           }}
         >

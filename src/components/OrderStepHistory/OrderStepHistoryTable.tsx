@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  ConfigProvider,
-  Table,
-  TableColumnsType,
-} from "antd";
+import { Table, TableColumnsType } from "antd";
 
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -18,12 +14,15 @@ interface OrderStepHistoryProps {
   OrderStepHistoryData: IStepHistory[] | undefined;
 }
 
-const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHistoryData }) => {
-
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
-  const StatusOption = [{label:"Согласована",value:"Согласована"},{label:"Отклонена",value:"Отклонена"}]
-
-
+const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({
+  OrderStepHistoryData,
+}) => {
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
+  const StatusOption = [
+    { label: "Согласована", value: "Согласована" },
+    { label: "Отклонена", value: "Отклонена" },
+  ];
 
   const columns: TableColumnsType<IStepHistory> = [
     {
@@ -85,31 +84,28 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       },
     },
     {
-        title: "Статус",
-        dataIndex: "status_name",
-        key: "status_name",
-        sorter: (a: IStepHistory, b: IStepHistory) =>
-          a.status_name.localeCompare(
-            b.status_name,
-            "ru"
-          ),
-        render: (status_name: string) => status_name,
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => (
-          <StatusFilter
-            options={StatusOption}
-            setSelectedKeys={setSelectedKeys}
-            selectedKeys={selectedKeys.map(key => String(key))}
-            confirm={confirm}
-            clearFilters={() => clearFilters && clearFilters()}
-          />
-        ),
-        onFilter: (value, record) => record.status_name === value,
-      },
+      title: "Статус",
+      dataIndex: "status_name",
+      key: "status_name",
+      sorter: (a: IStepHistory, b: IStepHistory) =>
+        a.status_name.localeCompare(b.status_name, "ru"),
+      render: (status_name: string) => status_name,
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <StatusFilter
+          options={StatusOption}
+          setSelectedKeys={setSelectedKeys}
+          selectedKeys={selectedKeys.map((key) => String(key))}
+          confirm={confirm}
+          clearFilters={() => clearFilters && clearFilters()}
+        />
+      ),
+      onFilter: (value, record) => record.status_name === value,
+    },
 
     {
       title: "Комментарий",
@@ -118,7 +114,6 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
       sorter: (a: IStepHistory, b: IStepHistory) =>
         a.note.localeCompare(b.note, "ru"),
     },
-
   ];
 
   const dataSource = OrderStepHistoryData?.map((order) => ({
@@ -127,15 +122,12 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({ OrderStepHisto
   }));
 
   return (
-    <ConfigProvider
-    theme={{
-      token: {
-        colorPrimary:"#678098"
-      },
-    }}
-  >
-    <Table dataSource={dataSource} columns={columns} scroll={{ x: 200 }} pagination={{locale:{items_per_page:"/ Шагов"} }}/>
-    </ConfigProvider>
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      scroll={{ x: 200 }}
+      pagination={{ locale: { items_per_page: "/ Шагов" } }}
+    />
   );
 };
 

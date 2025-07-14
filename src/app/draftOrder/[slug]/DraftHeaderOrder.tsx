@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import style from "./DraftHeaderOrder.module.scss";
-import { Checkbox, Select } from "antd";
+import { Checkbox, Input, Select } from "antd";
 import {
   Control,
   Controller,
@@ -35,6 +35,9 @@ export default function HeaderOrder({
   errors,
   disabledOrder,
 }: Props) {
+
+  const { TextArea } = Input;
+
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false);
@@ -324,7 +327,7 @@ export default function HeaderOrder({
       <div className={style.headerOrderTextArea}>
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <textarea
+          <TextArea
             placeholder="Примечание"
             className={style.modalTextArea}
             disabled={disabledOrder}

@@ -375,7 +375,7 @@ export default function DraftOrder({
           {toggle && (
             <Button
             type="primary"
-            ghost
+            // ghost
             icon={<ArrowLeftOutlined />}
             onClick={() => setToggle(!toggle)}
             style={{

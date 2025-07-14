@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import style from "./ApprovalHeaderOrder.module.scss";
-import { Checkbox, Select } from "antd";
+import { Checkbox, Input, Select } from "antd";
 import {
   Control,
   Controller,
@@ -32,6 +32,8 @@ export default function ApprovalHeaderOrder({
   watch,
   errors,
 }: Props) {
+  const { TextArea } = Input;
+
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false)
@@ -258,7 +260,7 @@ export default function ApprovalHeaderOrder({
       <div className={style.headerOrderTextArea}>
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <textarea
+          <TextArea
             placeholder="Примечание"
             disabled
             className={style.modalTextArea}

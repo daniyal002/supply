@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ConfigProvider,
   Table,
   TableColumnsType,
 } from "antd";
@@ -83,13 +82,6 @@ const RouteInfoTable: React.FC<RouteInfoProps> = ({ RouteInfoData }) => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#678098"
-        },
-      }}
-    >
       <Table
         dataSource={dataSource}
         columns={columns}
@@ -97,7 +89,6 @@ const RouteInfoTable: React.FC<RouteInfoProps> = ({ RouteInfoData }) => {
         rowClassName={rowClassName}
         pagination={{ locale: { items_per_page: "/ Шагов" } }}
       />
-    </ConfigProvider>
   );
 };
 

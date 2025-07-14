@@ -14,7 +14,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Button, message, Spin, Tabs } from "antd";
+import { Button, message, Spin, Tabs, theme } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -376,7 +376,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     };
   }, [isModalOpen, toggle]);
 
-
+  const {
+    token: { colorText },
+  } = theme.useToken();
 
   return (
     <div className={style.order}>
@@ -391,7 +393,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       )}
       <div className={style.newOrder}>
         {!toggle ? (
-          <h1>
+          <h1 style={{color:colorText}}>
             {orderid === "newOrder"
               ? "Новая заявка"
               : orderid === `copy${Number(orderid?.split("copy").join(""))}`
@@ -399,7 +401,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
           </h1>
         ) : (
-          <h1>Выбор товара</h1>
+          <h1 style={{color:colorText}}>Выбор товара</h1>
         )}
 
         <div
@@ -412,7 +414,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           {toggle && (
             <Button
               type="primary"
-              ghost
+              // ghost
               icon={<ArrowLeftOutlined />}
               onClick={() => setToggle(!toggle)}
               style={{

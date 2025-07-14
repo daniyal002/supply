@@ -5,9 +5,8 @@ import { useOrdersData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { Button, ConfigProvider, DatePicker } from "antd";
+import { Button, DatePicker } from "antd";
 import moment from "moment";
-import locale from 'antd/locale/ru_RU';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import { BookFilled } from "@ant-design/icons";
@@ -52,7 +51,6 @@ export default function AdminOrderList() {
   return (
     <div className={style.orderList}>
       <Toaster />
-      <ConfigProvider locale={locale} theme={{token:{colorPrimary:"#678098"}}}>
       <RangePicker
       //@ts-ignore
         value={dateRange}
@@ -61,8 +59,6 @@ export default function AdminOrderList() {
         style={{ marginBottom: 16 }}
         format="DD.MM.YYYY"
       />
-      </ConfigProvider>
-
       <Button
         type="primary"
         shape="circle"

@@ -12,7 +12,7 @@ import { IOrderItemFormValues } from "@/interface/orderItem";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import ApprovalHeaderOrder from "./ApprovalHeaderOrder";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
-import { message, Spin, Tabs, TabsProps } from "antd";
+import { Input, message, Spin, Tabs, TabsProps } from "antd";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useNotificationStore } from "../../../../store/notificationStore";
 import { useMarkAsReadNotification } from "@/hook/notificationHook";
@@ -30,6 +30,8 @@ export default function ApprovalOrder({
   remove,
   targetKey,
 }: Props) {
+  const { TextArea } = Input;
+
   const {
     reset,
     watch,
@@ -290,7 +292,7 @@ export default function ApprovalOrder({
         <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
 
         <div className={style.commentAndButtons}>
-          <textarea
+          <TextArea
             placeholder="Комментарий"
             className={style.comment}
             value={note}
