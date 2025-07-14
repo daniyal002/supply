@@ -19,7 +19,7 @@ import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useProductData } from "@/hook/productHook";
-import ModalSaveOrder from "./ModalSaveOrder/ModalSaveOrder";
+import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
 import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { ArrowLeftOutlined } from "@ant-design/icons";

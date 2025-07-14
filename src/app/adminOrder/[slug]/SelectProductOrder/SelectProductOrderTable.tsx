@@ -231,7 +231,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
-      rowClassName={(record) => getValues('order_products')?.find(product => product.product.product_id === record.product_id) ? style.highlightRow : ''}
+      rowClassName={(record) => getValues('order_products')?.find(product => product?.product?.product_id === record?.product_id) ? style.highlightRow : ''}
       locale={{emptyText:"Нет товаров"}}
     />
   );

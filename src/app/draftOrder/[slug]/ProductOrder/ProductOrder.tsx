@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
-import ModalSelectProductOrder from "../SelectProductOrder/ModalSelectProductOrder/ModalSelectProductOrder";
+import ModalSelectProductOrder from "@/components/UI/ModalSelectProductOrder/ModalSelectProductOrder";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { Button, message } from "antd";

@@ -201,7 +201,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     }
   }, [isNewProduct, allMesument, itemProductData]);
 
-
   return (
     <Modal
       title={
@@ -232,7 +231,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                   },
                   pattern: {
                     value:
-                      // /^https?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$/,
                       /^https?:\/\//,
                     message: "Вводить можно только ссылку",
                   },

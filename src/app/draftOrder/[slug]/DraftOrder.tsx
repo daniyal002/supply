@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import style from "./DraftOrder.module.scss";
 import {
   useCreateOrderMutation,
-  useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -12,18 +11,16 @@ import {
   IDraftOrderItemRequest,
   IOrderDraftItemFormValues,
   IOrderItemFormValues,
-  IOrderItemRequest,
 } from "@/interface/orderItem";
 import HeaderOrder from "./DraftHeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Button, FloatButton, message, Spin, Tabs } from "antd";
+import { Button, message, Spin, Tabs } from "antd";
 import { TabsProps } from "antd/lib";
 import { useProductData } from "@/hook/productHook";
-import { MoveLeft } from "lucide-react";
-import ModalSaveOrder from "./ModalSaveOrder/ModalSaveOrder";
+import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
 import {
   useDeleteDraftOrderByIdMutation,
   useGetOrderDraftById,

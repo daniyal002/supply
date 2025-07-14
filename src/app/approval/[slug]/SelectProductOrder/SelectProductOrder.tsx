@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import ModalSelectProductOrder from "./ModalSelectProductOrder/ModalSelectProductOrder";
-import { IProductResponse, IProductUnit } from "@/interface/product";
+import {IProductUnit } from "@/interface/product";
 import SelectProductOrderTableColumn from "./SelectProductOrderTable";
 import { useProductData } from "@/hook/productHook";
 import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
@@ -38,16 +37,6 @@ export default function SelectProductOrder({watch,getValues,setValue}:Props) {
 
   return (
     <>
-      <ModalSelectProductOrder
-        type="Добавить"
-        setIsModalOpen={setIsModalOpen}
-        isModalOpen={isModalOpen}
-        productId={productId}
-        watch={watch}
-        getValues={getValues}
-        setValue={setValue}
-        editProductId={null}
-      />
       <SelectProductOrderTableColumn productData={filterProductData ? filterProductData : []} setProductId={setProductId} showModal={showModal}/>
     </>
   );

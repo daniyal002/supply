@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ModalSelectProductOrder from "./ModalSelectProductOrder/ModalSelectProductOrder";
+import ModalSelectProductOrder from "@/components/UI/ModalSelectProductOrder/ModalSelectProductOrder";
 import { IProductUnit } from "@/interface/product";
 import SelectProductOrderTableColumn from "./SelectProductOrderTable";
 import { useProductData } from "@/hook/productHook";
