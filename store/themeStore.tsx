@@ -9,7 +9,7 @@ interface IThemeStore {
 export const useThemeStore = create<IThemeStore>()(
   devtools(
     (set, get) => ({
-      supplyTheme: "dark",
+      supplyTheme: "light",
       setSupplyTheme(supplyTheme) {
         set({ supplyTheme });
       },

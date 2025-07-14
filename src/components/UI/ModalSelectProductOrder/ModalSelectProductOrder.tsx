@@ -1,4 +1,4 @@
-import { Modal, Select } from "antd";
+import { Input, Modal, Select } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Controller,
@@ -177,26 +177,27 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
   const optionsUnit = useMemo(() => {
     if (isNewProduct) {
-      return allMesument?.map((unit) => ({
+      // Если allMesument пуст, добавляем placeholder-опцию
+      if (!allMesument || allMesument.length === 0) {
+        return [{ value: 0, label: "Единица измерения" }];
+      }
+      return allMesument.map((unit) => ({
         value: unit.unit_measurement_id,
         label: unit.unit_measurement_name,
       }));
     } else {
       return (
-        itemProductData?.directory_unit_measurement?.reduce(
-          (acc, item) => {
-            const id = item.unit_measurement.unit_measurement_id;
-            const existing = acc.find((opt) => opt.value === id);
-            if (!existing) {
-              acc.push({
-                value: id as number,
-                label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
-              });
-            }
-            return acc;
-          },
-          [] as { value: number; label: string }[]
-        ) || []
+        itemProductData?.directory_unit_measurement?.reduce((acc, item) => {
+          const id = item.unit_measurement.unit_measurement_id;
+          const existing = acc.find((opt) => opt.value === id);
+          if (!existing) {
+            acc.push({
+              value: id as number,
+              label: `${item.unit_measurement.unit_measurement_name}(${item.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
+            });
+          }
+          return acc;
+        }, [] as { value: number; label: string }[]) || []
       );
     }
   }, [isNewProduct, allMesument, itemProductData]);
@@ -220,22 +221,29 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           <>
             <div className={style.formItem}>
               <label className={style.formItemLabel}>Ссылка на товар</label>
-              <input
-                type="text"
-                placeholder="Ссылка на товар"
-                className={style.modalName}
-                {...register("order_product_link", {
+              <Controller
+                name="order_product_link"
+                control={control}
+                rules={{
                   required: {
                     value: isNewProduct,
                     message: "Ссылка обязательна",
                   },
                   pattern: {
-                    value:
-                      /^https?:\/\//,
+                    value: /^https?:\/\//,
                     message: "Вводить можно только ссылку",
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="Ссылка на товар"
+                    className={style.modalName}
+                  />
+                )}
               />
+
               {errors.order_product_link && (
                 <p className={style.error}>
                   {errors.order_product_link.message}
@@ -245,17 +253,25 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
             <div className={style.formItem}>
               <label className={style.formItemLabel}>Наименование товара</label>
-              <input
-                type="text"
-                placeholder="Наименование товара"
-                className={style.modalName}
-                {...register("order_product_name", {
+              <Controller
+                name="order_product_name"
+                control={control}
+                rules={{
                   required: {
                     value: isNewProduct,
                     message: "Наименование товара обязательна",
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    placeholder="Наименование товара"
+                    className={style.modalName}
+                    {...field}
+                  />
+                )}
               />
+
               {errors.order_product_name && (
                 <p className={style.error}>
                   {errors.order_product_name.message}
@@ -267,18 +283,26 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Количество</label>
-          <input
-            type="text"
-            placeholder="Количество"
-            className={style.modalName}
-            {...register("product_quantity", {
+          <Controller
+            name="product_quantity"
+            control={control}
+            rules={{
               required: { value: true, message: "Количество обязательно" },
               pattern: {
                 value: /^[0-9]*\.?[0-9]+$/, // Обновленное регулярное выражение для целых и дробных чисел
                 message: "Введите корректное число", // Сообщение об ошибке
               },
-            })}
+            }}
+            render={({ field }) => (
+              <Input
+                type="text"
+                placeholder="Количество"
+                className={style.modalName}
+                {...field}
+              />
+            )}
           />
+
           {errors.product_quantity && (
             <p className={style.error}>{errors.product_quantity.message}</p>
           )}
@@ -300,12 +324,13 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             render={({ field }) => (
               <Select
                 {...field}
-                options={optionsUnit}
-                onChange={(value, option) =>{
-                  // @ts-ignore: Unreachable code error
-                  field.onChange({ value, label: option.label })}
-                }
                 placeholder="Единица измерения"
+                options={optionsUnit}
+                onChange={(value, option) => {
+                  // @ts-ignore: Unreachable code error
+                  field.onChange({ value, label: option.label });
+                }}
+
               />
             )}
           />
@@ -339,18 +364,24 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                       .includes(input.toLowerCase())
                   }
                   placeholder="Врач"
-                  onChange={(value,option) => field.onChange(option)} // Передаём только значение
-                  />
+                  onChange={(value, option) => field.onChange(option)} // Передаём только значение
+                />
               )}
             />
           </div>
         )}
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <textarea
-            placeholder="Примечание"
-            className={style.modalTextArea}
-            {...register("note")}
+          <Controller
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <Input.TextArea
+                placeholder="Примечание"
+                className={style.modalTextArea}
+                {...field}
+              />
+            )}
           />
         </div>
 
