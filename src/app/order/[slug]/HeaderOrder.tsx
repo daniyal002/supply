@@ -43,10 +43,9 @@ export default function HeaderOrder({
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
 
-const storageId = useWatch({ control, name: 'storage_id' });
-const employeeId = useWatch({ control, name: 'employee_id' });
-const departmentId = useWatch({ control, name: 'department_id' });
-
+  const storageId = useWatch({ control, name: "storage_id" });
+  const employeeId = useWatch({ control, name: "employee_id" });
+  const departmentId = useWatch({ control, name: "department_id" });
 
   useEffect(() => {
     if (isProductInTable && isProductInTable.length > 0) {
@@ -127,8 +126,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-
-        {/* <div className={style.formItem}>
+          {/* <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
               control={control}
@@ -168,11 +166,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
               control={control}
               name="oms"
               render={({ field }) => (
-                <Checkbox
-                  {...field}
-                  checked={field.value}
-                  disabled={true}
-                />
+                <Checkbox {...field} checked={field.value} disabled={true} />
               )}
             />
           </div>
@@ -196,25 +190,27 @@ const departmentId = useWatch({ control, name: 'department_id' });
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-
                   onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
                     setValue("storage_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
-                    GetMeData?.employee?.storages?.find(storage => storage.storage_id === getValues('storage_id.value'))?.oms ? setValue('oms', true) : setValue('oms', false)
+                    GetMeData?.employee?.storages?.find(
+                      (storage) =>
+                        storage.storage_id === getValues("storage_id.value")
+                    )?.oms
+                      ? setValue("oms", true)
+                      : setValue("oms", false);
                   }}
                   placeholder="Склад"
                   className={style.formItemSelect}
                 />
               )}
             />
-            {errors && (
+            {errors.storage_id && (
               <p className={style.error}>{errors.storage_id?.message}</p>
             )}
           </div>
-
-
         </div>
 
         <div className={style.EmployeeDepartmentCategory}>
@@ -248,15 +244,13 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
+            {errors.employee_id && (
               <p className={style.error}>{errors.employee_id?.message}</p>
             )}
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>
-              Подразделение
-            </label>
+            <label className={style.formItemLabel}>Подразделение</label>
             <Controller
               control={control}
               name="department_id"
@@ -266,7 +260,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
               render={({ field }) => (
                 <Select
                   {...field}
-                  disabled={disabledOrder || !employeeId  }
+                  disabled={disabledOrder || !employeeId}
                   options={optionsDepartment}
                   showSearch
                   filterOption={(input, option) =>
@@ -283,15 +277,13 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
+            {errors.department_id && (
               <p className={style.error}>{errors.department_id?.message}</p>
             )}
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>
-              Категория товара
-            </label>
+            <label className={style.formItemLabel}>Категория товара</label>
             <Controller
               control={control}
               name="product_group"
@@ -303,7 +295,9 @@ const departmentId = useWatch({ control, name: 'department_id' });
                   {...field}
                   options={optionsProductGroup1}
                   // disabled={disabledOrder ? true : productSelect ? true : false}
-                  disabled={disabledOrder || productSelect || !departmentId?.value}
+                  disabled={
+                    disabledOrder || productSelect || !departmentId?.value
+                  }
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? "")
@@ -319,8 +313,8 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
-              <p className={style.error}>{errors.department_id?.message}</p>
+            {errors.product_group && (
+              <p className={style.error}>{errors.product_group?.message}</p>
             )}
           </div>
         </div>
@@ -328,11 +322,17 @@ const departmentId = useWatch({ control, name: 'department_id' });
       <div className={style.headerOrderTextArea}>
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <TextArea
-            placeholder="Примечание"
-            className={style.modalTextArea}
-            disabled={disabledOrder}
-            {...register("note")}
+          <Controller
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <TextArea
+                placeholder="Примечание"
+                className={style.modalTextArea}
+                disabled={disabledOrder}
+                {...field}
+              />
+            )}
           />
         </div>
       </div>

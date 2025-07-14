@@ -210,7 +210,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
+            {errors.storage_id && (
               <p className={style.error}>{errors.storage_id?.message}</p>
             )}
           </div>
@@ -249,7 +249,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
+            {errors.employee_id && (
               <p className={style.error}>{errors.employee_id?.message}</p>
             )}
           </div>
@@ -284,7 +284,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
+            {errors.department_id && (
               <p className={style.error}>{errors.department_id?.message}</p>
             )}
           </div>
@@ -320,8 +320,8 @@ const departmentId = useWatch({ control, name: 'department_id' });
                 />
               )}
             />
-            {errors && (
-              <p className={style.error}>{errors.department_id?.message}</p>
+            {errors.product_group && (
+              <p className={style.error}>{errors.product_group?.message}</p>
             )}
           </div>
         </div>
@@ -329,11 +329,17 @@ const departmentId = useWatch({ control, name: 'department_id' });
       <div className={style.headerOrderTextArea}>
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <TextArea
-            placeholder="Примечание"
-            className={style.modalTextArea}
-            disabled={disabledOrder}
-            {...register("note")}
+          <Controller
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <TextArea
+                placeholder="Примечание"
+                className={style.modalTextArea}
+                disabled={disabledOrder}
+                {...field}
+              />
+            )}
           />
         </div>
       </div>

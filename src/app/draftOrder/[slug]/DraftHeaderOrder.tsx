@@ -211,8 +211,8 @@ export default function HeaderOrder({
                 />
               )}
             />
-            {errors && (
-              <p className={style.error}>{errors.employee_id?.message}</p>
+            {errors.storage_id && (
+              <p className={style.error}>{errors.storage_id?.message}</p>
             )}
           </div>
         </div>
@@ -248,7 +248,7 @@ export default function HeaderOrder({
                 />
               )}
             />
-            {errors && (
+            {errors.employee_id && (
               <p className={style.error}>{errors.employee_id?.message}</p>
             )}
           </div>
@@ -283,7 +283,7 @@ export default function HeaderOrder({
                 />
               )}
             />
-            {errors && (
+            {errors.department_id && (
               <p className={style.error}>{errors.department_id?.message}</p>
             )}
           </div>
@@ -318,8 +318,8 @@ export default function HeaderOrder({
                 />
               )}
             />
-            {errors && (
-              <p className={style.error}>{errors.department_id?.message}</p>
+            {errors.product_group && (
+              <p className={style.error}>{errors.product_group?.message}</p>
             )}
           </div>
         </div>
@@ -327,11 +327,17 @@ export default function HeaderOrder({
       <div className={style.headerOrderTextArea}>
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <TextArea
-            placeholder="Примечание"
-            className={style.modalTextArea}
-            disabled={disabledOrder}
-            {...register("note")}
+          <Controller
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <TextArea
+                placeholder="Примечание"
+                className={style.modalTextArea}
+                disabled={disabledOrder}
+                {...field}
+              />
+            )}
           />
         </div>
       </div>
