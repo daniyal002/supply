@@ -262,12 +262,12 @@ const MainLayout = ({
           className={style.header}
         >
           <Button
-            type="text"
+            type="link"
             icon={
-              isMobile && isMobileMenuOpen ? (
-                <MenuFoldOutlined style={{color:supplyTheme === 'light' ? "#000" : "#fff"}}/>
+             collapsed ? (
+              <MenuUnfoldOutlined />
               ) : (
-                <MenuUnfoldOutlined style={{color:supplyTheme === 'light' ? "#000" : "#fff"}}/>
+                <MenuFoldOutlined/>
               )
             }
             onClick={toggleCollapsed}

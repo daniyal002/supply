@@ -1,6 +1,5 @@
-import { Badge, Button, Divider, Dropdown, Space, theme } from "antd";
+import { Badge, Button, Divider, Dropdown, Space } from "antd";
 import { MenuProps } from "antd/lib";
-import { Bell } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNotificationStore } from "../../../../store/notificationStore";
 import { formatNotificationDate } from "@/helper/DataFormat";
@@ -78,9 +77,6 @@ export default function DropdownMenu() {
     );
   }, [notifications]);
 
-  const {
-    token: { Layout,Badge:BadgeToken},
-  } = theme.useToken();
 
 
   return (
@@ -91,7 +87,6 @@ export default function DropdownMenu() {
         dropdownRender={(menu) => (
           <div
             style={{
-              backgroundColor: Layout?.headerBg,
               boxShadow:
                 "0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",
               borderRadius: "8px",

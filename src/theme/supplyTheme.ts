@@ -94,13 +94,15 @@ export const darkTheme: ThemeConfig = {
       headerBg: "#252628", // Почти черный для шапки
     },
     Dropdown: {
-      colorBgElevated: "#252628",
+      colorBgContainer:"#fff",
+      colorBgElevated: "#3d3e40",
       colorText: "#fff",
       colorTextDisabled: "#878686",
     },
     Badge: {
       colorBgBase: "#fff",
       colorText: "#fff",
+
     },
     Tabs: {
       colorPrimary: "#fff",
