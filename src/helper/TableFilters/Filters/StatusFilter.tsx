@@ -7,6 +7,7 @@ interface StatusFilterProps {
   selectedKeys: string[];
   confirm: () => void;
   clearFilters: () => void;
+  placeholder:string;
 }
 
 const StatusFilter: React.FC<StatusFilterProps> = ({
@@ -15,6 +16,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   selectedKeys,
   confirm,
   clearFilters,
+  placeholder
 }) => (
   <div style={{ padding: 8 }}>
     <Select
@@ -25,6 +27,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         confirm();
       }}
       style={{ width: 188, marginBottom: 8, display: 'block' }}
+      placeholder={placeholder}
     />
 
     <Button type="primary" onClick={() => {clearFilters(); confirm();} } size="small" style={{ width: 90 }}>

@@ -165,6 +165,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
           selectedKeys={selectedKeys.map((key) => String(key))}
           confirm={confirm}
           clearFilters={() => clearFilters && clearFilters()}
+          placeholder="Статус"
         />
       ),
       onFilter: (value, record) =>
@@ -230,6 +231,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({ OrderData,loading }) =
             selectedKeys={selectedKeys.map((key) => String(key))}
             confirm={confirm}
             clearFilters={() => clearFilters && clearFilters()}
+            placeholder="Категория"
           />
         ),
         onFilter: (value, record) =>

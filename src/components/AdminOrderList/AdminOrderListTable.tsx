@@ -200,6 +200,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
           selectedKeys={selectedKeys.map((key) => String(key))}
           confirm={confirm}
           clearFilters={() => clearFilters && clearFilters()}
+          placeholder="Статус"
         />
       ),
       onFilter: (value, record) =>
@@ -303,6 +304,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
             selectedKeys={selectedKeys.map((key) => String(key))}
             confirm={confirm}
             clearFilters={() => clearFilters && clearFilters()}
+            placeholder="Статус"
           />
         ),
         onFilter: (value, record) =>

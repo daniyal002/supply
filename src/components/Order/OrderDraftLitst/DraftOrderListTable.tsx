@@ -163,6 +163,7 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
           selectedKeys={selectedKeys.map((key) => String(key))}
           confirm={confirm}
           clearFilters={() => clearFilters && clearFilters()}
+          placeholder="Статус"
         />
       ),
       onFilter: (value, record) =>
@@ -251,6 +252,7 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
             selectedKeys={selectedKeys.map((key) => String(key))}
             confirm={confirm}
             clearFilters={() => clearFilters && clearFilters()}
+            placeholder="Категория"
           />
         ),
         onFilter: (value, record) =>

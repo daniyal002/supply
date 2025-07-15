@@ -9,6 +9,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import { useMemo } from "react";
 
 interface OrderStepHistoryProps {
   OrderStepHistoryData: IStepHistory[] | undefined;
@@ -19,10 +20,15 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
-  const StatusOption = [
-    { label: "Согласована", value: "Согласована" },
-    { label: "Отклонена", value: "Отклонена" },
-  ];
+  const StatusOption = useMemo(
+    () => Array.from(new Set(OrderStepHistoryData?.map((order) => (
+      order.status_name
+       )) )).map(status => ({
+      value:status,
+      label: status
+    })) || []
+  ,[OrderStepHistoryData])
+
 
   const columns: TableColumnsType<IStepHistory> = [
     {
@@ -102,6 +108,7 @@ const OrderStepHistoryTable: React.FC<OrderStepHistoryProps> = ({
           selectedKeys={selectedKeys.map((key) => String(key))}
           confirm={confirm}
           clearFilters={() => clearFilters && clearFilters()}
+          placeholder="Статус"
         />
       ),
       onFilter: (value, record) => record.status_name === value,
