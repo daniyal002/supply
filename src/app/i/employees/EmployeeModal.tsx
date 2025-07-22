@@ -230,12 +230,16 @@ export default function EmployeeModal({
                 }
                 mode="multiple"
                 placeholder="Склад"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                showSearch
               />
             )}
           />
         </div>
 
-        {errors && <p className={style.error}>{errors.parlor?.message}</p>}
+        {errors && <p className={style.error}>{errors.storages?.message}</p>}
 
 
         {getValues("buyer_type.value") === "employee" && (

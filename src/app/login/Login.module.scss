@@ -84,17 +84,17 @@
             -webkit-column-rule-color: #fff !important;
             -webkit-text-stroke-color: #fff !important;
             color: #fff !important; /* Добавлено */
-            font-size: 25px !important;
+            // font-size: 25px !important;
             transition: background-color 5000s ease-in-out 0s !important;
         }
 
         &::placeholder {
             color: #fff;
         }
-        &:-webkit-autofill::selection {
-            background: transparent;
-            color: #fff !important;
-        }
+        // &:-webkit-autofill::selection {
+        //     background: transparent;
+        //     color: #fff !important;
+        // }
     }
 
     .loginSubmit {

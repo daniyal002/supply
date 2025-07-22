@@ -20,13 +20,17 @@ interface Props {
 }
 
 export default function Route({ routeId }: Props) {
+
+  const newRouteId = routeId.startsWith("copy-") ? routeId.split("-")[1] : routeId
+
+
   const { employeeData } = useEmployeeData();
   const { departmentData } = useDepartmentData();
   const { oderStatusData } = useOderStatusData();
   const { productGroupData } = useProductGroupData();
   const { mutate:createOrderRouteMutation } = useCreateOrderRouteMutation();
   const { mutate:updateOrderRouteMutation } = useUpdateOrderRouteMutation();
-  const { orderRouteByIdData } = useOrderRouteByIdData(Number(routeId));
+  const { orderRouteByIdData } = useOrderRouteByIdData(Number(newRouteId));
 
   const { control, handleSubmit, watch,reset, formState: { errors }, } = useForm<IAddRouterRequest>({ mode: "onChange" });
 
@@ -78,7 +82,7 @@ export default function Route({ routeId }: Props) {
   };
 
   const onSubmit = (data: any) => {
-    if (routeId === "newRoute") {
+    if (routeId === "newRoute" || routeId.startsWith("copy-")) {
       createOrderRouteMutation(data)
     }else{
       updateOrderRouteMutation({...data, route_id:Number(routeId)})
@@ -324,7 +328,7 @@ export default function Route({ routeId }: Props) {
       </Button>
 
       <Button type="primary" htmlType="submit" className={styles.submitButton}>
-        {routeId === "newRoute" ? "Сохранить" : "Изменить"}
+        {routeId === "newRoute" || routeId.startsWith("copy-") ? "Сохранить" : "Изменить"}
       </Button>
     </Form>
   );

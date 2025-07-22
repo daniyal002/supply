@@ -138,6 +138,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
           <Button onClick={() => archiveOrderRouteMutation({route_id:record.route_id as number})}>
             {record.is_archive ? "Разархивировать" : "Архивировать"}
           </Button>
+          <Link href={`/i/routes/copy-${record.route_id}`}>Копия</Link>
         </Space>
       ),
     },
