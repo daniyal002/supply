@@ -39,6 +39,7 @@ export default function HeaderOrder({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false);
+  const [moreParlor, setMoreParlor] = useState<boolean>(false)
 
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
@@ -84,6 +85,7 @@ export default function HeaderOrder({
             return true;
           }
         })
+        // .filter((employee) => moreParlor ? employee.buyer_type === "parlor" : employee.buyer_type === "parlor" || employee.buyer_type === "employee"  )
         .map((employee) => ({
           value: employee.buyer_id,
           label: employee.buyer_name,
@@ -95,10 +97,10 @@ export default function HeaderOrder({
     label: storage.storage_name,
   }));
 
-  const optionsOrderTypes: { value: string; label: string }[] = [
-    { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
-    { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
-  ];
+  // const optionsOrderTypes: { value: string; label: string }[] = [
+  //   { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+  //   { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+  // ];
 
   const departmentSet = new Set();
   const optionsDepartment = GetMeData?.employee?.parlors
@@ -244,6 +246,12 @@ export default function HeaderOrder({
                 />
               )}
             />
+            <div className={style.formItemLabel}>
+              <label>
+              Режим много кабинетов
+              <Checkbox value={moreParlor} onChange={(e)=>setMoreParlor(e.target.checked)}/>
+              </label>
+            </div>
             {errors.employee_id && (
               <p className={style.error}>{errors.employee_id?.message}</p>
             )}

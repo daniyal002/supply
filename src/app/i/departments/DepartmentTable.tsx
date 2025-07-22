@@ -51,7 +51,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value:boolean|Key, record:IDepartment) => {
         const searchValue = (value as string).toLowerCase();

@@ -85,7 +85,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value, record) =>
         record.order_number
@@ -201,7 +201,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value, record) =>
         record.buyer?.buyer_name

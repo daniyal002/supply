@@ -50,7 +50,7 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) =>
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value:boolean|Key, record:IPost) => {
         const searchValue = (value as string).toLowerCase();

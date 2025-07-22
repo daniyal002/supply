@@ -52,7 +52,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -102,7 +102,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();

@@ -26,6 +26,7 @@ export const lightTheme: ThemeConfig = {
     },
     Table: {
       colorPrimary: "#678098",
+      fontSizeIcon:13
     },
     Layout: {
       siderBg: "#678098",

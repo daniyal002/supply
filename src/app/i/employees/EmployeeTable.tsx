@@ -94,7 +94,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -158,7 +158,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();

@@ -51,7 +51,7 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({ orderStatusData, on
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value:boolean|Key, record:IOrderStatus) => {
         const searchValue = (value as string).toLowerCase();

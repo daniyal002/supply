@@ -54,7 +54,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
       ),
       onFilter: (value: boolean | Key, record: IOrderRouteResponseDetail) => {
         const searchValue = (value as string).toLowerCase();
