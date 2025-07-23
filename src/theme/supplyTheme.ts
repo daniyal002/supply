@@ -40,6 +40,9 @@ export const lightTheme: ThemeConfig = {
       colorBgBase: "#fff",
       colorText: "#678098",
     },
+    Modal:{
+      boxShadow: '0 0 30px #999',
+    }
   },
 };
 
@@ -89,6 +92,8 @@ export const darkTheme: ThemeConfig = {
       // filterDropdownBg: "#252628",
     // filterDropdownMenuBg:"#fff",
       colorTextDisabled: "#fff",
+      fontSizeIcon:13
+
     },
     Layout: {
       siderBg: "#1d2939", // Темный боковой блок
@@ -163,6 +168,7 @@ export const darkTheme: ThemeConfig = {
       contentBg: "#252628",
       titleColor: "#",
       headerBg: "#252628",
+      boxShadow: "inset 0 0 15px #fff"
     },
   },
 };

@@ -11,6 +11,9 @@
 .newOrder {
   position: relative;
   padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   .active {
     display: flex !important;
     position: relative;
@@ -30,12 +33,6 @@
     width: 100%;
     display: flex;
     flex-direction: row;
-    position: absolute;
-    bottom: -30px;
-    z-index: 99;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 25px;
     justify-content: center;
     gap: 100px;
   }

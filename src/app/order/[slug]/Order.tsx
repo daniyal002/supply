@@ -7,14 +7,14 @@ import {
   useGetOrderById,
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { EnumOrderTypes, IDraftOrderItemRequest, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Button, message, Spin, Tabs, theme } from "antd";
+import { message, Spin, Tabs, theme } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -22,7 +22,6 @@ import { useProductData } from "@/hook/productHook";
 import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
 import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
@@ -43,14 +42,12 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   const { mutate: updateDraftOrderMutation } = useUpdateDraftOrderMutation();
   const {
     register,
-    handleSubmit,
     formState: { errors },
     reset,
     control,
     getValues,
     setValue,
     watch,
-    resetField,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   let orderIdFromGetOrderById = orderid;
   if (orderid?.startsWith("copy")) {
@@ -139,7 +136,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   const productsWatch = watch("order_products");
 
   useEffect(() => {
-    resetField("department_id", { defaultValue: undefined });
 
     const buyerType = GetMeData?.employee?.parlors
       ?.filter((parlor) =>
@@ -163,7 +159,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getValues("employee_id")]);
 
-  const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
+  const createOrder = () => {
+    const data = getValues()
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
@@ -171,7 +168,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
-        // order_route_id: 4,
         order_status_id: 1,
         note: data.note,
         product_group_id: data.product_group.value,
@@ -185,22 +181,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : hasProductId
               ? productData.product_id
               : NaN,
-            // order_product_name: hasProductId
-            //   ? ""
-            //   : hasOrderProductName
-            //   ? product.order_product_name
-            //   : "",
-            // order_product_link: hasProductId
-            //   ? ""
-            //   : hasOrderProductName
-            //   ? product.order_product_link
-            //   : "",
             order_product_name:product?.order_product_name,
             order_product_link:product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
-            // unit_measurement_id: 8,
             note: product.note,
             employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
           };
@@ -262,16 +247,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name: hasProductId
-              ? ""
-              : hasOrderProductName
-              ? product.order_product_name
-              : "",
-            order_product_link: hasProductId
-              ? ""
-              : hasOrderProductName
-              ? product.order_product_link
-              : "",
+            order_product_name:product?.order_product_name,
+            order_product_link:product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
@@ -411,30 +388,14 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : style.selectProductOrder
           }
         >
-          {toggle && (
-            <Button
-              type="primary"
-              // ghost
-              icon={<ArrowLeftOutlined />}
-              onClick={() => setToggle(!toggle)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "start",
-                marginTop: 10,
-                marginBottom: 10,
-                fontWeight: 500,
-                width:"100px"
-              }}
-            >
-              Назад
-            </Button>
-          )}
+
 
           <SelectProductOrder
             watch={watch}
             getValues={getValues}
             setValue={setValue}
+            toggle={toggle}
+            setToggle={setToggle}
           />
         </div>
 
@@ -445,7 +406,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : style.productOrder
           }
         >
-          <form key={1} onSubmit={handleSubmit(onSubmit)}>
+          {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
             <HeaderOrder
               control={control}
               register={register}
@@ -456,31 +417,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               disabledOrder={disabledOrder}
             />
 
-            <div className={style.footerButtonGroup}>
-              {!disabledOrder && (
-                <button type="submit" className={style.buttonOrderCreate}>
-                  {orderid === "newOrder" ||
-                  orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                    ? createOrderIsPending
-                      ? "Создается..."
-                      : "Создать"
-                    : updateOrderIsPending
-                    ? "Перезапускается..."
-                    : "Перезапуск"}
-                </button>
-              )}
 
-              {!disabledOrder && orderid === "newOrder" && (
-                <button
-                  type="button"
-                  className={style.buttonOrderSave}
-                  onClick={() => saveOrder()}
-                >
-                  {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
-                </button>
-              )}
-            </div>
-          </form>
+          {/* </form> */}
           <button
             onClick={() => {
               if (disabledOrder) {
@@ -505,7 +443,32 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           </button>
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+          <div className={style.footerButtonGroup} >
+              {!disabledOrder && (
+                <button type="button" onClick={() => createOrder()} className={style.buttonOrderCreate}>
+                  {orderid === "newOrder" ||
+                  orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                    ? createOrderIsPending
+                      ? "Создается..."
+                      : "Создать"
+                    : updateOrderIsPending
+                    ? "Перезапускается..."
+                    : "Перезапуск"}
+                </button>
+              )}
+
+              {!disabledOrder && orderid === "newOrder" && (
+                <button
+                  type="button"
+                  className={style.buttonOrderSave}
+                  onClick={() => saveOrder()}
+                >
+                  {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
+                </button>
+              )}
+            </div>
         </div>
+
       </div>
     </div>
   );

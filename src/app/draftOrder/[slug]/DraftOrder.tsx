@@ -124,8 +124,6 @@ export default function DraftOrder({
   const productsWatch = watch("order_products");
 
   useEffect(() => {
-    resetField("department_id", { defaultValue: undefined });
-
     const buyerType = GetMeData?.employee?.parlors
       ?.filter((parlor) =>
         parlor.employees.some(
@@ -148,7 +146,8 @@ export default function DraftOrder({
     }
   }, [getValues("employee_id")]);
 
-  const onSubmit: SubmitHandler<IOrderItemFormValues> = (data) => {
+  const createOrder = () => {
+    const data = getValues()
     if (data.order_products && data.order_products.length > 0) {
       const order: IDraftOrderItemRequest = {
         department_id: data.department_id.value,
@@ -156,7 +155,6 @@ export default function DraftOrder({
         order_type:EnumOrderTypes.WAREHOUSE,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
-        // order_route_id: 4,
         order_status_id: 1,
         note: data.note,
         product_group_id: data.product_group.value,
@@ -170,16 +168,8 @@ export default function DraftOrder({
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name: hasProductId
-              ? ""
-              : hasOrderProductName
-              ? product.order_product_name
-              : "",
-            order_product_link: hasProductId
-              ? ""
-              : hasOrderProductName
-              ? product.order_product_link
-              : "",
+            order_product_name:product?.order_product_name,
+            order_product_link:product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
@@ -233,16 +223,6 @@ export default function DraftOrder({
               : hasProductId
               ? productData.product_id
               : NaN,
-            // order_product_name: hasProductId
-            //   ? ""
-            //   : hasOrderProductName
-            //   ? product.order_product_name
-            //   : "",
-            // order_product_link: hasProductId
-            //   ? ""
-            //   : hasOrderProductName
-            //   ? product.order_product_link
-            //   : "",
             order_product_name:product?.order_product_name,
             order_product_link:product?.order_product_link,
             product_quantity: product.product_quantity,
@@ -369,30 +349,13 @@ export default function DraftOrder({
               : style.selectProductOrder
           }
         >
-          {toggle && (
-            <Button
-            type="primary"
-            // ghost
-            icon={<ArrowLeftOutlined />}
-            onClick={() => setToggle(!toggle)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "start",
-              marginTop: 10,
-              marginBottom: 10,
-              fontWeight: 500,
-              width:"100px"
-            }}
-          >
-            Назад
-          </Button>
-          )}
 
           <SelectProductOrder
             watch={watch}
             getValues={getValues}
             setValue={setValue}
+            setToggle={setToggle}
+            toggle={toggle}
           />
         </div>
 
@@ -403,7 +366,7 @@ export default function DraftOrder({
               : style.productOrder
           }
         >
-          <form key={1} onSubmit={handleSubmit(onSubmit)}>
+          {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
             <HeaderOrder
               control={control}
               register={register}
@@ -414,23 +377,8 @@ export default function DraftOrder({
               disabledOrder={false}
             />
 
-            <div className={style.footerButtonGroup}>
-                <button type="submit" className={style.buttonOrderCreate}>
-                  {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
-                </button>
 
-                <button
-                  type="button"
-                  className={style.buttonOrderSave}
-                  onClick={() => saveOrder()}
-                >
-                  {saveOrderIsPending
-                      ? "Сохраняется..."
-                      : "Сохранить"
-                    }
-                </button>
-            </div>
-          </form>
+          {/* </form> */}
           <button
             onClick={() => {
               if (!getValues("product_group.value")) {
@@ -451,6 +399,22 @@ export default function DraftOrder({
           </button>
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+          <div className={style.footerButtonGroup}>
+                <button type="button" onClick={() => createOrder()} className={style.buttonOrderCreate}>
+                  {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
+                </button>
+
+                <button
+                  type="button"
+                  className={style.buttonOrderSave}
+                  onClick={() => saveOrder()}
+                >
+                  {saveOrderIsPending
+                      ? "Сохраняется..."
+                      : "Сохранить"
+                    }
+                </button>
+            </div>
         </div>
       </div>
     </div>

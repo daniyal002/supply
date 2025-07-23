@@ -1,4 +1,4 @@
-import { Input, Modal, Select } from "antd";
+import { Button, Input, Modal, Select } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Controller,
@@ -202,6 +202,11 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     }
   }, [isNewProduct, allMesument, itemProductData]);
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    reset();
+  }
+
   return (
     <Modal
       title={
@@ -210,11 +215,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           : "Новый товар"
       }
       open={isModalOpen}
-      onCancel={() => {
-        setIsModalOpen(false);
-        reset();
-      }}
-      footer={null}
+      onCancel={() => closeModal()}
+      maskClosable={false}
+      footer={(null)}
+      mask={true}
     >
       <form onSubmit={handleSubmit(onSubmit)} className={style.modalForm}>
         {isNewProduct && (
@@ -281,32 +285,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           </>
         )}
 
-        <div className={style.formItem}>
-          <label className={style.formItemLabel}>Количество</label>
-          <Controller
-            name="product_quantity"
-            control={control}
-            rules={{
-              required: { value: true, message: "Количество обязательно" },
-              pattern: {
-                value: /^[0-9]*\.?[0-9]+$/, // Обновленное регулярное выражение для целых и дробных чисел
-                message: "Введите корректное число", // Сообщение об ошибке
-              },
-            }}
-            render={({ field }) => (
-              <Input
-                type="text"
-                placeholder="Количество"
-                className={style.modalName}
-                {...field}
-              />
-            )}
-          />
 
-          {errors.product_quantity && (
-            <p className={style.error}>{errors.product_quantity.message}</p>
-          )}
-        </div>
 
         <div className={style.formItem}>
           <label className={style.formItemLabel}>
@@ -338,6 +317,34 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             <p className={style.error}>{errors.unit_measurement.message}</p>
           )}
         </div>
+
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Количество</label>
+          <Controller
+            name="product_quantity"
+            control={control}
+            rules={{
+              required: { value: true, message: "Количество обязательно" },
+              pattern: {
+                value: /^[0-9]*\.?[0-9]+$/, // Обновленное регулярное выражение для целых и дробных чисел
+                message: "Введите корректное число", // Сообщение об ошибке
+              },
+            }}
+            render={({ field }) => (
+              <Input
+                type="text"
+                placeholder="Количество"
+                className={style.modalName}
+                {...field}
+              />
+            )}
+          />
+
+          {errors.product_quantity && (
+            <p className={style.error}>{errors.product_quantity.message}</p>
+          )}
+        </div>
+
         {buyerType === "parlor" && (
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Выберите врача</label>
@@ -388,6 +395,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         <button type="submit" className={style.modalSubmit}>
           {type}
         </button>
+        {/* <button  className={style.modalClose} onClick={() => closeModal()}>Отмена</button> */}
       </form>
     </Modal>
   );

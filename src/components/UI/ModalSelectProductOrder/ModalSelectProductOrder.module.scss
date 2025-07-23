@@ -37,7 +37,7 @@
         font-size: 12px;
         padding-left: 2px;
     }
-    .modalSubmit{
+    .modalSubmit,.modalClose{
         padding: 10px;
         border-radius: 6px;
         border: 0;
@@ -52,4 +52,14 @@
         }
 
     }
+
+    .modalClose{
+        background-color: #ff4d4f;
+        color: #fff;
+
+        &:hover{
+            background-color: #a03335;
+        }
+    }
+
 }

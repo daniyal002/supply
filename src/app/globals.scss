@@ -61,3 +61,7 @@ color: white !important;
 .ant-picker-clear:hover{
   color: #af5759 !important;
 }
+
+.ant-modal-mask{
+  backdrop-filter: blur(10px);
+}

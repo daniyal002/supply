@@ -238,7 +238,6 @@ const handleExpand = (expanded:boolean, record:IProductUnit) => {
   }, [productData]);
 
   return (
-
     <Table
       dataSource={dataSource}
       columns={columns}
@@ -250,17 +249,35 @@ const handleExpand = (expanded:boolean, record:IProductUnit) => {
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
-      rowClassName={(record) => getValues('order_products')?.find(product => product?.product?.product_id === record?.product_id) ? style.highlightRow : ''}
-      locale={{emptyText:"Нет товаров"}}
+      rowClassName={(record) =>
+        getValues("order_products")?.find(
+          (product) => product?.product?.product_id === record?.product_id
+        )
+          ? style.highlightRow
+          : ""
+      }
+      locale={{ emptyText: "Нет товаров" }}
       expandable={{
-              expandedRowKeys,
-              onExpand: handleExpand,
-              expandedRowRender: (record) => {
-                return <div className={style.remainContainer}>
-                <RemainProduct product_kod_1c={record?.product_kod_1c} expandedRowKeys={expandedRowKeys}/>
-              </div>
-              },
-            }}
+        expandedRowKeys,
+        onExpand: handleExpand,
+        expandedRowRender: (record) => {
+          return (
+            <div className={style.remainContainer}>
+              <RemainProduct
+                product_kod_1c={record?.product_kod_1c}
+                expandedRowKeys={expandedRowKeys}
+              />
+            </div>
+          );
+        },
+      }}
+      onRow={(record) => ({
+        onDoubleClick: () => {
+          record.product_group.product_group_id ===
+            getValues("product_group.value") && showModal();
+          setProductId(record.product_id);
+        },
+      })}
     />
   );
 };

@@ -38,6 +38,7 @@ export const MainTabs = () => {
         items={items}
         activeKey={activeMainTabKey}
         onChange={handleTabChange}
+        animated
       />
       <Notification />
     </div>

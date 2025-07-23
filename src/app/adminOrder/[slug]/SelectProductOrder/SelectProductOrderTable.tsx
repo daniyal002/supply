@@ -233,6 +233,13 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       }}
       rowClassName={(record) => getValues('order_products')?.find(product => product?.product?.product_id === record?.product_id) ? style.highlightRow : ''}
       locale={{emptyText:"Нет товаров"}}
+      onRow={(record) => ({
+        onDoubleClick: () => {
+          record.product_group.product_group_id ===
+            getValues("product_group.value") && showModal();
+          setProductId(record.product_id);
+        },
+      })}
     />
   );
 };

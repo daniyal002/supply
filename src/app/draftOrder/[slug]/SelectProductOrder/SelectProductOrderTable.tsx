@@ -260,6 +260,13 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         </div>
         },
       }}
+      onRow={(record) => ({
+        onDoubleClick: () => {
+          record.product_group.product_group_id ===
+            getValues("product_group.value") && showModal();
+          setProductId(record.product_id);
+        },
+      })}
 />
   );
 };

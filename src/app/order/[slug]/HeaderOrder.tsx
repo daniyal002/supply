@@ -11,7 +11,7 @@ import {
   UseFormWatch,
   useWatch,
 } from "react-hook-form";
-import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
+import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
@@ -39,7 +39,7 @@ export default function HeaderOrder({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false);
-  const [moreParlor, setMoreParlor] = useState<boolean>(false)
+  const [moreParlor, setMoreParlor] = useState<boolean>(false);
 
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
@@ -168,18 +168,18 @@ export default function HeaderOrder({
               control={control}
               name="oms"
               render={({ field }) => (
-                <Checkbox {...field} checked={field.value} disabled={true} />
+                <Checkbox {...field} checked={field.value} />
               )}
             />
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>Склад</label>
+            <label className={style.formItemLabel}>Место хранения</label>
             <Controller
               control={control}
               name="storage_id"
               rules={{
-                required: { message: "Выберите склад", value: true },
+                required: { message: "Выберите место хранения", value: true },
               }}
               render={({ field }) => (
                 <Select
@@ -240,6 +240,10 @@ export default function HeaderOrder({
                     setValue("employee_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
+                    if (getValues("department_id")) {
+                      // @ts-ignore: Unreachable code error
+                      setValue("department_id", undefined);
+                    }
                   }}
                   placeholder="Сотрудник/Кабинет"
                   className={style.formItemSelect}
@@ -248,8 +252,11 @@ export default function HeaderOrder({
             />
             <div className={style.formItemLabel}>
               <label>
-              Режим много кабинетов
-              <Checkbox value={moreParlor} onChange={(e)=>setMoreParlor(e.target.checked)}/>
+                Режим много кабинетов
+                <Checkbox
+                  value={moreParlor}
+                  onChange={(e) => setMoreParlor(e.target.checked)}
+                />
               </label>
             </div>
             {errors.employee_id && (
@@ -276,10 +283,12 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) =>
+                  onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label })
-                  }
+                    setValue("department_id.value", value);
+                    // @ts-ignore: Unreachable code error
+                    field.onChange({ value: value, label: option.label });
+                  }}
                   placeholder="Подразделение"
                   className={style.formItemSelect}
                 />

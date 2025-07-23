@@ -9,17 +9,22 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
+import { Modal } from "antd";
 
 interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
+  setToggle: (toggle:boolean) => void;
+  toggle:boolean
 }
 
 export default function SelectProductOrder({
   watch,
   getValues,
   setValue,
+  toggle,
+  setToggle
 }: Props) {
   const { productData } = useProductData();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,6 +63,16 @@ export default function SelectProductOrder({
   }, [productData, productGroup]);
   return (
     <>
+    <Modal
+     title="Выбор товара"
+    open={toggle}
+    onCancel={() => setToggle(!toggle)}
+    maskClosable={false}
+    mask
+    width={"100%"}
+    centered
+    footer={(null)}
+    >
       <ModalSelectProductOrder
         type="Добавить"
         setIsModalOpen={setIsModalOpen}
@@ -75,6 +90,8 @@ export default function SelectProductOrder({
         showModal={showModal}
         getValues={getValues}
       />
+    </Modal>
     </>
+
   );
 }

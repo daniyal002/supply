@@ -35,7 +35,6 @@ export default function HeaderOrder({
   errors,
   disabledOrder,
 }: Props) {
-
   const { TextArea } = Input;
 
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
@@ -45,12 +44,10 @@ export default function HeaderOrder({
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
 
-    const orderType = useWatch({ control, name: 'order_type' });
-  const storageId = useWatch({ control, name: 'storage_id' });
-  const employeeId = useWatch({ control, name: 'employee_id' });
-  const departmentId = useWatch({ control, name: 'department_id' });
-
-
+  const orderType = useWatch({ control, name: "order_type" });
+  const storageId = useWatch({ control, name: "storage_id" });
+  const employeeId = useWatch({ control, name: "employee_id" });
+  const departmentId = useWatch({ control, name: "department_id" });
 
   useEffect(() => {
     if (isProductInTable && isProductInTable.length > 0) {
@@ -130,7 +127,7 @@ export default function HeaderOrder({
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-        {/* <div className={style.formItem}>
+          {/* <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
               control={control}
@@ -173,19 +170,19 @@ export default function HeaderOrder({
                 <Checkbox
                   {...field}
                   checked={field.value}
-                  disabled={true}
+                  // disabled={true}
                 />
               )}
             />
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>Склад</label>
+            <label className={style.formItemLabel}>Место хранения</label>
             <Controller
               control={control}
               name="storage_id"
               rules={{
-                required: { message: "Выберите склад", value: true },
+                required: { message: "Выберите место хранения", value: true },
               }}
               render={({ field }) => (
                 <Select
@@ -198,13 +195,17 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-
                   onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
                     setValue("storage_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
-                    GetMeData?.employee?.storages?.find(storage => storage.storage_id === getValues('storage_id.value'))?.oms ? setValue('oms', true) : setValue('oms', false)
+                    GetMeData?.employee?.storages?.find(
+                      (storage) =>
+                        storage.storage_id === getValues("storage_id.value")
+                    )?.oms
+                      ? setValue("oms", true)
+                      : setValue("oms", false);
                   }}
                   placeholder="Склад"
                   className={style.formItemSelect}
@@ -242,6 +243,10 @@ export default function HeaderOrder({
                     setValue("employee_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
+                    if (getValues("department_id")) {
+                      // @ts-ignore: Unreachable code error
+                      setValue("department_id", undefined);
+                    }
                   }}
                   placeholder="Сотрудник/Кабинет"
                   className={style.formItemSelect}
@@ -254,9 +259,7 @@ export default function HeaderOrder({
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>
-              Подразделение
-            </label>
+            <label className={style.formItemLabel}>Подразделение</label>
             <Controller
               control={control}
               name="department_id"
@@ -274,10 +277,12 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) =>
+                  onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label })
-                  }
+                    setValue("department_id.value", value);
+                    // @ts-ignore: Unreachable code error
+                    field.onChange({ value: value, label: option.label });
+                  }}
                   placeholder="Подразделение"
                   className={style.formItemSelect}
                 />
@@ -289,9 +294,7 @@ export default function HeaderOrder({
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>
-              Категория товара
-            </label>
+            <label className={style.formItemLabel}>Категория товара</label>
             <Controller
               control={control}
               name="product_group"

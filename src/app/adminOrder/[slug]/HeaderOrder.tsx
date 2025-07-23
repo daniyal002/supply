@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import style from "./HeaderOrder.module.scss";
-import { Checkbox, Input, Select } from "antd";
+import { Checkbox, Select, Input } from "antd";
 import {
   Control,
   Controller,
@@ -11,7 +11,7 @@ import {
   UseFormWatch,
   useWatch,
 } from "react-hook-form";
-import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
+import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
@@ -36,18 +36,17 @@ export default function HeaderOrder({
   disabledOrder,
 }: Props) {
   const { TextArea } = Input;
-
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false);
+  const [moreParlor, setMoreParlor] = useState<boolean>(false);
 
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
 
-const storageId = useWatch({ control, name: 'storage_id' });
-const employeeId = useWatch({ control, name: 'employee_id' });
-const departmentId = useWatch({ control, name: 'department_id' });
-
+  const storageId = useWatch({ control, name: "storage_id" });
+  const employeeId = useWatch({ control, name: "employee_id" });
+  const departmentId = useWatch({ control, name: "department_id" });
 
   useEffect(() => {
     if (isProductInTable && isProductInTable.length > 0) {
@@ -86,6 +85,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
             return true;
           }
         })
+        // .filter((employee) => moreParlor ? employee.buyer_type === "parlor" : employee.buyer_type === "parlor" || employee.buyer_type === "employee"  )
         .map((employee) => ({
           value: employee.buyer_id,
           label: employee.buyer_name,
@@ -97,10 +97,10 @@ const departmentId = useWatch({ control, name: 'department_id' });
     label: storage.storage_name,
   }));
 
-  const optionsOrderTypes: { value: string; label: string }[] = [
-    { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
-    { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
-  ];
+  // const optionsOrderTypes: { value: string; label: string }[] = [
+  //   { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+  //   { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+  // ];
 
   const departmentSet = new Set();
   const optionsDepartment = GetMeData?.employee?.parlors
@@ -128,8 +128,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-
-        {/* <div className={style.formItem}>
+          {/* <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
               control={control}
@@ -169,22 +168,18 @@ const departmentId = useWatch({ control, name: 'department_id' });
               control={control}
               name="oms"
               render={({ field }) => (
-                <Checkbox
-                  {...field}
-                  checked={field.value}
-                  disabled={true}
-                />
+                <Checkbox {...field} checked={field.value} />
               )}
             />
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>Склад</label>
+            <label className={style.formItemLabel}>Место хранения</label>
             <Controller
               control={control}
               name="storage_id"
               rules={{
-                required: { message: "Выберите склад", value: true },
+                required: { message: "Выберите место хранения", value: true },
               }}
               render={({ field }) => (
                 <Select
@@ -197,13 +192,17 @@ const departmentId = useWatch({ control, name: 'department_id' });
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-
                   onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
                     setValue("storage_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
-                    GetMeData?.employee?.storages?.find(storage => storage.storage_id === getValues('storage_id.value'))?.oms ? setValue('oms', true) : setValue('oms', false)
+                    GetMeData?.employee?.storages?.find(
+                      (storage) =>
+                        storage.storage_id === getValues("storage_id.value")
+                    )?.oms
+                      ? setValue("oms", true)
+                      : setValue("oms", false);
                   }}
                   placeholder="Склад"
                   className={style.formItemSelect}
@@ -214,8 +213,6 @@ const departmentId = useWatch({ control, name: 'department_id' });
               <p className={style.error}>{errors.storage_id?.message}</p>
             )}
           </div>
-
-
         </div>
 
         <div className={style.EmployeeDepartmentCategory}>
@@ -243,21 +240,32 @@ const departmentId = useWatch({ control, name: 'department_id' });
                     setValue("employee_id.value", value);
                     // @ts-ignore: Unreachable code error
                     field.onChange({ value: value, label: option.label });
+                    if (getValues("department_id")) {
+                      // @ts-ignore: Unreachable code error
+                      setValue("department_id", undefined);
+                    }
                   }}
                   placeholder="Сотрудник/Кабинет"
                   className={style.formItemSelect}
                 />
               )}
             />
+            <div className={style.formItemLabel}>
+              <label>
+                Режим много кабинетов
+                <Checkbox
+                  value={moreParlor}
+                  onChange={(e) => setMoreParlor(e.target.checked)}
+                />
+              </label>
+            </div>
             {errors.employee_id && (
               <p className={style.error}>{errors.employee_id?.message}</p>
             )}
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>
-              Подразделение
-            </label>
+            <label className={style.formItemLabel}>Подразделение</label>
             <Controller
               control={control}
               name="department_id"
@@ -267,7 +275,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
               render={({ field }) => (
                 <Select
                   {...field}
-                  disabled={disabledOrder || !employeeId  }
+                  disabled={disabledOrder || !employeeId}
                   options={optionsDepartment}
                   showSearch
                   filterOption={(input, option) =>
@@ -275,10 +283,12 @@ const departmentId = useWatch({ control, name: 'department_id' });
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) =>
+                  onChange={(value, option) => {
                     // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label })
-                  }
+                    setValue("department_id.value", value);
+                    // @ts-ignore: Unreachable code error
+                    field.onChange({ value: value, label: option.label });
+                  }}
                   placeholder="Подразделение"
                   className={style.formItemSelect}
                 />
@@ -290,9 +300,7 @@ const departmentId = useWatch({ control, name: 'department_id' });
           </div>
 
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>
-              Категория товара
-            </label>
+            <label className={style.formItemLabel}>Категория товара</label>
             <Controller
               control={control}
               name="product_group"
@@ -304,7 +312,9 @@ const departmentId = useWatch({ control, name: 'department_id' });
                   {...field}
                   options={optionsProductGroup1}
                   // disabled={disabledOrder ? true : productSelect ? true : false}
-                  disabled={disabledOrder || productSelect || !departmentId?.value}
+                  disabled={
+                    disabledOrder || productSelect || !departmentId?.value
+                  }
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? "")
