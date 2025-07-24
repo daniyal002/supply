@@ -118,7 +118,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     if (employee) {
       setBuyerType(employee?.buyer_type);
     }
-  }, [getValues("employee_id.value")]);
+  }, [getValues("employee_id.value"),GetMeData]);
 
   useEffect(() => {
     if (type === "Добавить") {

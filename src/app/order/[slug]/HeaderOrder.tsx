@@ -39,7 +39,6 @@ export default function HeaderOrder({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false);
-  const [moreParlor, setMoreParlor] = useState<boolean>(false);
 
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
@@ -250,15 +249,6 @@ export default function HeaderOrder({
                 />
               )}
             />
-            <div className={style.formItemLabel}>
-              <label>
-                Режим много кабинетов
-                <Checkbox
-                  value={moreParlor}
-                  onChange={(e) => setMoreParlor(e.target.checked)}
-                />
-              </label>
-            </div>
             {errors.employee_id && (
               <p className={style.error}>{errors.employee_id?.message}</p>
             )}

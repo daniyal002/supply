@@ -174,7 +174,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         return parlors.map((parlor, index) => {
           const shouldHighlight =
             searchedColumn === "parlors" &&
-            parlor.parlor_name.toLowerCase().includes(searchText.toLowerCase());
+            parlor.parlor_name?.toLowerCase()?.includes(searchText?.toLowerCase());
 
           return (
             <div key={index}>
