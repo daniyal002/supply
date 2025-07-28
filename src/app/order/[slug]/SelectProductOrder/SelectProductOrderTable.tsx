@@ -27,8 +27,41 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
   setProductId,
   getValues,
 }) => {
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset,setSearchedColumn } =
     useSearch();
+
+
+
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "а")) {
+          e.preventDefault();
+
+          setSearchedColumn("product_name");
+
+          // Ищем кнопку фильтра по колонке "product_name"
+          const filterButton = document.querySelector(
+            `.ant-dropdown-trigger.ant-table-filter-trigger`
+          ) as HTMLButtonElement;
+
+          console.log(filterButton)
+          if (filterButton) {
+            filterButton.click(); // имитируем клик
+
+            // Через небольшую задержку ставим фокус на инпут
+            setTimeout(() => {
+              searchInput.current?.focus();
+            }, 200);
+          }
+        }
+      };
+
+      window.addEventListener("keydown", handleKeyDown);
+
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }, []);
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();

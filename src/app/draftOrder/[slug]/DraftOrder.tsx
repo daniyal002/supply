@@ -73,30 +73,30 @@ export default function DraftOrder({
 
   const {mutate:deleteDraftOrderByIdMutation,isPending:DeleteDraftOrderByIisPending} = useDeleteDraftOrderByIdMutation()
 
-  const [orderType, setOrderType] = useState<
-      "purchase" | "warehouse" | undefined
-    >(undefined);
+  const [newProduct, setNewProduct] = useState<
+     "newProduct" | "productFromCatalog" | undefined
+   >(undefined);
 
     useEffect(() => {
       const products = getValues("order_products");
 
       if (Array.isArray(products)) {
-        const hasPurchase = products.some(
+        const hasNewProuduct = products.some(
           (product) => product.order_product_link
         );
-        const hasWarehouseOnly = products.every(
+        const hasProductFrom = products.every(
           (product) => !product.order_product_link
         );
 
-        if (hasPurchase) {
-          setOrderType("purchase");
-        } else if (hasWarehouseOnly && products.length > 0) {
-          setOrderType("warehouse");
+        if (hasNewProuduct) {
+          setNewProduct("newProduct");
+        } else if (hasProductFrom && products.length > 0) {
+          setNewProduct("productFromCatalog");
         } else {
-          setOrderType(undefined);
+          setNewProduct(undefined);
         }
       } else {
-        setOrderType(undefined);
+        setNewProduct(undefined);
       }
     }, [getValues("order_products")]);
 
@@ -111,7 +111,7 @@ export default function DraftOrder({
           setValue={setValue}
           watch={watch}
           disabledOrder={false}
-          orderType={orderType}
+          newProduct={newProduct}
         />
       ),
     },
@@ -384,7 +384,7 @@ export default function DraftOrder({
               if (!getValues("product_group.value")) {
                 message.warning("Выберите категорию товара");
               } else {
-                if (orderType === "purchase") {
+                if (newProduct === "newProduct") {
                   message.warning(
                     "Вы не можете выбрать товары, пока есть новые товары"
                   );

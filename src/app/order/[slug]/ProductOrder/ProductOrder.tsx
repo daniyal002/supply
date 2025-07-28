@@ -12,10 +12,10 @@ interface Props {
   getValues:UseFormGetValues<IOrderItemFormValues>;
   setValue:UseFormSetValue<IOrderItemFormValues>
   disabledOrder:boolean
-  orderType:"purchase" | "warehouse" | undefined
+  newProduct: "newProduct" | "productFromCatalog" | undefined
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder,orderType}:Props) {
+export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder,newProduct}:Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
   const [productIndex,setProductIndex] = useState<number | null>()
@@ -59,7 +59,7 @@ export default function ProductOrder({productTableData,getValues,setValue,watch,
       {!disabledOrder && (
         <Button
           onClick={() => {
-            if (orderType === "warehouse") {
+            if (newProduct === "productFromCatalog") {
               message.warning(
                 "Вы не можете добавить новый товар, пока есть товары из подбора"
               );
