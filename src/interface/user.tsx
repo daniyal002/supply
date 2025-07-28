@@ -4,7 +4,7 @@ import { IRole, IRoleOption } from "./role";
 export interface IUser{
     user_id?:number,
     login:string,
-    password:string,
+    password?:string,
     role:IRole | undefined,
     employee:IEmployee,
     is_archive?: boolean,

@@ -44,7 +44,17 @@ export default function UserModal({
       (role) => role.role_id === data.role.value
     );
 
-    const updateUser: IUser = { ...data, employee: itemEmployeeData as IEmployee,role:itemRoleData };
+
+    const { password, ...updateUserWithoutPassword } = {
+      ...data,
+      employee: itemEmployeeData as IEmployee,
+      role: itemRoleData
+    };
+
+    const updateUser = password === ""
+      ? updateUserWithoutPassword
+      : { ...updateUserWithoutPassword, password };
+
     type === "Добавить"
       ? createUserMutation(updateUser)
       : updateUserMutation(updateUser);
@@ -125,7 +135,7 @@ export default function UserModal({
             placeholder="Пароль"
             className={style.userPassword}
             {...register("password", {
-              required: { message: "Введите пароль", value: true },
+              // required: { message: "Введите пароль", value: true },
               minLength: { message: "Пароль должен быть не менее 6 символов", value: 6 },
             })}
           />
