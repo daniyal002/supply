@@ -31,9 +31,17 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   handleReset,
   placeholder
 }) => {
+
+  // 🔍 Фокус на инпут при открытии
+  useEffect(() => {
+    setTimeout(() => {
+      searchInput.current?.focus({ cursor: 'end' });
+    }, 0);
+  }, []); // <-- один раз при маунте фильтра
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === "а")) {
         e.preventDefault();
 
         // Просто вызываем close(), чтобы закрыть фильтр
@@ -47,6 +55,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [close]); // <-- важно добавить close в зависимости
+
+
   return (
   <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
     <Input

@@ -12,6 +12,8 @@ import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { useEffect } from "react";
+import { useColumnFilterShortcut } from "@/helper/TableFilters/hook/useColumnFilterShortcut";
+import SearchFilteredIcon from "@/components/UI/FilteredIcon/SearchFilteredIcon";
 
 interface EmployeeTableProps {
   employeeData: IEmployee[] | undefined;
@@ -29,41 +31,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   const {
     searchText,
     searchedColumn,
-    setSearchedColumn,
     searchInput,
     handleSearch,
     handleReset,
   } = useSearch();
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "а")) {
-        e.preventDefault();
+      const { visibleColumnKey, setVisibleColumnKey } = useColumnFilterShortcut("buyer_name");
 
-        setSearchedColumn("buyer_name");
-
-        // Ищем кнопку фильтра по колонке "buyer_name"
-        const filterButton = document.querySelector(
-          `.ant-dropdown-trigger.ant-table-filter-trigger`
-        ) as HTMLButtonElement;
-
-        if (filterButton) {
-          filterButton.click(); // имитируем клик
-
-          // Через небольшую задержку ставим фокус на инпут
-          setTimeout(() => {
-            searchInput.current?.focus();
-          }, 200);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   const columns: TableColumnsType<IEmployee> = [
     {
@@ -81,6 +55,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       sorter: (a: any, b: any) =>
         a.buyer_name.localeCompare(b.buyer_name, "ru"),
       showSorterTooltip: { title: "Сортировка по наименованию" },
+      filterDropdownOpen: visibleColumnKey === "buyer_name",
+      onFilterDropdownOpenChange: (visible) => {
+        if (!visible) setVisibleColumnKey(null);
+      },
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -94,7 +72,16 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        //  <span
+        //     onClick={(e) => {
+        //       e.stopPropagation(); // 🔒 предотвратить автоматическое закрытие сортировки
+        //       setVisibleColumnKey((prev) => (prev === "buyer_name" ? null : "buyer_name")); // ⬅️ toggle
+        //     }}
+        //     style={{ cursor: "pointer" }}
+        //   >
+        //     <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }} />
+        //   </span>
+         <SearchFilteredIcon filtered={filtered} setVisibleColumnKey={setVisibleColumnKey} visibleColumnKey="buyer_name"/>
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();

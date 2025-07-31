@@ -164,7 +164,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
-        order_type: EnumOrderTypes.WAREHOUSE,
+        order_type: GetMeData?.role?.role_name === "user_purchase" ? data.order_type.value : EnumOrderTypes.WAREHOUSE,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
@@ -232,7 +232,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
-        order_type: EnumOrderTypes.WAREHOUSE,
+        order_type: GetMeData?.role?.role_name === "user_purchase" ? getValues().order_type.value : EnumOrderTypes.WAREHOUSE,
         oms: getValues().oms || false,
         order_status_id: 8,
         note: getValues().note,

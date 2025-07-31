@@ -13,6 +13,8 @@ import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues } from "react-hook-form";
 import style from './SelectProductOrderTable.module.scss'
 import { RemainProduct } from "../../../../components/UI/RemainProduct/RemainProduct";
+import { useColumnFilterShortcut } from "@/helper/TableFilters/hook/useColumnFilterShortcut";
+import SearchFilteredIcon from "@/components/UI/FilteredIcon/SearchFilteredIcon";
 
 interface ProductTableProps {
   productData: IProductUnit[];
@@ -27,41 +29,10 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
   setProductId,
   getValues,
 }) => {
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset,setSearchedColumn } =
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
-
-
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if ((e.ctrlKey || e.metaKey) && (e.key === "f" || e.key === "а")) {
-          e.preventDefault();
-
-          setSearchedColumn("product_name");
-
-          // Ищем кнопку фильтра по колонке "product_name"
-          const filterButton = document.querySelector(
-            `.ant-dropdown-trigger.ant-table-filter-trigger`
-          ) as HTMLButtonElement;
-
-          console.log(filterButton)
-          if (filterButton) {
-            filterButton.click(); // имитируем клик
-
-            // Через небольшую задержку ставим фокус на инпут
-            setTimeout(() => {
-              searchInput.current?.focus();
-            }, 200);
-          }
-        }
-      };
-
-      window.addEventListener("keydown", handleKeyDown);
-
-      return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }, []);
+    const { visibleColumnKey, setVisibleColumnKey } = useColumnFilterShortcut("product_name");
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();
@@ -105,6 +76,10 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       width: "400px",
       showSorterTooltip: { title: "Сортировка по товару" },
       sorter: (a, b) => a.product_name.localeCompare(b.product_name, "ru"),
+      filterDropdownOpen: visibleColumnKey === "product_name",
+      onFilterDropdownOpenChange: (visible) => {
+        if (!visible) setVisibleColumnKey(null);
+      },
       filterDropdown: (props) => (
         <SearchFilter
           {...props}
@@ -118,7 +93,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchFilteredIcon filtered={filtered} setVisibleColumnKey={setVisibleColumnKey} visibleColumnKey="product_name"/>
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();

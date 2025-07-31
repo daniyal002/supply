@@ -152,7 +152,7 @@ export default function DraftOrder({
       const order: IDraftOrderItemRequest = {
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
-        order_type:EnumOrderTypes.WAREHOUSE,
+        order_type:GetMeData?.role?.role_name === "user_purchase" ? data.order_type.value : EnumOrderTypes.WAREHOUSE,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         order_status_id: 1,
@@ -209,7 +209,7 @@ export default function DraftOrder({
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
         oms: getValues().oms || false,
-        order_type:EnumOrderTypes.WAREHOUSE,
+        order_type:GetMeData?.role?.role_name === "user_purchase" ? getValues().order_type.value : EnumOrderTypes.WAREHOUSE,
         order_status_id: 8,
         note: getValues().note,
         product_group_id: getValues().product_group.value,

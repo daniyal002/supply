@@ -10,7 +10,7 @@ import { useOderStatusData } from '@/hook/orderHook';
 import { useProductGroupData } from '@/hook/productHook';
 import { useCreateOrderRouteMutation, useOrderRouteByIdData, useUpdateOrderRouteMutation } from '@/hook/orderRouterHook';
 import { EnumOrderTypes } from '@/interface/orderItem';
-import { MoveLeft } from 'lucide-react';
+import { MoveDown, MoveLeft, MoveUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const { Option } = Select;
@@ -81,6 +81,28 @@ export default function Route({ routeId }: Props) {
     updatedSteps.forEach((step, idx) => update(idx, step));
   };
 
+  const onStepNumberChangeUp = (index: number, value: number) => {
+    if (!watchSteps || !watchSteps.length) return; // Add this check
+    if(index <= 0 || value <= 1) return;
+    const updatedSteps = [...watchSteps];
+    let oldValue = value
+    updatedSteps[index].step_number = updatedSteps[index - 1].step_number
+    updatedSteps[index - 1].step_number = oldValue
+    updatedSteps.sort((a, b) => a.step_number - b.step_number);
+    updatedSteps.forEach((step, idx) => update(idx, step));
+  }
+
+  const onStepNumberChangeDown = (index: number, value: number) => {
+    if (!watchSteps || !watchSteps.length) return; // Add this check
+    if(index + 1 >= fields.length) return;
+    const updatedSteps = [...watchSteps];
+    let oldValue = value
+    updatedSteps[index].step_number = updatedSteps[index + 1].step_number
+    updatedSteps[index + 1].step_number = oldValue
+    updatedSteps.sort((a, b) => a.step_number - b.step_number);
+    updatedSteps.forEach((step, idx) => update(idx, step));
+  }
+
   const onSubmit = (data: any) => {
     if (routeId === "newRoute" || routeId.startsWith("copy-")) {
       createOrderRouteMutation(data)
@@ -150,11 +172,16 @@ export default function Route({ routeId }: Props) {
       {fields.map((item, index) => (
         <div key={item.id} className={styles.stepContainer}>
           <div className={styles.stepHeader}>
+            <div className={styles.stepHeaderNuberButton}>
             {watchSteps && watchSteps[index] ? (
               <span>Шаг {watchSteps[index].step_number}</span>
             ) : (
               <span>Шаг {index + 1}</span>
             )}
+
+            <Button onClick={() => onStepNumberChangeUp(index,item.step_number)}><MoveUp/></Button>
+            <Button onClick={() => onStepNumberChangeDown(index,item.step_number)}><MoveDown/></Button>
+            </div>
             <Button
               type="text"
               onClick={() => remove(index)}
