@@ -65,7 +65,7 @@ export const useUpdateParlorMutation = () => {
         (oldData: IParlor[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((parlor) =>
-            parlor.parlor_id === variables.parlor_id ? variables : parlor
+            parlor.parlor_id === variables.parlor_id ? {...variables, is_archive:false} : parlor
           );
         }
       );

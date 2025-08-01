@@ -54,7 +54,7 @@ export const useUpdateOrderStatusMutation = () => {
           ["orderStatus"],
           (oldData: IOrderStatus[] | undefined) => {
             if (!oldData) return [];
-            return oldData.map((status) => status.status_id === variables.status_id ? variables : status  )
+            return oldData.map((status) => status.status_id === variables.status_id ? {...variables, is_archive:false} : status  )
           }
         );
       },

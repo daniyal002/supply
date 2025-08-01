@@ -164,9 +164,9 @@ export default function EmployeeModal({
           <Controller
             control={control}
             name="parlor"
-            rules={{
-              required: { message: "Выберите кабинет", value: true },
-            }}
+            // rules={{
+            //   required: { message: "Выберите кабинет", value: true },
+            // }}
             render={({ field }) => (
               <Select
                 {...field}

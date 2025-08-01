@@ -63,7 +63,7 @@ export const useUpdateDepartmentMutation = () => {
         (oldData: IDepartment[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((department) =>
-            department.department_id === variables.department_id ? variables : department
+            department.department_id === variables.department_id ? {...variables, is_archive:false} : department
           );
         }
       );

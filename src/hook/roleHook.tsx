@@ -51,7 +51,7 @@ export const useUpdateRoleMutation = () => {
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((role) =>
-          role.role_id === variables.role_id ? variables : role
+          role.role_id === variables.role_id ? {...variables, is_archive:false} : role
         );
       });
     },

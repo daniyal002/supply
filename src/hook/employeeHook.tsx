@@ -69,7 +69,7 @@ export const useUpdateEmployeeMutation = () => {
             (oldData: IEmployee[] | undefined) => {
               if (!oldData) return [];
               return oldData.map((employee) =>
-                employee.buyer_id === variables.buyer_id ? variables : employee
+                employee.buyer_id === variables.buyer_id ? {...variables, is_archive:false} : employee
               );
             }
           );

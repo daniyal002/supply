@@ -18,7 +18,7 @@ export interface IUserResponse{
 export interface IUserRequest{
     user_id?:number,
     login:string,
-    password:string,
+    password?:string,
     role_id:number,
     employee_id:number,
     is_archive?: boolean,

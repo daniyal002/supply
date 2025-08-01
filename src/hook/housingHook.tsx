@@ -53,7 +53,7 @@ export const useUpdateHousingMutation = () => {
         (oldData: IHousing[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((housing) =>
-            housing.housing_id === variables.housing_id ? variables : housing
+            housing.housing_id === variables.housing_id ? {...variables, is_archive:false} : housing
           );
         }
       );

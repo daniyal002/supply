@@ -49,7 +49,7 @@ export const useUpdatePostMutation = () => {
       queryClient.setQueryData(["Posts"], (oldData: IPost[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((post) =>
-          post.post_id === variables.post_id ? variables : post
+          post.post_id === variables.post_id ? {...variables, is_archive:false} : post
         );
       });
     },

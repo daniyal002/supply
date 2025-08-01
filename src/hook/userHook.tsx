@@ -38,7 +38,7 @@ export const useCreateUserMutation = () => {
     mutationFn: (data: IUser) =>
       userService.addUser({
         login: data.login,
-        password: data.password,
+        password: data.password ,
         employee_id: data.employee.buyer_id as number,
         role_id: data.role?.role_id as number,
       }),
@@ -73,7 +73,7 @@ export const useUpdateUserMutation = () => {
       queryClient.setQueryData(["Users"], (oldData: IUser[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((users) =>
-          users.user_id === variables.user_id ? variables : users
+          users.user_id === variables.user_id ? {...variables, is_archive:false} : users
         );
       });
     },
