@@ -86,6 +86,10 @@ const ModalCommentSelectProductOrder: React.FC<Props> = ({
                 value: /^[0-9]+$/,
                 message: "Вводить можно только цифры",
               },
+              min: {
+                value: 1,
+                message: "Количество не должно быть меньше 1. Если вы хотите отклонить, то отклоните через кнопку 'Отклонить' ",
+              },
             })}
           />
           {errors.product_count && (
