@@ -342,6 +342,9 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) =>
   return (
 
       <Table
+      title={() => <p style={{padding:0}}>Заявок: {
+        currentFilters ? currentFilters : dataSource?.length
+      }</p>}
         dataSource={dataSource}
         columns={columns}
         scroll={{ x: 200 }}

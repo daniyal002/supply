@@ -46,6 +46,7 @@ export default function AdminUser() {
         icon={<PlusOutlined />}
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
+        title="Добавить"
       />
       <Button
         type="primary"
@@ -53,6 +54,7 @@ export default function AdminUser() {
         icon={<BookFilled />}
         onClick={() => setIsArchive(!isArchive)}
         style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+        title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
       <UserTable userData={userData} onEdit={onEdit} isArchive={isArchive}/>

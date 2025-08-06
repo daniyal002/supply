@@ -1,6 +1,13 @@
+// .highlightRow {
+//     background: rgb(72, 223, 130); /* Задайте нужный вам цвет */
+// }
+
 .highlightRow {
-    background: rgb(72, 223, 130); /* Задайте нужный вам цвет */
-}
+    background-color: rgb(72, 223, 130) !important;
+    > td {
+      background-color: rgb(72, 223, 130) !important;
+    }
+  }
 
 .remainContainer {
     background-color: #678098a8;

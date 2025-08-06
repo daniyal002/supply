@@ -5,6 +5,7 @@ import QueryClientContextProvider from "./QueryClientContextProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import MainLayout from "@/components/UI/MainLayout/MainLayout";
 import AntdConfigProvider from "./AntdConfigProvider";
+import Beforeunload from "@/components/Beforeunload/Beforeunload";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,11 +30,13 @@ export default function RootLayout({
       <AntdRegistry>
         <QueryClientContextProvider>
         <AntdConfigProvider>
+          <Beforeunload>
           <body className={inter.className}>
             <MainLayout>
             {children}
             </MainLayout>
           </body>
+          </Beforeunload>
             </AntdConfigProvider>
         </QueryClientContextProvider>
       </AntdRegistry>

@@ -272,6 +272,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   order_product_id: record.order_product_id as number,
                 })
               }
+        title="Активировать"
             >
               Активировать
             </Button>
@@ -288,6 +289,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                 // @ts-ignore: Unreachable code error
                 setProductIndexCancel(record.key);
               }}
+        title="Отклонить"
             >
               Отклонить
             </Button>

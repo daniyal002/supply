@@ -11,6 +11,7 @@ interface Props {
 
 export const RemainProduct: React.FC<Props> = ({ product_kod_1c,expandedRowKeys }) => {
   const { remainProductById, isError, isLoading,refetch } = useRemainProductById(product_kod_1c);
+  console.log(product_kod_1c)
 
   useEffect(() => {
     if(expandedRowKeys)

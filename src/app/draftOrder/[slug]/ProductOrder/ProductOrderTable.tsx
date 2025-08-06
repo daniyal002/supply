@@ -20,7 +20,7 @@ interface productOrderTableProps {
   deleteProduct: (key: number) => void;
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
-  orderId:number;
+  orderId: number;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -31,7 +31,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   deleteProduct,
   setIsNewProduct,
   disabledOrder,
-  orderId
+  orderId,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -82,7 +82,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -132,7 +134,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -179,7 +183,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -263,6 +269,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   // @ts-ignore: Unreachable code error
                   setProductIndex(record.key);
                 }}
+        title="Изменить"
               >
                 Изменить
               </Button>
@@ -273,6 +280,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   // @ts-ignore: Unreachable code error
                   deleteProduct(record.key);
                 }}
+        title="Удалить"
               >
                 Удалить
               </Button>
@@ -287,7 +295,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
 
   // Обработчик раскрытия строки
   const handleExpand = async (expanded: boolean, record: IProductTable) => {
-   // @ts-ignore: Unreachable code error
+    // @ts-ignore: Unreachable code error
     const key = record.key as number;
     setExpandedRowKeys(
       (prev) =>
@@ -296,7 +304,6 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           : prev.filter((k) => k !== key) // Удаляем ключ при сворачивании
     );
   };
-
 
   const dataSource = productTableData?.map((product, index) => ({
     ...product,
@@ -313,27 +320,34 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
-      footer={() => "Всего: " + (currentFilters ? currentFilters : dataSource?.length ? dataSource?.length : 0)}
+      footer={() =>
+        "Всего: " +
+        (currentFilters
+          ? currentFilters
+          : dataSource?.length
+          ? dataSource?.length
+          : 0)
+      }
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
-      locale={{emptyText:"Нет товаров"}}
-       expandable={{
-              expandedRowKeys,
-              onExpand: handleExpand,
-              expandedRowRender: (record) => (
-                <>
-                    <ExpandedRowContent
-                      orderProductComments={record?.order_product_comment || []}
-                      productPreviousOrders={record?.product_previous_orders}
-                      orderId={orderId}
-                    />
+      locale={{ emptyText: "Нет товаров" }}
+      expandable={{
+        expandedRowKeys,
+        onExpand: handleExpand,
+        expandedRowRender: (record) => (
+          <>
+            <ExpandedRowContent
+              orderProductComments={record?.order_product_comment || []}
+              productPreviousOrders={record?.product_previous_orders}
+              orderId={orderId}
+            />
 
-                  <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />
-                </>
-              ),
-            }}
-            rowHoverable={false}
+            <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />
+          </>
+        ),
+      }}
+      rowHoverable={false}
     />
   );
 };

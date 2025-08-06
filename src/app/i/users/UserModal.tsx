@@ -1,12 +1,19 @@
-import { Modal, Select } from "antd";
-import React, { useEffect } from "react";
+import { Button, Modal, Select } from "antd";
+import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import style from "./UserModal.module.scss";
 import { IUser, IUserFormValues } from "@/interface/user";
-import { useCreateUserMutation, useUpdateUserMutation, useUserData } from "@/hook/userHook";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useUserData,
+} from "@/hook/userHook";
 import { useEmployeeData } from "@/hook/employeeHook";
 import { useRoleData } from "@/hook/roleHook";
 import { IEmployee } from "@/interface/employee";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { generateSixDigitString } from "@/helper/generateSixDigitString";
+import { generateLoginFromName } from "@/helper/transliterate";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -27,6 +34,7 @@ export default function UserModal({
     formState: { errors },
     reset,
     control,
+    setValue
   } = useForm<IUserFormValues>({ mode: "onChange" });
   const { userData } = useUserData();
   const { employeeData } = useEmployeeData();
@@ -44,16 +52,16 @@ export default function UserModal({
       (role) => role.role_id === data.role.value
     );
 
-
     const { password, ...updateUserWithoutPassword } = {
       ...data,
       employee: itemEmployeeData as IEmployee,
-      role: itemRoleData
+      role: itemRoleData,
     };
 
-    const updateUser = password === ""
-      ? updateUserWithoutPassword
-      : { ...updateUserWithoutPassword, password };
+    const updateUser =
+      password === ""
+        ? updateUserWithoutPassword
+        : { ...updateUserWithoutPassword, password };
 
     type === "Добавить"
       ? createUserMutation(updateUser)
@@ -62,17 +70,18 @@ export default function UserModal({
     setIsModalOpen(false);
   };
 
-  const itemUserData = userData?.find(
-    (user) => user.user_id === userId
-  );
+  const itemUserData = userData?.find((user) => user.user_id === userId);
 
   useEffect(() => {
     if (userId === undefined) {
       reset({
         login: undefined,
         password: undefined,
-        employee:undefined,
-        role:undefined,
+        employee: undefined,
+        role: {
+          value: 6,
+          label: 'user',
+        },
       });
     } else if (type === "Изменить" && itemUserData) {
       reset({
@@ -101,17 +110,63 @@ export default function UserModal({
     label: role.role_name as string,
   }));
 
+  const [showPassword, setShowPassword] = useState<boolean>(false); // Состояние для видимости пароля
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <Modal
       title={`${type} пользователя`}
       open={isModalOpen}
       onCancel={() => {
         setIsModalOpen(false);
-        reset();
+        reset({
+          login: undefined,
+        password: undefined,
+        employee: undefined,
+        role:   {
+          value: 6,
+          label: 'user',
+        },
+        });
       }}
       footer={null}
     >
       <form onSubmit={handleSubmit(onSubmit)} className={style.userForm}>
+      <div className={style.formItem}>
+          <label className={style.formItemLabel}>Выберите сотрудника</label>
+          <Controller
+            control={control}
+            name="employee"
+            rules={{
+              required: { message: "Выберите сотрудника", value: true },
+            }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={optionsEmployee}
+                onChange={(value, option: any) =>{
+                  field.onChange({ value: value, label: option.label })
+                  const login = generateLoginFromName(option.label);
+                  setValue("login", login)}
+                }
+                placeholder="Сотрудник"
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+
+                showSearch
+              />
+            )}
+          />
+        </div>
+
+        {errors && <p className={style.error}>{errors.employee?.message}</p>}
+
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Логин</label>
           <input
@@ -124,53 +179,43 @@ export default function UserModal({
           />
         </div>
 
-        {errors && (
-          <p className={style.error}>{errors.login?.message}</p>
-        )}
+        {errors && <p className={style.error}>{errors.login?.message}</p>}
 
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Пароль</label>
-          <input
-            type="password"
-            placeholder="Пароль"
-            className={style.userPassword}
-            {...register("password", {
-              // required: { message: "Введите пароль", value: true },
-              minLength: { message: "Пароль должен быть не менее 6 символов", value: 6 },
-            })}
-          />
+          <div className={style.passwordInputContainer}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Пароль"
+              className={style.userPassword}
+              {...register("password", {
+                // required: { message: "Введите пароль", value: true },
+                minLength: {
+                  message: "Пароль должен быть не менее 6 символов",
+                  value: 6,
+                },
+              })}
+            />
+            <button
+              type="button"
+              className={style.showPasswordButton}
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? (
+                <EyeOutlined style={{ fontSize: "25px" }} />
+              ) : (
+                <EyeInvisibleOutlined style={{ fontSize: "25px" }} />
+              )}
+            </button>
+          </div>
+          <Button className={style.buttonGeneratePassword} onClick={() => setValue('password',generateSixDigitString())}>
+            Сгенерировать пароль
+          </Button>
         </div>
 
-        {errors && (
-          <p className={style.error}>{errors.password?.message}</p>
-        )}
+        {errors && <p className={style.error}>{errors.password?.message}</p>}
 
-        <div className={style.formItem}>
-          <label className={style.formItemLabel}>Выберите сотрудника</label>
-          <Controller
-            control={control}
-            name="employee"
-            rules={{
-              required: { message: "Выберите сотрудника", value: true },
-            }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={optionsEmployee}
-                onChange={(value, option:any) => field.onChange({value:value,label:option.label})}
-                placeholder="Сотрудник"
-                filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                }
-                showSearch
-              />
-            )}
-          />
-        </div>
 
-        {errors && (
-          <p className={style.error}>{errors.employee?.message}</p>
-        )}
 
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Выберите роль</label>
@@ -184,17 +229,18 @@ export default function UserModal({
               <Select
                 {...field}
                 options={optionsRole}
-                // @ts-ignore: Unreachable code error
-                onChange={(value, option) => field.onChange({value:value,label:option.label})}
+                onChange={(value, option) =>
+                  // @ts-ignore: Unreachable code error
+                  field.onChange({ value: value, label: option.label })
+                }
                 placeholder="Роль"
-              />
+                defaultValue={{label:"user",value:6}}
+                />
             )}
           />
         </div>
 
-        {errors && (
-          <p className={style.error}>{errors.role?.message}</p>
-        )}
+        {errors && <p className={style.error}>{errors.role?.message}</p>}
 
         <button type="submit" className={style.userNameSubmit}>
           {type}

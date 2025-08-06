@@ -277,6 +277,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   // @ts-ignore: Unreachable code error
                   setProductIndex(record.key);
                 }}
+                title="Изменить"
               >
                 Изменить
               </Button>
@@ -287,6 +288,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   // @ts-ignore: Unreachable code error
                   deleteProduct(record.key);
                 }}
+                title="Удалить"
               >
                 Удалить
               </Button>

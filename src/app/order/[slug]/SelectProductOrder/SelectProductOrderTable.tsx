@@ -11,7 +11,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues } from "react-hook-form";
-import style from './SelectProductOrderTable.module.scss'
+import style from "./SelectProductOrderTable.module.scss";
 import { RemainProduct } from "../../../../components/UI/RemainProduct/RemainProduct";
 import { useColumnFilterShortcut } from "@/helper/TableFilters/hook/useColumnFilterShortcut";
 import SearchFilteredIcon from "@/components/UI/FilteredIcon/SearchFilteredIcon";
@@ -32,7 +32,8 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
-    const { visibleColumnKey, setVisibleColumnKey } = useColumnFilterShortcut("product_name");
+  const { visibleColumnKey, setVisibleColumnKey } =
+    useColumnFilterShortcut("product_name");
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();
@@ -93,7 +94,11 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchFilteredIcon filtered={filtered} setVisibleColumnKey={setVisibleColumnKey} visibleColumnKey="product_name"/>
+        <SearchFilteredIcon
+          filtered={filtered}
+          setVisibleColumnKey={setVisibleColumnKey}
+          visibleColumnKey="product_name"
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -153,7 +158,9 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -208,6 +215,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
               record.product_group.product_group_id !==
               getValues("product_group.value")
             }
+            title="Добавить"
           >
             Добавить
           </Button>
@@ -218,19 +226,18 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
-const handleExpand = (expanded:boolean, record:IProductUnit) => {
-  const key = record.product_kod_1c;
-  let newExpandedRowKeys = [...expandedRowKeys];
+  const handleExpand = (expanded: boolean, record: IProductUnit) => {
+    const key = record.product_kod_1c;
+    let newExpandedRowKeys = [...expandedRowKeys];
 
-  if (expanded) {
-    newExpandedRowKeys.push(key);
-  } else {
-    newExpandedRowKeys = newExpandedRowKeys.filter(k => k !== key);
-  }
+    if (expanded) {
+      newExpandedRowKeys.push(key);
+    } else {
+      newExpandedRowKeys = newExpandedRowKeys.filter((k) => k !== key);
+    }
 
-  setExpandedRowKeys(newExpandedRowKeys);
-};
-
+    setExpandedRowKeys(newExpandedRowKeys);
+  };
 
   const dataSource = productData?.map((product) => ({
     ...product,

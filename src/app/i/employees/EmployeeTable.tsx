@@ -198,6 +198,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
           <Button
             type="dashed"
             onClick={() => onEdit(record.buyer_id as number)}
+            title="Изменить"
           >
             Изменить
           </Button>
@@ -215,6 +216,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>

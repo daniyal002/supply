@@ -199,6 +199,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
               record.product_group.product_group_id !==
               getValues("product_group.value")
             }
+            title="Добавить"
           >
             Добавить
           </Button>

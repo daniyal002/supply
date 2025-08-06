@@ -212,7 +212,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       title={
         !isNewProduct
           ? `${type} ${itemProductData?.product_name}`
-          : "Новый товар"
+          : "Новый товар - если вы не нашли товар по подбору"
       }
       open={isModalOpen}
       onCancel={() => closeModal()}
@@ -309,7 +309,12 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                   // @ts-ignore: Unreachable code error
                   field.onChange({ value, label: option.label });
                 }}
-
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               />
             )}
           />
@@ -347,7 +352,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 
         {buyerType === "parlor" && (
           <div className={style.formItem}>
-            <label className={style.formItemLabel}>Выберите врача</label>
+            <label className={style.formItemLabel}>Выберите сотрудника</label>
             <Controller
               control={control}
               name="buyers"
@@ -370,7 +375,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  placeholder="Врач"
+                  placeholder="сотрудник"
+                  autoClearSearchValue={false}
                   onChange={(value, option) => field.onChange(option)} // Передаём только значение
                 />
               )}

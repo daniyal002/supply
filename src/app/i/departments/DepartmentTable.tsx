@@ -1,9 +1,12 @@
-'use client';
+"use client";
 
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IDepartment } from "@/interface/department";
-import { useArchiveDepartmentMutation, useDeleteDepartmentMutation } from "@/hook/departmentHook";
+import {
+  useArchiveDepartmentMutation,
+  useDeleteDepartmentMutation,
+} from "@/hook/departmentHook";
 import { IHousing } from "@/interface/housing";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { SearchOutlined } from "@ant-design/icons";
@@ -15,30 +18,35 @@ import { Key, useMemo } from "react";
 interface PostTableProps {
   departmentData: IDepartment[] | undefined;
   onEdit: (id: number) => void;
-  isArchive:boolean
+  isArchive: boolean;
 }
 
-const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isArchive = false }) => {
+const DepartmentTable: React.FC<PostTableProps> = ({
+  departmentData,
+  onEdit,
+  isArchive = false,
+}) => {
   const { mutate: deleteDepartmentMutation } = useDeleteDepartmentMutation();
-  const {mutate:archiveDepartmentMutation} = useArchiveDepartmentMutation()
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { mutate: archiveDepartmentMutation } = useArchiveDepartmentMutation();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
-
-  const columns:TableColumnsType<IDepartment> = [
+  const columns: TableColumnsType<IDepartment> = [
     {
       title: "ID",
       dataIndex: "department_id",
       key: "department_id",
-      sorter: (a:any, b:any) => a.department_id - b.department_id,
+      sorter: (a: any, b: any) => a.department_id - b.department_id,
       showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Подразделение",
       dataIndex: "department_name",
       key: "department_name",
-      sorter: (a:any, b:any) => a.department_name.localeCompare(b.department_name, 'ru'),
+      sorter: (a: any, b: any) =>
+        a.department_name.localeCompare(b.department_name, "ru"),
       showSorterTooltip: { title: "Сортировка по подразделению" },
-      filterDropdown: (props:any) => (
+      filterDropdown: (props: any) => (
         <SearchFilter
           {...props}
           placeholder="Поиск по подразделению"
@@ -51,15 +59,17 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
-      onFilter: (value:boolean|Key, record:IDepartment) => {
+      onFilter: (value: boolean | Key, record: IDepartment) => {
         const searchValue = (value as string).toLowerCase();
         const department_name = record.department_name.toString().toLowerCase();
 
         return filterBySearchText(searchValue, department_name);
       },
-      render: (text:string) =>
+      render: (text: string) =>
         searchedColumn === "department_name" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -72,32 +82,34 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
         ),
     },
     {
-      title: 'Корпус',
-      dataIndex: 'housing',
-      key: 'housing',
-      sorter: (a: any, b: any) => a.housing?.housing_name.localeCompare(b.housing?.housing_name, 'ru'),
+      title: "Корпус",
+      dataIndex: "housing",
+      key: "housing",
+      sorter: (a: any, b: any) =>
+        a.housing?.housing_name.localeCompare(b.housing?.housing_name, "ru"),
       showSorterTooltip: { title: "Сортировка по корпусу" },
-      render: (housing:IHousing) => housing?.housing_name,
+      render: (housing: IHousing) => housing?.housing_name,
       filters: useMemo(() => {
-              if (!departmentData) return [];
+        if (!departmentData) return [];
 
-              const uniqueDepartments = Array.from(
-                new Map(
-                  departmentData
-                    .filter(d => d.housing && d.housing.housing_id) // Фильтруем сразу по наличию housing_id
-                    .map(department => [
-                      department.housing!.housing_id,
-                      {
-                        text: department.housing!.housing_name,
-                        value: department.housing!.housing_id as number, // Явно приводим к number
-                      },
-                    ])
-                ).values()
-              );
+        const uniqueDepartments = Array.from(
+          new Map(
+            departmentData
+              .filter((d) => d.housing && d.housing.housing_id) // Фильтруем сразу по наличию housing_id
+              .map((department) => [
+                department.housing!.housing_id,
+                {
+                  text: department.housing!.housing_name,
+                  value: department.housing!.housing_id as number, // Явно приводим к number
+                },
+              ])
+          ).values()
+        );
 
-              return uniqueDepartments
-                .sort((a, b) => a.text.localeCompare(b.text, 'ru'));
-            }, [departmentData]),
+        return uniqueDepartments.sort((a, b) =>
+          a.text.localeCompare(b.text, "ru")
+        );
+      }, [departmentData]),
       onFilter: (value: boolean | Key, record: IDepartment) =>
         record.housing?.housing_id === Number(value),
     },
@@ -106,7 +118,11 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
       key: "action",
       render: (_: any, record: IDepartment) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.department_id as number)}>
+          <Button
+            type="dashed"
+            onClick={() => onEdit(record.department_id as number)}
+            title="Изменить"
+          >
             Изменить
           </Button>
           <Button
@@ -123,6 +139,7 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>
@@ -134,10 +151,12 @@ const DepartmentTable: React.FC<PostTableProps> = ({ departmentData, onEdit, isA
     },
   ];
 
-  const dataSource = departmentData?.map((department) => ({
-    ...department,
-    key: department.department_id, // Ensure each item has a unique key
-  })).filter((depatment) => depatment.is_archive === isArchive);
+  const dataSource = departmentData
+    ?.map((department) => ({
+      ...department,
+      key: department.department_id, // Ensure each item has a unique key
+    }))
+    .filter((depatment) => depatment.is_archive === isArchive);
 
   return (
     <Table

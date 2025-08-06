@@ -59,6 +59,7 @@ export const ExpandedRowContent = ({
           setProductIndex(order_product_id);
         }}
         style={{ marginBottom: "10px" }}
+        title="Добавить комментарий"
       >
         Добавить комментарий
       </Button>

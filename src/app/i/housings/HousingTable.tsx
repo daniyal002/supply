@@ -79,6 +79,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
           <Button
             type="dashed"
             onClick={() => onEdit(record.housing_id as number)}
+            title="Изменить"
           >
             Изменить
           </Button>
@@ -96,6 +97,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>

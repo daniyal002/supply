@@ -144,7 +144,7 @@ export default function DropdownMenu() {
               style={{
                 cursor: "pointer",
                 transition: "all 0.3s",
-                fontSize:"32px"
+                fontSize:"28px"
               }}
             />
           </Badge>

@@ -38,19 +38,21 @@ export default function AdminRoute() {
       <Toaster />
       <div style={{display:'flex', gap:'10px'}}>
 
-      <Link href="routes/newRoute"><Button
+      <Link href="routes/newRoute">  <Button
         type="primary"
         shape="circle"
         icon={<PlusOutlined />}
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
+        title="Добавить"
       /></Link>
-       <Button
+      <Button
         type="primary"
         shape="circle"
         icon={<BookFilled />}
         onClick={() => setIsArchive(!isArchive)}
         style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+        title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
 

@@ -200,6 +200,7 @@ export default function Route({ routeId }: Props) {
                   {...field}
                   showSearch
                   mode="multiple"
+                  autoClearSearchValue={false}
                   placeholder="Выберите сотрудников для текущего шага"
                   filterOption={(input, option) =>
                     (option?.children ?? "")
@@ -313,6 +314,8 @@ export default function Route({ routeId }: Props) {
                       placeholder="Выберите группу продуктов"
                       value={field.value || []} // защита от undefined
                       style={{ flexGrow: 1 }}
+                  autoClearSearchValue={false}
+
                     >
                       {productGroupData?.map((productGroup) => (
                         <Option

@@ -133,6 +133,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
           <Button
             type="dashed"
             onClick={() => onEdit(record.user_id as number)}
+            title="Изменить"
           >
             Изменить
           </Button>
@@ -150,6 +151,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>

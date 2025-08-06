@@ -11,8 +11,7 @@ import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearch
 import { useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
-import style from "./ProductOrderTable.module.scss"
-
+import style from "./ProductOrderTable.module.scss";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -23,7 +22,6 @@ interface productOrderTableProps {
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
   orderId: number;
-
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -34,8 +32,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   deleteProduct,
   setIsNewProduct,
   disabledOrder,
-  orderId
-
+  orderId,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -59,7 +56,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       })
       .map((product) => ({
         value: product?.unit_measurement?.unit_measurement?.unit_measurement_id,
-        text: product?.unit_measurement?.unit_measurement?.unit_measurement_name,
+        text: product?.unit_measurement?.unit_measurement
+          ?.unit_measurement_name,
       }));
   }, [productTableData]);
 
@@ -86,7 +84,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -136,7 +136,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -183,7 +185,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -254,18 +258,20 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_status",
       key: "order_product_status",
       // responsive: ["sm"],
-      render: (order_product_status:IOrderProductStatus) => <p
-      style={{
-        backgroundColor: order_product_status?.product_status_name,
-        color: "#fff",
-        padding: "10px",
-        textAlign: "center",
-        textTransform: "uppercase",
-        borderRadius: "5px",
-      }}
-    >
-      {order_product_status?.product_status_name}
-    </p>
+      render: (order_product_status: IOrderProductStatus) => (
+        <p
+          style={{
+            backgroundColor: order_product_status?.product_status_name,
+            color: "#fff",
+            padding: "10px",
+            textAlign: "center",
+            textTransform: "uppercase",
+            borderRadius: "5px",
+          }}
+        >
+          {order_product_status?.product_status_name}
+        </p>
+      ),
     },
     {
       title: "Действия",
@@ -275,8 +281,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         <Space size="middle">
           {record.is_cancel && (
             <Tooltip title={<span>{record.order_cancel_comment.comment}</span>}>
-              <InfoCircleFilled  style={{color:"#fff"}}/>
-              </Tooltip>
+              <InfoCircleFilled style={{ color: "#fff" }} />
+            </Tooltip>
           )}
 
           {!disabledOrder && (
@@ -291,6 +297,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   // @ts-ignore: Unreachable code error
                   setProductIndex(record.key);
                 }}
+                title="Изменить"
               >
                 Изменить
               </Button>
@@ -301,6 +308,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   // @ts-ignore: Unreachable code error
                   deleteProduct(record.key);
                 }}
+                title="Удалить"
               >
                 Удалить
               </Button>
@@ -311,7 +319,6 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     },
   ];
 
-
   const [currentFilters, setCurrentFilters] = useState<number>(
     productTableData?.length as number
   );
@@ -320,7 +327,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
 
   // Обработчик раскрытия строки
   const handleExpand = async (expanded: boolean, record: IProductTable) => {
-   // @ts-ignore: Unreachable code error
+    // @ts-ignore: Unreachable code error
     const key = record.key as number;
     setExpandedRowKeys(
       (prev) =>
@@ -330,9 +337,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     );
   };
 
-  const dataSource = productTableData?.map((product,index) => ({
+  const dataSource = productTableData?.map((product, index) => ({
     ...product,
-    key:index, // Ensure each item has a unique key
+    key: index, // Ensure each item has a unique key
   }));
 
   return (
@@ -361,11 +368,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         onExpand: handleExpand,
         expandedRowRender: (record) => (
           <>
-              <ExpandedRowContent
-                orderProductComments={record?.order_product_comment || []}
-                productPreviousOrders={record?.product_previous_orders}
-                orderId={orderId}
-              />
+            <ExpandedRowContent
+              orderProductComments={record?.order_product_comment || []}
+              productPreviousOrders={record?.product_previous_orders}
+              orderId={orderId}
+            />
 
             <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />
           </>

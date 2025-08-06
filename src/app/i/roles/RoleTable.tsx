@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button, Space, Table } from "antd";
 import { toast } from "sonner";
@@ -8,27 +8,30 @@ import { useArchiveRoleMutation, useDeleteRoleMutation } from "@/hook/roleHook";
 interface RoleTableProps {
   roleData: IRole[] | undefined;
   onEdit: (id: number) => void;
-  isArchive:boolean
+  isArchive: boolean;
 }
 
-const RoleTable: React.FC<RoleTableProps> = ({ roleData, onEdit,isArchive }) => {
+const RoleTable: React.FC<RoleTableProps> = ({
+  roleData,
+  onEdit,
+  isArchive,
+}) => {
   const { mutate: deleteRoleMutation } = useDeleteRoleMutation();
-  const {mutate:archiveRoleMutation} = useArchiveRoleMutation()
+  const { mutate: archiveRoleMutation } = useArchiveRoleMutation();
 
   const columns = [
     {
       title: "ID",
       dataIndex: "role_id",
       key: "role_id",
-      sorter: (a:any, b:any) => a.role_id - b.role_id,
+      sorter: (a: any, b: any) => a.role_id - b.role_id,
       showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Роль",
       dataIndex: "role_name",
       key: "role_name",
-      sorter: (a: any, b: any) =>
-        a.role_name.localeCompare(b.role_name, 'ru'),
+      sorter: (a: any, b: any) => a.role_name.localeCompare(b.role_name, "ru"),
       showSorterTooltip: { title: "Сортировка по ролям" },
     },
     {
@@ -36,7 +39,11 @@ const RoleTable: React.FC<RoleTableProps> = ({ roleData, onEdit,isArchive }) => 
       key: "action",
       render: (_: any, record: IRole) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.role_id as number)}>
+          <Button
+            type="dashed"
+            onClick={() => onEdit(record.role_id as number)}
+            title="Изменить"
+          >
             Изменить
           </Button>
           <Button
@@ -53,6 +60,7 @@ const RoleTable: React.FC<RoleTableProps> = ({ roleData, onEdit,isArchive }) => 
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>
@@ -64,10 +72,12 @@ const RoleTable: React.FC<RoleTableProps> = ({ roleData, onEdit,isArchive }) => 
     },
   ];
 
-  const dataSource = roleData?.map((role) => ({
-    ...role,
-    key: role.role_id, // Ensure each item has a unique key
-  })).filter((role) => role.is_archive === isArchive);;
+  const dataSource = roleData
+    ?.map((role) => ({
+      ...role,
+      key: role.role_id, // Ensure each item has a unique key
+    }))
+    .filter((role) => role.is_archive === isArchive);
 
   return (
     <Table

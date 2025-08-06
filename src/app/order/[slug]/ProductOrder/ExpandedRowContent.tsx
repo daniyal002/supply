@@ -15,37 +15,34 @@ export const ExpandedRowContent = ({
   productPreviousOrders,
   orderId,
 }: Props) => {
-  const dataSourceProductComments: IOrderProductCommentsResponse[] = orderProductComments?.map(
-    (product, index) => ({
+  const dataSourceProductComments: IOrderProductCommentsResponse[] =
+    orderProductComments?.map((product, index) => ({
       ...product,
       key: index, // Ensure each item has a unique key
-    })
-  );
+    }));
 
-  const dataSourceProductPreviousOrders: IProductPreviousOrders[] = productPreviousOrders?.map(
-    (product, index) => ({
+  const dataSourceProductPreviousOrders: IProductPreviousOrders[] =
+    productPreviousOrders?.map((product, index) => ({
       ...product,
       key: index, // Ensure each item has a unique key
-    })
-  );
-
+    }));
 
   const { mutate: deleteOrderProductCommentMutation } =
     useDeleteOrderProductCommentMutation(orderId);
 
   return (
     <>
-
-  <div style={{display:'flex', flexDirection:"column", gap:"10px"}}>
-      {!dataSourceProductComments || dataSourceProductComments?.length === 0 ? (
-        <div style={{margin:"12px 16px"}}>Данные не найдены</div>
-      ) : (
-        <Collapse
-          items={[
-            {
-              key: "comments-panel", // Уникальный ключ для панели
-              label: "Комментарии к товару", // Заголовок (можно оставить пустым)
-              children: (
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {!dataSourceProductComments ||
+        dataSourceProductComments?.length === 0 ? (
+          <div style={{ margin: "12px 16px" }}>Данные не найдены</div>
+        ) : (
+          <Collapse
+            items={[
+              {
+                key: "comments-panel", // Уникальный ключ для панели
+                label: "Комментарии к товару", // Заголовок (можно оставить пустым)
+                children: (
                   <Table
                     dataSource={dataSourceProductComments}
                     columns={[
@@ -72,22 +69,24 @@ export const ExpandedRowContent = ({
                     ]}
                     pagination={false}
                   />
-              ),
-            },
-          ]}
-        />
-      )}
+                ),
+              },
+            ]}
+          />
+        )}
 
-      {!dataSourceProductPreviousOrders || dataSourceProductPreviousOrders?.length === 0 ? (
-        <div style={{margin:"12px 16px"}}>Ранее этот товар этот не заказывали</div>
-      ) : (
-        <Collapse
-          items={[
-            {
-              key: "product-previous-orders-panel", // Уникальный ключ для панели
-              label: "Предыдущие заказы c первого числа текущего месяца", // Заголовок (можно оставить пустым)
-              children: (
-
+        {!dataSourceProductPreviousOrders ||
+        dataSourceProductPreviousOrders?.length === 0 ? (
+          <div style={{ margin: "12px 16px" }}>
+            Ранее этот товар этот не заказывали
+          </div>
+        ) : (
+          <Collapse
+            items={[
+              {
+                key: "product-previous-orders-panel", // Уникальный ключ для панели
+                label: "Предыдущие заказы c первого числа текущего месяца", // Заголовок (можно оставить пустым)
+                children: (
                   <Table
                     dataSource={dataSourceProductPreviousOrders}
                     columns={[
@@ -110,17 +109,17 @@ export const ExpandedRowContent = ({
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
-                        render: (data:string) => formatNotificationDate(data)
+                        render: (data: string) => formatNotificationDate(data),
                       },
                     ]}
                     pagination={false}
                   />
-              ),
-            },
-          ]}
-        />
-      )}
-</div>
+                ),
+              },
+            ]}
+          />
+        )}
+      </div>
     </>
   );
 };

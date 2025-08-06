@@ -3,6 +3,7 @@ import { ILoginRequest, ILoginResponse, IRefreshRequest } from "@/interface/auth
 import { removeAccessTokenFromStorage, removeRefreshTokenFromStorage, saveAccessToken, saveRefreshToken } from "./auth-token.service";
 import { userService } from "./user.service";
 import { deleteGetMe } from "@/db/db";
+import { setLoggingOut } from "@/components/Beforeunload/Beforeunload";
 
 export const authService = {
     async login (body:ILoginRequest){
@@ -22,6 +23,7 @@ export const authService = {
 
 
     async logout(){
+        setLoggingOut(true);
         try {
             const response = await axiosWidthAuth.post("/auth/logout");
 

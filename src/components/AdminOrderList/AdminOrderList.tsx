@@ -59,12 +59,13 @@ export default function AdminOrderList() {
         style={{ marginBottom: 16 }}
         format="DD.MM.YYYY"
       />
-      <Button
+     <Button
         type="primary"
         shape="circle"
         icon={<BookFilled />}
         onClick={() => setIsArchive(!isArchive)}
         style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+        title={isArchive ? 'Не архивные' : 'Архивные'}
       />
 
       <OrderListTable OrderData={filteredOrderData} isArchive={isArchive}/>

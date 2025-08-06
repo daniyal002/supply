@@ -40,19 +40,21 @@ export default function AdminEmployee() {
         employeeId={employeeId}
       />
       <div style={{display:'flex', gap:'10px'}}>
-      <Button
+        <Button
         type="primary"
         shape="circle"
         icon={<PlusOutlined />}
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
+        title="Добавить"
       />
-      <Button
+     <Button
         type="primary"
         shape="circle"
         icon={<BookFilled />}
         onClick={() => setIsArchive(!isArchive)}
         style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+        title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
       <EmployeeTable employeeData={employeeData} onEdit={onEdit} isArchive={isArchive}/>

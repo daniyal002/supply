@@ -155,6 +155,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
               showModal();
               setProductId(record.product_id);
             }}
+        title="Добавить"
           >
             Добавить
           </Button>

@@ -115,6 +115,7 @@ const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive
           <Button
             type="dashed"
             onClick={() => onEdit(record.parlor_id as number)}
+            title="Изменить"
           >
             Изменить
           </Button>
@@ -132,6 +133,7 @@ const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>

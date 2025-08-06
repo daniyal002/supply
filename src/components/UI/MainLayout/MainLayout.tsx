@@ -11,6 +11,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MoonOutlined,
+  QuestionCircleOutlined,
   ShopOutlined,
   SunOutlined,
   TagsOutlined,
@@ -53,6 +54,9 @@ const MainLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+
+
+
   const [collapsed, setCollapsed] = useState(true);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -278,8 +282,16 @@ const MainLayout = ({
             }}
           />
 
+
           <div className={style.headerBellAndButtons}>
-          <Button onClick={() => editTheme()}>
+          <Button onClick={() => message.info("Для связи с техподдержкой позвоните по внутренному телефону на 194 или 195")}
+                size={isMobile ? "small" : "middle"}
+                title="Техподдержка"
+                >{isMobile ? <QuestionCircleOutlined /> : 'Техподдержка'}</Button>
+
+          <Button onClick={() => editTheme()}
+                size={isMobile ? "small" : "middle"}
+                >
             {supplyTheme === "light" ? <SunOutlined /> : <MoonOutlined /> }
             </Button>
             <DropdownMenu />
@@ -290,6 +302,7 @@ const MainLayout = ({
                   onClick={() =>
                     message.info("Пока еще не придумали функционал для этой кнопки")
                   }
+                size={isMobile ? "small" : "middle"}
                 />
               <p className={style.headerLogin}>{login}</p>
               <Tooltip title="Выход">

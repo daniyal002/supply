@@ -6,7 +6,8 @@
     .formItem{
         display: flex;
         flex-direction: column;
-        
+
+
         .formItemLabel{
             font-size: 16px;
             font-weight: 600;
@@ -19,7 +20,7 @@
             border-radius: 6px;
             font-size: 16px;
             outline: none;
-    
+
             &:focus{
             border: 2px solid #649ace;
             }
@@ -27,8 +28,35 @@
                 color: #678098;
             }
         }
+
+        .passwordInputContainer {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            .userPassword {
+                flex: 1;
+            }
+
+            .showPasswordButton {
+                position: absolute;
+                right: 10px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #649ace; // Цвет текста кнопки
+                outline: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+        .buttonGeneratePassword{
+            margin-top: 10px;
+        }
     }
-    
+
 
     .error{
         color: red;
@@ -48,6 +76,6 @@
         &:hover{
             background-color: #678098;
         }
-       
+
     }
 }

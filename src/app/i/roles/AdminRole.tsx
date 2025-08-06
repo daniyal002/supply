@@ -40,19 +40,21 @@ export default function AdminRole() {
         roleId={roleId}
       />
       <div style={{display:'flex', gap:'10px'}}>
-      <Button
+        <Button
         type="primary"
         shape="circle"
         icon={<PlusOutlined />}
         onClick={onAdd}
         style={{ marginBottom: "10px" }}
+        title="Добавить"
       />
-      <Button
+     <Button
         type="primary"
         shape="circle"
         icon={<BookFilled />}
         onClick={() => setIsArchive(!isArchive)}
         style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
+        title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
       <RoleTable roleData={roleData} onEdit={onEdit} isArchive={isArchive}/>

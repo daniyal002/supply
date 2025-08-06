@@ -181,6 +181,7 @@ export default function EmployeeModal({
                   (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                 }
                 showSearch
+                autoClearSearchValue={false}
               />
             )}
           />
@@ -234,6 +235,7 @@ export default function EmployeeModal({
                   (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                 }
                 showSearch
+                autoClearSearchValue={false}
               />
             )}
           />

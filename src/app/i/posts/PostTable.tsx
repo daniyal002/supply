@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { IPost } from "@/interface/post";
 import { Button, Space, Table } from "antd";
@@ -14,30 +14,34 @@ import Highlighter from "react-highlight-words";
 interface PostTableProps {
   postData: IPost[] | undefined;
   onEdit: (id: number) => void;
-  isArchive:boolean;
+  isArchive: boolean;
 }
 
-const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) => {
+const PostTable: React.FC<PostTableProps> = ({
+  postData,
+  onEdit,
+  isArchive,
+}) => {
   const { mutate: deletePostMutation } = useDeletePostMutation();
-  const {mutate: archivePostMutation} = useArchivePostMutation()
-  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } = useSearch();
+  const { mutate: archivePostMutation } = useArchivePostMutation();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
   const columns = [
     {
       title: "ID",
       dataIndex: "post_id",
       key: "post_id",
-      sorter: (a:any, b:any) => a.post_id - b.post_id,
+      sorter: (a: any, b: any) => a.post_id - b.post_id,
       showSorterTooltip: { title: "Сортировка по ID" },
     },
     {
       title: "Должность",
       dataIndex: "post_name",
       key: "post_name",
-      sorter: (a: any, b: any) =>
-        a.post_name.localeCompare(b.post_name, 'ru'),
+      sorter: (a: any, b: any) => a.post_name.localeCompare(b.post_name, "ru"),
       showSorterTooltip: { title: "Сортировка по должности" },
-      filterDropdown: (props:any) => (
+      filterDropdown: (props: any) => (
         <SearchFilter
           {...props}
           placeholder="Поиск по должности"
@@ -50,15 +54,17 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) =>
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
-      onFilter: (value:boolean|Key, record:IPost) => {
+      onFilter: (value: boolean | Key, record: IPost) => {
         const searchValue = (value as string).toLowerCase();
         const post_name = record.post_name.toString().toLowerCase();
 
         return filterBySearchText(searchValue, post_name);
       },
-      render: (text:string) =>
+      render: (text: string) =>
         searchedColumn === "post_name" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -75,7 +81,11 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) =>
       key: "action",
       render: (_: any, record: IPost) => (
         <Space size="middle">
-          <Button type="dashed" onClick={() => onEdit(record.post_id as number)}>
+          <Button
+            type="dashed"
+            onClick={() => onEdit(record.post_id as number)}
+            title="Изменить"
+          >
             Изменить
           </Button>
           <Button
@@ -92,6 +102,7 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) =>
                 },
               })
             }
+            title="Удалить"
           >
             Удалить
           </Button>
@@ -103,10 +114,12 @@ const PostTable: React.FC<PostTableProps> = ({ postData, onEdit, isArchive }) =>
     },
   ];
 
-  const dataSource = postData?.map((post) => ({
-    ...post,
-    key: post.post_id, // Ensure each item has a unique key
-  })).filter((post) => post.is_archive === isArchive);
+  const dataSource = postData
+    ?.map((post) => ({
+      ...post,
+      key: post.post_id, // Ensure each item has a unique key
+    }))
+    .filter((post) => post.is_archive === isArchive);
 
   return (
     <Table

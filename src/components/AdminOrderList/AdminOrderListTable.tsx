@@ -64,9 +64,11 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
       })
     : [];
 
-    const CategoryOption = OrderData
+  const CategoryOption = OrderData
     ? Array.from(
-        new Set(OrderData.map((order) => order?.product_group?.product_group_id))
+        new Set(
+          OrderData.map((order) => order?.product_group?.product_group_id)
+        )
       ).map((id) => {
         const orderCategory = OrderData.find(
           (order) => order?.product_group?.product_group_id === id
@@ -114,7 +116,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) =>
         record.order_number
@@ -230,7 +234,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) =>
         record.buyer?.buyer_name
@@ -292,23 +298,23 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
           b.product_group.product_group_name,
           "ru"
         ),
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => (
-          <StatusFilter
-            options={CategoryOption}
-            setSelectedKeys={setSelectedKeys}
-            selectedKeys={selectedKeys.map((key) => String(key))}
-            confirm={confirm}
-            clearFilters={() => clearFilters && clearFilters()}
-            placeholder="Статус"
-          />
-        ),
-        onFilter: (value, record) =>
-          record.product_group.product_group_id === Number(value),
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <StatusFilter
+          options={CategoryOption}
+          setSelectedKeys={setSelectedKeys}
+          selectedKeys={selectedKeys.map((key) => String(key))}
+          confirm={confirm}
+          clearFilters={() => clearFilters && clearFilters()}
+          placeholder="Статус"
+        />
+      ),
+      onFilter: (value, record) =>
+        record.product_group.product_group_id === Number(value),
       render: (productGroup: IProductGroup) => productGroup?.product_group_name,
     },
     {
@@ -407,7 +413,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
             okText="Да"
             cancelText="Нет"
           >
-            <Button danger>
+            <Button danger
+            title={record.is_archive ? "Разархивировать" : "Архивировать"}
+            >
               <FileZipOutlined />
             </Button>
           </Popconfirm>
@@ -422,21 +430,23 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
   })).filter((order) => order.is_archive === isArchive);
 
   return (
-
-      <Table
-        dataSource={dataSource}
-        columns={columns}
-        scroll={{ x: 200 }}
-        pagination={{ locale: { items_per_page: "/ Заявок" } }}
-        footer={() =>
-          `Заявок: ${
-            (dataSource?.length as number) > 0 ? dataSource?.length : 0
-          }`
-        }
-        onRow={(record) => ({
-          onDoubleClick: () => setAdminOrderId(String(record.order_id)),
-        })}
-      />
+    <Table
+      title={() => (
+        <p style={{ padding: 0 }}>
+          Заявок: {(dataSource?.length as number) > 0 ? dataSource?.length : 0}
+        </p>
+      )}
+      dataSource={dataSource}
+      columns={columns}
+      scroll={{ x: 200 }}
+      pagination={{ locale: { items_per_page: "/ Заявок" } }}
+      footer={() =>
+        `Заявок: ${(dataSource?.length as number) > 0 ? dataSource?.length : 0}`
+      }
+      onRow={(record) => ({
+        onDoubleClick: () => setAdminOrderId(String(record.order_id)),
+      })}
+    />
   );
 };
 
