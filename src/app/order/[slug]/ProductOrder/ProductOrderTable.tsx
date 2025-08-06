@@ -22,6 +22,7 @@ interface productOrderTableProps {
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
   orderId: number;
+  tableRef?:React.RefObject<HTMLDivElement>
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -33,6 +34,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setIsNewProduct,
   disabledOrder,
   orderId,
+  tableRef
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -343,6 +345,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   }));
 
   return (
+    <div ref={tableRef}>
     <Table
       dataSource={dataSource}
       columns={columns}
@@ -380,6 +383,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       }}
       rowHoverable={false}
     />
+    </div>
   );
 };
 

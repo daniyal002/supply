@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import style from "./Order.module.scss";
 import {
   useCreateOrderMutation,
@@ -31,6 +32,8 @@ interface Props {
 }
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
   const { mutate: createOrderMutation, isPending: createOrderIsPending } =
@@ -114,6 +117,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           watch={watch}
           disabledOrder={disabledOrder}
           newProduct={newProduct}
+          tableRef={contentRef}
         />
       ),
     },
@@ -467,6 +471,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 </button>
               )}
             </div>
+            {/* <button onClick={reactToPrintFn}>Print</button> */}
         </div>
       </div>
     </div>

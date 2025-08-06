@@ -13,9 +13,10 @@ interface Props {
   setValue:UseFormSetValue<IOrderItemFormValues>
   disabledOrder:boolean
   newProduct: "newProduct" | "productFromCatalog" | undefined
+  tableRef?: React.RefObject<HTMLDivElement>;
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder,newProduct}:Props) {
+export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder,newProduct,tableRef}:Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
   const [productIndex,setProductIndex] = useState<number | null>()
@@ -83,6 +84,7 @@ export default function ProductOrder({productTableData,getValues,setValue,watch,
         setIsNewProduct={setIsNewProduct}
         disabledOrder={disabledOrder}
         orderId={orderId as number}
+        tableRef={tableRef}
       />
     </>
   );
