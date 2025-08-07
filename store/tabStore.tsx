@@ -2,6 +2,7 @@ import AdminOrderList from "@/components/AdminOrderList/AdminOrderList";
 import ApprovalList from "@/components/Approval/ApprovalList/ApprovalList";
 import DraftOrderList from "@/components/Order/OrderDraftLitst/DraftOrderList";
 import OrderList from "@/components/Order/OrderList/OrderList";
+import OrderListAll from "@/components/Order/OrderListAll/OrderListAll";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -44,6 +45,14 @@ interface ITabStore {
   activeTabAdminOrders: string;
   setActiveTabAdminOrders: (key: string) => void;
   deleteTabsAdminOrders: () => void;
+
+  tabsAllOrders: Tab[];
+  addTabAllOrders: (tab: Tab) => void;
+  removeTabAllOrders: (key: string) => void;
+  setTabsAllOrders: (tabs: Tab[]) => void;
+  activeTabAllOrders: string;
+  setActiveTabAllOrders: (key: string) => void;
+  deleteTabsAllOrders: () => void;
 
   activeMainTabKey:string,
   setActiveMainTabKey: (key: string) => void;
@@ -171,6 +180,36 @@ export const useTabStore = create<ITabStore>()(
             ],
             activeTabAdminOrders: "1",
           }),
+
+          tabsAllOrders: [
+            {
+              label: "Главная",
+              children: <OrderListAll />,
+              key: "1",
+              closable: false,
+            },
+          ],
+          addTabAllOrders: (tab) =>
+            set((state) => ({ tabsAllOrders: [...state.tabsAllOrders, tab] })),
+          removeTabAllOrders: (key) =>
+            set((state) => ({
+              tabsAllOrders: state.tabsAllOrders.filter((tab) => tab.key !== key),
+            })),
+          setTabsAllOrders: (tabs) => set({ tabsAllOrders: tabs }),
+          activeTabAllOrders: "1",
+          setActiveTabAllOrders: (key) => set({ activeTabAllOrders: key }),
+          deleteTabsAllOrders: () =>
+            set({
+              tabsAllOrders: [
+                {
+                  label: "Главная",
+                  children: <OrderListAll />,
+                  key: "1",
+                  closable: false,
+                },
+              ],
+              activeTabAllOrders: "1",
+            }),
 
         activeMainTabKey: "1",
         setActiveMainTabKey: (key) => set({activeMainTabKey:key})
