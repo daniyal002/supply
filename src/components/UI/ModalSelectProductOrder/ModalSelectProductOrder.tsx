@@ -128,7 +128,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         product_quantity: undefined,
         order_product_link: undefined,
         order_product_name: undefined,
-        unit_measurement: undefined,
+        unit_measurement: defaultUnit,
         note: undefined,
       });
     } else if (type === "Изменить" && editProductId !== null) {
@@ -202,9 +202,33 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     }
   }, [isNewProduct, allMesument, itemProductData]);
 
+  const defaultUnit = useMemo(() => {
+    if (isNewProduct || !itemProductData?.directory_unit_measurement?.length) {
+      return undefined;
+    }
+
+    const maxUnit = itemProductData.directory_unit_measurement.reduce(
+      (prev, current) =>
+        (prev.coefficient || 0) > (current.coefficient || 0) ? prev : current
+    );
+
+    return {
+      value: maxUnit.unit_measurement.unit_measurement_id,
+      label: `${maxUnit.unit_measurement.unit_measurement_name}(${maxUnit.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
+    };
+  }, [isNewProduct, itemProductData,allMesument]);
+
   const closeModal = () => {
     setIsModalOpen(false);
-    reset();
+    reset({
+      product: undefined,
+        buyers: undefined,
+        product_quantity: undefined,
+        order_product_link: undefined,
+        order_product_name: undefined,
+        unit_measurement: defaultUnit,
+        note: undefined,
+    });
   }
 
   return (
@@ -315,6 +339,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                     .toLowerCase()
                     .includes(input.toLowerCase())
                 }
+                defaultValue={!isNewProduct ? defaultUnit : undefined}
               />
             )}
           />

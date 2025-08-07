@@ -5,13 +5,13 @@ import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useEffect, useMemo, useState } from "react";
 import { IProductGroup, IProductUnit } from "@/interface/product";
-import { IBasicUnit } from "@/interface/basicUnit";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormGetValues } from "react-hook-form";
-import style from './SelectProductOrderTable.module.scss'
+import style from "./SelectProductOrderTable.module.scss";
+import { IUnit } from "@/interface/unit";
 
 interface ProductTableProps {
   productData: IProductUnit[];
@@ -84,7 +84,9 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -144,7 +146,9 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -167,21 +171,41 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
     },
     {
       title: "Ед. измерения",
-      dataIndex: "unit_measurement",
+      dataIndex: "directory_unit_measurement",
       key: "unit_measurement",
       width: "180px",
       showSorterTooltip: { title: "Сортировка по ед. измерения" },
-      sorter: (a, b) =>
-        a.unit_measurement.unit_measurement_name.localeCompare(
-          b.unit_measurement.unit_measurement_name,
+      sorter: (a, b) => {
+        // Получаем основную единицу: с коэффициентом > 1, если есть, иначе — первая
+        const getMainUnit = (product: IProductUnit) => {
+          return (
+            product.directory_unit_measurement.find((u) => u.coefficient > 1) ||
+            product.directory_unit_measurement[0]
+          );
+        };
+
+        const unitA = getMainUnit(a);
+        const unitB = getMainUnit(b);
+
+        return unitA.unit_measurement.unit_measurement_name.localeCompare(
+          unitB.unit_measurement.unit_measurement_name,
           "ru"
-        ),
-      render: (unit_measurement: IBasicUnit) =>
-        unit_measurement.unit_measurement_name,
+        );
+      },
+      render: (directory_unit_measurement: IUnit[]) => {
+        const mainUnit =
+          directory_unit_measurement.find((unit) => unit.coefficient > 1) ||
+          directory_unit_measurement[0];
+        return mainUnit.unit_measurement.unit_measurement_name;
+      },
       responsive: ["sm"],
       filters: unitGroup as { text: string; value: number }[],
-      onFilter: (value, record) =>
-        record.unit_measurement.unit_measurement_id === value,
+      onFilter: (value, record) => {
+        const mainUnit =
+          record.directory_unit_measurement.find((u) => u.coefficient > 1) ||
+          record.directory_unit_measurement[0];
+        return mainUnit.unit_measurement.unit_measurement_id === value;
+      },
     },
     {
       title: "Действия",
@@ -232,8 +256,14 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
-      rowClassName={(record) => getValues('order_products')?.find(product => product?.product?.product_id === record?.product_id) ? style.highlightRow : ''}
-      locale={{emptyText:"Нет товаров"}}
+      rowClassName={(record) =>
+        getValues("order_products")?.find(
+          (product) => product?.product?.product_id === record?.product_id
+        )
+          ? style.highlightRow
+          : ""
+      }
+      locale={{ emptyText: "Нет товаров" }}
       onRow={(record) => ({
         onDoubleClick: () => {
           record.product_group.product_group_id ===
