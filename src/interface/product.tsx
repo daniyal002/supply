@@ -31,6 +31,7 @@ export interface IProductUnit{
     directory_unit_measurement:IUnit[]
     product_article?:string
     product_kod_1c:string
+    remainder?:number
 }
 
 export interface IProductResponse{

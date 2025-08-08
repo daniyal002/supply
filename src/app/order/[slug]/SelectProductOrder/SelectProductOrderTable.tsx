@@ -216,6 +216,16 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       },
     },
     {
+      title: "Общий остаток",
+      key: "remainder",
+      dataIndex:"remainder",
+      width: "100px",
+      showSorterTooltip: { title: "Действия" },
+      sorter: {
+        compare: (a: any, b: any) => a.remainder - b.remainder,
+      },
+    },
+    {
       title: "Действия",
       key: "action",
       width: "100px",

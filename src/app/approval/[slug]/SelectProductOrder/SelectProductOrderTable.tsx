@@ -5,10 +5,10 @@ import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { useState, useRef, useMemo } from 'react';
 import { IProductGroup, IProductUnit } from "@/interface/product";
-import { IBasicUnit } from "@/interface/basicUnit";
 import type { InputRef, TableColumnType } from 'antd';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
+import { IUnit } from "@/interface/unit";
 
 interface ProductTableProps {
   productData: IProductUnit[];
@@ -133,17 +133,50 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({ productData, sho
       filters: productGroup,
       onFilter: (value, record) => record.product_group.product_group_id === value,
     },
-    {
-      title: "Ед. измерения",
-      dataIndex: "unit_measurement",
-      key: "unit_measurement",
-      width:"180px",
-      sorter: (a, b) => a.unit_measurement.unit_measurement_name.localeCompare(b.unit_measurement.unit_measurement_name, "ru"),
-      render: (unit_measurement: IBasicUnit) => unit_measurement.unit_measurement_name,
-      responsive: ["sm"],
-      filters: unitGroup as { text: string; value: number }[],
-      onFilter: (value, record) => record.unit_measurement.unit_measurement_id === value,
-    },
+   {
+         title: "Ед. измерения",
+         dataIndex: "directory_unit_measurement",
+         key: "unit_measurement",
+         width: "180px",
+         showSorterTooltip: { title: "Сортировка по ед. измерения" },
+         sorter: (a, b) => {
+           // Получаем основную единицу: с коэффициентом > 1, если есть, иначе — первая
+           const getMainUnit = (product: IProductUnit) => {
+             return product.directory_unit_measurement.find(u => u.coefficient > 1)
+               || product.directory_unit_measurement[0];
+           };
+
+           const unitA = getMainUnit(a);
+           const unitB = getMainUnit(b);
+
+           return unitA.unit_measurement.unit_measurement_name.localeCompare(
+             unitB.unit_measurement.unit_measurement_name,
+             "ru"
+           );
+         },
+         render: (directory_unit_measurement: IUnit[]) => {
+           const mainUnit = directory_unit_measurement.find(unit => unit.coefficient > 1)
+             || directory_unit_measurement[0];
+           return mainUnit.unit_measurement.unit_measurement_name;
+         },
+         responsive: ["sm"],
+         filters: unitGroup as { text: string; value: number }[],
+         onFilter: (value, record) => {
+           const mainUnit = record.directory_unit_measurement.find(u => u.coefficient > 1)
+             || record.directory_unit_measurement[0];
+           return mainUnit.unit_measurement.unit_measurement_id === value;
+         },
+       },
+       {
+         title: "Общий остаток",
+         key: "remainder",
+         dataIndex:"remainder",
+         width: "100px",
+         showSorterTooltip: { title: "Действия" },
+         sorter: {
+           compare: (a: any, b: any) => a.remainder - b.remainder,
+         },
+       },
     {
       title: "Действия",
       key: "action",

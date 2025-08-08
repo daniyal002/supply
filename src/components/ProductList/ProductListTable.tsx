@@ -198,6 +198,16 @@ const ProductListTable: React.FC<ProductListTableProps> = ({ productData }) => {
         return mainUnit.unit_measurement.unit_measurement_id === value;
       },
     },
+    {
+      title: "Общий остаток",
+      key: "remainder",
+      dataIndex:"remainder",
+      width: "100px",
+      showSorterTooltip: { title: "Действия" },
+      sorter: {
+        compare: (a: any, b: any) => a.remainder - b.remainder,
+      },
+    },
   ];
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
