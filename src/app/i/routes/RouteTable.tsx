@@ -15,6 +15,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { Key, useMemo } from "react";
 import Highlighter from "react-highlight-words";
+import { EnumOrderTypes } from "@/interface/orderItem";
 
 interface RouteTableProps {
   routeData: IOrderRouteResponseDetail[] | undefined;
@@ -112,6 +113,20 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
         );
       }, [routeData]),
       onFilter: (value, record) => record.department?.department_id === value,
+    },
+    {title:"Тип маршрута",
+      dataIndex: "order_route_type",
+      key: "order_route_type",
+      render: (order_route_type:string) => order_route_type === EnumOrderTypes.WAREHOUSE ? "Маршут на склад" : "Маршрут на закуп",
+      filters: [{
+        text:"Маршут на склад",
+        value:EnumOrderTypes.WAREHOUSE
+      },{
+        text:"Маршрут на закуп",
+        value:EnumOrderTypes.PURCHASE
+      }],
+      onFilter: (value, record) => record.order_route_type === value,
+
     },
     {
       title: "Действия",
