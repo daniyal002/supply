@@ -123,46 +123,46 @@ export default function HeaderOrder({
       // label: `${parlor.department?.department_name}-${parlor.department?.housing?.housing_name}`,
       label: parlor.department?.department_name,
     }));
+
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-        {GetMeData?.role?.role_name === "user_purchase" && (
-
-          <div className={style.formItem}>
-            <label className={style.formItemLabel}>Тип</label>
-            <Controller
-              control={control}
-              name="order_type"
-              rules={{
-                required: { message: "Выберите тип", value: true },
-              }}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  disabled={disabledOrder}
-                  options={optionsOrderTypes}
-                  showSearch
-                  filterOption={(input, option) =>
-                    (option?.label ?? "")
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+          {GetMeData?.role?.role_name === "user_purchase" ||
+            (GetMeData?.role?.role_name === "admin" && (
+              <div className={style.formItem}>
+                <label className={style.formItemLabel}>Тип</label>
+                <Controller
+                  control={control}
+                  name="order_type"
+                  rules={{
+                    required: { message: "Выберите тип", value: true },
                   }}
-                  placeholder="Тип"
-                  className={style.formItemSelect}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      disabled={disabledOrder}
+                      options={optionsOrderTypes}
+                      showSearch
+                      filterOption={(input, option) =>
+                        (option?.label ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      onChange={(value, option) => {
+                        // @ts-ignore: Unreachable code error
+                        field.onChange({ value: value, label: option.label });
+                      }}
+                      placeholder="Тип"
+                      className={style.formItemSelect}
+                    />
+                  )}
                 />
-              )}
-            />
-            {errors && (
-              <p className={style.error}>{errors.order_type?.message}</p>
-            )}
-          </div>
-        )}
+                {errors && (
+                  <p className={style.error}>{errors.order_type?.message}</p>
+                )}
+              </div>
+            ))}
           <div className={`${style.Checkbox}`}>
             <label className={style.formItemLabel}>ОМС</label>
             <Controller

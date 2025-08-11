@@ -2,22 +2,19 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import style from "./DraftOrder.module.scss";
-import {
-  useCreateOrderMutation,
-} from "@/hook/orderHook";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useCreateOrderMutation } from "@/hook/orderHook";
+import { useForm } from "react-hook-form";
 import {
   EnumOrderTypes,
   IDraftOrderItemRequest,
   IOrderDraftItemFormValues,
-  IOrderItemFormValues,
 } from "@/interface/orderItem";
 import HeaderOrder from "./DraftHeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Button, message, Spin, Tabs } from "antd";
+import { message, Spin, Tabs } from "antd";
 import { TabsProps } from "antd/lib";
 import { useProductData } from "@/hook/productHook";
 import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
@@ -27,7 +24,6 @@ import {
   useSaveDraftOrderMutation,
   useUpdateDraftOrderMutation,
 } from "@/hook/orderTempHook";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 
 interface Props {
   draftOrderid?: string;
@@ -42,26 +38,21 @@ export default function DraftOrder({
   remove,
   targetKey,
 }: Props) {
+  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
-  const { mutate: createOrderMutation } =
-    useCreateOrderMutation();
+  const { mutate: createOrderMutation } = useCreateOrderMutation();
 
-  const { isPending: saveOrderIsPending } =
-    useSaveDraftOrderMutation();
-  const {
-    mutate: updateDraftOrderMutation,
-  } = useUpdateDraftOrderMutation();
+  const { isPending: saveOrderIsPending } = useSaveDraftOrderMutation();
+  const { mutate: updateDraftOrderMutation } = useUpdateDraftOrderMutation();
   const {
     register,
-    handleSubmit,
     formState: { errors },
     reset,
     control,
     getValues,
     setValue,
     watch,
-    resetField,
   } = useForm<IOrderDraftItemFormValues>({ mode: "onChange" });
   let orderIdFromGetOrderById = draftOrderid;
   if (draftOrderid?.startsWith("copy")) {
@@ -71,34 +62,10 @@ export default function DraftOrder({
     orderIdFromGetOrderById as string
   );
 
-  const {mutate:deleteDraftOrderByIdMutation,isPending:DeleteDraftOrderByIisPending} = useDeleteDraftOrderByIdMutation()
-
-  const [newProduct, setNewProduct] = useState<
-     "newProduct" | "productFromCatalog" | undefined
-   >(undefined);
-
-    useEffect(() => {
-      const products = getValues("order_products");
-
-      if (Array.isArray(products)) {
-        const hasNewProuduct = products.some(
-          (product) => product.order_product_link
-        );
-        const hasProductFrom = products.every(
-          (product) => !product.order_product_link
-        );
-
-        if (hasNewProuduct) {
-          setNewProduct("newProduct");
-        } else if (hasProductFrom && products.length > 0) {
-          setNewProduct("productFromCatalog");
-        } else {
-          setNewProduct(undefined);
-        }
-      } else {
-        setNewProduct(undefined);
-      }
-    }, [getValues("order_products")]);
+  const {
+    mutate: deleteDraftOrderByIdMutation,
+    isPending: DeleteDraftOrderByIisPending,
+  } = useDeleteDraftOrderByIdMutation();
 
   const items: TabsProps["items"] = [
     {
@@ -111,15 +78,13 @@ export default function DraftOrder({
           setValue={setValue}
           watch={watch}
           disabledOrder={false}
-          newProduct={newProduct}
+          role={GetMeData?.role?.role_name as string}
         />
       ),
     },
   ];
 
   const onChange = (key: string) => {};
-
-  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const productsWatch = watch("order_products");
 
@@ -147,12 +112,16 @@ export default function DraftOrder({
   }, [getValues("employee_id")]);
 
   const createOrder = () => {
-    const data = getValues()
+    const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IDraftOrderItemRequest = {
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
-        order_type:GetMeData?.role?.role_name === "user_purchase" ? data.order_type.value : EnumOrderTypes.WAREHOUSE,
+        order_type:
+          GetMeData?.role?.role_name === "user_purchase" ||
+          GetMeData?.role?.role_name === "admin"
+            ? data.order_type.value
+            : EnumOrderTypes.WAREHOUSE,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         order_status_id: 1,
@@ -168,8 +137,8 @@ export default function DraftOrder({
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name:product?.order_product_name,
-            order_product_link:product?.order_product_link,
+            order_product_name: product?.order_product_name,
+            order_product_link: product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
@@ -185,7 +154,9 @@ export default function DraftOrder({
       ) {
         createOrderMutation(order, {
           onSuccess() {
-            deleteDraftOrderByIdMutation({order_temp_id:Number(draftOrderid)})
+            deleteDraftOrderByIdMutation({
+              order_temp_id: Number(draftOrderid),
+            });
             remove(targetKey);
           },
         });
@@ -209,7 +180,11 @@ export default function DraftOrder({
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
         oms: getValues().oms || false,
-        order_type:GetMeData?.role?.role_name === "user_purchase" ? getValues().order_type.value : EnumOrderTypes.WAREHOUSE,
+        order_type:
+          GetMeData?.role?.role_name === "user_purchase" ||
+          GetMeData?.role?.role_name === "admin"
+            ? getValues().order_type.value
+            : EnumOrderTypes.WAREHOUSE,
         order_status_id: 8,
         note: getValues().note,
         product_group_id: getValues().product_group.value,
@@ -223,8 +198,8 @@ export default function DraftOrder({
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name:product?.order_product_name,
-            order_product_link:product?.order_product_link,
+            order_product_name: product?.order_product_name,
+            order_product_link: product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: 8,
             note: product.note,
@@ -251,7 +226,7 @@ export default function DraftOrder({
         order_products: undefined,
         product_group: undefined,
         storage_id: undefined,
-        order_type:undefined,
+        order_type: undefined,
       });
     } else if (
       draftOrderid !== "newOrder"
@@ -280,11 +255,14 @@ export default function DraftOrder({
         order_status_id: getOrderByIdData?.order_status?.status_id,
         note: getOrderByIdData?.note,
         order_products: getOrderByIdData?.order_products,
-        order_type:{
-          value:getOrderByIdData?.order_type,
-          label: getOrderByIdData?.order_type === "purchase" ? "Заявка на закупку" : "Заявка на склад"
-        }
-    });
+        order_type: {
+          value: getOrderByIdData?.order_type,
+          label:
+            getOrderByIdData?.order_type === "purchase"
+              ? "Заявка на закупку"
+              : "Заявка на склад",
+        },
+      });
     }
   }, [reset, type, draftOrderid, getOrderByIdData]);
 
@@ -349,7 +327,6 @@ export default function DraftOrder({
               : style.selectProductOrder
           }
         >
-
           <SelectProductOrder
             watch={watch}
             getValues={getValues}
@@ -367,16 +344,15 @@ export default function DraftOrder({
           }
         >
           {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
-            <HeaderOrder
-              control={control}
-              register={register}
-              getValues={getValues}
-              setValue={setValue}
-              watch={watch}
-              errors={errors}
-              disabledOrder={false}
-            />
-
+          <HeaderOrder
+            control={control}
+            register={register}
+            getValues={getValues}
+            setValue={setValue}
+            watch={watch}
+            errors={errors}
+            disabledOrder={false}
+          />
 
           {/* </form> */}
           <button
@@ -384,13 +360,7 @@ export default function DraftOrder({
               if (!getValues("product_group.value")) {
                 message.warning("Выберите категорию товара");
               } else {
-                if (newProduct === "newProduct") {
-                  message.warning(
-                    "Вы не можете выбрать товары, пока есть новые товары"
-                  );
-                } else {
-                  setToggle(!toggle);
-                }
+                setToggle(!toggle);
               }
             }}
             className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
@@ -400,21 +370,22 @@ export default function DraftOrder({
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
           <div className={style.footerButtonGroup}>
-                <button type="button" onClick={() => createOrder()} className={style.buttonOrderCreate}>
-                  {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
-                </button>
+            <button
+              type="button"
+              onClick={() => createOrder()}
+              className={style.buttonOrderCreate}
+            >
+              {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
+            </button>
 
-                <button
-                  type="button"
-                  className={style.buttonOrderSave}
-                  onClick={() => saveOrder()}
-                >
-                  {saveOrderIsPending
-                      ? "Сохраняется..."
-                      : "Сохранить"
-                    }
-                </button>
-            </div>
+            <button
+              type="button"
+              className={style.buttonOrderSave}
+              onClick={() => saveOrder()}
+            >
+              {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -2,61 +2,93 @@ import { useEffect, useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
 import ModalSelectProductOrder from "@/components/UI/ModalSelectProductOrder/ModalSelectProductOrder";
-import { IOrderItemFormValues } from "@/interface/orderItem";
-import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
+import {
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { Button } from "antd";
 
 interface Props {
-  productTableData:IProductTable[];
+  productTableData: IProductTable[];
   watch: UseFormWatch<IOrderItemFormValues>;
-  getValues:UseFormGetValues<IOrderItemFormValues>;
-  setValue:UseFormSetValue<IOrderItemFormValues>
-  disabledOrder:boolean
+  getValues: UseFormGetValues<IOrderItemFormValues>;
+  setValue: UseFormSetValue<IOrderItemFormValues>;
+  disabledOrder: boolean;
+  role: string;
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder}:Props) {
+export default function ProductOrder({
+  productTableData,
+  getValues,
+  setValue,
+  watch,
+  disabledOrder,
+  role
+}: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
-  const [productIndex,setProductIndex] = useState<number | null>()
+  const [productIndex, setProductIndex] = useState<number | null>();
   const [isNewProduct, setIsNewProduct] = useState(false);
-  const [type, setType] = useState<"Добавить" | "Изменить">("Изменить")
+  const [type, setType] = useState<"Добавить" | "Изменить">("Изменить");
 
+  // Следим за полем order_type
+    const orderType = watch("order_type")
+      ? watch("order_type")
+      : { value: EnumOrderTypes.WAREHOUSE };
 
   const showModal = () => {
     setIsModalOpen(true);
-    setIsNewProduct(false)
-    setType('Изменить')
+    setIsNewProduct(false);
+    setType("Изменить");
   };
 
   const showModalIsNewProduct = () => {
-    setType('Добавить')
-    setIsNewProduct(true)
-    setProductIndex(null)
+    setType("Добавить");
+    setIsNewProduct(true);
+    setProductIndex(null);
     setIsModalOpen(true);
   };
-  const deleteProduct = (productIndex:number) => {
-    const updatedProducts = getValues("order_products").filter((_, index) => index !== productIndex);
+  const deleteProduct = (productIndex: number) => {
+    const updatedProducts = getValues("order_products").filter(
+      (_, index) => index !== productIndex
+    );
     setValue("order_products", updatedProducts);
-  }
-
+  };
 
   return (
     <>
       <ModalSelectProductOrder
         type={type}
         isModalOpen={isModalOpen}
-       editProductId={productIndex as number}
-       productId={productId}
-       setIsModalOpen={setIsModalOpen}
-       getValues={getValues}
-       setValue={setValue}
-       watch={watch}
-       isNewProduct={isNewProduct}
+        editProductId={productIndex as number}
+        productId={productId}
+        setIsModalOpen={setIsModalOpen}
+        getValues={getValues}
+        setValue={setValue}
+        watch={watch}
+        isNewProduct={isNewProduct}
       />
-      {!disabledOrder && (
-        <Button onClick={() => showModalIsNewProduct()} style={{width:"100%", marginBottom:"10px"}}>Добавить новый товар</Button>
+      {!disabledOrder  &&
+        (role === "user_purchase" || role === "admin") &&
+        orderType.value === EnumOrderTypes.PURCHASE &&  (
+        <Button
+          onClick={() => showModalIsNewProduct()}
+          style={{ width: "100%", marginBottom: "10px" }}
+        >
+          Добавить новый товар
+        </Button>
       )}
-      <ProductOrderTable showModal={showModal} productTableData={productTableData} setProductId={setProductId} setProductIndex={setProductIndex} deleteProduct={deleteProduct} setIsNewProduct={setIsNewProduct} disabledOrder={disabledOrder }/>
+      <ProductOrderTable
+        showModal={showModal}
+        productTableData={productTableData}
+        setProductId={setProductId}
+        setProductIndex={setProductIndex}
+        deleteProduct={deleteProduct}
+        setIsNewProduct={setIsNewProduct}
+        disabledOrder={disabledOrder}
+      />
     </>
   );
 }

@@ -8,7 +8,12 @@ import {
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { useForm } from "react-hook-form";
-import { EnumOrderTypes, IDraftOrderItemRequest, IOrderItemFormValues, IOrderItemRequest } from "@/interface/orderItem";
+import {
+  EnumOrderTypes,
+  IDraftOrderItemRequest,
+  IOrderItemFormValues,
+  IOrderItemRequest,
+} from "@/interface/orderItem";
 import HeaderOrder from "./HeaderOrder";
 import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
@@ -20,7 +25,10 @@ import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useProductData } from "@/hook/productHook";
 import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
-import { useSaveDraftOrderMutation, useUpdateDraftOrderMutation } from "@/hook/orderTempHook";
+import {
+  useSaveDraftOrderMutation,
+  useUpdateDraftOrderMutation,
+} from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 
 interface Props {
@@ -31,6 +39,8 @@ interface Props {
 }
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
+  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
   const { mutate: createOrderMutation, isPending: createOrderIsPending } =
@@ -54,7 +64,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     orderIdFromGetOrderById = orderid.replace("copy", "");
   }
 
-
   const { getOrderByIdData } = useGetOrderById(
     orderIdFromGetOrderById as string
   );
@@ -75,33 +84,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getOrderByIdData]);
 
-    const [newProduct, setNewProduct] = useState<
-       "newProduct" | "productFromCatalog" | undefined
-     >(undefined);
-
-  useEffect(() => {
-    const products = getValues("order_products");
-
-    if (Array.isArray(products)) {
-      const hasNewProuduct = products.some(
-        (product) => product.order_product_link
-      );
-      const hasProductFrom = products.every(
-        (product) => !product.order_product_link
-      );
-
-      if (hasNewProuduct) {
-        setNewProduct("newProduct");
-      } else if (hasProductFrom && products.length > 0) {
-        setNewProduct("productFromCatalog");
-      } else {
-        setNewProduct(undefined);
-      }
-    } else {
-      setNewProduct(undefined);
-    }
-  }, [getValues("order_products")]);
-
   const items: TabsProps["items"] = [
     {
       key: "1",
@@ -113,6 +95,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           setValue={setValue}
           watch={watch}
           disabledOrder={disabledOrder}
+          role={GetMeData?.role?.role_name as string}
         />
       ),
     },
@@ -130,12 +113,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
   const onChange = (key: string) => {};
 
-  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
-
   const productsWatch = watch("order_products");
 
   useEffect(() => {
-
     const buyerType = GetMeData?.employee?.parlors
       ?.filter((parlor) =>
         parlor.employees.some(
@@ -159,11 +139,15 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   }, [getValues("employee_id")]);
 
   const createOrder = () => {
-    const data = getValues()
+    const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         department_id: data.department_id.value,
-        order_type: EnumOrderTypes.WAREHOUSE,
+        order_type:
+          GetMeData?.role?.role_name === "user_purchase" ||
+          GetMeData?.role?.role_name === "admin"
+            ? data.order_type.value
+            : EnumOrderTypes.WAREHOUSE,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
@@ -180,8 +164,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name:product?.order_product_name,
-            order_product_link:product?.order_product_link,
+            order_product_name: product?.order_product_name,
+            order_product_link: product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
@@ -231,7 +215,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
-        order_type: EnumOrderTypes.WAREHOUSE,
+        order_type:
+          GetMeData?.role?.role_name === "user_purchase" ||
+          GetMeData?.role?.role_name === "admin"
+            ? getValues().order_type.value
+            : EnumOrderTypes.WAREHOUSE,
         oms: getValues().oms || false,
         order_status_id: 8,
         note: getValues().note,
@@ -246,8 +234,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : hasProductId
               ? productData.product_id
               : NaN,
-            order_product_name:product?.order_product_name,
-            order_product_link:product?.order_product_link,
+            order_product_name: product?.order_product_name,
+            order_product_link: product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
@@ -369,7 +357,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       )}
       <div className={style.newOrder}>
         {!toggle ? (
-          <h1 style={{color:colorText}}>
+          <h1 style={{ color: colorText }}>
             {orderid === "newOrder"
               ? "Новая заявка"
               : orderid === `copy${Number(orderid?.split("copy").join(""))}`
@@ -377,7 +365,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
           </h1>
         ) : (
-          <h1 style={{color:colorText}}>Выбор товара</h1>
+          <h1 style={{ color: colorText }}>Выбор товара</h1>
         )}
 
         <div
@@ -387,8 +375,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : style.selectProductOrder
           }
         >
-
-
           <SelectProductOrder
             watch={watch}
             getValues={getValues}
@@ -406,16 +392,15 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           }
         >
           {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
-            <HeaderOrder
-              control={control}
-              register={register}
-              getValues={getValues}
-              setValue={setValue}
-              watch={watch}
-              errors={errors}
-              disabledOrder={disabledOrder}
-            />
-
+          <HeaderOrder
+            control={control}
+            register={register}
+            getValues={getValues}
+            setValue={setValue}
+            watch={watch}
+            errors={errors}
+            disabledOrder={disabledOrder}
+          />
 
           {/* </form> */}
           <button
@@ -427,13 +412,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               } else if (!getValues("product_group.value")) {
                 message.warning("Выберите категорию товара");
               } else {
-                if (newProduct === "newProduct") {
-                  message.warning(
-                    "Вы не можете выбрать товары, пока есть новые товары"
-                  );
-                } else {
-                  setToggle(!toggle);
-                }
+                setToggle(!toggle);
               }
             }}
             className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
@@ -442,32 +421,35 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           </button>
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
-          <div className={style.footerButtonGroup} >
-              {!disabledOrder && (
-                <button type="button" onClick={() => createOrder()} className={style.buttonOrderCreate}>
-                  {orderid === "newOrder" ||
-                  orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                    ? createOrderIsPending
-                      ? "Создается..."
-                      : "Создать"
-                    : updateOrderIsPending
-                    ? "Перезапускается..."
-                    : "Перезапуск"}
-                </button>
-              )}
+          <div className={style.footerButtonGroup}>
+            {!disabledOrder && (
+              <button
+                type="button"
+                onClick={() => createOrder()}
+                className={style.buttonOrderCreate}
+              >
+                {orderid === "newOrder" ||
+                orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                  ? createOrderIsPending
+                    ? "Создается..."
+                    : "Создать"
+                  : updateOrderIsPending
+                  ? "Перезапускается..."
+                  : "Перезапуск"}
+              </button>
+            )}
 
-              {!disabledOrder && orderid === "newOrder" && (
-                <button
-                  type="button"
-                  className={style.buttonOrderSave}
-                  onClick={() => saveOrder()}
-                >
-                  {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
-                </button>
-              )}
-            </div>
+            {!disabledOrder && orderid === "newOrder" && (
+              <button
+                type="button"
+                className={style.buttonOrderSave}
+                onClick={() => saveOrder()}
+              >
+                {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
+              </button>
+            )}
+          </div>
         </div>
-
       </div>
     </div>
   );

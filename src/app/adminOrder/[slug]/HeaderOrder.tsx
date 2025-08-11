@@ -11,7 +11,7 @@ import {
   UseFormWatch,
   useWatch,
 } from "react-hook-form";
-import { IOrderItemFormValues } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
@@ -97,10 +97,10 @@ export default function HeaderOrder({
     label: storage.storage_name,
   }));
 
-  // const optionsOrderTypes: { value: string; label: string }[] = [
-  //   { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
-  //   { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
-  // ];
+  const optionsOrderTypes: { value: string; label: string }[] = [
+    { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
+    { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
+  ];
 
   const departmentSet = new Set();
   const optionsDepartment = GetMeData?.employee?.parlors
@@ -128,7 +128,9 @@ export default function HeaderOrder({
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-          {/* <div className={style.formItem}>
+        {GetMeData?.role?.role_name === "user_purchase" ||
+            (GetMeData?.role?.role_name === "admin" && (
+          <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
               control={control}
@@ -160,7 +162,8 @@ export default function HeaderOrder({
             {errors && (
               <p className={style.error}>{errors.order_type?.message}</p>
             )}
-          </div> */}
+          </div>
+            ))}
 
           <div className={`${style.Checkbox}`}>
             <label className={style.formItemLabel}>ОМС</label>

@@ -2,47 +2,64 @@ import { useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
 import ModalSelectProductOrder from "@/components/UI/ModalSelectProductOrder/ModalSelectProductOrder";
-import { IOrderItemFormValues } from "@/interface/orderItem";
-import { UseFormGetValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
+import {
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { Button, message } from "antd";
 
 interface Props {
-  productTableData:IProductTable[];
+  productTableData: IProductTable[];
   watch: UseFormWatch<IOrderItemFormValues>;
-  getValues:UseFormGetValues<IOrderItemFormValues>;
-  setValue:UseFormSetValue<IOrderItemFormValues>
-  disabledOrder:boolean
-  newProduct: "newProduct" | "productFromCatalog" | undefined
+  getValues: UseFormGetValues<IOrderItemFormValues>;
+  setValue: UseFormSetValue<IOrderItemFormValues>;
+  disabledOrder: boolean;
   tableRef?: React.RefObject<HTMLDivElement>;
+  role: string;
 }
 
-export default function ProductOrder({productTableData,getValues,setValue,watch,disabledOrder,newProduct,tableRef}:Props) {
+export default function ProductOrder({
+  productTableData,
+  getValues,
+  setValue,
+  watch,
+  disabledOrder,
+  tableRef,
+  role,
+}: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
-  const [productIndex,setProductIndex] = useState<number | null>()
+  const [productIndex, setProductIndex] = useState<number | null>();
   const [isNewProduct, setIsNewProduct] = useState(false);
-  const [type, setType] = useState<"Добавить" | "Изменить">("Изменить")
+  const [type, setType] = useState<"Добавить" | "Изменить">("Изменить");
 
+  // Следим за полем order_type
+  const orderType = watch("order_type")
+    ? watch("order_type")
+    : { value: EnumOrderTypes.WAREHOUSE };
 
   const showModal = () => {
     setIsModalOpen(true);
-    setIsNewProduct(false)
-    setType('Изменить')
+    setIsNewProduct(false);
+    setType("Изменить");
   };
 
   const showModalIsNewProduct = () => {
-    setType('Добавить')
-    setIsNewProduct(true)
-    setProductIndex(null)
+    setType("Добавить");
+    setIsNewProduct(true);
+    setProductIndex(null);
     setIsModalOpen(true);
   };
-  const deleteProduct = (productIndex:number) => {
-    const updatedProducts = getValues("order_products").filter((_, index) => index !== productIndex);
+  const deleteProduct = (productIndex: number) => {
+    const updatedProducts = getValues("order_products").filter(
+      (_, index) => index !== productIndex
+    );
     setValue("order_products", updatedProducts);
-  }
+  };
 
   const orderId = getValues("order_id");
-
 
   return (
     <>
@@ -57,24 +74,22 @@ export default function ProductOrder({productTableData,getValues,setValue,watch,
         watch={watch}
         isNewProduct={isNewProduct}
       />
-      {!disabledOrder && (
-        <Button
-          onClick={() => {
-            if (newProduct === "productFromCatalog") {
-              message.warning(
-                "Вы не можете добавить новый товар, пока есть товары из подбора"
-              );
-            } else if (!getValues("product_group.value")) {
-              message.warning("Выберите категорию товара");
-            } else {
-              showModalIsNewProduct();
-            }
-          }}
-          style={{ width: "100%", marginBottom: "10px" }}
-        >
-          Добавить новый товар
-        </Button>
-      )}
+      {!disabledOrder &&
+        (role === "user_purchase" || role === "admin") &&
+        orderType.value === EnumOrderTypes.PURCHASE && (
+          <Button
+            onClick={() => {
+              if (!getValues("product_group.value")) {
+                message.warning("Выберите категорию товара");
+              } else {
+                showModalIsNewProduct();
+              }
+            }}
+            style={{ width: "100%", marginBottom: "10px" }}
+          >
+            Добавить новый товар
+          </Button>
+        )}
       <ProductOrderTable
         showModal={showModal}
         productTableData={productTableData}
