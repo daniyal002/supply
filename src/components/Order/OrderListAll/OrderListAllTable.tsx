@@ -14,6 +14,7 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { useState } from "react";
 import { IProductGroup } from "@/interface/product";
 import { IOrderStatus } from "@/interface/orderStatus";
+import { IUser } from "@/interface/user";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -47,6 +48,20 @@ const OrderListAllTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         return {
           value: String(orderCategory?.product_group_id),
           label: orderCategory?.product_group_name || "",
+        };
+      })
+    : [];
+
+    const departmetnOption = OrderData
+    ? Array.from(
+        new Set(OrderData.map((order) => order?.department?.department_id))
+      ).map((id) => {
+        const orderDepatment = OrderData.find(
+          (order) => order?.department?.department_id === id
+        )?.department;
+        return {
+          value: String(orderDepatment?.department_id),
+          label: orderDepatment?.department_name || "",
         };
       })
     : [];
@@ -231,7 +246,62 @@ const OrderListAllTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         const nameB = b.department?.department_name || "";
         return nameA.localeCompare(nameB, "ru");
       },
+      filters: departmetnOption.map(option => ({text:option.label,value:option.value})),
+      onFilter: (value, record) =>
+        record.department?.department_id === Number(value),
+      filterSearch: true,
+      filterMode: 'menu',
       render: (department: IDepartment) => department?.department_name,
+    },
+    {
+          title: "Пользователь",
+          dataIndex: "user",
+          key: "user",
+          showSorterTooltip: { title: "Сортировка по пользователю" },
+          sorter: (a: IOrderItem, b: IOrderItem) => {
+            const nameA = a.user?.employee.buyer_name || "";
+            const nameB = b.user?.employee?.buyer_name || "";
+            return nameA.localeCompare(nameB, "ru");
+          },
+          responsive: ["lg"],
+
+          filterDropdown: (props) => (
+            <SearchFilter
+              {...props}
+              placeholder="Поиск по пользователю"
+              searchText={searchText}
+              searchedColumn={searchedColumn}
+              dataIndex="user"
+              searchInput={searchInput}
+              handleSearch={handleSearch}
+              handleReset={handleReset}
+            />
+          ),
+          filterIcon: (filtered: boolean) => (
+            <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+          ),
+          onFilter: (value, record) =>
+            record.user?.employee.buyer_name
+              .toString()
+              .toLowerCase()
+              .includes((value as string).toLowerCase()) || false,
+          onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+              setTimeout(() => searchInput.current?.select(), 100);
+            }
+          },
+          render: (user: IUser) => {
+            return searchedColumn === "user" ? (
+              <Highlighter
+                highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={user?.employee.buyer_name}
+              />
+            ) : (
+              user?.employee.buyer_name
+            );
+          },
     },
     {
       title: "Категория",
