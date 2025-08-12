@@ -84,7 +84,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         Поиск
       </Button>
       <Button
-        onClick={() => clearFilters && handleReset(clearFilters)}
+        onClick={() => {clearFilters && handleReset(clearFilters);handleSearch(selectedKeys as string[], confirm, dataIndex);clearFilters && handleReset(clearFilters)}}
         size="small"
         style={{ width: 90 }}
       >
