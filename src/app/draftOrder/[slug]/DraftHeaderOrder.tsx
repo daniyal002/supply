@@ -128,8 +128,8 @@ export default function HeaderOrder({
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-          {GetMeData?.role?.role_name === "user_purchase" ||
-            (GetMeData?.role?.role_name === "admin" && (
+          {(GetMeData?.role?.role_name === "user_purchase" ||
+            GetMeData?.role?.role_name === "admin") && (
               <div className={style.formItem}>
                 <label className={style.formItemLabel}>Тип</label>
                 <Controller
@@ -162,7 +162,7 @@ export default function HeaderOrder({
                   <p className={style.error}>{errors.order_type?.message}</p>
                 )}
               </div>
-            ))}
+            )}
           <div className={`${style.Checkbox}`}>
             <label className={style.formItemLabel}>ОМС</label>
             <Controller
