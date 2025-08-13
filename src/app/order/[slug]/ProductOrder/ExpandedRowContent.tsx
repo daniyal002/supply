@@ -78,7 +78,7 @@ export const ExpandedRowContent = ({
         {!dataSourceProductPreviousOrders ||
         dataSourceProductPreviousOrders?.length === 0 ? (
           <div style={{ margin: "12px 16px" }}>
-            Ранее этот товар этот не заказывали
+            Ранее этот товар не заказывали
           </div>
         ) : (
           <Collapse

@@ -131,6 +131,10 @@ export default function ParlorModal({
                 // @ts-ignore: Unreachable code error
                 onChange={(value, option) => field.onChange({value:value,label:option.label})}
                 placeholder="Подразделение"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                showSearch
               />
             )}
           />
@@ -153,6 +157,10 @@ export default function ParlorModal({
                 // @ts-ignore: Unreachable code error
                 onChange={(value, option) => field.onChange({value:value,label:option.label})}
                 placeholder="Этаж"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                showSearch
               />
             )}
           />

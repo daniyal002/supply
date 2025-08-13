@@ -133,7 +133,7 @@ export default function EmployeeModal({
 
   return (
     <Modal
-      title={`${type} кабинет`}
+      title={`${type} сотрудник/кабинет`}
       open={isModalOpen}
       onCancel={() => {
         setIsModalOpen(false);
@@ -226,11 +226,10 @@ export default function EmployeeModal({
                 {...field}
                 options={optionsStorage}
                 onChange={(value, option) =>
-                  // @ts-ignore: Unreachable code error
                   field.onChange(option)
                 }
-                mode="multiple"
                 placeholder="Склад"
+                mode="multiple"
                 filterOption={(input, option) =>
                   (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                 }
@@ -263,6 +262,11 @@ export default function EmployeeModal({
                       field.onChange({ value: value, label: option.label })
                     }
                     placeholder="Должность"
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                    showSearch
+                    autoClearSearchValue={false}
                   />
                 )}
               />
