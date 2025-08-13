@@ -113,29 +113,37 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
         );
       }, [routeData]),
       onFilter: (value, record) => record.department?.department_id === value,
+      filterMode:'menu',
+      filterSearch:true
     },
-    {title:"Тип маршрута",
+    {
+      title: "Тип маршрута",
       dataIndex: "order_route_type",
       key: "order_route_type",
-      render: (order_route_type:string) => order_route_type === EnumOrderTypes.WAREHOUSE ? "Маршут на склад" : "Маршрут на закуп",
-      filters: [{
-        text:"Маршут на склад",
-        value:EnumOrderTypes.WAREHOUSE
-      },{
-        text:"Маршрут на закуп",
-        value:EnumOrderTypes.PURCHASE
-      }],
+      render: (order_route_type: string) =>
+        order_route_type === EnumOrderTypes.WAREHOUSE
+          ? "Маршут на склад"
+          : "Маршрут на закуп",
+      filters: [
+        {
+          text: "Маршут на склад",
+          value: EnumOrderTypes.WAREHOUSE,
+        },
+        {
+          text: "Маршрут на закуп",
+          value: EnumOrderTypes.PURCHASE,
+        },
+      ],
       onFilter: (value, record) => record.order_route_type === value,
-
     },
     {
       title: "Действия",
       key: "action",
       render: (_: any, record: IOrderRouteResponseDetail) => (
         <Space size="middle">
-          <Link href={`/i/routes/${record.route_id}`}
-            title="Изменить"
-            >Изменить</Link>
+          <Link href={`/i/routes/${record.route_id}`} title="Изменить">
+            Изменить
+          </Link>
           <Button
             type="primary"
             danger
