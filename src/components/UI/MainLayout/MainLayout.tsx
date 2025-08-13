@@ -296,22 +296,24 @@ const MainLayout = ({
             </Button>
             <DropdownMenu />
             <div className={style.headerButtons} style={{backgroundColor:LayoutToken?.siderBg}}>
+              <Tooltip title={login}>
                 <Button
                   icon={<p>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
                   onClick={() =>
-                    message.info("Пока еще не придумали функционал для этой кнопки")
+                    message.info(`Ваш логин: ${login}`)
                   }
-                size={isMobile ? "small" : "middle"}
+                  size={isMobile ? "small" : "middle"}
                 />
-              <p className={style.headerLogin}>{login}</p>
+                </Tooltip>
               <Tooltip title="Выход">
-                <LogOut
-                  size={32}
-                  color="#fff"
-                  cursor="pointer"
-                  onClick={() => logout()}
-                />
+                <Button icon={
+                   <LogOut
+                    size={20}
+                   color={supplyTheme === "light" ? "#678098" : "#fff"}
+                   cursor="pointer"
+                 />
+                } onClick={() => logout()} iconPosition="end">Выход</Button>
               </Tooltip>
             </div>
           </div>
