@@ -15,6 +15,7 @@ interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
+  readonly?:boolean
 }
 
 export default function ProductOrder({
@@ -22,6 +23,7 @@ export default function ProductOrder({
   getValues,
   setValue,
   watch,
+  readonly = false
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
@@ -83,6 +85,7 @@ export default function ProductOrder({
         setProductIndexCancel={setProductIndexCancel}
         deleteProduct={deleteProduct}
         orderId={orderId as number}
+        readonly={readonly}
       />
     </>
   );

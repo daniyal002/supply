@@ -26,6 +26,8 @@ interface productOrderTableProps {
   setProductIndexCancel: (key: number) => void;
   deleteProduct: (key: number) => void;
   orderId: number;
+  readonly?:boolean
+
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -40,6 +42,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setProductIndexCancel,
   deleteProduct,
   orderId,
+  readonly = false
 }) => {
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
@@ -336,6 +339,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               showModal={showModal}
               orderId={orderId}
               is_cancel={record.is_cancel as boolean}
+              readonly={readonly}
             />
             <RemainProduct product_kod_1c={record.product.product_kod_1c}/>
             </>

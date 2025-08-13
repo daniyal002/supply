@@ -79,6 +79,7 @@ export default function ApprovalOrder({
           getValues={getValues}
           setValue={setValue}
           watch={watch}
+          readonly={readonly}
         />
       ),
     },
