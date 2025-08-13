@@ -22,6 +22,7 @@ interface Props {
   type: "Добавить" | "Изменить";
   targetKey?: string;
   remove?: any;
+  readonly?: boolean;
 }
 
 export default function ApprovalOrder({
@@ -29,6 +30,7 @@ export default function ApprovalOrder({
   type,
   remove,
   targetKey,
+  readonly = false,
 }: Props) {
   const { TextArea } = Input;
 
@@ -91,10 +93,6 @@ export default function ApprovalOrder({
       children: <RouteInfo order_id={Number(orderid)} />,
     },
   ];
-
-  const onChange = (key: string) => {
-    // console.log(key);
-  };
 
   const agreedOrder = (order_id: number) => {
     agreedOrderMutation(
@@ -258,11 +256,14 @@ export default function ApprovalOrder({
       order_status_id: getOrderByIdData?.order_status?.status_id,
       note: getOrderByIdData?.note,
       order_products: getOrderByIdData?.order_products,
-      order_type:{
-        value:getOrderByIdData?.order_type,
-        label: getOrderByIdData?.order_type === "purchase" ? "Заявка на закупку" : "Заявка на склад"
+      order_type: {
+        value: getOrderByIdData?.order_type,
+        label:
+          getOrderByIdData?.order_type === "purchase"
+            ? "Заявка на закупку"
+            : "Заявка на склад",
       },
-      order_author_name:getOrderByIdData?.order_author_name
+      order_author_name: getOrderByIdData?.order_author_name,
     });
   }, [reset, type, orderid, getOrderByIdData]);
 
@@ -289,30 +290,31 @@ export default function ApprovalOrder({
            Согласовать
           </button> */}
         {/* </form> */}
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
-
-        <div className={style.commentAndButtons}>
-          <TextArea
-            placeholder="Комментарий"
-            className={style.comment}
-            value={note}
-            onChange={(e) => setnote(e.target.value)}
-          />
-          <div className={style.buttonGroup}>
-            <button
-              className={style.buttonOrderApproval}
-              onClick={() => agreedOrder(Number(orderid))}
-            >
-              Согласовать
-            </button>
-            <button
-              className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
-              onClick={() => rejectOrder(Number(orderid))}
-            >
-              Отклонить
-            </button>
+        <Tabs defaultActiveKey="1" items={items} />
+        {!readonly && (
+          <div className={style.commentAndButtons}>
+            <TextArea
+              placeholder="Комментарий"
+              className={style.comment}
+              value={note}
+              onChange={(e) => setnote(e.target.value)}
+            />
+            <div className={style.buttonGroup}>
+              <button
+                className={style.buttonOrderApproval}
+                onClick={() => agreedOrder(Number(orderid))}
+              >
+                Согласовать
+              </button>
+              <button
+                className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
+                onClick={() => rejectOrder(Number(orderid))}
+              >
+                Отклонить
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );

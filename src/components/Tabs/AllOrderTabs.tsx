@@ -3,10 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import {Tabs } from "antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { useApprovalStore } from "../../../store/approvalStore";
-import ApprovalOrder from "@/app/approval/[slug]/ApprovalOrder";
 import { useTabStore } from "../../../store/tabStore";
 import { useOrderIdStore } from "../../../store/orderIdStore";
+import ApprovalOrder from "@/app/approval/[slug]/ApprovalOrder";
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
@@ -31,6 +30,7 @@ export default function AllOrderTabs() {
             orderid={orderid}
             remove={remove}
             targetKey={newActiveKey}
+            readonly
           />
       ),
         key: newActiveKey,
