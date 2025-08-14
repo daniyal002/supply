@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import { IOrderItem } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
 
 export const exportOrderToExcel = async (order: IOrderItem) => {
   if (!order.order_products?.length) {
@@ -27,7 +27,7 @@ export const exportOrderToExcel = async (order: IOrderItem) => {
   // --- Данные для шапки ---
   const headerData = [
     ["Номер заявки", order.order_number],
-    ["Тип заявки", order.order_type],
+    ["Тип заявки", order.order_type === EnumOrderTypes.WAREHOUSE ? "На склад" : "На закупку"],
     [
       "Дата создания",
       order.created_at ? new Date(order.created_at).toLocaleString() : "",
@@ -76,6 +76,8 @@ export const exportOrderToExcel = async (order: IOrderItem) => {
     "Сотрудники",
     "Ед. изм.",
     "Кол-во",
+    "Добавленный товар",
+    "Ссылка на добавленный товар",
     "Примечание",
   ];
   const headerRow = sheet.addRow(productHeader);
@@ -99,6 +101,8 @@ export const exportOrderToExcel = async (order: IOrderItem) => {
       product.buyers?.map((buyers) => buyers.buyer_name).join(", ") || "",
       product.unit_measurement?.unit_measurement?.unit_measurement_name || "",
       product.product_quantity,
+      product.order_product_name || "",
+      product.order_product_link || "",
       product.note || "",
     ]);
 
