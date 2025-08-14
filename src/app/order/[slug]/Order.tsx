@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import {
   EnumOrderTypes,
   IDraftOrderItemRequest,
+  IOrderItem,
   IOrderItemFormValues,
   IOrderItemRequest,
 } from "@/interface/orderItem";
@@ -31,6 +32,7 @@ import {
   useUpdateDraftOrderMutation,
 } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
+import { exportOrderToExcel } from "@/helper/ExportToExcel";
 
 interface Props {
   orderid?: string;
@@ -99,6 +101,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           disabledOrder={disabledOrder}
           tableRef={contentRef}
           role={GetMeData?.role?.role_name as string}
+          exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem)}
         />
       ),
     },

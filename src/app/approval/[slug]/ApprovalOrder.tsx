@@ -8,7 +8,7 @@ import {
   useRejectOrderMutation,
 } from "@/hook/orderHook";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IOrderItemFormValues } from "@/interface/orderItem";
+import { IOrderItem, IOrderItemFormValues } from "@/interface/orderItem";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import ApprovalHeaderOrder from "./ApprovalHeaderOrder";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
@@ -16,6 +16,7 @@ import { Input, message, Spin, Tabs, TabsProps } from "antd";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useNotificationStore } from "../../../../store/notificationStore";
 import { useMarkAsReadNotification } from "@/hook/notificationHook";
+import { exportOrderToExcel } from "@/helper/ExportToExcel";
 
 interface Props {
   orderid?: string;
@@ -80,6 +81,7 @@ export default function ApprovalOrder({
           setValue={setValue}
           watch={watch}
           readonly={readonly}
+          exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem)}
         />
       ),
     },

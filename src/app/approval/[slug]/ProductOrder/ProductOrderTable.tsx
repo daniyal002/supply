@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss"
-import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
+import { FileExcelFilled, InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -27,7 +27,7 @@ interface productOrderTableProps {
   deleteProduct: (key: number) => void;
   orderId: number;
   readonly?:boolean
-
+  exportToExcel: () => void
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -42,7 +42,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setProductIndexCancel,
   deleteProduct,
   orderId,
-  readonly = false
+  readonly = false,
+  exportToExcel
 }) => {
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
@@ -346,7 +347,22 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ),
       }}
       rowHoverable={false}
-      footer={() => "Всего: " + productTableData?.length}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Всего: {productTableData?.length}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
+            <FileExcelFilled style={{color:"#10793F", fontSize:"18px"}}/>
+            </Button>
+          </div>
+        </div>
+      )}
       rowKey="order_product_id"
     />
   );

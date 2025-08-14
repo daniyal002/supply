@@ -18,6 +18,7 @@ interface Props {
   disabledOrder: boolean;
   tableRef?: React.RefObject<HTMLDivElement>;
   role: string;
+  exportToExcel: () => void
 }
 
 export default function ProductOrder({
@@ -28,6 +29,7 @@ export default function ProductOrder({
   disabledOrder,
   tableRef,
   role,
+  exportToExcel
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
@@ -100,6 +102,7 @@ export default function ProductOrder({
         disabledOrder={disabledOrder}
         orderId={orderId as number}
         tableRef={tableRef}
+        exportToExcel={exportToExcel}
       />
     </>
   );

@@ -3,7 +3,7 @@ import { IProduct } from "@/interface/product";
 import { IOrderProductStatus, IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
-import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
+import { FileExcelFilled, FileExcelTwoTone, InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -23,6 +23,7 @@ interface productOrderTableProps {
   disabledOrder: boolean;
   orderId: number;
   tableRef?:React.RefObject<HTMLDivElement>
+  exportToExcel: () => void;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -34,7 +35,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setIsNewProduct,
   disabledOrder,
   orderId,
-  tableRef
+  tableRef,
+  exportToExcel
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -351,14 +353,27 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
-      footer={() =>
-        "Всего: " +
-        (currentFilters
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Всего: {currentFilters
           ? currentFilters
           : dataSource?.length
           ? dataSource?.length
-          : 0)
-      }
+          : 0}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
+            <FileExcelFilled style={{color:"#10793F", fontSize:"18px"}}/>
+            </Button>
+
+          </div>
+        </div>
+      )}
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
