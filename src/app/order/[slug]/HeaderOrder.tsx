@@ -124,9 +124,6 @@ export default function HeaderOrder({
       label: parlor.department?.department_name,
     }));
 
-    console.log(GetMeData?.role?.role_name === "user_purchase" ||
-      GetMeData?.role?.role_name === "admin")
-
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>

@@ -473,7 +473,6 @@ export const useArchiveOrderMutation = () => {
       queryClient.setQueryData(
         ["Orders"],
         (oldData: IOrderItem[] | undefined) => {
-          console.log(oldData)
           if (!oldData) return [];
           return oldData.map((order) => {
             if (order.order_id === variables.order_id) {

@@ -322,7 +322,6 @@ export default function EmployeeModal({
           <Select
             placeholder="Сотрудник"
             onChange={(value) => {
-              console.log(value);
               setEmployeeIdForParlor(value);
             }}
             showSearch
