@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Space, Table, TableColumnsType } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { ClearOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useEffect, useMemo, useState } from "react";
 import { IProductGroup, IProductUnit } from "@/interface/product";
@@ -13,19 +13,28 @@ import { UseFormGetValues } from "react-hook-form";
 import style from "./SelectProductOrderTable.module.scss";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 import { IUnit } from "@/interface/unit";
+import { TableProps } from "antd/lib";
 
 interface ProductTableProps {
   productData: IProductUnit[];
   showModal: () => void;
   setProductId: (product: number) => void;
   getValues: UseFormGetValues<IOrderItemFormValues>;
+  refetch: () => void;
 }
+
+type OnChange = NonNullable<TableProps<IProductUnit>["onChange"]>;
+type Filters = Parameters<OnChange>[1];
+
+type GetSingle<T> = T extends (infer U)[] ? U : never;
+type Sorts = GetSingle<Parameters<OnChange>[2]>;
 
 const SelectProductOrderTable: React.FC<ProductTableProps> = ({
   productData,
   showModal,
   setProductId,
   getValues,
+  refetch,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -63,6 +72,21 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         text: product.product_group.product_group_name,
       }));
   }, [productData]);
+
+  const [filteredInfo, setFilteredInfo] = useState<Filters>({});
+  const [sortedInfo, setSortedInfo] = useState<Sorts>({});
+
+  const handleChange: OnChange = (pagination, filters, sorter, extra) => {
+    setCurrentFilters(extra.currentDataSource.length);
+    setFilteredInfo(filters);
+    setSortedInfo(sorter as Sorts);
+  };
+
+  const clearAll = () => {
+    setCurrentFilters(dataSource.length);
+    setFilteredInfo({});
+    setSortedInfo({});
+  };
 
   const columns: TableColumnsType<IProductUnit> = [
     {
@@ -106,6 +130,9 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         ) : (
           text
         ),
+      filteredValue: filteredInfo.product_name || null,
+      sortOrder:
+        sortedInfo.columnKey === "product_name" ? sortedInfo.order : null,
     },
     {
       title: "Категория товаров",
@@ -124,6 +151,8 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       filters: productGroup,
       onFilter: (value, record) =>
         record.product_group.product_group_id === value,
+      sortOrder:
+        sortedInfo.columnKey === "product_group" ? sortedInfo.order : null,
     },
     {
       title: "Артикул",
@@ -169,24 +198,31 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         ) : (
           text
         ),
+      filteredValue: filteredInfo.product_article || null,
+      sortOrder:
+        sortedInfo.columnKey === "product_article" ? sortedInfo.order : null,
     },
     {
       title: "Ед. измерения",
       dataIndex: "directory_unit_measurement",
-      key: "unit_measurement",
+      key: "directory_unit_measurement",
       width: "180px",
       showSorterTooltip: { title: "Сортировка по ед. измерения" },
       sorter: (a, b) => {
-        // Получаем основную единицу: с коэффициентом > 1, если есть, иначе — первая
+        if (!a || !b) return 0;
+
         const getMainUnit = (product: IProductUnit) => {
-          return (
-            product.directory_unit_measurement.find((u) => u.coefficient > 1) ||
-            product.directory_unit_measurement[0]
-          );
+          const units = product.directory_unit_measurement;
+          if (!units?.length) return null;
+          return units.find((u) => u.coefficient > 1) || units[0];
         };
 
         const unitA = getMainUnit(a);
         const unitB = getMainUnit(b);
+
+        if (!unitA && !unitB) return 0;
+        if (!unitA) return -1;
+        if (!unitB) return 1;
 
         return unitA.unit_measurement.unit_measurement_name.localeCompare(
           unitB.unit_measurement.unit_measurement_name,
@@ -197,7 +233,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         const mainUnit =
           directory_unit_measurement.find((unit) => unit.coefficient > 1) ||
           directory_unit_measurement[0];
-        return mainUnit.unit_measurement.unit_measurement_name;
+        return mainUnit?.unit_measurement.unit_measurement_name;
       },
       responsive: ["sm"],
       filters: unitGroup as { text: string; value: number }[],
@@ -205,18 +241,24 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         const mainUnit =
           record.directory_unit_measurement.find((u) => u.coefficient > 1) ||
           record.directory_unit_measurement[0];
-        return mainUnit.unit_measurement.unit_measurement_id === value;
+        return mainUnit?.unit_measurement?.unit_measurement_id === value;
       },
+      filteredValue: filteredInfo.directory_unit_measurement || null,
+      sortOrder:
+        sortedInfo.columnKey === "directory_unit_measurement"
+          ? sortedInfo.order
+          : null,
     },
     {
       title: "Общий остаток",
       key: "remainder",
-      dataIndex:"remainder",
+      dataIndex: "remainder",
       width: "100px",
       showSorterTooltip: { title: "Действия" },
       sorter: {
         compare: (a: any, b: any) => a.remainder - b.remainder,
       },
+      sortOrder: sortedInfo.columnKey === "remainder" ? sortedInfo.order : null,
     },
     {
       title: "Действия",
@@ -279,10 +321,26 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       rowKey={(record) => record.product_kod_1c}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Товаров" } }}
-      footer={() => `Товаров: ${currentFilters}`}
-      onChange={(pagination, filters, sorter, extra) => {
-        setCurrentFilters(extra.currentDataSource.length);
-      }}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Товаров: {currentFilters}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить товары">
+              <SyncOutlined />
+            </Button>
+            <Button onClick={() => clearAll()} title="Очистить все фильтры">
+              <ClearOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={handleChange}
       rowClassName={(record) =>
         getValues("order_products")?.find(
           (product) => product?.product?.product_id === record.product_id

@@ -26,7 +26,7 @@ export default function SelectProductOrder({
   toggle,
   setToggle
 }: Props) {
-  const { productData } = useProductData();
+  const { productData, refetch } = useProductData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productId, setProductId] = useState<number>();
   const productGroup = watch("product_group");
@@ -89,6 +89,7 @@ export default function SelectProductOrder({
         setProductId={setProductId}
         showModal={showModal}
         getValues={getValues}
+        refetch={refetch}
       />
       </Modal>
     </>
