@@ -47,12 +47,13 @@ export const useOrderUserData = () => {
     data: orderUserData,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["OrderUser"],
     queryFn: orderService.getUserOrder,
     // staleTime: Infinity,
   });
-  return { orderUserData, isLoading, error };
+  return { orderUserData, isLoading, error,refetch };
 };
 
 export const useOrdersData = () => {
@@ -60,12 +61,13 @@ export const useOrdersData = () => {
     data: ordersData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["Orders"],
     queryFn: orderService.getOrders,
     // staleTime: Infinity,
   });
-  return { ordersData, isLoading, error };
+  return { ordersData, isLoading, error,refetch };
 };
 
 export const useApprovalOrders = () => {
@@ -73,11 +75,12 @@ export const useApprovalOrders = () => {
     data: approvalOrders,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["approvalOrders"],
     queryFn: orderService.getApprovalOrders,
   });
-  return { approvalOrders, isLoading, error };
+  return { approvalOrders, isLoading, error, refetch };
 };
 
 export const useOderStatusData = () => {

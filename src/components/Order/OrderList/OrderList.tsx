@@ -5,7 +5,7 @@ import { useOrderUserData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import {DatePicker } from "antd";
+import { DatePicker } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -14,7 +14,7 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function OrderList() {
-  const { orderUserData,isLoading } = useOrderUserData();
+  const { orderUserData, isLoading, refetch } = useOrderUserData();
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     orderUserData as IOrderItem[]
   );
@@ -54,15 +54,19 @@ export default function OrderList() {
   return (
     <div className={style.orderList}>
       <Toaster />
-        <RangePicker
-          //@ts-ignore
-          value={dateRange}
-          //@ts-ignore
-          onChange={handleFilter}
-          style={{ marginBottom: 16 }}
-          format="DD.MM.YYYY"
-        />
-      <OrderListTable OrderData={filteredOrderData} loading={isLoading} />
+      <RangePicker
+        //@ts-ignore
+        value={dateRange}
+        //@ts-ignore
+        onChange={handleFilter}
+        style={{ marginBottom: 16 }}
+        format="DD.MM.YYYY"
+      />
+      <OrderListTable
+        OrderData={filteredOrderData}
+        loading={isLoading}
+        refetch={refetch}
+      />
     </div>
   );
 }

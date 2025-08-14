@@ -5,7 +5,7 @@ import { useApprovalOrders } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import {  DatePicker } from "antd";
+import { DatePicker } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -15,7 +15,7 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function ApprovalList() {
-  const { approvalOrders,isLoading } = useApprovalOrders();
+  const { approvalOrders, isLoading, refetch } = useApprovalOrders();
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     approvalOrders as IOrderItem[]
   );
@@ -56,15 +56,19 @@ export default function ApprovalList() {
     <div className={style.orderList}>
       <Toaster />
 
-        <RangePicker
-          //@ts-ignore
-          value={dateRange}
-          //@ts-ignore
-          onChange={handleFilter}
-          style={{ marginBottom: 16 }}
-          format="DD.MM.YYYY"
-        />
-      <ApprovalListTable OrderData={filteredOrderData} loading={isLoading} />
+      <RangePicker
+        //@ts-ignore
+        value={dateRange}
+        //@ts-ignore
+        onChange={handleFilter}
+        style={{ marginBottom: 16 }}
+        format="DD.MM.YYYY"
+      />
+      <ApprovalListTable
+        OrderData={filteredOrderData}
+        loading={isLoading}
+        refetch={refetch}
+      />
     </div>
   );
 }

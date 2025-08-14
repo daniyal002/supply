@@ -14,7 +14,7 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function DraftOrderList() {
-  const { draftOrderUserData,isLoading } = useDraftOrderUserData();
+  const { draftOrderUserData,isLoading,refetch } = useDraftOrderUserData();
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     draftOrderUserData as IOrderItem[]
   );
@@ -76,7 +76,7 @@ export default function DraftOrderList() {
           style={{ marginBottom: 16 }}
           format="DD.MM.YYYY"
         />
-      <OrderListTable OrderData={filteredOrderData} loading={isLoading} />
+      <OrderListTable OrderData={filteredOrderData} loading={isLoading} refetch={refetch}/>
     </div>
   );
 }

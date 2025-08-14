@@ -3,15 +3,18 @@
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
-import { IOrderItem } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import { useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
-import { EyeTwoTone, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  EyeTwoTone,
+  ReloadOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
-import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { useState } from "react";
 import ContextMenu from "@/components/UI/ContextMenu/ContextMenu";
@@ -21,44 +24,17 @@ import { IOrderStatus } from "@/interface/orderStatus";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
-  loading:boolean
+  loading: boolean;
+  refetch: () => void;
 }
 
-const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
+const OrderListTable: React.FC<OrderListProps> = ({
+  OrderData,
+  loading,
+  refetch,
+}) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
-  const StatusOption = OrderData
-    ? Array.from(
-        new Set(OrderData.map((order) => order?.order_status?.status_id))
-      ).map((id) => {
-        const orderStatus = OrderData.find(
-          (order) => order?.order_status?.status_id === id
-        )?.order_status;
-        return {
-          value: String(orderStatus?.status_id),
-          label: orderStatus?.status_name || "",
-        };
-      })
-    : [];
-
-    const CategoryOption = OrderData
-    ? Array.from(
-        new Set(OrderData.map((order) => order?.product_group?.product_group_id))
-      ).map((id) => {
-        const orderCategory = OrderData.find(
-          (order) => order?.product_group?.product_group_id === id
-        )?.product_group;
-        return {
-          value: String(orderCategory?.product_group_id),
-          label: orderCategory?.product_group_name || "",
-        };
-      })
-    : [];
-
-    // const optionsOrderTypes: { value: string; label: string }[] = [
-    //     { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
-    //     { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
-    //   ];
 
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
@@ -85,7 +61,9 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) =>
         record.order_number
@@ -145,37 +123,36 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
           b.order_status.status_name,
           "ru"
         ),
-     render: (order_status: IOrderStatus) => (
-             <p
-               style={{
-                 backgroundColor: order_status.status_color,
-                 color: "#fff",
-                 padding: "10px",
-                 textAlign: "center",
-                 textTransform: "uppercase",
-                 borderRadius: "5px",
-               }}
-             >
-               {order_status?.status_name}
-             </p>
-           ),
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <StatusFilter
-          options={StatusOption}
-          setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map((key) => String(key))}
-          confirm={confirm}
-          clearFilters={() => clearFilters && clearFilters()}
-          placeholder="Статус"
-        />
+      render: (order_status: IOrderStatus) => (
+        <p
+          style={{
+            backgroundColor: order_status.status_color,
+            color: "#fff",
+            padding: "10px",
+            textAlign: "center",
+            textTransform: "uppercase",
+            borderRadius: "5px",
+          }}
+        >
+          {order_status?.status_name}
+        </p>
       ),
+      filters: OrderData
+        ? Array.from(
+            new Set(OrderData.map((order) => order?.order_status?.status_id))
+          ).map((id) => {
+            const orderStatus = OrderData.find(
+              (order) => order?.order_status?.status_id === id
+            )?.order_status;
+            return {
+              value: String(orderStatus?.status_id),
+              text: orderStatus?.status_name || "",
+            };
+          })
+        : [],
       onFilter: (value, record) =>
         record.order_status.status_id === Number(value),
+      filterSearch: true,
     },
     {
       title: "Сотрудник/Кабинет",
@@ -201,7 +178,9 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) =>
         record.buyer?.buyer_name
@@ -236,6 +215,22 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         const nameB = b.department?.department_name || "";
         return nameA.localeCompare(nameB, "ru");
       },
+      filters: OrderData
+        ? Array.from(
+            new Set(OrderData.map((order) => order?.department?.department_id))
+          ).map((id) => {
+            const orderDepartment = OrderData.find(
+              (order) => order?.department?.department_id === id
+            )?.department;
+            return {
+              value: String(orderDepartment?.department_id),
+              text: orderDepartment?.department_name || "",
+            };
+          })
+        : [],
+      onFilter: (value, record) =>
+        record.department?.department_id === Number(value),
+      filterSearch: true,
       render: (department: IDepartment) => department?.department_name,
     },
     {
@@ -248,47 +243,55 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
           b.product_group.product_group_name,
           "ru"
         ),
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => (
-          <StatusFilter
-            options={CategoryOption}
-            setSelectedKeys={setSelectedKeys}
-            selectedKeys={selectedKeys.map((key) => String(key))}
-            confirm={confirm}
-            clearFilters={() => clearFilters && clearFilters()}
-            placeholder="Категория"
-          />
-        ),
-        onFilter: (value, record) =>
-          record.product_group.product_group_id === Number(value),
+      filters: OrderData
+        ? Array.from(
+            new Set(
+              OrderData.map((order) => order?.product_group?.product_group_id)
+            )
+          ).map((id) => {
+            const orderCategory = OrderData.find(
+              (order) => order?.product_group?.product_group_id === id
+            )?.product_group;
+            return {
+              value: String(orderCategory?.product_group_id),
+              text: orderCategory?.product_group_name || "",
+            };
+          })
+        : [],
+      onFilter: (value, record) =>
+        record.product_group.product_group_id === Number(value),
+      filterSearch: true,
       render: (productGroup: IProductGroup) => productGroup?.product_group_name,
+    },
+    {
+      title: "Тип заявки",
+      dataIndex: "order_type",
+      showSorterTooltip: { title: "Сортировка по типу заявки" },
+      key: "order_type",
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.order_type;
+        const nameB = b.order_type;
+        return nameA.localeCompare(nameB, "ru");
+      },
+      render: (orderType: string) =>
+        orderType === "warehouse" ? "На склад" : "На закупку",
+      filters: [
+        { value: EnumOrderTypes.WAREHOUSE, text: "Заявка на склад" },
+        { value: EnumOrderTypes.PURCHASE, text: "Заявка на закуп" },
+      ],
+      onFilter: (value, record) => record.order_type === value,
     },
     {
       title: "ОМС/ПУ",
       dataIndex: "oms",
       showSorterTooltip: { title: "Сортировка по ОМС/ПУ" },
       key: "oms",
-      // sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
       responsive: ["lg"],
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <CheckboxFilter
-          setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map((key) => String(key))}
-          confirm={confirm}
-          clearFilters={() => clearFilters && clearFilters()}
-        />
-      ),
+      filters: [
+        { value: "OMS", text: "ОМС" },
+        { value: "PU", text: "ПУ" },
+      ],
       onFilter: (value, record) => {
-        // Предположим, что record.oms - это boolean
         if (value === "OMS") {
           return record.oms === true;
         }
@@ -381,29 +384,43 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
   };
 
   return (
-
     <>
       <Table
-      title={() => <p style={{padding:0}}>Заявок: {
-            currentFilters ? currentFilters : dataSource?.length
-          }</p>}
+        title={() => (
+          <p style={{ padding: 0 }}>
+            Заявок: {currentFilters ? currentFilters : dataSource?.length}
+          </p>
+        )}
         dataSource={dataSource}
         columns={columns}
         scroll={{ x: 200 }}
         pagination={{ locale: { items_per_page: "/ Заявок" } }}
-        footer={() =>
-          `Заявок: ${
-            currentFilters ? currentFilters : dataSource?.length
-          }`
-        }
+        footer={() => (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <p>
+              Заявок: {currentFilters ? currentFilters : dataSource?.length}
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <Button onClick={() => refetch()} title="Обновить заявки">
+                <SyncOutlined />
+              </Button>
+            </div>
+          </div>
+        )}
         onRow={(record) => ({
           onContextMenu: (e) => handleContextMenu(e, record),
-          onDoubleClick: () => setOrderId(String(record.order_id))
+          onDoubleClick: () => setOrderId(String(record.order_id)),
         })}
         onChange={(pagination, filters, sorter, extra) => {
           setCurrentFilters(extra.currentDataSource.length);
         }}
-        locale={{emptyText:"Нет заявок"}}
+        locale={{ emptyText: "Нет заявок" }}
         loading={loading}
       />
 
@@ -414,7 +431,7 @@ const OrderListTable: React.FC<OrderListProps> = ({ OrderData,loading }) => {
         onClose={() => setContextMenu((prev) => ({ ...prev, visible: false }))}
         onCopy={handleCopyOrder}
       />
-      </>
+    </>
   );
 };
 

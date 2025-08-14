@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
-import { IOrderItem } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
 import {
   useArchiveOrderMutation,
@@ -24,11 +24,10 @@ import {
   ReloadOutlined,
   SearchOutlined,
   SendOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
-import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { IUser } from "@/interface/user";
 import { useState } from "react";
@@ -38,48 +37,19 @@ import { IProductGroup } from "@/interface/product";
 interface AdminOrderListProps {
   OrderData: IOrderItem[] | undefined;
   isArchive: boolean;
+  refetch: () => void;
 }
 
 const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
   OrderData,
   isArchive,
+  refetch,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
   const { mutate: forceSubmitOrderTo1c } = useForceSubmitOrderTo1cMutation();
   const { mutate: archiveOrderMutation } = useArchiveOrderMutation();
-
-  const StatusOption = OrderData
-    ? Array.from(
-        new Set(OrderData.map((order) => order?.order_status?.status_id))
-      ).map((id) => {
-        const orderStatus = OrderData.find(
-          (order) => order?.order_status?.status_id === id
-        )?.order_status;
-        return {
-          value: String(orderStatus?.status_id),
-          label: orderStatus?.status_name || "",
-        };
-      })
-    : [];
-
-  const CategoryOption = OrderData
-    ? Array.from(
-        new Set(
-          OrderData.map((order) => order?.product_group?.product_group_id)
-        )
-      ).map((id) => {
-        const orderCategory = OrderData.find(
-          (order) => order?.product_group?.product_group_id === id
-        )?.product_group;
-        return {
-          value: String(orderCategory?.product_group_id),
-          label: orderCategory?.product_group_name || "",
-        };
-      })
-    : [];
-
   const { mutate: resetOrderMutation } = useResetOrderMutation();
   const setAdminOrderId = useOrderIdStore((state) => state.setAdminOrderId);
 
@@ -192,23 +162,22 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
           {order_status?.status_name}
         </p>
       ),
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <StatusFilter
-          options={StatusOption}
-          setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map((key) => String(key))}
-          confirm={confirm}
-          clearFilters={() => clearFilters && clearFilters()}
-          placeholder="Статус"
-        />
-      ),
+      filters: OrderData
+        ? Array.from(
+            new Set(OrderData.map((order) => order?.order_status?.status_id))
+          ).map((id) => {
+            const orderStatus = OrderData.find(
+              (order) => order?.order_status?.status_id === id
+            )?.order_status;
+            return {
+              value: String(orderStatus?.status_id),
+              text: orderStatus?.status_name || "",
+            };
+          })
+        : [],
       onFilter: (value, record) =>
         record.order_status.status_id === Number(value),
+      filterSearch: true,
     },
     {
       title: "Сотрудник/Кабинет",
@@ -286,6 +255,22 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
         const nameB = b.department?.department_name || "";
         return nameA.localeCompare(nameB, "ru");
       },
+      filters: OrderData
+        ? Array.from(
+            new Set(OrderData.map((order) => order?.department?.department_id))
+          ).map((id) => {
+            const orderDepatment = OrderData.find(
+              (order) => order?.department?.department_id === id
+            )?.department;
+            return {
+              value: String(orderDepatment?.department_id),
+              text: orderDepatment?.department_name || "",
+            };
+          })
+        : [],
+      onFilter: (value, record) =>
+        record.department?.department_id === Number(value),
+      filterSearch: true,
       render: (department: IDepartment) => department?.department_name,
     },
     {
@@ -298,45 +283,54 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
           b.product_group.product_group_name,
           "ru"
         ),
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <StatusFilter
-          options={CategoryOption}
-          setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map((key) => String(key))}
-          confirm={confirm}
-          clearFilters={() => clearFilters && clearFilters()}
-          placeholder="Статус"
-        />
-      ),
+      filters: OrderData
+        ? Array.from(
+            new Set(
+              OrderData.map((order) => order?.product_group?.product_group_id)
+            )
+          ).map((id) => {
+            const orderCategory = OrderData.find(
+              (order) => order?.product_group?.product_group_id === id
+            )?.product_group;
+            return {
+              value: String(orderCategory?.product_group_id),
+              text: orderCategory?.product_group_name || "",
+            };
+          })
+        : [],
       onFilter: (value, record) =>
         record.product_group.product_group_id === Number(value),
+      filterSearch: true,
       render: (productGroup: IProductGroup) => productGroup?.product_group_name,
+    },
+    {
+      title: "Тип заявки",
+      dataIndex: "order_type",
+      showSorterTooltip: { title: "Сортировка по типу заявки" },
+      key: "order_type",
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.order_type;
+        const nameB = b.order_type;
+        return nameA.localeCompare(nameB, "ru");
+      },
+      render: (orderType: string) =>
+        orderType === "warehouse" ? "На склад" : "На закупку",
+      filters: [
+        { value: EnumOrderTypes.WAREHOUSE, text: "Заявка на склад" },
+        { value: EnumOrderTypes.PURCHASE, text: "Заявка на закуп" },
+      ],
+      onFilter: (value, record) => record.order_type === value,
     },
     {
       title: "ОМС/ПУ",
       dataIndex: "oms",
       showSorterTooltip: { title: "Сортировка по ОМС/ПУ" },
       key: "oms",
-      // sorter: (a: any, b: any) => a?.post?.post_name?.localeCompare(b?.post?.post_name, 'ru'),
       responsive: ["lg"],
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <CheckboxFilter
-          setSelectedKeys={setSelectedKeys}
-          selectedKeys={selectedKeys.map((key) => String(key))}
-          confirm={confirm}
-          clearFilters={() => clearFilters && clearFilters()}
-        />
-      ),
+      filters: [
+        { value: "OMS", text: "ОМС" },
+        { value: "PU", text: "ПУ" },
+      ],
       onFilter: (value, record) => {
         // Предположим, что record.oms - это boolean
         if (value === "OMS") {
@@ -413,8 +407,9 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
             okText="Да"
             cancelText="Нет"
           >
-            <Button danger
-            title={record.is_archive ? "Разархивировать" : "Архивировать"}
+            <Button
+              danger
+              title={record.is_archive ? "Разархивировать" : "Архивировать"}
             >
               <FileZipOutlined />
             </Button>
@@ -440,9 +435,25 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
       columns={columns}
       scroll={{ x: 200 }}
       pagination={{ locale: { items_per_page: "/ Заявок" } }}
-      footer={() =>
-        `Заявок: ${(dataSource?.length as number) > 0 ? dataSource?.length : 0}`
-      }
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>
+            Заявок:{" "}
+            {(dataSource?.length as number) > 0 ? dataSource?.length : 0}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить заявки">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
       onRow={(record) => ({
         onDoubleClick: () => setAdminOrderId(String(record.order_id)),
       })}
