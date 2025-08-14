@@ -35,6 +35,8 @@ export const lightTheme: ThemeConfig = {
     Dropdown: {
       colorBgElevated: "#fff",
       colorText: "#678098",
+
+
     },
     Badge: {
       colorBgBase: "#fff",

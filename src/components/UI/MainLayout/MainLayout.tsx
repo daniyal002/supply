@@ -20,14 +20,7 @@ import {
   UserOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Layout,
-  Menu,
-  Tooltip,
-  message,
-  theme,
-} from "antd";
+import { Button, Layout, Menu, Tooltip, message, theme } from "antd";
 import { LogOut } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
@@ -54,16 +47,13 @@ const MainLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-
-
-
   const [collapsed, setCollapsed] = useState(true);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isMobile, setIsMobile] = useState(false);
 
   const {
-    token: { borderRadiusLG,Layout:LayoutToken },
+    token: { borderRadiusLG, Layout: LayoutToken },
   } = theme.useToken();
 
   const setLogin = useHeaderStore((state) => state.setLogin);
@@ -197,20 +187,20 @@ const MainLayout = ({
     }
   };
 
-  const {setSupplyTheme,supplyTheme} = useThemeStore()
+  const { setSupplyTheme, supplyTheme } = useThemeStore();
 
   const editTheme = () => {
-    supplyTheme === "light" ? setSupplyTheme("dark") : setSupplyTheme("light")
-
-  }
+    supplyTheme === "light" ? setSupplyTheme("dark") : setSupplyTheme("light");
+  };
 
   if (path === "/login") {
     return <>{children}</>;
   }
 
   return (
-
-    <Layout style={{ minHeight: "100vh", backgroundColor: LayoutToken?.headerBg}}>
+    <Layout
+      style={{ minHeight: "100vh", backgroundColor: LayoutToken?.headerBg }}
+    >
       <Sider
         trigger={null}
         collapsible={!isMobile}
@@ -228,17 +218,16 @@ const MainLayout = ({
           display: isMobile ? (isMobileMenuOpen ? "block" : "none") : "block",
         }}
       >
-
-          <Menu
-            mode="inline"
-            theme="light"
-            defaultSelectedKeys={["1"]}
-            items={menuItems}
-            style={{
-              maxHeight: "100vh",
-              overflowY: "auto",
-            }}
-          />
+        <Menu
+          mode="inline"
+          theme="light"
+          defaultSelectedKeys={["1"]}
+          items={menuItems}
+          style={{
+            maxHeight: "100vh",
+            overflowY: "auto",
+          }}
+        />
       </Sider>
 
       {/* Overlay для мобильных */}
@@ -267,13 +256,7 @@ const MainLayout = ({
         >
           <Button
             type="link"
-            icon={
-             collapsed ? (
-              <MenuUnfoldOutlined />
-              ) : (
-                <MenuFoldOutlined/>
-              )
-            }
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={toggleCollapsed}
             style={{
               fontSize: "16px",
@@ -282,38 +265,63 @@ const MainLayout = ({
             }}
           />
 
-
           <div className={style.headerBellAndButtons}>
-          <Button onClick={() => message.info("Для связи с техподдержкой позвоните по внутренному телефону на 194 или 195")}
+            <Tooltip title={"Техподдержка"}>
+              <Button
+                onClick={() =>
+                  message.info(
+                    "Для связи с техподдержкой позвоните по внутренному телефону на 194 или 195"
+                  )
+                }
                 size={isMobile ? "small" : "middle"}
-                title="Техподдержка"
-                >{isMobile ? <QuestionCircleOutlined /> : 'Техподдержка'}</Button>
+              >
+                {isMobile ? <QuestionCircleOutlined /> : "Техподдержка"}
+              </Button>
+            </Tooltip>
 
-          <Button onClick={() => editTheme()}
+            <Tooltip
+              title={
+                supplyTheme === "light"
+                  ? "Сменить на темную тему"
+                  : "Сменить на светлую тему"
+              }
+            >
+              <Button
+                onClick={() => editTheme()}
                 size={isMobile ? "small" : "middle"}
-                >
-            {supplyTheme === "light" ? <SunOutlined /> : <MoonOutlined /> }
-            </Button>
+              >
+                {supplyTheme === "light" ? <SunOutlined /> : <MoonOutlined />}
+              </Button>
+            </Tooltip>
+
             <DropdownMenu />
-            <div className={style.headerButtons} style={{backgroundColor:LayoutToken?.siderBg}}>
+
+            <div
+              className={style.headerButtons}
+              style={{ backgroundColor: LayoutToken?.siderBg }}
+            >
               <Tooltip title={login}>
                 <Button
                   icon={<p>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
-                  onClick={() =>
-                    message.info(`Ваш логин: ${login}`)
-                  }
+                  onClick={() => message.info(`Ваш логин: ${login}`)}
                   size={isMobile ? "small" : "middle"}
                 />
-                </Tooltip>
+              </Tooltip>
               <Tooltip title="Выход">
-                <Button icon={
-                   <LogOut
-                    size={20}
-                   color={supplyTheme === "light" ? "#678098" : "#fff"}
-                   cursor="pointer"
-                 />
-                } onClick={() => logout()} iconPosition="end">Выход</Button>
+                <Button
+                  icon={
+                    <LogOut
+                      size={20}
+                      color={supplyTheme === "light" ? "#678098" : "#fff"}
+                      cursor="pointer"
+                    />
+                  }
+                  onClick={() => logout()}
+                  iconPosition="end"
+                >
+                  Выход
+                </Button>
               </Tooltip>
             </div>
           </div>

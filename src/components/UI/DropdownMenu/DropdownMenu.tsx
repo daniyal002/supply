@@ -1,4 +1,4 @@
-import { Badge, Button, Divider, Dropdown, Space } from "antd";
+import { Badge, Button, Divider, Dropdown, Space, Tooltip } from "antd";
 import { MenuProps } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { useNotificationStore } from "../../../../store/notificationStore";
@@ -10,6 +10,7 @@ import {
 import { useTabStore } from "../../../../store/tabStore";
 import { useApprovalStore } from "../../../../store/approvalStore";
 import { BellOutlined } from "@ant-design/icons";
+import { useThemeStore } from "../../../../store/themeStore";
 
 export default function DropdownMenu() {
   const notifications = useNotificationStore((state) => state.notifications);
@@ -41,6 +42,9 @@ export default function DropdownMenu() {
       markAsReadAllNotification();
     }
   };
+
+  const { supplyTheme } = useThemeStore();
+
 
   useEffect(() => {
     setItems(
@@ -93,6 +97,7 @@ export default function DropdownMenu() {
               maxHeight: "200px", // Ограничиваем высоту
               display: "flex",
               flexDirection: "column", // Располагаем элементы вертикально
+              backgroundColor: supplyTheme === 'light' ? "#fff" : "#343434"
             }}
           >
             {/* Контейнер для прокрутки уведомлений */}
@@ -129,6 +134,7 @@ export default function DropdownMenu() {
         )}
       >
         <Space>
+          <Tooltip title="Уведомления">
           <Badge
             count={notifications.length}
             size="small"
@@ -148,6 +154,7 @@ export default function DropdownMenu() {
               }}
             />
           </Badge>
+          </Tooltip>
         </Space>
       </Dropdown>
   );
