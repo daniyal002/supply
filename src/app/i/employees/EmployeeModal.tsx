@@ -1,8 +1,8 @@
-import { Modal, Select } from "antd";
-import React, { useEffect } from "react";
+import { Button, Modal, Select } from "antd";
+import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import style from "./EmployeeModal.module.scss";
-import {useParlorData} from "@/hook/parlorHook";
+import { useParlorData } from "@/hook/parlorHook";
 import { usePostData } from "@/hook/postHook";
 import {
   useCreateEmployeeMutation,
@@ -13,11 +13,14 @@ import { IEmployee, IEmployeeFormValues } from "@/interface/employee";
 import { IPost } from "@/interface/post";
 import { useStorageData } from "@/hook/storageHook";
 
+const { Option } = Select;
+
 interface Props {
   type: "Добавить" | "Изменить";
   employeeId?: number;
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
+  employeeData: IEmployee[];
 }
 
 export default function EmployeeModal({
@@ -34,6 +37,7 @@ export default function EmployeeModal({
     control,
     watch,
     getValues,
+    setValue,
   } = useForm<IEmployeeFormValues>({ mode: "onChange" });
   const { employeeData } = useEmployeeData();
   const { parlorData } = useParlorData();
@@ -41,16 +45,44 @@ export default function EmployeeModal({
 
   const { mutate: createEmployeeMutation } = useCreateEmployeeMutation();
   const { mutate: updateEmployeeMutation } = useUpdateEmployeeMutation();
-  const {storageData} = useStorageData()
+  const { storageData } = useStorageData();
 
-  const watchBuyerType = watch("buyer_type")
+  const [employeeIdForParlor, setEmployeeIdForParlor] = useState<number>();
+
+  const CopyParlorsAndStorage = (employeeId: number) => {
+    const employee = employeeData?.find(
+      (employee) => employee.buyer_id === employeeId
+    );
+    const employeeParlors = employee?.parlors;
+    const employeeStorages = employee?.storages;
+    setValue(
+      "parlor",
+      employeeParlors?.map((employeeParlor) => ({
+        label: employeeParlor.parlor_name as string,
+        value: employeeParlor.parlor_id as number,
+      })) || []
+    );
+    setValue(
+      "storages",
+      employeeStorages?.map((employeeStorage) => ({
+        label: employeeStorage.storage_name as string,
+        value: employeeStorage.storage_id as number,
+      })) || []
+    );
+  };
+
+  const watchBuyerType = watch("buyer_type");
 
   const onSubmit: SubmitHandler<IEmployeeFormValues> = (data) => {
     const itemParlorData = parlorData?.filter((parlor) =>
-      data.parlor?.some((selectedParlor) => selectedParlor.value === parlor.parlor_id)
+      data.parlor?.some(
+        (selectedParlor) => selectedParlor.value === parlor.parlor_id
+      )
     );
     const itemStorageData = storageData?.filter((storage) =>
-      data.storages?.some((selectedStorage) => selectedStorage.value === storage.storage_id)
+      data.storages?.some(
+        (selectedStorage) => selectedStorage.value === storage.storage_id
+      )
     );
 
     const itemPostData = postData?.find(
@@ -58,7 +90,7 @@ export default function EmployeeModal({
     );
     const updateParlor: IEmployee = {
       ...data,
-      buyer_type:data.buyer_type.value,
+      buyer_type: data.buyer_type.value,
       parlors: itemParlorData,
       post: itemPostData as IPost,
       storages: itemStorageData,
@@ -74,7 +106,6 @@ export default function EmployeeModal({
     (employee) => employee.buyer_id === employeeId
   );
 
-
   useEffect(() => {
     if (employeeId === undefined) {
       reset({
@@ -82,25 +113,25 @@ export default function EmployeeModal({
         buyer_type: undefined,
         post: undefined,
         parlor: undefined,
-        storages:undefined
+        storages: undefined,
       });
     } else if (type === "Изменить" && itemEmployeeData) {
       reset({
         buyer_id: itemEmployeeData?.buyer_id,
         buyer_name: itemEmployeeData.buyer_name,
-        buyer_type: {value:itemEmployeeData.buyer_type},
+        buyer_type: { value: itemEmployeeData.buyer_type },
         post: {
           value: itemEmployeeData?.post?.post_id,
           label: itemEmployeeData?.post?.post_name,
         },
-        parlor: itemEmployeeData?.parlors?.map(parlor => ({
+        parlor: itemEmployeeData?.parlors?.map((parlor) => ({
           value: parlor?.parlor_id,
           label: parlor.parlor_name,
         })),
-        storages:itemEmployeeData.storages?.map(storage => ({
-          value:storage.storage_id,
-          label:storage.storage_name,
-        }))
+        storages: itemEmployeeData.storages?.map((storage) => ({
+          value: storage.storage_id,
+          label: storage.storage_name,
+        })),
       });
     }
   }, [reset, type, employeeId, itemEmployeeData]);
@@ -178,7 +209,9 @@ export default function EmployeeModal({
                 mode="multiple"
                 placeholder="Кабинет"
                 filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
                 showSearch
                 autoClearSearchValue={false}
@@ -218,20 +251,22 @@ export default function EmployeeModal({
           <Controller
             control={control}
             name="storages"
-            rules={{
-              // required: { message: "Выберите склад", value: true },
-            }}
+            rules={
+              {
+                // required: { message: "Выберите склад", value: true },
+              }
+            }
             render={({ field }) => (
               <Select
                 {...field}
                 options={optionsStorage}
-                onChange={(value, option) =>
-                  field.onChange(option)
-                }
+                onChange={(value, option) => field.onChange(option)}
                 placeholder="Склад"
                 mode="multiple"
                 filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
                 showSearch
                 autoClearSearchValue={false}
@@ -242,7 +277,6 @@ export default function EmployeeModal({
 
         {errors && <p className={style.error}>{errors.storages?.message}</p>}
 
-
         {getValues("buyer_type.value") === "employee" && (
           <>
             <div className={style.formItem}>
@@ -251,7 +285,13 @@ export default function EmployeeModal({
                 control={control}
                 name="post"
                 rules={{
-                  required: { message: "Выберите должность", value: getValues("buyer_type.value") === "employee" ? true : false },
+                  required: {
+                    message: "Выберите должность",
+                    value:
+                      getValues("buyer_type.value") === "employee"
+                        ? true
+                        : false,
+                  },
                 }}
                 render={({ field }) => (
                   <Select
@@ -263,7 +303,9 @@ export default function EmployeeModal({
                     }
                     placeholder="Должность"
                     filterOption={(input, option) =>
-                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
                     }
                     showSearch
                     autoClearSearchValue={false}
@@ -275,6 +317,33 @@ export default function EmployeeModal({
             {errors && <p className={style.error}>{errors.post?.message}</p>}
           </>
         )}
+        <div className={style.formItem} style={{gap:"10px",}}>
+          <label className={style.formItemLabel}>Скопировать из сотрудника кабинеты и склады</label>
+          <Select
+            placeholder="Сотрудник"
+            onChange={(value) => {
+              console.log(value);
+              setEmployeeIdForParlor(value);
+            }}
+            showSearch
+            optionFilterProp="children" // или "label", если используешь label
+            filterOption={(input, option) =>
+              option?.children
+                ?.toString()
+                .toLowerCase()
+                .includes(input.toLowerCase()) as boolean
+            }
+          >
+            {employeeData?.map((employee) => (
+              <Option key={employee.buyer_id} value={employee.buyer_id}>
+                {employee.buyer_name}
+              </Option>
+            ))}
+          </Select>
+          <Button onClick={() => CopyParlorsAndStorage(employeeIdForParlor as number)}>
+          Скопировать
+          </Button>
+        </div>
 
         <button type="submit" className={style.employeeNameSubmit}>
           {type}

@@ -38,6 +38,7 @@ export default function AdminEmployee() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         employeeId={employeeId}
+        employeeData={employeeData || []}
       />
       <div style={{display:'flex', gap:'10px'}}>
         <Button
