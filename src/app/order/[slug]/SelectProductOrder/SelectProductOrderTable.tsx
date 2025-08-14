@@ -160,6 +160,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         product_group.product_group_name,
       responsive: ["sm"],
       filters: productGroup,
+      filterSearch:true,
       onFilter: (value, record) =>
         record.product_group.product_group_id === value,
       sortOrder:
@@ -248,6 +249,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       },
       responsive: ["sm"],
       filters: unitGroup as { text: string; value: number }[],
+      filterSearch:true,
       onFilter: (value, record) => {
         const mainUnit =
           record.directory_unit_measurement.find((u) => u.coefficient > 1) ||
