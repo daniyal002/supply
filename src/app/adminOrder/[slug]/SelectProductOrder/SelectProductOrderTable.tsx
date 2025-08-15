@@ -137,7 +137,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       title: "Категория товаров",
       dataIndex: "product_group",
       key: "product_group",
-      width: "350px",
+      width: "150px",
       showSorterTooltip: { title: "Сортировка по категории товаров" },
       sorter: (a, b) =>
         a.product_group.product_group_name.localeCompare(
@@ -159,7 +159,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       title: "Артикул",
       dataIndex: "product_article",
       key: "product_article",
-      width: "350px",
+      width: "150px",
       showSorterTooltip: { title: "Сортировка по артикулу" },
       sorter: (a, b) =>
         a?.product_article?.localeCompare(b?.product_article ?? "", "ru") ?? 0,
@@ -207,7 +207,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       title: "Ед. измерения",
       dataIndex: "directory_unit_measurement",
       key: "directory_unit_measurement",
-      width: "180px",
+      width: "50px",
       showSorterTooltip: { title: "Сортировка по ед. измерения" },
       sorter: (a, b) => {
         if (!a || !b) return 0;
@@ -255,7 +255,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
       title: "Общий остаток",
       key: "remainder",
       dataIndex:"remainder",
-      width: "100px",
+      width: "50px",
       showSorterTooltip: { title: "Действия" },
       sorter: {
         compare: (a: any, b: any) => a.remainder - b.remainder,
