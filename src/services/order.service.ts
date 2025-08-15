@@ -60,6 +60,13 @@ export const orderService = {
     return response.data.detail;
   },
 
+  async getOrdersWhereUserIsApprover() {
+    const response = await axiosWidthAuth.get<IOrderItemResponse>(
+      "/order/get_orders_where_user_is_approver"
+    );
+    return response.data.detail;
+  },
+
   async getOrderStepHistory(order_id: number) {
     if (!isNaN(Number(order_id)) && Number(order_id) > 0) {
       const response = await axiosWidthAuth.get<IStepHistoryResponse>(

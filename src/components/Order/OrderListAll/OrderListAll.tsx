@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import OrderListTable from "./OrderListAllTable";
-import { useOrdersData } from "@/hook/orderHook";
+import { useOrdersWhereUserIsApproverData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
@@ -14,7 +14,7 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function OrderListAll() {
-  const { ordersData, isLoading, refetch } = useOrdersData();
+  const { ordersData, isLoading, refetch } = useOrdersWhereUserIsApproverData();
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     ordersData as IOrderItem[]
   );

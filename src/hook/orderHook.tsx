@@ -70,6 +70,20 @@ export const useOrdersData = () => {
   return { ordersData, isLoading, error,refetch };
 };
 
+export const useOrdersWhereUserIsApproverData = () => {
+  const {
+    data: ordersData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["Orders"],
+    queryFn: orderService.getOrdersWhereUserIsApprover,
+    // staleTime: Infinity,
+  });
+  return { ordersData, isLoading, error,refetch };
+};
+
 export const useApprovalOrders = () => {
   const {
     data: approvalOrders,
