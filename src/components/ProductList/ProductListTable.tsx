@@ -127,7 +127,7 @@ const ProductListTable: React.FC<ProductListTableProps> = ({ productData, refetc
       title: "Категория товаров",
       dataIndex: "product_group",
       key: "product_group",
-      width: "350px",
+      width: "200px",
       showSorterTooltip: { title: "Сортировка по категории товаров" },
       sorter: (a, b) =>
         a.product_group.product_group_name.localeCompare(
@@ -141,6 +141,7 @@ const ProductListTable: React.FC<ProductListTableProps> = ({ productData, refetc
       filterSearch:true,
       onFilter: (value, record) =>
         record.product_group.product_group_id === value,
+      filteredValue: filteredInfo.product_group || null,
       sortOrder:
         sortedInfo.columnKey === "product_group" ? sortedInfo.order : null,
     },
