@@ -27,6 +27,7 @@ export const useCreateDepartmentMutation = () => {
       departmentService.addDepartment({
         department_name: data.department_name,
         housing_id: data.housing?.housing_id as number,
+        is_generic: data.is_generic
       }),
     onSuccess: (newDepartment) => {
       message.success(`Подразделение "${newDepartment.department.department_name}" успешно удалено`)
@@ -55,6 +56,7 @@ export const useUpdateDepartmentMutation = () => {
         department_id: data.department_id,
         department_name: data.department_name,
         housing_id: data.housing?.housing_id as number,
+        is_generic: data.is_generic
       }),
     onSuccess: (updatedDepartment, variables) => {
       message.success(`Подразделение "${variables.department_name}" успешно изменено`)
@@ -85,6 +87,7 @@ export const useDeleteDepartmentMutation = () => {
         department_id: data.department_id,
         department_name: data.department_name,
         housing_id: data.housing?.housing_id as number,
+        is_generic: data.is_generic
       }),
     onSuccess: (updatedDepartment, variables) => {
       message.success(`Подразделение "${variables.department_name}" успешно удалено`)
@@ -113,6 +116,7 @@ export const useArchiveDepartmentMutation = () => {
         department_id: data.department_id,
         department_name: data.department_name,
         housing_id: data.housing?.housing_id as number,
+        is_generic: data.is_generic
       }),
     onSuccess: (updatedDepartment, variables) => {
       message.success(`Подразделение "${variables.department_name}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)

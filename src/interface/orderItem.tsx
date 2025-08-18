@@ -40,6 +40,7 @@ export interface IOrderItem {
     user?:IUser
     order_author_name?:string
     is_archive?:boolean
+    is_generic:boolean
   }
 
   export interface IDraftOrderItem {
@@ -61,6 +62,7 @@ export interface IOrderItem {
     in_route: boolean,
     user?:IUser
     is_archive?:boolean
+    is_generic:boolean
 
   }
 
@@ -86,6 +88,7 @@ export interface IOrderItem {
     product_group_id:number,
     note?: string,
     products: IProductTableRequest[]
+    is_generic:boolean
   }
 
   export interface IDraftOrderItemRequest{
@@ -100,6 +103,7 @@ export interface IOrderItem {
     product_group_id:number,
     note?: string,
     products: IProductTableRequest[]
+    is_generic:boolean
   }
 
   export interface IOrderItemRequestDelete{
@@ -128,6 +132,7 @@ export interface IOrderItem {
     note: string,
     order_products: IProductTable[]
     is_archive?:boolean
+    is_generic:boolean
   }
 
 
@@ -147,6 +152,7 @@ export interface IOrderItem {
     note: string,
     order_products: IProductTable[]
     is_archive?:boolean
+    is_generic:boolean
   }
 
   export interface IOrderItemResponse{

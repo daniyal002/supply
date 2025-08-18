@@ -4,7 +4,9 @@ export interface IDepartment{
     department_id?:number,
     department_name: string,
     is_archive?: boolean,
-    housing:IHousing | undefined
+    housing:IHousing | undefined,
+    is_generic:boolean
+
 }
 
 export interface IDepartmentResponse{
@@ -15,6 +17,8 @@ export interface IDepartmentRequest{
     department_id?:number,
     department_name: string
     housing_id:number
+    is_generic:boolean
+
 }
 
 export interface IDepartmentAddResponse{
@@ -26,6 +30,7 @@ export interface IDepartmentFormValues {
     department_id?: number;
     department_name: string;
     housing?: HousingOption;
+    is_generic:boolean
   }
 
 export interface IDepartmentOption {

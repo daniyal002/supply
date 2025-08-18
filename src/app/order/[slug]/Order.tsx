@@ -152,12 +152,13 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         order_type:
           GetMeData?.role?.role_name === "user_purchase" ||
           GetMeData?.role?.role_name === "admin"
-            ? data.order_type.value
+            ? data?.order_type?.value
             : EnumOrderTypes.WAREHOUSE,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         order_status_id: 1,
+        is_generic: data.is_generic,
         note: data.note,
         product_group_id: data.product_group.value,
         products: data.order_products.map((product) => {
@@ -228,6 +229,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             : EnumOrderTypes.WAREHOUSE,
         oms: getValues().oms || false,
         order_status_id: 8,
+        is_generic: getValues().is_generic,
         note: getValues().note,
         product_group_id: getValues().product_group.value,
         products: getValues().order_products.map((product) => {
@@ -280,6 +282,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         product_group: undefined,
         storage_id: undefined,
         order_type: undefined,
+        is_generic:false,
       });
     } else if (
       orderid !== "newOrder"
@@ -315,6 +318,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               ? "Заявка на закупку"
               : "Заявка на склад",
         },
+        is_generic: getOrderByIdData?.is_generic
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);

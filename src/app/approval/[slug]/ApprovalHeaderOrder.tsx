@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import style from "./ApprovalHeaderOrder.module.scss";
-import { Checkbox, Input, Select } from "antd";
+import { Checkbox, Input, Select, Switch } from "antd";
 import {
   Control,
   Controller,
@@ -134,22 +134,31 @@ export default function ApprovalHeaderOrder({
                   placeholder="Тип"
                   className={style.formItemSelect}
                 />
+
               )}
+
             />
+            <div className={`${style.Checkbox}`}>
+              <Controller
+                control={control}
+                name="oms"
+                render={({ field }) => (
+                  <Switch
+                    {...field}
+                    disabled
+                    checked={field.value}
+                    checkedChildren={"ОМС"}
+                    unCheckedChildren={"ПУ"}
+                    title={field.value ? "ОМС": "ПУ"}
+                  />
+                )}
+              />
+            </div>
             {errors && (
               <p className={style.error}>{errors.order_type?.message}</p>
             )}
           </div>
-        <div className={`${style.Checkbox}`}>
-          <label className={style.formItemLabel}>ОМС</label>
-          <Controller
-            control={control}
-            name="oms"
-            render={({ field }) => (
-              <Checkbox {...field} checked={field.value} disabled/>
-            )}
-          />
-        </div>
+
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Сотрудник</label>
           {/* <label className={style.formItemLabel}>Выберите сотрудника</label> */}

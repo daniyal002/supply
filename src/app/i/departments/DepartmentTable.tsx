@@ -114,6 +114,26 @@ const DepartmentTable: React.FC<PostTableProps> = ({
         record.housing?.housing_id === Number(value),
     },
     {
+      title: "Корпус",
+      dataIndex: "is_generic",
+      key: "is_generic",
+      render: (isGeneric: boolean) => isGeneric ? "Обобщенный" : "Частный",
+      filters: [
+        { value: "generic", text: "Обобщенный" },
+        { value: "noGeneric", text: "Частный" },
+      ],
+      onFilter: (value, record) => {
+        // Предположим, что record.oms - это boolean
+        if (value === "generic") {
+          return record.is_generic === true;
+        }
+        if (value === "noGeneric") {
+          return record.is_generic === false;
+        }
+        return false;
+      },
+    },
+    {
       title: "Действия",
       key: "action",
       render: (_: any, record: IDepartment) => (

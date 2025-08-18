@@ -125,6 +125,7 @@ export default function DraftOrder({
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         order_status_id: 1,
+        is_generic: data.is_generic,
         note: data.note,
         product_group_id: data.product_group.value,
         products: data.order_products.map((product) => {
@@ -186,6 +187,7 @@ export default function DraftOrder({
             ? getValues().order_type.value
             : EnumOrderTypes.WAREHOUSE,
         order_status_id: 8,
+        is_generic: getValues().is_generic,
         note: getValues().note,
         product_group_id: getValues().product_group.value,
         products: getValues().order_products.map((product) => {
@@ -227,6 +229,7 @@ export default function DraftOrder({
         product_group: undefined,
         storage_id: undefined,
         order_type: undefined,
+        is_generic:false
       });
     } else if (
       draftOrderid !== "newOrder"
@@ -262,6 +265,7 @@ export default function DraftOrder({
               ? "Заявка на закупку"
               : "Заявка на склад",
         },
+        is_generic: getOrderByIdData?.is_generic
       });
     }
   }, [reset, type, draftOrderid, getOrderByIdData]);

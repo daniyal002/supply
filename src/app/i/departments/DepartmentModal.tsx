@@ -1,4 +1,4 @@
-import { Modal, Select } from "antd";
+import { Modal, Select, Switch } from "antd";
 import React, { useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import style from "./DepartmentModal.module.scss";
@@ -57,6 +57,7 @@ export default function DepartmentModal({
       reset({
         department_name: undefined,
         housing: undefined,
+        is_generic: false,
       });
     } else if (type === "Изменить" && itemDepartmentData) {
       reset({
@@ -66,6 +67,7 @@ export default function DepartmentModal({
           value: itemDepartmentData?.housing?.housing_id,
           label: itemDepartmentData?.housing?.housing_name,
         },
+        is_generic: itemDepartmentData?.is_generic,
       });
     }
   }, [reset, type, departmentId, itemDepartmentData]);
@@ -96,6 +98,10 @@ export default function DepartmentModal({
               required: { message: "Введите подразделение", value: true },
             })}
           />
+
+          {errors.department_name && (
+            <p className={style.error}>{errors.department_name?.message}</p>
+          )}
         </div>
 
         <div className={style.formItem}>
@@ -107,16 +113,29 @@ export default function DepartmentModal({
               <Select
                 {...field}
                 options={options}
-                // @ts-ignore: Unreachable code error
-                onChange={(value, option) => field.onChange({value:value,label:option.label})} 
+                onChange={(value, option) =>
+                  // @ts-ignore: Unreachable code error
+                  field.onChange({ value: value, label: option.label })
+                }
               />
             )}
           />
         </div>
 
-        {errors && (
-          <p className={style.error}>{errors.department_name?.message}</p>
-        )}
+        <div className={style.formItem}>
+          <Controller
+            control={control}
+            name="is_generic"
+            render={({ field }) => (
+              <Switch
+                {...field}
+                checked={field.value}
+                checkedChildren={"Обобщенный"}
+                unCheckedChildren={"Частный"}
+              />
+            )}
+          />
+        </div>
 
         <button type="submit" className={style.departmentNameSubmit}>
           {type}
