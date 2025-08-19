@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Switch, Table, TableColumnsType } from "antd";
 import { IEmployee } from "@/interface/employee";
 import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
 import { IDepartment } from "@/interface/department";
@@ -18,12 +18,16 @@ interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
   loading: boolean;
   refetch: () => void;
+  isAllOrder: boolean;
+  setIsAllOrder: (isAllOrder: boolean) => void;
 }
 
 const OrderListAllTable: React.FC<OrderListProps> = ({
   OrderData,
   loading,
   refetch,
+  isAllOrder,
+  setIsAllOrder,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -379,9 +383,25 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
     <>
       <Table
         title={() => (
-          <p style={{ padding: 0 }}>
-            Заявок: {currentFilters ? currentFilters : dataSource?.length}
-          </p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <p style={{ padding: 0 }}>
+              Заявок: {currentFilters ? currentFilters : dataSource?.length}
+            </p>
+            <Switch
+              checkedChildren={"Все заявки"}
+              unCheckedChildren={"Я Согласователь"}
+              title={isAllOrder ? "Все заявки" : "Я Согласователь"}
+              onChange={(e) => {
+                setIsAllOrder(e);
+              }}
+            />
+          </div>
         )}
         dataSource={dataSource}
         columns={columns}

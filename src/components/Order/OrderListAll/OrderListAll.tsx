@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import OrderListTable from "./OrderListAllTable";
-import { useOrdersWhereUserIsApproverData } from "@/hook/orderHook";
+import { useOrdersData, useOrdersWhereUserIsApproverData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
@@ -14,58 +14,66 @@ dayjs.locale("ru_RU");
 const { RangePicker } = DatePicker;
 
 export default function OrderListAll() {
-  const { ordersData, isLoading, refetch } = useOrdersWhereUserIsApproverData();
-  const [orderData, setOrderData] = useState<IOrderItem[]>(
-    ordersData as IOrderItem[]
-  );
-  const [filteredOrderData, setFilteredOrderData] = useState<IOrderItem[]>(
-    ordersData as IOrderItem[]
-  );
-  const [dateRange, setDateRange] = useState<
-    [moment.Moment, moment.Moment] | null
-  >(null);
+  const [isAllOrder, setIsAllOrder] = useState<boolean>(false);
+  const [dateRange, setDateRange] = useState<[moment.Moment, moment.Moment] | null>(null);
 
+  const { ordersData: ordersDataIsApprover, isLoading: isLoadingIsApprover, refetch: refetchIsApprover } =
+    useOrdersWhereUserIsApproverData();
+  const { ordersData: ordersDataIsAll, isLoading: isLoadingIsAll, refetch: refetchIsAll } =
+    useOrdersData();
+
+  // --- Определяем текущие данные (с учётом isAllOrder и самих данных) ---
+  const currentOrdersData = isAllOrder ? ordersDataIsAll : ordersDataIsApprover;
+  const currentIsLoading = isAllOrder ? isLoadingIsAll : isLoadingIsApprover;
+  const currentRefetch = isAllOrder ? refetchIsAll : refetchIsApprover;
+
+  // --- Фильтрация по дате ---
+  const filteredOrderData = useMemo(() => {
+    // Если данных нет — возвращаем пустой массив
+    if (!currentOrdersData) return [];
+
+    if (!dateRange) return currentOrdersData;
+
+    const [start, end] = dateRange;
+    const startDate = start.startOf("day");
+    const endDate = end.endOf("day");
+
+    return currentOrdersData.filter((order) => {
+      const orderDate = moment(order.created_at).startOf("day");
+      return orderDate.isSameOrAfter(startDate) && orderDate.isSameOrBefore(endDate);
+    });
+  }, [currentOrdersData, dateRange]);
+
+  // --- Обработчик фильтрации ---
   const handleFilter = (dates: [moment.Moment, moment.Moment] | null) => {
     setDateRange(dates);
   };
-  useEffect(() => {
-    if (dateRange) {
-      const [start, end] = dateRange;
-      const filteredData = orderData.filter((order) => {
-        const orderDate = moment(order.created_at).startOf("day");
-        const startDate = start.startOf("day");
-        const endDate = end.endOf("day");
-        const isInRange =
-          orderDate.isSameOrAfter(startDate.format("YYYY-MM-DD")) &&
-          orderDate.isSameOrBefore(endDate.format("YYYY-MM-DD"));
-        return isInRange;
-      });
-      setFilteredOrderData(filteredData);
-    } else {
-      setFilteredOrderData(orderData);
-    }
-  }, [dateRange, orderData]);
 
   useEffect(() => {
-    setOrderData(ordersData as IOrderItem[]);
-    setFilteredOrderData(ordersData as IOrderItem[]);
-  }, [ordersData]);
+    if (isAllOrder) {
+      refetchIsAll();
+    } else {
+      refetchIsApprover();
+    }
+  }, [isAllOrder, refetchIsAll, refetchIsApprover]);
 
   return (
     <div className={style.orderList}>
       <Toaster />
       <RangePicker
-        //@ts-ignore
+      //@ts-ignore
         value={dateRange}
-        //@ts-ignore
+      //@ts-ignore
         onChange={handleFilter}
         style={{ marginBottom: 16 }}
         format="DD.MM.YYYY"
       />
       <OrderListTable
         OrderData={filteredOrderData}
-        loading={isLoading}
-        refetch={refetch}
+        loading={currentIsLoading}
+        refetch={currentRefetch}
+        isAllOrder={isAllOrder}
+        setIsAllOrder={setIsAllOrder}
       />
     </div>
   );
