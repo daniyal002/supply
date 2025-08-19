@@ -2,26 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  ApartmentOutlined,
   BookOutlined,
-  CalculatorOutlined,
-  CompassOutlined,
-  HomeOutlined,
-  IdcardOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MoonOutlined,
   QuestionCircleOutlined,
-  ShopOutlined,
   SunOutlined,
-  TagsOutlined,
-  TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
-  UserSwitchOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Tooltip, message, theme } from "antd";
-import { LogOut } from "lucide-react";
+import { LogOut, Waypoints } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
 import { useHeaderStore } from "../../../../store/headerStore";
@@ -81,7 +72,7 @@ const MainLayout = ({
         key: "2",
         icon: <UserOutlined />,
         label: "Админ-панель",
-        children: AdminPanelList(push)
+        children: AdminPanelList(push),
       },
       {
         key: "3",
@@ -155,7 +146,15 @@ const MainLayout = ({
           left: 0,
           transition: "all 0.3s ease",
           overflowY: "auto",
-          display: isMobile ? (isMobileMenuOpen ? "block" : "none") : "block",
+          // display: isMobile ? (isMobileMenuOpen ? "block" : "none") : "block",
+          display:
+            menuItems.length === 0
+              ? "none"
+              : isMobile
+              ? isMobileMenuOpen
+                ? "block"
+                : "none"
+              : "block",
         }}
       >
         <Menu
@@ -196,8 +195,19 @@ const MainLayout = ({
         >
           <Button
             type="link"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={toggleCollapsed}
+            icon={
+              menuItems.length === 0 ? (
+                <Waypoints
+                  size={25}
+                  color={supplyTheme === "light" ? "#678098" : "#fff"}
+                />
+              ) : collapsed ? (
+                <MenuUnfoldOutlined />
+              ) : (
+                <MenuFoldOutlined />
+              )
+            }
+            onClick={ menuItems.length === 0 ? undefined : toggleCollapsed}
             style={{
               fontSize: "16px",
               width: 64,
@@ -260,7 +270,7 @@ const MainLayout = ({
                   onClick={() => logout()}
                   iconPosition="end"
                 >
-                  Выход
+                  {!isMobile ? "Выход" : ""}
                 </Button>
               </Tooltip>
             </div>

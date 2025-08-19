@@ -140,8 +140,8 @@ export default function DropdownMenu() {
             size="small"
             style={{
               boxShadow: "none",
-              marginTop: 1,
-              marginRight: 2,
+              marginTop: -2,
+              marginRight: 7,
               fontSize: "9px",
             }}
             offset={[5, -5]}
