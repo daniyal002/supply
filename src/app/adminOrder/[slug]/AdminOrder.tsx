@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import {
   EnumOrderTypes,
   IDraftOrderItemRequest,
+  IOrderItem,
   IOrderItemFormValues,
   IOrderItemRequest,
 } from "@/interface/orderItem";
@@ -30,6 +31,8 @@ import {
   useUpdateDraftOrderMutation,
 } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
+import { useReactToPrint } from "react-to-print";
+import { exportOrderToExcel } from "@/helper/ExportToExcel";
 
 interface Props {
   orderid?: string;
@@ -40,6 +43,15 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
+  // Print
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [isPrinting, setIsPrinting] = useState(false);
+    const handlePrint = useReactToPrint({
+      contentRef,
+      onBeforePrint: async () => await setIsPrinting(true),
+      onAfterPrint: () => setIsPrinting(false),
+    });
 
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
@@ -96,6 +108,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           watch={watch}
           disabledOrder={disabledOrder}
           role={GetMeData?.role?.role_name as string}
+          exportToExcel={() =>
+            exportOrderToExcel(getOrderByIdData as IOrderItem)
+          }
+          handlePrint={handlePrint}
+          isPrinting={isPrinting}
         />
       ),
     },
@@ -349,7 +366,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   } = theme.useToken();
 
   return (
-    <div className={style.order}>
+    <div className={style.order} ref={contentRef}>
       <ModalSaveOrder
         setIsModalOpen={setIsModalOpen}
         isModalOpen={isModalOpen}
@@ -407,6 +424,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           />
 
           {/* </form> */}
+          {!isPrinting && (
           <button
             onClick={() => {
               if (disabledOrder) {
@@ -423,10 +441,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           >
             Подбор товара
           </button>
+          )}
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
           <div className={style.footerButtonGroup}>
-            {!disabledOrder && (
+            {!disabledOrder && !isPrinting && (
               <button
                 type="button"
                 onClick={() => createOrder()}
@@ -443,7 +462,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               </button>
             )}
 
-            {!disabledOrder && orderid === "newOrder" && (
+            {!disabledOrder && orderid === "newOrder" && !isPrinting && (
               <button
                 type="button"
                 className={style.buttonOrderSave}

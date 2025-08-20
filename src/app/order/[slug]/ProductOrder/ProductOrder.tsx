@@ -16,9 +16,10 @@ interface Props {
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
   disabledOrder: boolean;
-  tableRef?: React.RefObject<HTMLDivElement>;
   role: string;
   exportToExcel: () => void
+  handlePrint: () => void
+  isPrinting: boolean
 }
 
 export default function ProductOrder({
@@ -27,9 +28,10 @@ export default function ProductOrder({
   setValue,
   watch,
   disabledOrder,
-  tableRef,
   role,
-  exportToExcel
+  exportToExcel,
+  handlePrint,
+  isPrinting,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
@@ -101,8 +103,9 @@ export default function ProductOrder({
         setIsNewProduct={setIsNewProduct}
         disabledOrder={disabledOrder}
         orderId={orderId as number}
-        tableRef={tableRef}
         exportToExcel={exportToExcel}
+        handlePrint={handlePrint}
+        isPrinting={isPrinting}
       />
     </>
   );

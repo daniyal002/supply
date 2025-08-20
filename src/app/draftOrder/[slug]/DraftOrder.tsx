@@ -24,6 +24,7 @@ import {
   useSaveDraftOrderMutation,
   useUpdateDraftOrderMutation,
 } from "@/hook/orderTempHook";
+import { useReactToPrint } from "react-to-print";
 
 interface Props {
   draftOrderid?: string;
@@ -39,6 +40,16 @@ export default function DraftOrder({
   targetKey,
 }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
+  // Print
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [isPrinting, setIsPrinting] = useState(false);
+    const handlePrint = useReactToPrint({
+      contentRef,
+      onBeforePrint: async () => await setIsPrinting(true),
+      onAfterPrint: () => setIsPrinting(false),
+    });
+
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
   const { mutate: createOrderMutation } = useCreateOrderMutation();
@@ -79,6 +90,8 @@ export default function DraftOrder({
           watch={watch}
           disabledOrder={false}
           role={GetMeData?.role?.role_name as string}
+          handlePrint={handlePrint}
+          isPrinting={isPrinting}
         />
       ),
     },
@@ -298,7 +311,7 @@ export default function DraftOrder({
   }, [isModalOpen, toggle]);
 
   return (
-    <div className={style.order}>
+    <div className={style.order} ref={contentRef}>
       <ModalSaveOrder
         setIsModalOpen={setIsModalOpen}
         isModalOpen={isModalOpen}
@@ -359,6 +372,8 @@ export default function DraftOrder({
           />
 
           {/* </form> */}
+          {!isPrinting && (
+
           <button
             onClick={() => {
               if (!getValues("product_group.value")) {
@@ -371,10 +386,13 @@ export default function DraftOrder({
           >
             Подбор товара
           </button>
+          )}
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
           <div className={style.footerButtonGroup}>
-            <button
+            {!isPrinting && (
+              <>
+              <button
               type="button"
               onClick={() => createOrder()}
               className={style.buttonOrderCreate}
@@ -389,6 +407,8 @@ export default function DraftOrder({
             >
               {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
             </button>
+            </>
+            )}
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss"
-import { FileExcelFilled, InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
+import { FileExcelFilled, InfoCircleFilled, PrinterOutlined, SearchOutlined } from "@ant-design/icons";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -28,6 +28,8 @@ interface productOrderTableProps {
   orderId: number;
   readonly?:boolean
   exportToExcel: () => void
+  handlePrint: () => void;
+  isPrinting: boolean;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -40,10 +42,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   showModalCancel,
   setProductIndex,
   setProductIndexCancel,
-  deleteProduct,
   orderId,
   readonly = false,
-  exportToExcel
+  exportToExcel,
+  handlePrint,
+  isPrinting
 }) => {
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
@@ -79,6 +82,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "product",
       key: "product",
       showSorterTooltip: { title: "Сортировка по товару" },
+      width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
@@ -126,6 +130,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_name",
       key: "order_product_name",
       showSorterTooltip: { title: "Сортировка по добавленному товару" },
+      width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(
@@ -173,6 +178,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_link",
       key: "order_product_link",
       showSorterTooltip: { title: "Сортировка по ссылке товара" },
+      width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_link?.localeCompare(
@@ -222,6 +228,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "unit_measurement",
       key: "unit_measurement",
       showSorterTooltip: { title: "Сортировка по ед. измерения" },
+      width: "50px",
       sorter: {
         compare: (a: any, b: any) =>
           a.unit_measurement?.unit_measurement.unit_measurement_name.localeCompare(
@@ -241,6 +248,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "product_quantity",
       key: "product_quantity",
       showSorterTooltip: { title: "Сортировка по количеству" },
+      width: "50px",
       sorter: {
         compare: (a: any, b: any) => a.count - b.count,
       },
@@ -249,6 +257,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     {
       title: "Врач",
       dataIndex: "buyers",
+      width: "300px",
       key: "buyers",
       render: (buyers: IEmployeeFromParlorGetMe[]) =>
         buyers.map((buyer) => buyer.buyer_name).join(", "),
@@ -257,6 +266,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     {
       title: "Примечание",
       dataIndex: "note",
+      width: "150px",
       key: "note",
       responsive: ["sm"],
     },
@@ -265,6 +275,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "action",
       width: "100px",
       render: (_: any, record: IProductTable) => (
+        !isPrinting &&
         <Space size="middle">
           {record.is_cancel ? (
             <>
@@ -321,7 +332,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataSource={productTableData}
       columns={columns}
       scroll={{ x: 200 }}
-      pagination={{ locale: { items_per_page: "/ Товаров" } }}
+      pagination={
+        isPrinting
+          ? false // отключаем пагинацию при печати
+          : {
+              locale: { items_per_page: "/ Товаров" },
+            }
+      }
       rowClassName={(record) => record.is_cancel === true ? style.highlightRow : ''}
       expandable={{
         expandedRowKeys,
@@ -356,11 +373,16 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           }}
         >
           <p>Всего: {productTableData?.length}</p>
+          {!isPrinting && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
             <FileExcelFilled style={{color:"#10793F", fontSize:"18px"}}/>
             </Button>
+            <Button onClick={handlePrint}>
+              <PrinterOutlined style={{ fontSize: "18px" }} />
+            </Button>
           </div>
+          )}
         </div>
       )}
       rowKey="order_product_id"

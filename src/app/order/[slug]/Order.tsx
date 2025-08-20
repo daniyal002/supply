@@ -21,7 +21,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Button, message, Spin, Tabs, theme } from "antd";
+import { message, Spin, Tabs, theme } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -43,8 +43,16 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
+
+  // Print
   const contentRef = useRef<HTMLDivElement>(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const [isPrinting, setIsPrinting] = useState(false);
+  const handlePrint = useReactToPrint({
+    contentRef,
+    onBeforePrint: async () => await setIsPrinting(true),
+    onAfterPrint: () => setIsPrinting(false),
+  });
+
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
   const { mutate: createOrderMutation, isPending: createOrderIsPending } =
@@ -99,9 +107,12 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           setValue={setValue}
           watch={watch}
           disabledOrder={disabledOrder}
-          tableRef={contentRef}
           role={GetMeData?.role?.role_name as string}
-          exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem)}
+          exportToExcel={() =>
+            exportOrderToExcel(getOrderByIdData as IOrderItem)
+          }
+          handlePrint={handlePrint}
+          isPrinting={isPrinting}
         />
       ),
     },
@@ -282,7 +293,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         product_group: undefined,
         storage_id: undefined,
         order_type: undefined,
-        is_generic:false,
+        is_generic: false,
       });
     } else if (
       orderid !== "newOrder"
@@ -318,7 +329,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               ? "Заявка на закупку"
               : "Заявка на склад",
         },
-        is_generic: getOrderByIdData?.is_generic
+        is_generic: getOrderByIdData?.is_generic,
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);
@@ -355,7 +366,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   } = theme.useToken();
 
   return (
-    <div className={style.order}>
+    <div className={style.order} ref={contentRef}>
       <ModalSaveOrder
         setIsModalOpen={setIsModalOpen}
         isModalOpen={isModalOpen}
@@ -413,26 +424,28 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           />
 
           {/* </form> */}
-          <button
-            onClick={() => {
-              if (disabledOrder) {
-                message.info(
-                  "Заявка в маршруте! Сбросьте заявку если хотите изменить."
-                );
-              } else if (!getValues("product_group.value")) {
-                message.warning("Выберите категорию товара");
-              } else {
-                setToggle(!toggle);
-              }
-            }}
-            className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
-          >
-            Подбор товара
-          </button>
+          {!isPrinting && (
+            <button
+              onClick={() => {
+                if (disabledOrder) {
+                  message.info(
+                    "Заявка в маршруте! Сбросьте заявку если хотите изменить."
+                  );
+                } else if (!getValues("product_group.value")) {
+                  message.warning("Выберите категорию товара");
+                } else {
+                  setToggle(!toggle);
+                }
+              }}
+              className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
+            >
+              Подбор товара
+            </button>
+          )}
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
           <div className={style.footerButtonGroup}>
-            {!disabledOrder && (
+            {!disabledOrder && !isPrinting &&(
               <button
                 type="button"
                 onClick={() => createOrder()}
@@ -449,7 +462,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               </button>
             )}
 
-            {!disabledOrder && orderid === "newOrder" && (
+            {!disabledOrder && orderid === "newOrder" && !isPrinting && (
               <button
                 type="button"
                 className={style.buttonOrderSave}
@@ -459,7 +472,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               </button>
             )}
           </div>
-          {/* <button onClick={reactToPrintFn}>Print</button> */}
         </div>
       </div>
     </div>

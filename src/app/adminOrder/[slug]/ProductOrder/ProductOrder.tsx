@@ -17,6 +17,9 @@ interface Props {
   setValue: UseFormSetValue<IOrderItemFormValues>;
   disabledOrder: boolean;
   role: string;
+  exportToExcel: () => void;
+  handlePrint: () => void;
+  isPrinting: boolean;
 }
 
 export default function ProductOrder({
@@ -25,7 +28,10 @@ export default function ProductOrder({
   setValue,
   watch,
   disabledOrder,
-  role
+  role,
+  exportToExcel,
+  handlePrint,
+  isPrinting,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
@@ -34,9 +40,9 @@ export default function ProductOrder({
   const [type, setType] = useState<"Добавить" | "Изменить">("Изменить");
 
   // Следим за полем order_type
-    const orderType = watch("order_type")
-      ? watch("order_type")
-      : { value: EnumOrderTypes.WAREHOUSE };
+  const orderType = watch("order_type")
+    ? watch("order_type")
+    : { value: EnumOrderTypes.WAREHOUSE };
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -70,16 +76,16 @@ export default function ProductOrder({
         watch={watch}
         isNewProduct={isNewProduct}
       />
-      {!disabledOrder  &&
+      {!disabledOrder &&
         (role === "user_purchase" || role === "admin") &&
-        orderType.value === EnumOrderTypes.PURCHASE &&  (
-        <Button
-          onClick={() => showModalIsNewProduct()}
-          style={{ width: "100%", marginBottom: "10px" }}
-        >
-          Добавить новый товар
-        </Button>
-      )}
+        orderType.value === EnumOrderTypes.PURCHASE && (
+          <Button
+            onClick={() => showModalIsNewProduct()}
+            style={{ width: "100%", marginBottom: "10px" }}
+          >
+            Добавить новый товар
+          </Button>
+        )}
       <ProductOrderTable
         showModal={showModal}
         productTableData={productTableData}
@@ -88,6 +94,9 @@ export default function ProductOrder({
         deleteProduct={deleteProduct}
         setIsNewProduct={setIsNewProduct}
         disabledOrder={disabledOrder}
+        exportToExcel={exportToExcel}
+        handlePrint={handlePrint}
+        isPrinting={isPrinting}
       />
     </>
   );

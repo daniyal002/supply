@@ -17,15 +17,18 @@ interface Props {
   setValue: UseFormSetValue<IOrderItemFormValues>;
   readonly?:boolean
   exportToExcel: () => void
+  handlePrint: () => void
+  isPrinting:boolean,
 }
 
 export default function ProductOrder({
   productTableData,
   getValues,
   setValue,
-  watch,
   readonly = false,
-  exportToExcel
+  exportToExcel,
+  handlePrint,
+  isPrinting,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
@@ -89,6 +92,8 @@ export default function ProductOrder({
         orderId={orderId as number}
         readonly={readonly}
         exportToExcel={exportToExcel}
+        handlePrint={handlePrint}
+        isPrinting={isPrinting}
       />
     </>
   );

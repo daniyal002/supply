@@ -3,7 +3,12 @@ import { IProduct } from "@/interface/product";
 import { IOrderProductStatus, IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
-import { FileExcelFilled, FileExcelTwoTone, InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
+import {
+  FileExcelFilled,
+  InfoCircleFilled,
+  PrinterOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -22,8 +27,9 @@ interface productOrderTableProps {
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
   orderId: number;
-  tableRef?:React.RefObject<HTMLDivElement>
   exportToExcel: () => void;
+  handlePrint: () => void;
+  isPrinting: boolean;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -35,8 +41,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setIsNewProduct,
   disabledOrder,
   orderId,
-  tableRef,
-  exportToExcel
+  exportToExcel,
+  handlePrint,
+  isPrinting,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -71,6 +78,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "product",
       key: "product",
       showSorterTooltip: { title: "Сортировка по товару" },
+      width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
@@ -120,6 +128,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_name",
       key: "order_product_name",
       showSorterTooltip: { title: "Сортировка по добавленному товару" },
+      width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(
@@ -168,6 +177,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Ссылка товар",
       dataIndex: "order_product_link",
       key: "order_product_link",
+      width: "400px",
       showSorterTooltip: { title: "Сортировка по ссылке товара" },
       sorter: {
         compare: (a: any, b: any) =>
@@ -218,6 +228,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Ед. измерения",
       dataIndex: "unit_measurement",
       key: "unit_measurement",
+      width: "50px",
       showSorterTooltip: { title: "Сортировка по ед. измерения" },
       sorter: {
         compare: (a: any, b: any) =>
@@ -237,6 +248,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Количество",
       dataIndex: "product_quantity",
       key: "product_quantity",
+      width: "50px",
       showSorterTooltip: { title: "Сортировка по количеству" },
       sorter: {
         compare: (a: any, b: any) => a.count - b.count,
@@ -247,6 +259,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Врач",
       dataIndex: "buyers",
       key: "buyers",
+      width: "300px",
       render: (buyers: IEmployeeFromParlorGetMe[]) =>
         buyers.map((buyer) => buyer.buyer_name).join(", "),
       responsive: ["sm"],
@@ -254,6 +267,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     {
       title: "Примечание",
       dataIndex: "note",
+      width: "150px",
       key: "note",
       responsive: ["sm"],
     },
@@ -262,6 +276,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_status",
       key: "order_product_status",
       // responsive: ["sm"],
+      width: "150px",
       render: (order_product_status: IOrderProductStatus) => (
         <p
           style={{
@@ -282,6 +297,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "action",
 
       render: (record: IProductTable) => (
+        !isPrinting &&
         <Space size="middle">
           {record.is_cancel && (
             <Tooltip title={<span>{record.order_cancel_comment.comment}</span>}>
@@ -347,12 +363,17 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   }));
 
   return (
-    <div ref={tableRef}>
     <Table
       dataSource={dataSource}
       columns={columns}
       scroll={{ x: 200 }}
-      pagination={{ locale: { items_per_page: "/ Товаров" } }}
+      pagination={
+        isPrinting
+          ? false // отключаем пагинацию при печати
+          : {
+              locale: { items_per_page: "/ Товаров" },
+            }
+      }
       footer={() => (
         <div
           style={{
@@ -361,17 +382,24 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             justifyContent: "space-between",
           }}
         >
-          <p>Всего: {currentFilters
-          ? currentFilters
-          : dataSource?.length
-          ? dataSource?.length
-          : 0}</p>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <p>
+            Всего:{" "}
+            {currentFilters
+              ? currentFilters
+              : dataSource?.length
+              ? dataSource?.length
+              : 0}
+          </p>
+          {!isPrinting && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
-            <FileExcelFilled style={{color:"#10793F", fontSize:"18px"}}/>
+              <FileExcelFilled style={{ color: "#10793F", fontSize: "18px" }} />
             </Button>
-
+            <Button onClick={handlePrint}>
+              <PrinterOutlined style={{ fontSize: "18px" }} />
+            </Button>
           </div>
+          ) }
         </div>
       )}
       onChange={(pagination, filters, sorter, extra) => {
@@ -398,7 +426,6 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       }}
       rowHoverable={false}
     />
-    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import style from "./Order.module.scss";
 import {
   useAgreedOrderMutation,
@@ -17,6 +17,7 @@ import RouteInfo from "@/components/RouteInfo/RouteInfo";
 import { useNotificationStore } from "../../../../store/notificationStore";
 import { useMarkAsReadNotification } from "@/hook/notificationHook";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
+import { useReactToPrint } from "react-to-print";
 
 interface Props {
   orderid?: string;
@@ -47,6 +48,15 @@ export default function ApprovalOrder({
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const notifications = useNotificationStore((state) => state.notifications);
   const { mutate: markAsReadNotification } = useMarkAsReadNotification();
+
+   // Print
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [isPrinting, setIsPrinting] = useState<boolean>(false);
+    const handlePrint = useReactToPrint({
+      contentRef,
+      onBeforePrint: async () => await setIsPrinting(true),
+      onAfterPrint: () => setIsPrinting(false),
+    });
 
   useEffect(() => {
     const currentNotifications = notifications.filter(
@@ -82,6 +92,8 @@ export default function ApprovalOrder({
           watch={watch}
           readonly={readonly}
           exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem)}
+          handlePrint={handlePrint}
+          isPrinting={isPrinting}
         />
       ),
     },
@@ -275,7 +287,7 @@ export default function ApprovalOrder({
   };
 
   return (
-    <>
+    <div ref={contentRef}>
       {(agreedOrderPending || rejectOrderPending) && <Spin fullscreen={true} />}
       <div className={style.newOrder}>
         <h1>Заявка на согласовании №: {orderid}</h1>
@@ -294,7 +306,7 @@ export default function ApprovalOrder({
           </button> */}
         {/* </form> */}
         <Tabs defaultActiveKey="1" items={items} />
-        {!readonly && (
+        {!readonly && !isPrinting &&  (
           <div className={style.commentAndButtons}>
             <TextArea
               placeholder="Комментарий"
@@ -319,6 +331,6 @@ export default function ApprovalOrder({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
