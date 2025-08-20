@@ -12,17 +12,17 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Tooltip, message, theme } from "antd";
-import { LogOut, Waypoints } from "lucide-react";
+import { Waypoints } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
 import { useHeaderStore } from "../../../../store/headerStore";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useLogout } from "@/hook/useAuth";
 import { db } from "@/db/db";
 import { usePathname, useRouter } from "next/navigation";
 import { protectedRoutes, isRole } from "@/helper/ProtectedRoutes";
 import { useThemeStore } from "../../../../store/themeStore";
 import { AdminPanelList } from "./AdminPanelList";
+import LogoutDropdown from "./LogoutDropdown";
 
 const { Header, Sider, Content } = Layout;
 
@@ -53,7 +53,6 @@ const MainLayout = ({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const { push } = useRouter();
-  const { mutate: logout } = useLogout();
   const path = usePathname();
 
   // Получаем роль из токена
@@ -207,7 +206,7 @@ const MainLayout = ({
                 <MenuFoldOutlined />
               )
             }
-            onClick={ menuItems.length === 0 ? undefined : toggleCollapsed}
+            onClick={menuItems.length === 0 ? undefined : toggleCollapsed}
             style={{
               fontSize: "16px",
               width: 64,
@@ -258,21 +257,7 @@ const MainLayout = ({
                   size={isMobile ? "small" : "middle"}
                 />
               </Tooltip>
-              <Tooltip title="Выход">
-                <Button
-                  icon={
-                    <LogOut
-                      size={20}
-                      color={supplyTheme === "light" ? "#678098" : "#fff"}
-                      cursor="pointer"
-                    />
-                  }
-                  onClick={() => logout()}
-                  iconPosition="end"
-                >
-                  {!isMobile ? "Выход" : ""}
-                </Button>
-              </Tooltip>
+              <LogoutDropdown isMobile={isMobile} supplyTheme={supplyTheme} />
             </div>
           </div>
         </Header>
