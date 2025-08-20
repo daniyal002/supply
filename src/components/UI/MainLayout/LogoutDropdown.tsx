@@ -59,7 +59,7 @@ const LogoutDropdown = ({ isMobile, supplyTheme }: Props) => {
   ];
 
   return (
-    <Dropdown menu={{ items }} placement="bottomCenter">
+    <Dropdown menu={{ items }} placement="bottom">
       <Button
         icon={
           <LogOut
