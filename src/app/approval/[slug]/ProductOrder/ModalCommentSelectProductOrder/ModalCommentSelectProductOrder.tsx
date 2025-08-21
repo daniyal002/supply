@@ -83,12 +83,12 @@ const ModalCommentSelectProductOrder: React.FC<Props> = ({
             {...register("product_count", {
               required: { value: true, message: "Количество обязательно" },
               pattern: {
-                value: /^[0-9]+$/,
+                value: /^\d+(\.\d+)?$/,
                 message: "Вводить можно только цифры",
               },
               min: {
-                value: 1,
-                message: "Количество не должно быть меньше 1. Если вы хотите отклонить, то отклоните через кнопку 'Отклонить' ",
+                value: 0.1,
+                message: "Количество не должно быть меньше 0.1. Если вы хотите отклонить, то отклоните через кнопку 'Отклонить' ",
               },
             })}
           />

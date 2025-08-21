@@ -320,7 +320,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             name="unit_measurement"
             rules={{
               required: {
-                value: !isNewProduct,
+                value: true,
                 message: "Выберите Единицу измерения",
               },
             }}
