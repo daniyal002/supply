@@ -13,6 +13,7 @@ import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
+import { useProductData } from "@/hook/productHook";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -52,6 +53,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     useDeleteOrderProductCancelCommentMutation(orderId);
      const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
         useSearch();
+    const {productData} = useProductData()
 
          const unitGroup = useMemo(() => {
             const productSet = new Set();
@@ -84,7 +86,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       showSorterTooltip: { title: "Сортировка по товару" },
       width: "400px",
       sorter: {
-        compare: (a: any, b: any) =>
+        compare: (a: IProductTable, b: IProductTable) =>
           a.product.product_name.localeCompare(b.product.product_name, "ru"),
       },
       filterDropdown: (props) => (
@@ -124,7 +126,52 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           text?.product_name
         ),
     },
+    {
+      title: "Артикул",
+      dataIndex: "product",
+      key: "product",
+      showSorterTooltip: { title: "Сортировка по артиклу" },
+      width: "150px",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product?.product_article?.localeCompare(b.product?.product_article, "ru"),
+      },
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по товару"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="product_article"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+      ),
+      onFilter: (value, record) => {
+        const searchValue = (value as string).toLowerCase();
+        const product_article = record.product?.product_article?.toString()
+          .toLowerCase();
 
+        return filterBySearchText(searchValue, product_article || '');
+      },
+      render: (text: IProduct) =>
+        searchedColumn === "product_article" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={
+              text?.product_article ? text?.product_article.toString() : ""
+            }
+          />
+        ) : (
+          text?.product_article || "_"
+        ),
+    },
     {
       title: "Добавленный товар",
       dataIndex: "order_product_name",
@@ -253,6 +300,18 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) => a.count - b.count,
       },
       responsive: ["sm"],
+    },
+    {
+      title: "Общий остаток",
+      dataIndex: "remainder",
+      key: "remainder",
+      showSorterTooltip: { title: "Сортировка по количеству" },
+      width: "50px",
+      sorter: {
+        compare: (a: any, b: any) => a.remainder - b.remainder,
+      },
+      responsive: ["sm"],
+      render: (value:number,record) => productData?.find(product => product.product_id === record.product.product_id)?.remainder || "_"
     },
     {
       title: "Врач",

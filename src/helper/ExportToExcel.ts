@@ -1,8 +1,9 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
+import { IProductUnit } from "@/interface/product";
 
-export const exportOrderToExcel = async (order: IOrderItem) => {
+export const exportOrderToExcel = async (order: IOrderItem, products:IProductUnit[]) => {
   if (!order.order_products?.length) {
     console.warn("В заявке нет товаров");
     return;
@@ -76,6 +77,8 @@ export const exportOrderToExcel = async (order: IOrderItem) => {
     "Сотрудники",
     "Ед. изм.",
     "Кол-во",
+    "Общий остаток",
+    "Артикул",
     "Добавленный товар",
     "Ссылка на добавленный товар",
     "Примечание",
@@ -101,6 +104,8 @@ export const exportOrderToExcel = async (order: IOrderItem) => {
       product.buyers?.map((buyers) => buyers.buyer_name).join(", ") || "",
       product.unit_measurement?.unit_measurement?.unit_measurement_name || "",
       product.product_quantity,
+      products.find(products => products.product_id === product.product.product_id)?.remainder || "",
+      product.product.product_article || "",
       product.order_product_name || "",
       product.order_product_link || "",
       product.note || "",

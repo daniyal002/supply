@@ -18,6 +18,7 @@ import { useNotificationStore } from "../../../../store/notificationStore";
 import { useMarkAsReadNotification } from "@/hook/notificationHook";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
 import { useReactToPrint } from "react-to-print";
+import { useProductData } from "@/hook/productHook";
 
 interface Props {
   orderid?: string;
@@ -35,6 +36,8 @@ export default function ApprovalOrder({
   readonly = false,
 }: Props) {
   const { TextArea } = Input;
+    const {productData} = useProductData()
+
 
   const {
     reset,
@@ -91,7 +94,7 @@ export default function ApprovalOrder({
           setValue={setValue}
           watch={watch}
           readonly={readonly}
-          exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem)}
+          exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem, productData || [])}
           handlePrint={handlePrint}
           isPrinting={isPrinting}
         />

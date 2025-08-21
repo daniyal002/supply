@@ -27,6 +27,7 @@ export interface IProductTable {
   is_cancel?: boolean;
   note?: string;
   order_product_status?:IOrderProductStatus
+  remainder?:number
 }
 
 export interface IProductTableRequest {

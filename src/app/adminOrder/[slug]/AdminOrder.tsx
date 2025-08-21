@@ -43,7 +43,7 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
-
+  const {productData} = useProductData()
   // Print
     const contentRef = useRef<HTMLDivElement>(null);
     const [isPrinting, setIsPrinting] = useState(false);
@@ -109,7 +109,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           disabledOrder={disabledOrder}
           role={GetMeData?.role?.role_name as string}
           exportToExcel={() =>
-            exportOrderToExcel(getOrderByIdData as IOrderItem)
+            exportOrderToExcel(getOrderByIdData as IOrderItem, productData || [])
           }
           handlePrint={handlePrint}
           isPrinting={isPrinting}
