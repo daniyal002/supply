@@ -275,10 +275,10 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
               showModal();
               setProductId(record.product_id);
             }}
-            disabled={
-              record.product_group.product_group_id !==
-              getValues("product_group.value")
-            }
+            // disabled={
+            //   record.product_group.product_group_id !==
+            //   getValues("product_group.value")
+            // }
             title="Добавить"
           >
             Добавить

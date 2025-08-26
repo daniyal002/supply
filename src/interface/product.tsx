@@ -4,7 +4,7 @@ import { IUnit } from "./unit";
 export interface IProduct{
     id?:number,
     product_name:string,
-    product_group:string,
+    product_group:IProductGroup,
     unit_measurement:IBasicUnit,
     product_article?:string,
 }

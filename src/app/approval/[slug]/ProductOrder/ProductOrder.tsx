@@ -29,6 +29,7 @@ export default function ProductOrder({
   exportToExcel,
   handlePrint,
   isPrinting,
+  watch,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
@@ -94,6 +95,7 @@ export default function ProductOrder({
         exportToExcel={exportToExcel}
         handlePrint={handlePrint}
         isPrinting={isPrinting}
+        watch={watch}
       />
     </>
   );

@@ -103,6 +103,7 @@ export default function ProductOrder({
         orderId={orderId as number}
         handlePrint={handlePrint}
         isPrinting={isPrinting}
+        watch={watch}
       />
     </>
   );

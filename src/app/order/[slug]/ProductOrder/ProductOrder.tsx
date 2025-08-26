@@ -106,6 +106,7 @@ export default function ProductOrder({
         exportToExcel={exportToExcel}
         handlePrint={handlePrint}
         isPrinting={isPrinting}
+        watch={watch}
       />
     </>
   );

@@ -1,18 +1,22 @@
 import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import {
-  IOrderProductStatus,
-  IProductTable,
-  IProductTableRequest,
-} from "@/interface/productTable";
+import { IOrderProductStatus, IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Space, Table, TableColumnsType } from "antd";
-import { FileExcelFilled, PrinterOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Space, Table, TableColumnsType, theme } from "antd";
+import {
+  FileExcelFilled,
+  PrinterOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { useMemo, useState } from "react";
+import style from "./ProductOrderTable.module.scss";
+import { IOrderItemFormValues } from "@/interface/orderItem";
+import { UseFormWatch } from "react-hook-form";
+import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -25,6 +29,7 @@ interface productOrderTableProps {
   exportToExcel: () => void;
   handlePrint: () => void;
   isPrinting: boolean;
+  watch: UseFormWatch<IOrderItemFormValues>;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -38,9 +43,15 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   exportToExcel,
   handlePrint,
   isPrinting,
+  watch,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
+
+  const { hasOrderProductName, hasOrderProductLink, hasBuyers, hasNote } =
+    useProductTableColumnVisibility(productTableData);
+
+  const orderProductGroup = watch("product_group");
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();
@@ -64,6 +75,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         text: product.unit_measurement.unit_measurement.unit_measurement_name,
       }));
   }, [productTableData]);
+
+  const {
+    token: { colorText },
+  } = theme.useToken();
 
   const columns: TableColumnsType<IProductTable> = [
     {
@@ -115,12 +130,42 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           text?.product_name
         ),
     },
-
+    {
+      title: "Категория",
+      dataIndex: "product",
+      key: "product",
+      showSorterTooltip: { title: "Сортировка по категории" },
+      width: "150px",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product.product_group.product_group_name.localeCompare(
+            b.product.product_group.product_group_name,
+            "ru"
+          ),
+      },
+      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group?.product_group_name
+    },
+    {
+      title: "Артикул",
+      dataIndex: "product",
+      key: "product",
+      showSorterTooltip: { title: "Сортировка по артиклу" },
+      width: "150px",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product?.product_article?.localeCompare(
+            b.product?.product_article,
+            "ru"
+          ),
+      },
+      render: (text: IProduct) => text?.product_article || "_"
+    },
     {
       title: "Добавленный товар",
       dataIndex: "order_product_name",
       key: "order_product_name",
       showSorterTooltip: { title: "Сортировка по добавленному товару" },
+      hidden:!hasOrderProductName,
       width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
@@ -171,6 +216,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_link",
       key: "order_product_link",
       showSorterTooltip: { title: "Сортировка по ссылке товара" },
+      hidden:!hasOrderProductLink,
       width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
@@ -213,7 +259,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             textToHighlight={text ? text.toString() : ""}
           />
         ) : (
-          text
+          text &&
+          <a href={text} target="_blank" style={{color:colorText}}>Нажмите чтобы перейти</a>
         ),
     },
 
@@ -253,6 +300,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "buyers",
       key: "buyers",
       width: "300px",
+      hidden:!hasBuyers,
       render: (buyers: IEmployeeFromParlorGetMe[]) =>
         buyers.map((buyer) => buyer.buyer_name).join(", "),
       responsive: ["sm"],
@@ -282,6 +330,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Примечание",
       dataIndex: "note",
       key: "note",
+      hidden:!hasNote,
       width: "150px",
       responsive: ["sm"],
     },
@@ -289,40 +338,42 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Действия",
       key: "action",
 
-      render: (record: IProductTable) => (
-        !isPrinting &&
-        <Space size="middle">
-          {!disabledOrder && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              <Button
-                onClick={() => {
-                  setProductId(
-                    record.product ? (record.product.product_id as number) : NaN
-                  );
-                  showModal();
-                  setIsNewProduct(record.order_product_name ? true : false);
-                  // @ts-ignore: Unreachable code error
-                  setProductIndex(record.key);
-                }}
-                title="Изменить"
-              >
-                Изменить
-              </Button>
-              <Button
-                danger
-                type="primary"
-                onClick={() => {
-                  // @ts-ignore: Unreachable code error
-                  deleteProduct(record.key);
-                }}
-                title="Удалить"
-              >
-                Удалить
-              </Button>
-            </div>
-          )}
-        </Space>
-      ),
+      render: (record: IProductTable) =>
+        !isPrinting && (
+          <Space size="middle">
+            {!disabledOrder && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                <Button
+                  onClick={() => {
+                    setProductId(
+                      record.product
+                        ? (record.product.product_id as number)
+                        : NaN
+                    );
+                    showModal();
+                    setIsNewProduct(record.order_product_name ? true : false);
+                    // @ts-ignore: Unreachable code error
+                    setProductIndex(record.key);
+                  }}
+                  title="Изменить"
+                >
+                  Изменить
+                </Button>
+                <Button
+                  danger
+                  type="primary"
+                  onClick={() => {
+                    // @ts-ignore: Unreachable code error
+                    deleteProduct(record.key);
+                  }}
+                  title="Удалить"
+                >
+                  Удалить
+                </Button>
+              </div>
+            )}
+          </Space>
+        ),
     },
   ];
 
@@ -365,20 +416,30 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           </p>
           {!isPrinting && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
-              <FileExcelFilled style={{ color: "#10793F", fontSize: "18px" }} />
-            </Button>
-            <Button onClick={handlePrint}>
-              <PrinterOutlined style={{ fontSize: "18px" }} />
-            </Button>
-          </div>
-          ) }
+              <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
+                <FileExcelFilled
+                  style={{ color: "#10793F", fontSize: "18px" }}
+                />
+              </Button>
+              <Button onClick={handlePrint}>
+                <PrinterOutlined style={{ fontSize: "18px" }} />
+              </Button>
+            </div>
+          )}
         </div>
       )}
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
       locale={{ emptyText: "Нет товаров" }}
+      rowClassName={(record) =>
+        record?.is_cancel === true
+          ? style.highlightRowIsCancel
+          : record?.product?.product_group?.product_group_id !==
+            orderProductGroup?.value && !record?.order_product_link
+          ? style.highlightRowMatchCategory
+          : ""
+      }
     />
   );
 };

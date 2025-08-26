@@ -89,6 +89,7 @@ export interface IOrderItem {
     note?: string,
     products: IProductTableRequest[]
     is_generic:boolean
+    category_matches: boolean,
   }
 
   export interface IDraftOrderItemRequest{
@@ -103,7 +104,8 @@ export interface IOrderItem {
     product_group_id:number,
     note?: string,
     products: IProductTableRequest[]
-    is_generic:boolean
+    is_generic:boolean,
+    category_matches: boolean,
   }
 
   export interface IOrderItemRequestDelete{
@@ -133,6 +135,7 @@ export interface IOrderItem {
     order_products: IProductTable[]
     is_archive?:boolean
     is_generic:boolean
+    category_matches: boolean,
   }
 
 
@@ -153,6 +156,7 @@ export interface IOrderItem {
     order_products: IProductTable[]
     is_archive?:boolean
     is_generic:boolean
+    category_matches: boolean,
   }
 
   export interface IOrderItemResponse{

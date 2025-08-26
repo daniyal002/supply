@@ -14,7 +14,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message, Spin, Tabs } from "antd";
+import { message, Spin, Tabs, Tooltip } from "antd";
 import { TabsProps } from "antd/lib";
 import { useProductData } from "@/hook/productHook";
 import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
@@ -25,6 +25,7 @@ import {
   useUpdateDraftOrderMutation,
 } from "@/hook/orderTempHook";
 import { useReactToPrint } from "react-to-print";
+import { InfoCircleFilled } from "@ant-design/icons";
 
 interface Props {
   draftOrderid?: string;
@@ -100,6 +101,7 @@ export default function DraftOrder({
   const onChange = (key: string) => {};
 
   const productsWatch = watch("order_products");
+  const productGroup = watch("product_group");
 
   useEffect(() => {
     const buyerType = GetMeData?.employee?.parlors
@@ -124,10 +126,25 @@ export default function DraftOrder({
     }
   }, [getValues("employee_id")]);
 
+  const [categoryMatches,setCategoryMatches] = useState<boolean>(false)
+
+    useEffect(() => {
+      const orderProducts = productsWatch;
+
+      if (Array.isArray(orderProducts)) {
+        const matches = orderProducts.some(product =>
+          product.product?.product_group?.product_group_name !== productGroup.label && !product.order_product_link
+        );
+        setCategoryMatches(matches);
+      }
+
+    }, [productsWatch,  productGroup]);
+
   const createOrder = () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IDraftOrderItemRequest = {
+        category_matches:categoryMatches,
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
         order_type:
@@ -190,6 +207,7 @@ export default function DraftOrder({
       getValues().product_group
     ) {
       const order: IDraftOrderItemRequest = {
+        category_matches:categoryMatches,
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
@@ -322,6 +340,7 @@ export default function DraftOrder({
         <Spin fullscreen={true} className={style.spin} size="large" />
       )}
       <div className={style.newOrder}>
+        <div style={{display:"flex",flexDirection:'row-reverse', gap:"10px", alignItems:"center",justifyContent:"flex-end"}}>
         {!toggle ? (
           <h1>
             {draftOrderid === "newOrder"
@@ -336,6 +355,12 @@ export default function DraftOrder({
         ) : (
           <h1>Выбор товара</h1>
         )}
+         {categoryMatches && (
+          <Tooltip title={ "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"}>
+        <InfoCircleFilled style={{fontSize:"20px", color:"red"}} className={style.pulseAnimation} />
+        </Tooltip>
+        )}
+        </div>
 
         <div
           className={

@@ -21,7 +21,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message, Spin, Tabs, theme } from "antd";
+import { message, Spin, Tabs, theme, Tooltip } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -33,6 +33,7 @@ import {
 } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
+import { InfoCircleFilled } from "@ant-design/icons";
 
 interface Props {
   orderid?: string;
@@ -43,7 +44,7 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
-  const {productData} = useProductData()
+  const { productData } = useProductData();
 
   // Print
   const contentRef = useRef<HTMLDivElement>(null);
@@ -110,7 +111,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           disabledOrder={disabledOrder}
           role={GetMeData?.role?.role_name as string}
           exportToExcel={() =>
-            exportOrderToExcel(getOrderByIdData as IOrderItem, productData || [])
+            exportOrderToExcel(
+              getOrderByIdData as IOrderItem,
+              productData || []
+            )
           }
           handlePrint={handlePrint}
           isPrinting={isPrinting}
@@ -132,6 +136,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   const onChange = (key: string) => {};
 
   const productsWatch = watch("order_products");
+  const productGroup = watch("product_group");
 
   useEffect(() => {
     const buyerType = GetMeData?.employee?.parlors
@@ -156,10 +161,26 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getValues("employee_id")]);
 
+  const [categoryMatches, setCategoryMatches] = useState<boolean>(false);
+
+  useEffect(() => {
+    const orderProducts = productsWatch;
+
+    if (Array.isArray(orderProducts)) {
+      const matches = orderProducts.some(
+        (product) =>
+          product.product?.product_group?.product_group_name !==
+            productGroup.label && !product.order_product_link
+      );
+      setCategoryMatches(matches);
+    }
+  }, [productsWatch, productGroup]);
+
   const createOrder = () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
+        category_matches: categoryMatches,
         department_id: data.department_id.value,
         order_type:
           GetMeData?.role?.role_name === "user_purchase" ||
@@ -231,6 +252,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       getValues().product_group
     ) {
       const order: IDraftOrderItemRequest = {
+        category_matches: categoryMatches,
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
@@ -378,17 +400,42 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         <Spin fullscreen={true} className={style.spin} size="large" />
       )}
       <div className={style.newOrder}>
-        {!toggle ? (
-          <h1 style={{ color: colorText }}>
-            {orderid === "newOrder"
-              ? "Новая заявка"
-              : orderid === `copy${Number(orderid?.split("copy").join(""))}`
-              ? "Копия"
-              : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
-          </h1>
-        ) : (
-          <h1 style={{ color: colorText }}>Выбор товара</h1>
-        )}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row-reverse",
+            gap: "10px",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
+          {!toggle ? (
+            <h1 style={{ color: colorText }}>
+              {orderid === "newOrder"
+                ? "Новая заявка"
+                : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                ? "Копия"
+                : `Заявка №-${getOrderByIdData?.order_number.replace(
+                    /^0+/,
+                    ""
+                  )}`}
+            </h1>
+          ) : (
+            <h1 style={{ color: colorText }}>Выбор товара</h1>
+          )}
+          {categoryMatches && (
+            <Tooltip
+              title={
+                "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"
+              }
+            >
+              <InfoCircleFilled
+                style={{ fontSize: "20px", color: "rgb(131, 124, 230)" }}
+                className={style.pulseAnimation}
+              />
+            </Tooltip>
+          )}
+        </div>
 
         <div
           className={
@@ -446,7 +493,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
           <div className={style.footerButtonGroup}>
-            {!disabledOrder && !isPrinting &&(
+            {!disabledOrder && !isPrinting && (
               <button
                 type="button"
                 onClick={() => createOrder()}

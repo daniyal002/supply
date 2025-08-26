@@ -2,18 +2,26 @@ import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
 import { IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { Button, Space, Table, TableColumnsType, theme, Tooltip } from "antd";
 import { useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
-import style from "./ProductOrderTable.module.scss"
-import { FileExcelFilled, InfoCircleFilled, PrinterOutlined, SearchOutlined } from "@ant-design/icons";
+import style from "./ProductOrderTable.module.scss";
+import {
+  FileExcelFilled,
+  InfoCircleFilled,
+  PrinterOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useProductData } from "@/hook/productHook";
+import { UseFormWatch } from "react-hook-form";
+import { IOrderItemFormValues } from "@/interface/orderItem";
+import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -27,10 +35,11 @@ interface productOrderTableProps {
   setProductIndexCancel: (key: number) => void;
   deleteProduct: (key: number) => void;
   orderId: number;
-  readonly?:boolean
-  exportToExcel: () => void
+  readonly?: boolean;
+  exportToExcel: () => void;
   handlePrint: () => void;
   isPrinting: boolean;
+  watch: UseFormWatch<IOrderItemFormValues>;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -47,36 +56,46 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   readonly = false,
   exportToExcel,
   handlePrint,
-  isPrinting
+  isPrinting,
+  watch,
 }) => {
+  const orderProductGroup = watch("product_group");
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
-     const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
-        useSearch();
-    const {productData} = useProductData()
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
-         const unitGroup = useMemo(() => {
-            const productSet = new Set();
-            return productTableData
-              ?.filter((product) => {
-                if (
-                  productSet.has(
-                    product?.unit_measurement?.unit_measurement?.unit_measurement_id
-                  )
-                ) {
-                  return false;
-                } else {
-                  productSet.add(
-                    product?.unit_measurement?.unit_measurement?.unit_measurement_id
-                  );
-                  return true;
-                }
-              })
-              .map((product) => ({
-                value: product?.unit_measurement?.unit_measurement?.unit_measurement_id,
-                text: product?.unit_measurement?.unit_measurement?.unit_measurement_name,
-              }));
-          }, [productTableData]);
+  const { hasOrderProductName, hasOrderProductLink, hasBuyers, hasNote } =
+    useProductTableColumnVisibility(productTableData);
+
+  const {
+    token: { colorText },
+  } = theme.useToken();
+  const { productData } = useProductData();
+
+  const unitGroup = useMemo(() => {
+    const productSet = new Set();
+    return productTableData
+      ?.filter((product) => {
+        if (
+          productSet.has(
+            product?.unit_measurement?.unit_measurement?.unit_measurement_id
+          )
+        ) {
+          return false;
+        } else {
+          productSet.add(
+            product?.unit_measurement?.unit_measurement?.unit_measurement_id
+          );
+          return true;
+        }
+      })
+      .map((product) => ({
+        value: product?.unit_measurement?.unit_measurement?.unit_measurement_id,
+        text: product?.unit_measurement?.unit_measurement
+          ?.unit_measurement_name,
+      }));
+  }, [productTableData]);
 
   const columns: TableColumnsType<IProductTable> = [
     {
@@ -102,7 +121,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -127,6 +148,21 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         ),
     },
     {
+      title: "Категория",
+      dataIndex: "product",
+      key: "product",
+      showSorterTooltip: { title: "Сортировка по категории" },
+      width: "150px",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product.product_group.product_group_name.localeCompare(
+            b.product.product_group.product_group_name,
+            "ru"
+          ),
+      },
+      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group?.product_group_name
+    },
+    {
       title: "Артикул",
       dataIndex: "product",
       key: "product",
@@ -134,43 +170,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       width: "150px",
       sorter: {
         compare: (a: any, b: any) =>
-          a.product?.product_article?.localeCompare(b.product?.product_article, "ru"),
+          a.product?.product_article?.localeCompare(
+            b.product?.product_article,
+            "ru"
+          ),
       },
-      filterDropdown: (props) => (
-        <SearchFilter
-          {...props}
-          placeholder="Поиск по товару"
-          searchText={searchText}
-          searchedColumn={searchedColumn}
-          dataIndex="product_article"
-          searchInput={searchInput}
-          handleSearch={handleSearch}
-          handleReset={handleReset}
-        />
-      ),
-      filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
-      ),
-      onFilter: (value, record) => {
-        const searchValue = (value as string).toLowerCase();
-        const product_article = record.product?.product_article?.toString()
-          .toLowerCase();
-
-        return filterBySearchText(searchValue, product_article || '');
-      },
-      render: (text: IProduct) =>
-        searchedColumn === "product_article" ? (
-          <Highlighter
-            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[searchText]}
-            autoEscape
-            textToHighlight={
-              text?.product_article ? text?.product_article.toString() : ""
-            }
-          />
-        ) : (
-          text?.product_article || "_"
-        ),
+      render: (text: IProduct) => text?.product_article || "_"
     },
     {
       title: "Добавленный товар",
@@ -178,6 +183,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "order_product_name",
       showSorterTooltip: { title: "Сортировка по добавленному товару" },
       width: "400px",
+      hidden:!hasOrderProductName,
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(
@@ -198,7 +204,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -226,6 +234,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "order_product_link",
       showSorterTooltip: { title: "Сортировка по ссылке товара" },
       width: "400px",
+      hidden:!hasOrderProductLink,
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_link?.localeCompare(
@@ -246,7 +255,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -265,10 +276,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             textToHighlight={text ? text.toString() : ""}
           />
         ) : (
-          text
+          text &&
+          <a href={text} target="_blank" style={{color:colorText}}>Нажмите чтобы перейти</a>
         ),
     },
-
 
     {
       title: "Ед. измерения",
@@ -311,13 +322,17 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) => a.remainder - b.remainder,
       },
       responsive: ["sm"],
-      render: (value:number,record) => productData?.find(product => product.product_id === record.product.product_id)?.remainder || "_"
+      render: (value: number, record) =>
+        productData?.find(
+          (product) => product.product_id === record.product.product_id
+        )?.remainder || "_",
     },
     {
       title: "Врач",
       dataIndex: "buyers",
       width: "300px",
       key: "buyers",
+      hidden:!hasBuyers,
       render: (buyers: IEmployeeFromParlorGetMe[]) =>
         buyers.map((buyer) => buyer.buyer_name).join(", "),
       responsive: ["sm"],
@@ -327,49 +342,52 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "note",
       width: "150px",
       key: "note",
+      hidden:!hasNote,
       responsive: ["sm"],
     },
     {
       title: "Действия",
       key: "action",
       width: "100px",
-      render: (_: any, record: IProductTable) => (
-        !isPrinting &&
-        <Space size="middle">
-          {record.is_cancel ? (
-            <>
-            <Button
-              onClick={() =>
-                deleteOrderProductCancelCommentMutation({
-                  cancel_comment_id:
-                    record.order_cancel_comment.comment_cancel_id,
-                  order_product_id: record.order_product_id as number,
-                })
-              }
-        title="Активировать"
-            >
-              Активировать
-            </Button>
-            <Tooltip title={<span>{record.order_cancel_comment.comment}</span>}>
-            <InfoCircleFilled  style={{color:"#fff"}}/>
-            </Tooltip>
-            </>
-          ) : (
-            <Button
-              onClick={() => {
-                showModalCancel();
-                setProductIdCancel(record.product.product_id);
-                setOrderProductIdCancel(record.order_product_id as number);
-                // @ts-ignore: Unreachable code error
-                setProductIndexCancel(record.key);
-              }}
-        title="Отклонить"
-            >
-              Отклонить
-            </Button>
-          )}
-        </Space>
-      ),
+      render: (_: any, record: IProductTable) =>
+        !isPrinting && (
+          <Space size="middle">
+            {record.is_cancel ? (
+              <>
+                <Button
+                  onClick={() =>
+                    deleteOrderProductCancelCommentMutation({
+                      cancel_comment_id:
+                        record.order_cancel_comment.comment_cancel_id,
+                      order_product_id: record.order_product_id as number,
+                    })
+                  }
+                  title="Активировать"
+                >
+                  Активировать
+                </Button>
+                <Tooltip
+                  title={<span>{record.order_cancel_comment.comment}</span>}
+                >
+                  <InfoCircleFilled style={{ color: "#fff" }} />
+                </Tooltip>
+              </>
+            ) : (
+              <Button
+                onClick={() => {
+                  showModalCancel();
+                  setProductIdCancel(record.product.product_id);
+                  setOrderProductIdCancel(record.order_product_id as number);
+                  // @ts-ignore: Unreachable code error
+                  setProductIndexCancel(record.key);
+                }}
+                title="Отклонить"
+              >
+                Отклонить
+              </Button>
+            )}
+          </Space>
+        ),
     },
   ];
 
@@ -398,27 +416,34 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               locale: { items_per_page: "/ Товаров" },
             }
       }
-      rowClassName={(record) => record.is_cancel === true ? style.highlightRow : ''}
+      rowClassName={(record) =>
+        record?.is_cancel === true
+        ? style.highlightRowIsCancel
+        : record?.product?.product_group?.product_group_id !==
+          orderProductGroup?.value && !record?.order_product_link
+        ? style.highlightRowMatchCategory
+        : ""
+      }
       expandable={{
         expandedRowKeys,
         onExpand: handleExpand,
         expandedRowRender: (record) =>
           record.order_product_comment && (
             <>
-            <ExpandedRowContent
-            orderProductComments={record.order_product_comment}
-            productPreviousOrders={record.product_previous_orders}
-              product_id={record.product.product_id}
-              order_product_id={record.order_product_id as number}
-              setOrderProductId={setOrderProductId}
-              setProductId={setProductId}
-              setProductIndex={setProductIndex}
-              showModal={showModal}
-              orderId={orderId}
-              is_cancel={record.is_cancel as boolean}
-              readonly={readonly}
-            />
-            <RemainProduct product_kod_1c={record.product.product_kod_1c}/>
+              <ExpandedRowContent
+                orderProductComments={record.order_product_comment}
+                productPreviousOrders={record.product_previous_orders}
+                product_id={record.product.product_id}
+                order_product_id={record.order_product_id as number}
+                setOrderProductId={setOrderProductId}
+                setProductId={setProductId}
+                setProductIndex={setProductIndex}
+                showModal={showModal}
+                orderId={orderId}
+                is_cancel={record.is_cancel as boolean}
+                readonly={readonly}
+              />
+              <RemainProduct product_kod_1c={record.product.product_kod_1c} />
             </>
           ),
       }}
@@ -433,14 +458,16 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         >
           <p>Всего: {productTableData?.length}</p>
           {!isPrinting && (
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
-            <FileExcelFilled style={{color:"#10793F", fontSize:"18px"}}/>
-            </Button>
-            <Button onClick={handlePrint}>
-              <PrinterOutlined style={{ fontSize: "18px" }} />
-            </Button>
-          </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <Button onClick={() => exportToExcel()} title="Выгрузить в Excel">
+                <FileExcelFilled
+                  style={{ color: "#10793F", fontSize: "18px" }}
+                />
+              </Button>
+              <Button onClick={handlePrint}>
+                <PrinterOutlined style={{ fontSize: "18px" }} />
+              </Button>
+            </div>
           )}
         </div>
       )}

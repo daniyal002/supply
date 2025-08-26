@@ -2,7 +2,7 @@ import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
 import { IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType, theme } from "antd";
 import { PrinterOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
@@ -11,6 +11,10 @@ import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearch
 import { useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
+import { UseFormWatch } from "react-hook-form";
+import { IOrderItemFormValues } from "@/interface/orderItem";
+import style from "./ProductOrderTable.module.scss";
+import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -23,6 +27,7 @@ interface productOrderTableProps {
   orderId: number;
   handlePrint: () => void;
   isPrinting: boolean;
+  watch: UseFormWatch<IOrderItemFormValues>;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -35,10 +40,19 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   disabledOrder,
   orderId,
   handlePrint,
-  isPrinting
+  isPrinting,
+  watch,
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
+
+  const { hasOrderProductName, hasOrderProductLink, hasBuyers, hasNote } =
+    useProductTableColumnVisibility(productTableData);
+
+  const {
+    token: { colorText },
+  } = theme.useToken();
+  const orderProductGroup = watch("product_group");
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();
@@ -113,13 +127,43 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           text?.product_name
         ),
     },
-
+    {
+      title: "Категория",
+      dataIndex: "product",
+      key: "product",
+      showSorterTooltip: { title: "Сортировка по категории" },
+      width: "150px",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product.product_group.product_group_name.localeCompare(
+            b.product.product_group.product_group_name,
+            "ru"
+          ),
+      },
+      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group.product_group_name
+    },
+    {
+      title: "Артикул",
+      dataIndex: "product",
+      key: "product",
+      showSorterTooltip: { title: "Сортировка по артиклу" },
+      width: "150px",
+      sorter: {
+        compare: (a: any, b: any) =>
+          a.product?.product_article?.localeCompare(
+            b.product?.product_article,
+            "ru"
+          ),
+      },
+      render: (text: IProduct) => text?.product_article || "_"
+    },
     {
       title: "Добавленный товар",
       dataIndex: "order_product_name",
       key: "order_product_name",
       showSorterTooltip: { title: "Сортировка по добавленному товару" },
       width: "400px",
+      hidden: !hasOrderProductName,
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(
@@ -169,6 +213,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_link",
       key: "order_product_link",
       showSorterTooltip: { title: "Сортировка по ссылке товара" },
+      hidden: !hasOrderProductLink,
       width: "400px",
       sorter: {
         compare: (a: any, b: any) =>
@@ -211,7 +256,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             textToHighlight={text ? text.toString() : ""}
           />
         ) : (
-          text
+          text && (
+            <a href={text} target="_blank" style={{ color: colorText }}>
+              Нажмите чтобы перейти
+            </a>
+          )
         ),
     },
 
@@ -250,6 +299,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Врач",
       dataIndex: "buyers",
       key: "buyers",
+      hidden: !hasBuyers,
       width: "300px",
       render: (buyers: IEmployeeFromParlorGetMe[]) =>
         buyers.map((buyer) => buyer.buyer_name).join(", "),
@@ -258,6 +308,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     {
       title: "Примечание",
       dataIndex: "note",
+      hidden: !hasNote,
       width: "150px",
       key: "note",
       responsive: ["sm"],
@@ -266,40 +317,42 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Действия",
       key: "action",
 
-      render: (record: IProductTable) => (
-        !isPrinting &&
-        <Space size="middle">
-          {!disabledOrder && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              <Button
-                onClick={() => {
-                  setProductId(
-                    record.product ? (record.product.product_id as number) : NaN
-                  );
-                  showModal();
-                  setIsNewProduct(record.product ? false : true);
-                  // @ts-ignore: Unreachable code error
-                  setProductIndex(record.key);
-                }}
-        title="Изменить"
-              >
-                Изменить
-              </Button>
-              <Button
-                danger
-                type="primary"
-                onClick={() => {
-                  // @ts-ignore: Unreachable code error
-                  deleteProduct(record.key);
-                }}
-        title="Удалить"
-              >
-                Удалить
-              </Button>
-            </div>
-          )}
-        </Space>
-      ),
+      render: (record: IProductTable) =>
+        !isPrinting && (
+          <Space size="middle">
+            {!disabledOrder && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                <Button
+                  onClick={() => {
+                    setProductId(
+                      record.product
+                        ? (record.product.product_id as number)
+                        : NaN
+                    );
+                    showModal();
+                    setIsNewProduct(record.product ? false : true);
+                    // @ts-ignore: Unreachable code error
+                    setProductIndex(record.key);
+                  }}
+                  title="Изменить"
+                >
+                  Изменить
+                </Button>
+                <Button
+                  danger
+                  type="primary"
+                  onClick={() => {
+                    // @ts-ignore: Unreachable code error
+                    deleteProduct(record.key);
+                  }}
+                  title="Удалить"
+                >
+                  Удалить
+                </Button>
+              </div>
+            )}
+          </Space>
+        ),
     },
   ];
 
@@ -356,11 +409,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           </p>
           {!isPrinting && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Button onClick={handlePrint}>
-              <PrinterOutlined style={{ fontSize: "18px" }} />
-            </Button>
-          </div>
-          ) }
+              <Button onClick={handlePrint}>
+                <PrinterOutlined style={{ fontSize: "18px" }} />
+              </Button>
+            </div>
+          )}
         </div>
       )}
       onChange={(pagination, filters, sorter, extra) => {
@@ -382,6 +435,14 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           </>
         ),
       }}
+      rowClassName={(record) =>
+        record?.is_cancel === true
+        ? style.highlightRowIsCancel
+        : record?.product?.product_group?.product_group_id !==
+          orderProductGroup?.value && !record?.order_product_link
+        ? style.highlightRowMatchCategory
+        : ""
+      }
       rowHoverable={false}
     />
   );

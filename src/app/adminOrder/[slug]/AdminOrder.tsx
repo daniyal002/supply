@@ -43,15 +43,15 @@ interface Props {
 
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
-  const {productData} = useProductData()
+  const { productData } = useProductData();
   // Print
-    const contentRef = useRef<HTMLDivElement>(null);
-    const [isPrinting, setIsPrinting] = useState(false);
-    const handlePrint = useReactToPrint({
-      contentRef,
-      onBeforePrint: async () => await setIsPrinting(true),
-      onAfterPrint: () => setIsPrinting(false),
-    });
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const handlePrint = useReactToPrint({
+    contentRef,
+    onBeforePrint: async () => await setIsPrinting(true),
+    onAfterPrint: () => setIsPrinting(false),
+  });
 
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
@@ -109,7 +109,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           disabledOrder={disabledOrder}
           role={GetMeData?.role?.role_name as string}
           exportToExcel={() =>
-            exportOrderToExcel(getOrderByIdData as IOrderItem, productData || [])
+            exportOrderToExcel(
+              getOrderByIdData as IOrderItem,
+              productData || []
+            )
           }
           handlePrint={handlePrint}
           isPrinting={isPrinting}
@@ -131,6 +134,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   const onChange = (key: string) => {};
 
   const productsWatch = watch("order_products");
+  const productGroup = watch("product_group");
 
   useEffect(() => {
     const buyerType = GetMeData?.employee?.parlors
@@ -155,10 +159,26 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getValues("employee_id")]);
 
+  const [categoryMatches, setCategoryMatches] = useState<boolean>(false);
+
+  useEffect(() => {
+    const orderProducts = productsWatch;
+
+    if (Array.isArray(orderProducts)) {
+      const matches = orderProducts.some(
+        (product) =>
+          product.product?.product_group?.product_group_name !==
+            productGroup.label && !product.order_product_link
+      );
+      setCategoryMatches(matches);
+    }
+  }, [productsWatch, productGroup]);
+
   const createOrder = () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
+        category_matches: categoryMatches,
         department_id: data.department_id.value,
         order_type:
           GetMeData?.role?.role_name === "user_purchase" ||
@@ -169,7 +189,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         order_status_id: 1,
-        is_generic:data.is_generic,
+        is_generic: data.is_generic,
         note: data.note,
         product_group_id: data.product_group.value,
         products: data.order_products.map((product) => {
@@ -230,6 +250,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       getValues().product_group
     ) {
       const order: IDraftOrderItemRequest = {
+        category_matches: categoryMatches,
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
@@ -293,7 +314,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         product_group: undefined,
         storage_id: undefined,
         order_type: undefined,
-       is_generic:undefined,
+        is_generic: undefined,
       });
     } else if (
       orderid !== "newOrder"
@@ -329,7 +350,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               ? "Заявка на закупку"
               : "Заявка на склад",
         },
-        is_generic: getOrderByIdData?.is_generic
+        is_generic: getOrderByIdData?.is_generic,
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);
@@ -425,22 +446,22 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
           {/* </form> */}
           {!isPrinting && (
-          <button
-            onClick={() => {
-              if (disabledOrder) {
-                message.info(
-                  "Заявка в маршруте! Сбросьте заявку если хотите изменить."
-                );
-              } else if (!getValues("product_group.value")) {
-                message.warning("Выберите категорию товара");
-              } else {
-                setToggle(!toggle);
-              }
-            }}
-            className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
-          >
-            Подбор товара
-          </button>
+            <button
+              onClick={() => {
+                if (disabledOrder) {
+                  message.info(
+                    "Заявка в маршруте! Сбросьте заявку если хотите изменить."
+                  );
+                } else if (!getValues("product_group.value")) {
+                  message.warning("Выберите категорию товара");
+                } else {
+                  setToggle(!toggle);
+                }
+              }}
+              className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
+            >
+              Подбор товара
+            </button>
           )}
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />

@@ -218,13 +218,13 @@ export default function ApprovalHeaderOrder({
         </div>
 
         <div className={style.formItem}>
-          <label className={style.formItemLabel}>Группа товара</label>
+          <label className={style.formItemLabel}>Категория товара</label>
           {/* <label className={style.formItemLabel}>Выберите группу товара</label> */}
           <Controller
             control={control}
             name="product_group"
             rules={{
-              required: { message: "Выберите группу товара", value: true },
+              required: { message: "Выберите категорию товара", value: true },
             }}
             render={({ field }) => (
               <Select
@@ -235,7 +235,7 @@ export default function ApprovalHeaderOrder({
                   // @ts-ignore: Unreachable code error
                   field.onChange({ value: value, label: option.label })
                 }
-                placeholder="Группа товара"
+                placeholder="Категория товара"
                 className={style.formItemSelect}
               />
             )}
