@@ -64,7 +64,21 @@ export default function SelectProductOrder({
   return (
     <>
     <Modal
-     title="Выбор товара"
+     title={
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: "15px 10px",
+          flexWrap:"wrap",
+          gap:"10px"
+        }}
+      >
+        <p style={{fontSize:"20px"}}>Выбор товара</p>
+        <p>Выбранная категория: {productGroup.label}</p>
+      </div>
+    }
     open={toggle}
     onCancel={() => setToggle(!toggle)}
     maskClosable={false}

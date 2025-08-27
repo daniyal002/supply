@@ -9,14 +9,14 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
-import { Modal } from "antd";
+import { Modal, theme } from "antd";
 
 interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
-  setToggle: (toggle:boolean) => void;
-  toggle:boolean
+  setToggle: (toggle: boolean) => void;
+  toggle: boolean;
 }
 
 export default function SelectProductOrder({
@@ -24,7 +24,7 @@ export default function SelectProductOrder({
   getValues,
   setValue,
   toggle,
-  setToggle
+  setToggle,
 }: Props) {
   const { productData, refetch } = useProductData();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,36 +61,52 @@ export default function SelectProductOrder({
       setFilterProductData([]);
     }
   }, [productData, productGroup]);
+
+
   return (
     <>
-    <Modal
-     title="Выбор товара"
-    open={toggle}
-    onCancel={() => setToggle(!toggle)}
-    maskClosable={false}
-    mask
-    width={"100%"}
-    centered
-    footer={(null)}
-    >
-      <ModalSelectProductOrder
-        type="Добавить"
-        setIsModalOpen={setIsModalOpen}
-        isModalOpen={isModalOpen}
-        productId={productId}
-        watch={watch}
-        getValues={getValues}
-        setValue={setValue}
-        editProductId={null}
-        isNewProduct={false}
-      />
-      <SelectProductOrderTableColumn
-        productData={filterProductData ? filterProductData : []}
-        setProductId={setProductId}
-        showModal={showModal}
-        getValues={getValues}
-        refetch={refetch}
-      />
+      <Modal
+        title={
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              padding: "15px 10px",
+              flexWrap:"wrap",
+              gap:"10px"
+            }}
+          >
+            <p style={{fontSize:"20px"}}>Выбор товара</p>
+            <p>Выбранная категория: {productGroup.label}</p>
+          </div>
+        }
+        open={toggle}
+        onCancel={() => setToggle(!toggle)}
+        maskClosable={false}
+        mask
+        width={"100%"}
+        centered
+        footer={null}
+      >
+        <ModalSelectProductOrder
+          type="Добавить"
+          setIsModalOpen={setIsModalOpen}
+          isModalOpen={isModalOpen}
+          productId={productId}
+          watch={watch}
+          getValues={getValues}
+          setValue={setValue}
+          editProductId={null}
+          isNewProduct={false}
+        />
+        <SelectProductOrderTableColumn
+          productData={filterProductData ? filterProductData : []}
+          setProductId={setProductId}
+          showModal={showModal}
+          getValues={getValues}
+          refetch={refetch}
+        />
       </Modal>
     </>
   );
