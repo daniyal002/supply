@@ -1,4 +1,5 @@
 import { ApartmentOutlined, CalculatorOutlined, CompassOutlined, HomeOutlined, IdcardOutlined, ShopOutlined, TagsOutlined, TeamOutlined, UserOutlined, UserSwitchOutlined } from "@ant-design/icons";
+import { MessageCircleMore } from "lucide-react";
 
 export const AdminPanelList = (push: (url:string) => void) => [
     {
@@ -60,5 +61,11 @@ export const AdminPanelList = (push: (url:string) => void) => [
       label: "1C",
       icon: <CalculatorOutlined />,
       onClick: () => push("/i/oneC"),
+    },
+    {
+      key: "14",
+      label: "Brodcast",
+      icon: <MessageCircleMore />,
+      onClick: () => push("/i/brodcast"),
     },
   ]

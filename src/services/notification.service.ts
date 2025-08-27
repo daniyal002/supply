@@ -23,5 +23,13 @@ export const notificationService = {
         const response = await axiosWidthAuth.post<string>("/notify/mark_as_read_all_notifications")
 
         return response.data
+      },
+
+      async sendBroadcastNotification(message:string){
+        const response = await axiosWidthAuth.post<string>(`/notify/send_broadcast_notification?notification_message=${message}`)
+
+        return response.data
       }
+
+
 }

@@ -12,5 +12,5 @@ export const useNotificationStore = create<INotificationStore>((set,get) => ({
     notifications:[],
     setNotifications: (notification:INotification[]) => set({notifications:notification}),
     deleteNotification: (notification_id) => set((state) => ({notifications:state.notifications.filter(notification => notification.notification_id !== notification_id)})),
-    deleteAllNotification: () => set(() => ({notifications:[]}))
+    deleteAllNotification: () => set(() => ({notifications:[]})),
 }))
