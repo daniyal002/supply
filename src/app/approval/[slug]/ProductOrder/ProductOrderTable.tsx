@@ -367,7 +367,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   Активировать
                 </Button>
                 <Tooltip
-                  title={<span>{record.order_cancel_comment.comment}</span>}
+                  title={<span>{record.order_cancel_comment.comment}<br/> Сотрудник: {record.order_cancel_comment.employee}</span>}
+
                 >
                   <InfoCircleFilled style={{ color: "#fff" }} />
                 </Tooltip>
