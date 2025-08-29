@@ -78,7 +78,7 @@ export default function SelectProductOrder({
             }}
           >
             <p style={{fontSize:"20px"}}>Выбор товара</p>
-            <p>Выбранная категория: {productGroup.label}</p>
+            <p>Выбранная категория: {productGroup?.label}</p>
           </div>
         }
         open={toggle}

@@ -140,7 +140,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             "ru"
           ),
       },
-      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group.product_group_name
+      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group?.product_group_name
     },
     {
       title: "Артикул",
