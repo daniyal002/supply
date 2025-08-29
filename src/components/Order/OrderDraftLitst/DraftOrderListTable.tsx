@@ -390,6 +390,9 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({
           </div>
         </div>
       )}
+      onRow={(record) => ({
+        onDoubleClick: () => setDraftOrderId(String(record.order_temp_id)),
+      })}
       onChange={(pagination, filters, sorter, extra) => {
         setCurrentFilters(extra.currentDataSource.length);
       }}
