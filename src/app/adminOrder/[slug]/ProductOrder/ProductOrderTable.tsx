@@ -17,6 +17,8 @@ import style from "./ProductOrderTable.module.scss";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormWatch } from "react-hook-form";
 import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
+import { ExpandedRowContent } from "./ExpandedRowContent";
+import { RemainProduct } from "@/components/UI/RemainProduct/RemainProduct";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -26,6 +28,7 @@ interface productOrderTableProps {
   deleteProduct: (key: number) => void;
   setIsNewProduct: (isNewProduct: boolean) => void;
   disabledOrder: boolean;
+  orderId: number;
   exportToExcel: () => void;
   handlePrint: () => void;
   isPrinting: boolean;
@@ -40,6 +43,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   deleteProduct,
   setIsNewProduct,
   disabledOrder,
+  orderId,
   exportToExcel,
   handlePrint,
   isPrinting,
@@ -377,6 +381,20 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     },
   ];
 
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+
+  // Обработчик раскрытия строки
+  const handleExpand = async (expanded: boolean, record: IProductTable) => {
+    // @ts-ignore: Unreachable code error
+    const key = record.key as number;
+    setExpandedRowKeys(
+      (prev) =>
+        expanded
+          ? [...prev, key] // Добавляем ключ при раскрытии
+          : prev.filter((k) => k !== key) // Удаляем ключ при сворачивании
+    );
+  };
+
   const dataSource = productTableData?.map((product, index) => ({
     ...product,
     key: index, // Ensure each item has a unique key
@@ -440,6 +458,21 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ? style.highlightRowMatchCategory
           : ""
       }
+      expandable={{
+              expandedRowKeys,
+              onExpand: handleExpand,
+              expandedRowRender: (record) => (
+                <>
+                  <ExpandedRowContent
+                    orderProductComments={record?.order_product_comment || []}
+                    productPreviousOrders={record?.product_previous_orders}
+                    orderId={orderId}
+                  />
+
+                  <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />
+                </>
+              ),
+            }}
     />
   );
 };

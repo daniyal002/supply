@@ -63,6 +63,9 @@ export default function ProductOrder({
     setValue("order_products", updatedProducts);
   };
 
+  const orderId = getValues("order_id");
+
+
   return (
     <>
       <ModalSelectProductOrder
@@ -94,6 +97,7 @@ export default function ProductOrder({
         deleteProduct={deleteProduct}
         setIsNewProduct={setIsNewProduct}
         disabledOrder={disabledOrder}
+        orderId={orderId as number}
         exportToExcel={exportToExcel}
         handlePrint={handlePrint}
         isPrinting={isPrinting}
