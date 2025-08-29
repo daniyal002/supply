@@ -9,7 +9,7 @@ import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { IOrderItemFormValues } from "@/interface/orderItem";
-import { UseFormGetValues } from "react-hook-form";
+import { UseFormGetValues, UseFormWatch } from "react-hook-form";
 import style from "./SelectProductOrderTable.module.scss";
 import { RemainProduct } from "../../../../components/UI/RemainProduct/RemainProduct";
 import { useColumnFilterShortcut } from "@/helper/TableFilters/hook/useColumnFilterShortcut";
@@ -23,6 +23,7 @@ interface ProductTableProps {
   setProductId: (product: number) => void;
   getValues: UseFormGetValues<IOrderItemFormValues>;
   refetch: () => void;
+  watch: UseFormWatch<IOrderItemFormValues>;
 }
 
 type OnChange = NonNullable<TableProps<IProductUnit>["onChange"]>;
@@ -37,10 +38,12 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
   setProductId,
   getValues,
   refetch,
+  watch
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
+  const orderProducts = watch('order_products')
   const { visibleColumnKey, setVisibleColumnKey } =
     useColumnFilterShortcut("product_name");
 
@@ -343,7 +346,10 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
             justifyContent: "space-between",
           }}
         >
-          <p>Товаров: {currentFilters}</p>
+          <div>
+            <p>Товаров: {currentFilters}</p>
+            <p>Выбранно товаров: {orderProducts.length}</p>
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => refetch()} title="Обновить товары">
               <SyncOutlined />

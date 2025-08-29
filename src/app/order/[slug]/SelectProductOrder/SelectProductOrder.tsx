@@ -9,7 +9,7 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
-import { Modal, theme } from "antd";
+import { Modal } from "antd";
 
 interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
@@ -106,6 +106,7 @@ export default function SelectProductOrder({
           showModal={showModal}
           getValues={getValues}
           refetch={refetch}
+          watch={watch}
         />
       </Modal>
     </>

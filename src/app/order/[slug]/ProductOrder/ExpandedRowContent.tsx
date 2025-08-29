@@ -2,7 +2,7 @@ import { formatNotificationDate } from "@/helper/DataFormat";
 import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
-import { Collapse, Space, Table } from "antd";
+import { Collapse, Table } from "antd";
 
 interface Props {
   orderProductComments: IOrderProductCommentsResponse[];

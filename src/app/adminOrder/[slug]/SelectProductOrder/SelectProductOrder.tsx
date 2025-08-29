@@ -104,6 +104,7 @@ export default function SelectProductOrder({
         showModal={showModal}
         getValues={getValues}
         refetch={refetch}
+        watch={watch}
       />
       </Modal>
     </>
