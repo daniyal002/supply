@@ -6,7 +6,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import MainLayout from "@/components/UI/MainLayout/MainLayout";
 import AntdConfigProvider from "./AntdConfigProvider";
 import Beforeunload from "@/components/Beforeunload/Beforeunload";
-import BroadcastModal from "./i/brodcast/BroadcastModal";
+import BroadcastModal from "./i/broadcast/BroadcastModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
