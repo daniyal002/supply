@@ -76,7 +76,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     };
     const productTable = {
       ...data,
-      product: itemProductData,
+      product: !isNewProduct && itemProductData,
       buyers: doctors,
       unit_measurement: isNewProduct ? newUnitMesurement : unit,
     };
@@ -319,10 +319,10 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             control={control}
             name="unit_measurement"
             rules={{
-              required: {
-                value: true,
-                message: "Выберите Единицу измерения",
-              },
+              validate: (value) =>
+                value?.value !== undefined && value?.value !== null
+                  ? true
+                  : "Выберите единицу измерения",
             }}
             render={({ field }) => (
               <Select
@@ -339,7 +339,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                     .toLowerCase()
                     .includes(input.toLowerCase())
                 }
-                defaultValue={!isNewProduct ? defaultUnit : undefined}
+                defaultValue={!isNewProduct && defaultUnit}
               />
             )}
           />
