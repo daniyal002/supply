@@ -320,7 +320,7 @@ const SelectProductOrderTable: React.FC<ProductTableProps> = ({
         >
            <div>
             <p>Товаров: {currentFilters}</p>
-            <p>Выбранно товаров: {orderProducts.length}</p>
+            <p>Выбранно товаров: {orderProducts?.length}</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => refetch()} title="Обновить товары">
