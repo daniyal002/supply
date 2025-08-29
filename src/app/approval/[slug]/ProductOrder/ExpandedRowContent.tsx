@@ -98,6 +98,7 @@ export const ExpandedRowContent = ({
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
+                        render: (data: string) => formatNotificationDate(data)
                       },
                       {
                         title: "Действия",
