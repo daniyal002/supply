@@ -81,7 +81,12 @@ const RoleTable: React.FC<RoleTableProps> = ({
       dataIndex: "role_name",
       key: "role_name",
       sorter: (a: any, b: any) => a.role_name.localeCompare(b.role_name, "ru"),
-      showSorterTooltip: { title: "Сортировка по ролям" },
+    },
+    {
+      title: "Роль",
+      dataIndex: "note",
+      key: "note",
+      sorter: (a: any, b: any) => a.note.localeCompare(b.note, "ru"),
     },
     {
       title: "Действия",

@@ -161,7 +161,7 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
       key: "role",
       sorter: (a: any, b: any) =>
         a.role.role_name.localeCompare(b.role.role_name, "ru"),
-      render: (role: IRole) => role?.role_name,
+      render: (role: IRole) => role?.note,
       filters: roleData?.map((role) => ({
         text: role.role_name,
         value: role.role_id,

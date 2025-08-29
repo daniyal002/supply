@@ -1,8 +1,8 @@
-import { Button, Modal, Select } from "antd";
+import { Button, message, Modal, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import style from "./UserModal.module.scss";
-import { IUser, IUserFormValues } from "@/interface/user";
+import { IUserFormValues } from "@/interface/user";
 import {
   useCreateUserMutation,
   useUpdateUserMutation,
@@ -14,6 +14,7 @@ import { IEmployee } from "@/interface/employee";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { generateSixDigitString } from "@/helper/generateSixDigitString";
 import { generateLoginFromName } from "@/helper/transliterate";
+import CopyFormDataButton from "@/components/ButtonCopyUser/ButtonCopyUser";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -34,7 +35,9 @@ export default function UserModal({
     formState: { errors },
     reset,
     control,
-    setValue
+    setValue,
+    getValues,
+    watch,
   } = useForm<IUserFormValues>({ mode: "onChange" });
   const { userData } = useUserData();
   const { employeeData } = useEmployeeData();
@@ -73,15 +76,12 @@ export default function UserModal({
   const itemUserData = userData?.find((user) => user.user_id === userId);
 
   useEffect(() => {
-    if (userId === undefined) {
+    if (type === "Добавить" || userId === undefined) {
       reset({
         login: undefined,
         password: undefined,
         employee: undefined,
-        role: {
-          value: 6,
-          label: 'user',
-        },
+        role:{value:6,label:"Пользователь"}
       });
     } else if (type === "Изменить" && itemUserData) {
       reset({
@@ -94,7 +94,7 @@ export default function UserModal({
         },
         role: {
           value: itemUserData?.role?.role_id,
-          label: itemUserData?.role?.role_name,
+          label: itemUserData?.role?.note,
         },
       });
     }
@@ -107,10 +107,10 @@ export default function UserModal({
 
   const optionsRole = roleData?.map((role) => ({
     value: role.role_id as number,
-    label: role.role_name as string,
+    label: role.note as string,
   }));
 
-  const [showPassword, setShowPassword] = useState<boolean>(false); // Состояние для видимости пароля
+  const [showPassword, setShowPassword] = useState<boolean>(true); // Состояние для видимости пароля
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -122,20 +122,12 @@ export default function UserModal({
       open={isModalOpen}
       onCancel={() => {
         setIsModalOpen(false);
-        reset({
-          login: undefined,
-        password: undefined,
-        employee: undefined,
-        role:   {
-          value: 6,
-          label: 'user',
-        },
-        });
+        reset();
       }}
       footer={null}
     >
       <form onSubmit={handleSubmit(onSubmit)} className={style.userForm}>
-      <div className={style.formItem}>
+        <div className={style.formItem}>
           <label className={style.formItemLabel}>Выберите сотрудника</label>
           <Controller
             control={control}
@@ -147,18 +139,17 @@ export default function UserModal({
               <Select
                 {...field}
                 options={optionsEmployee}
-                onChange={(value, option: any) =>{
-                  field.onChange({ value: value, label: option.label })
+                onChange={(value, option: any) => {
+                  field.onChange({ value: value, label: option.label });
                   const login = generateLoginFromName(option.label);
-                  setValue("login", login)}
-                }
+                  setValue("login", login);
+                }}
                 placeholder="Сотрудник"
                 filterOption={(input, option) =>
                   (option?.label ?? "")
                     .toLowerCase()
                     .includes(input.toLowerCase())
                 }
-
                 showSearch
               />
             )}
@@ -208,14 +199,27 @@ export default function UserModal({
               )}
             </button>
           </div>
-          <Button className={style.buttonGeneratePassword} onClick={() => setValue('password',generateSixDigitString())}>
+          <Button
+            className={style.buttonGeneratePassword}
+            onClick={() => setValue("password", generateSixDigitString())}
+          >
             Сгенерировать пароль
           </Button>
+          {watch("login") && watch("employee") && watch("password") && (
+            <CopyFormDataButton
+              getValues={getValues}
+              onCopySuccess={(text) => {
+                message.info("Данные скопированы:\n\n" + text);
+              }}
+              onCopyError={(err) => {
+                console.error("Ошибка копирования:", err);
+                message.info("Не удалось скопировать: " + err.message);
+              }}
+            />
+          )}
         </div>
 
         {errors && <p className={style.error}>{errors.password?.message}</p>}
-
-
 
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Выберите роль</label>
@@ -234,8 +238,8 @@ export default function UserModal({
                   field.onChange({ value: value, label: option.label })
                 }
                 placeholder="Роль"
-                defaultValue={{label:"user",value:6}}
-                />
+                defaultValue={{ label: "Пользователь", value: 6 }}
+              />
             )}
           />
         </div>

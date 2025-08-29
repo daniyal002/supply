@@ -43,11 +43,13 @@ export default function RoleModal({
     if (roleId === undefined) {
       reset({
         role_name: undefined,
+        note:undefined
       });
     } else if (type === "Изменить") {
       reset({
         role_id: itemRoleData?.role_id,
         role_name: itemRoleData?.role_name,
+        note:itemRoleData?.note
       });
     }
   }, [reset, type, roleId, itemRoleData]);
@@ -75,7 +77,17 @@ export default function RoleModal({
               })}
             />
           </div>
-          {errors && <p className={style.error}>{errors.role_name?.message}</p>}
+          {errors.role_name && <p className={style.error}>{errors.role_name?.message}</p>}
+
+          <div className={style.formItem}>
+            <label className={style.formItemLabel}>Описание роли</label>
+            <input
+              type="text"
+              placeholder="Описание роли"
+              className={style.roleName}
+              {...register("note")}
+            />
+          </div>
 
           <button type="submit" className={style.roleNameSubmit}>
             {type}
