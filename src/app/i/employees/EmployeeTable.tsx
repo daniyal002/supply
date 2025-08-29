@@ -46,6 +46,49 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       key: "buyer_id",
       sorter: (a: any, b: any) => a.buyer_id - b.buyer_id,
       showSorterTooltip: { title: "Сортировка по ID" },
+      defaultSortOrder: "descend",
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по ID"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="buyer_id"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
+      ),
+      onFilter: (value, record) =>
+      (record.buyer_id as number)
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase()),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+      render: (text) => {
+        const formattedID = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
+        return searchedColumn === "buyer_id" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={formattedID}
+          />
+        ) : (
+          formattedID
+        );
+      },
     },
 
     {

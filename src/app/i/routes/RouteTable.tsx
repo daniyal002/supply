@@ -37,6 +37,49 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
       sorter: (a: IOrderRouteResponseDetail, b: IOrderRouteResponseDetail) =>
         Number(a?.route_id) - Number(b?.route_id),
       showSorterTooltip: { title: "Сортировка по ID" },
+      defaultSortOrder: "descend",
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по ID"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="route_id"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
+      ),
+      onFilter: (value, record) =>
+      (record.route_id as number)
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase()),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+      render: (text) => {
+        const formattedID = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
+        return searchedColumn === "route_id" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={formattedID}
+          />
+        ) : (
+          formattedID
+        );
+      },
     },
     {
       title: "Маршрут",

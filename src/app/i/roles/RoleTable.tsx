@@ -1,9 +1,13 @@
 "use client";
 
-import { Button, Space, Table } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IRole } from "@/interface/role";
 import { useArchiveRoleMutation, useDeleteRoleMutation } from "@/hook/roleHook";
+import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
 
 interface RoleTableProps {
   roleData: IRole[] | undefined;
@@ -18,14 +22,59 @@ const RoleTable: React.FC<RoleTableProps> = ({
 }) => {
   const { mutate: deleteRoleMutation } = useDeleteRoleMutation();
   const { mutate: archiveRoleMutation } = useArchiveRoleMutation();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+      useSearch();
 
-  const columns = [
+  const columns: TableColumnsType<IRole> = [
     {
       title: "ID",
       dataIndex: "role_id",
       key: "role_id",
       sorter: (a: any, b: any) => a.role_id - b.role_id,
       showSorterTooltip: { title: "Сортировка по ID" },
+      defaultSortOrder: "descend",
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по ID"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="role_id"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
+      ),
+      onFilter: (value, record) =>
+      (record.role_id as number)
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase()),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+      render: (text) => {
+        const formattedID = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
+        return searchedColumn === "role_id" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={formattedID}
+          />
+        ) : (
+          formattedID
+        );
+      },
     },
     {
       title: "Роль",

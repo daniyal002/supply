@@ -38,6 +38,49 @@ const DepartmentTable: React.FC<PostTableProps> = ({
       key: "department_id",
       sorter: (a: any, b: any) => a.department_id - b.department_id,
       showSorterTooltip: { title: "Сортировка по ID" },
+      defaultSortOrder: "descend",
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по ID"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="department_id"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
+      ),
+      onFilter: (value, record) =>
+      (record.department_id as number)
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase()),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+      render: (text) => {
+        const formattedID = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
+        return searchedColumn === "department_id" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={formattedID}
+          />
+        ) : (
+          formattedID
+        );
+      },
     },
     {
       title: "Подразделение",

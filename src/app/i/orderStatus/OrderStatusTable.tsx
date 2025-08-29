@@ -35,6 +35,48 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
       sorter: (a: any, b: any) => a.status_id - b.status_id,
       showSorterTooltip: { title: "Сортировка по ID" },
       defaultSortOrder: "ascend",
+      filterDropdown: (props) => (
+        <SearchFilter
+          {...props}
+          placeholder="Поиск по ID"
+          searchText={searchText}
+          searchedColumn={searchedColumn}
+          dataIndex="status_id"
+          searchInput={searchInput}
+          handleSearch={handleSearch}
+          handleReset={handleReset}
+        />
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
+      ),
+      onFilter: (value, record) =>
+      (record.status_id as number)
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase()),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+      render: (text) => {
+        const formattedID = text
+          ? text.toString().replace(/^0+/, "")
+          : "";
+        return searchedColumn === "status_id" ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={formattedID}
+          />
+        ) : (
+          formattedID
+        );
+      },
     },
     {
       title: "Статус",
