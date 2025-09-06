@@ -34,6 +34,8 @@ export default function Tab() {
     }
 
     setActiveKey(newActiveKey);
+    setActiveTabOrders(newActiveKey)
+
   };
 
   useEffect(() => {
@@ -85,6 +87,8 @@ export default function Tab() {
 
     setOrderId("newOrder");
     setActiveKey(newActiveKey);
+    setActiveTabOrders(newActiveKey)
+
 };
 
 

@@ -41,6 +41,7 @@ export default function ApprovalTabs() {
     }
 
     setActiveKey(newActiveKey);
+    setActiveTabApproval(newActiveKey)
   };
 
   useEffect(() => {

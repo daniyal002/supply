@@ -7,6 +7,7 @@ import MainLayout from "@/components/UI/MainLayout/MainLayout";
 import AntdConfigProvider from "./AntdConfigProvider";
 import Beforeunload from "@/components/Beforeunload/Beforeunload";
 import BroadcastModal from "./i/broadcast/BroadcastModal";
+import Notification from "@/components/Notification/Notification";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,16 +31,17 @@ export default function RootLayout({
       </head>
       <AntdRegistry>
         <QueryClientContextProvider>
-        <AntdConfigProvider>
-          <Beforeunload>
-          <body className={inter.className}>
-            <MainLayout>
-              <BroadcastModal/>
-            {children}
-            </MainLayout>
-          </body>
-          </Beforeunload>
-            </AntdConfigProvider>
+          <AntdConfigProvider>
+            <Beforeunload>
+              <body className={inter.className}>
+                <MainLayout>
+                  <BroadcastModal />
+                  {children}
+                </MainLayout>
+                <Notification />
+              </body>
+            </Beforeunload>
+          </AntdConfigProvider>
         </QueryClientContextProvider>
       </AntdRegistry>
     </html>

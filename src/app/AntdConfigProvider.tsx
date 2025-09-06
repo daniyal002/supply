@@ -14,21 +14,21 @@ export default function AntdConfigProvider({
   const { supplyTheme, setSupplyTheme } = useThemeStore();
 
 
-  useEffect(() => {
-    // Обновите тему на основе системных настроек
-    const isDarkMode = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    setSupplyTheme(isDarkMode ? "dark" : "light");
+  // useEffect(() => {
+  //   // Обновите тему на основе системных настроек
+  //   const isDarkMode = window.matchMedia(
+  //     "(prefers-color-scheme: dark)"
+  //   ).matches;
+  //   setSupplyTheme(isDarkMode ? "dark" : "light");
 
-    // Добавьте слушатель изменений системной темы
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      setSupplyTheme(e.matches ? "dark" : "light");
-    };
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [setSupplyTheme]);
+  //   // Добавьте слушатель изменений системной темы
+  //   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  //   const handleChange = (e: MediaQueryListEvent) => {
+  //     setSupplyTheme(e.matches ? "dark" : "light");
+  //   };
+  //   mediaQuery.addEventListener("change", handleChange);
+  //   return () => mediaQuery.removeEventListener("change", handleChange);
+  // }, [setSupplyTheme]);
 
 
   return (

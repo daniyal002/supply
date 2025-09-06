@@ -19,6 +19,8 @@ import { useMarkAsReadNotification } from "@/hook/notificationHook";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
 import { useReactToPrint } from "react-to-print";
 import { useProductData } from "@/hook/productHook";
+import ChatCore from "@/components/Chat/ChatCore";
+import { useTabStore } from "../../../../store/tabStore";
 
 interface Props {
   orderid?: string;
@@ -36,8 +38,7 @@ export default function ApprovalOrder({
   readonly = false,
 }: Props) {
   const { TextArea } = Input;
-    const {productData} = useProductData()
-
+  const { productData } = useProductData();
 
   const {
     reset,
@@ -52,14 +53,14 @@ export default function ApprovalOrder({
   const notifications = useNotificationStore((state) => state.notifications);
   const { mutate: markAsReadNotification } = useMarkAsReadNotification();
 
-   // Print
-    const contentRef = useRef<HTMLDivElement>(null);
-    const [isPrinting, setIsPrinting] = useState<boolean>(false);
-    const handlePrint = useReactToPrint({
-      contentRef,
-      onBeforePrint: async () => await setIsPrinting(true),
-      onAfterPrint: () => setIsPrinting(false),
-    });
+  // Print
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isPrinting, setIsPrinting] = useState<boolean>(false);
+  const handlePrint = useReactToPrint({
+    contentRef,
+    onBeforePrint: async () => await setIsPrinting(true),
+    onAfterPrint: () => setIsPrinting(false),
+  });
 
   useEffect(() => {
     const currentNotifications = notifications.filter(
@@ -83,7 +84,10 @@ export default function ApprovalOrder({
     isSuccess: rejectOrderSuccess,
   } = useRejectOrderMutation();
   const [note, setnote] = React.useState("");
-  const items: TabsProps["items"] = [
+
+  const orderId = useTabStore((state => state.activeTabApproval))
+
+  const items: TabsProps["items"] = readonly ? [
     {
       key: "1",
       label: "Выбранные товары",
@@ -94,7 +98,12 @@ export default function ApprovalOrder({
           setValue={setValue}
           watch={watch}
           readonly={readonly}
-          exportToExcel={() => exportOrderToExcel(getOrderByIdData as IOrderItem, productData || [])}
+          exportToExcel={() =>
+            exportOrderToExcel(
+              getOrderByIdData as IOrderItem,
+              productData || []
+            )
+          }
           handlePrint={handlePrint}
           isPrinting={isPrinting}
         />
@@ -109,6 +118,43 @@ export default function ApprovalOrder({
       key: "3",
       label: "Маршрут",
       children: <RouteInfo order_id={Number(orderid)} />,
+    },
+  ] : [
+    {
+      key: "1",
+      label: "Выбранные товары",
+      children: (
+        <ProductOrder
+          productTableData={getValues("order_products")}
+          getValues={getValues}
+          setValue={setValue}
+          watch={watch}
+          readonly={readonly}
+          exportToExcel={() =>
+            exportOrderToExcel(
+              getOrderByIdData as IOrderItem,
+              productData || []
+            )
+          }
+          handlePrint={handlePrint}
+          isPrinting={isPrinting}
+        />
+      ),
+    },
+    {
+      key: "2",
+      label: "История согласования",
+      children: <OrderStepHistory order_id={Number(orderid)} />,
+    },
+    {
+      key: "3",
+      label: "Маршрут",
+      children: <RouteInfo order_id={Number(orderid)} />,
+    },
+    {
+      key: "4",
+      label: "Чат",
+      children: <ChatCore orderId={Number(orderId.replace("order-", ''))} />,
     },
   ];
 
@@ -309,7 +355,7 @@ export default function ApprovalOrder({
           </button> */}
         {/* </form> */}
         <Tabs defaultActiveKey="1" items={items} />
-        {!readonly && !isPrinting &&  (
+        {!readonly && !isPrinting && (
           <div className={style.commentAndButtons}>
             <TextArea
               placeholder="Комментарий"

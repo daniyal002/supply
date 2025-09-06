@@ -119,9 +119,9 @@ const MainLayout = ({
 
   const { setSupplyTheme, supplyTheme } = useThemeStore();
 
-  const editTheme = () => {
-    supplyTheme === "light" ? setSupplyTheme("dark") : setSupplyTheme("light");
-  };
+  // const editTheme = () => {
+  //   supplyTheme === "light" ? setSupplyTheme("dark") : setSupplyTheme("light");
+  // };
 
   if (path === "/login") {
     return <>{children}</>;
@@ -228,7 +228,7 @@ const MainLayout = ({
               </Button>
             </Tooltip>
 
-            <Tooltip
+            {/* <Tooltip
               title={
                 supplyTheme === "light"
                   ? "Сменить на темную тему"
@@ -241,7 +241,7 @@ const MainLayout = ({
               >
                 {supplyTheme === "light" ? <SunOutlined /> : <MoonOutlined />}
               </Button>
-            </Tooltip>
+            </Tooltip> */}
 
             <DropdownMenu />
 

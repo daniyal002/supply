@@ -2,6 +2,7 @@
 import { ThemeConfig } from "antd";
 
 export const lightTheme: ThemeConfig = {
+  cssVar:true,
   token: {
     colorPrimary: "#678098",
   },
@@ -44,11 +45,15 @@ export const lightTheme: ThemeConfig = {
     },
     Modal:{
       boxShadow: '0 0 30px #999',
+    },
+    Popover:{
+      colorBgBase:""
     }
   },
 };
 
 export const darkTheme: ThemeConfig = {
+  cssVar:true,
   token: {
     colorPrimary: "#2d3a4a", // Темно-серо-синий (антоним к #678098)
     colorText: "#fff",

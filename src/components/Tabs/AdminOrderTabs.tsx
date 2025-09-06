@@ -29,6 +29,7 @@ export default function AdminOrderTab() {
       addTabAdminOrders(newTab); // Добавляем вкладку в глобальное состояние
     }else{
       setActiveKey(newActiveKey)
+      setActiveTabAdminOrders(newActiveKey)
     }
 
     setActiveKey(newActiveKey);
@@ -83,6 +84,8 @@ export default function AdminOrderTab() {
 
     setAdminOrderId("newOrder");
     setActiveKey(newActiveKey);
+    setActiveTabAdminOrders(newActiveKey)
+
 };
 
 

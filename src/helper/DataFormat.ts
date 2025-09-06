@@ -11,3 +11,14 @@ export const formatNotificationDate = (dateString: string) => {
       return 'неверный формат даты';
     }
   };
+
+  export const formatMessageDate = (dateString: string) => {
+    try {
+      return new Intl.DateTimeFormat('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(new Date(dateString));
+    } catch (e) {
+      return 'неверный формат даты';
+    }
+  };

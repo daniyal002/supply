@@ -34,6 +34,8 @@ import {
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
 import { InfoCircleFilled } from "@ant-design/icons";
+import ChatCore from "@/components/Chat/ChatCore";
+import { useTabStore } from "../../../../store/tabStore";
 
 interface Props {
   orderid?: string;
@@ -98,6 +100,8 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getOrderByIdData]);
 
+  const orderId = useTabStore((state => state.activeTabOrders))
+
   const items: TabsProps["items"] = [
     {
       key: "1",
@@ -131,7 +135,13 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       label: "Маршрут",
       children: <RouteInfo order_id={Number(orderid)} />,
     },
+    {
+      key: "4",
+      label: "Чат",
+      children: <ChatCore  orderId={Number(orderId.replace("order-", ''))} />,
+    },
   ];
+
 
   const onChange = (key: string) => {};
 

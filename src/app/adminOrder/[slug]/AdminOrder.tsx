@@ -33,6 +33,8 @@ import {
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { useReactToPrint } from "react-to-print";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
+import ChatCore from "@/components/Chat/ChatCore";
+import { useTabStore } from "../../../../store/tabStore";
 
 interface Props {
   orderid?: string;
@@ -96,6 +98,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getOrderByIdData]);
 
+    const orderId = useTabStore((state => state.activeTabAdminOrders))
+
+
   const items: TabsProps["items"] = [
     {
       key: "1",
@@ -128,6 +133,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       key: "3",
       label: "Маршрут",
       children: <RouteInfo order_id={Number(orderid)} />,
+    },
+    {
+      key: "4",
+      label: "Чат",
+      children: <ChatCore orderId={Number(orderId.replace('order-', ''))} />,
     },
   ];
 

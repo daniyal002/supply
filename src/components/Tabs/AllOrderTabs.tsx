@@ -42,6 +42,7 @@ export default function AllOrderTabs() {
     }
 
     setActiveKey(newActiveKey);
+    setActiveTabAllOrders(newActiveKey)
   };
 
   useEffect(() => {

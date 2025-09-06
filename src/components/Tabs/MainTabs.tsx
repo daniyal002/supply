@@ -3,7 +3,6 @@ import ApprovalTabs from "@/components/Tabs/ApprovalTabs";
 import Tab from "@/components/Tabs/Tabs";
 import { Tabs, TabsProps } from "antd";
 import { useTabStore } from "../../../store/tabStore";
-import Notification from "../Notification/Notification";
 import DraftTabs from "./DraftTabs";
 import ProductList from "../ProductList/ProductList";
 import AllOrderTabs from "./AllOrderTabs";
@@ -70,7 +69,6 @@ export const MainTabs = () => {
         onChange={handleTabChange}
         animated
       />
-      <Notification />
     </div>
   );
 };

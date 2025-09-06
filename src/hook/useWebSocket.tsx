@@ -15,6 +15,18 @@ let handlers: { [type: string]: WebSocketHandler } = {};
 let reconnectTimeout: number | null = null;
 let isInitialized = false;
 
+// Функция для отправки сообщения
+const sendMessage = (message: object): boolean => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(message));
+    return true;
+  } else {
+    console.warn('WebSocket is not open. ReadyState:', socket?.readyState);
+    return false;
+  }
+};
+
+
 export const useWebSocket = (newHandlers: { [type: string]: WebSocketHandler }) => {
   const queryClient = useQueryClient();
 
@@ -34,7 +46,10 @@ export const useWebSocket = (newHandlers: { [type: string]: WebSocketHandler }) 
       // Можно почистить, если нужно
     };
   }, [newHandlers, queryClient]);
+
+  return { sendMessage };
 };
+
 
 const connect = (queryClient: any) => {
   const accessToken = getAccessToken();
@@ -55,7 +70,7 @@ const connect = (queryClient: any) => {
   socket.onmessage = (event) => {
     try {
       const message: WebSocketMessage = JSON.parse(event.data);
-      const { type } = message.detail;
+      const  type  = message?.detail?.type;
 
       // Вызываем обработчик
       if (handlers[type]) {
@@ -73,6 +88,8 @@ const connect = (queryClient: any) => {
       console.error('Error parsing message:', error);
     }
   };
+
+
 
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
