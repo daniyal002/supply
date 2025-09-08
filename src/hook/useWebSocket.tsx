@@ -15,6 +15,11 @@ let handlers: { [type: string]: WebSocketHandler } = {};
 let reconnectTimeout: number | null = null;
 let isInitialized = false;
 
+// --- Экспортируем функцию инициализации ---
+export const initWebSocket = (queryClient: any) => {
+  connect(queryClient);
+};
+
 // Функция для отправки сообщения
 const sendMessage = (message: object): boolean => {
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -109,6 +114,10 @@ const connect = (queryClient: any) => {
     if (event.code !== 1000 && !event.wasClean) {
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       reconnectTimeout = window.setTimeout(() => connect(queryClient), 3000);
+    }
+
+    if(event.code === 4403) {
+      connect(queryClient)
     }
   };
 };
