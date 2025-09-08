@@ -102,7 +102,41 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
   const orderId = useTabStore((state => state.activeTabOrders))
 
-  const items: TabsProps["items"] = [
+  const items: TabsProps["items"] =  orderid === "newOrder" ? [
+    {
+      key: "1",
+      label: "Выбранные товары",
+      children: (
+        <ProductOrder
+          productTableData={getValues("order_products")}
+          getValues={getValues}
+          setValue={setValue}
+          watch={watch}
+          disabledOrder={disabledOrder}
+          role={GetMeData?.role?.role_name as string}
+          exportToExcel={() =>
+            exportOrderToExcel(
+              getOrderByIdData as IOrderItem,
+              productData || []
+            )
+          }
+          handlePrint={handlePrint}
+          isPrinting={isPrinting}
+        />
+      ),
+    },
+    {
+      key: "2",
+      label: "История согласования",
+      children: <OrderStepHistory order_id={Number(orderid)} />,
+    },
+    {
+      key: "3",
+      label: "Маршрут",
+      children: <RouteInfo order_id={Number(orderid)} />,
+    },
+  ] :
+  [
     {
       key: "1",
       label: "Выбранные товары",
