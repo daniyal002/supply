@@ -86,7 +86,7 @@ export const ExpandedRowContent = ({
             items={[
               {
                 key: "product-previous-orders-panel", // Уникальный ключ для панели
-                label: "Предыдущие заказы c первого числа текущего месяца", // Заголовок (можно оставить пустым)
+                label: "Предыдущие заказы за год", // Заголовок (можно оставить пустым)
                 children: (
                   <Table
                     dataSource={dataSourceProductPreviousOrders}
