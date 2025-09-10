@@ -22,3 +22,10 @@ export const formatNotificationDate = (dateString: string) => {
       return 'неверный формат даты';
     }
   };
+
+  export function getCurrentDateWithMicroseconds() {
+    const now = new Date();
+    const iso = now.toISOString(); // "2025-09-10T11:02:24.500Z"
+    // Заменяем .XXXZ на .XXXXXXZ
+    return iso.replace(/\.\d{3}Z$/, match => match.slice(0, -1).padEnd(7, '0') + 'Z');
+}

@@ -14,7 +14,7 @@ import {
 import { Button, Layout, Menu, Tooltip, message, theme } from "antd";
 import { Waypoints } from "lucide-react";
 import style from "./MainLayout.module.scss";
-import DropdownMenu from "../DropdownMenu/DropdownMenu";
+import DropdownNotifications from "../DropdownMenu/DropdownNotifications";
 import { useHeaderStore } from "../../../../store/headerStore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
@@ -23,6 +23,7 @@ import { protectedRoutes, isRole } from "@/helper/ProtectedRoutes";
 import { useThemeStore } from "../../../../store/themeStore";
 import { AdminPanelList } from "./AdminPanelList";
 import LogoutDropdown from "./LogoutDropdown";
+import DropdownNotificationsChat from "../DropdownMenu/DropdownNotificationsChat";
 
 const { Header, Sider, Content } = Layout;
 
@@ -243,7 +244,8 @@ const MainLayout = ({
               </Button>
             </Tooltip> */}
 
-            <DropdownMenu />
+            <DropdownNotifications />
+            <DropdownNotificationsChat />
 
             <div
               className={style.headerButtons}

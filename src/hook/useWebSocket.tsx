@@ -75,7 +75,7 @@ const connect = (queryClient: any) => {
   socket.onmessage = (event) => {
     try {
       const message: WebSocketMessage = JSON.parse(event.data);
-      const  type  = message?.detail?.type;
+      const  type  = message.type;
 
       // Вызываем обработчик
       if (handlers[type]) {

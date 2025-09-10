@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useThemeStore } from "../../../store/themeStore";
 import Chat from "./Chat";
 import { Modal } from "antd";
@@ -7,6 +13,8 @@ import { useWebSocket } from "@/hook/useWebSocket";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useOnlineStore } from "../../../store/OnlineStore";
+import { getCurrentDateWithMicroseconds } from "@/helper/DataFormat";
+import { IMessage } from "@/interface/message";
 
 interface Props {
   orderId: number;
@@ -18,6 +26,7 @@ export default function ChatCore({ orderId }: Props) {
   const messages = useMessageStore((state) =>
     state.data.find((data) => data.orderId === orderId)
   );
+
   const setMessages = useMessageStore((state) => state.setMessages);
 
   const [isOpenEmojiPicker, setIsOpenEmojiPicker] = useState<boolean>(false);
@@ -26,50 +35,49 @@ export default function ChatCore({ orderId }: Props) {
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Глобальный онлайн-стор
-    const { openTab, closeTab, isAnyTabOpen, getTabCount } = useOnlineStore();
+  // Глобальный онлайн-стор
+  const { openTab, closeTab, isAnyTabOpen, getTabCount } = useOnlineStore();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleHistory = useCallback((event: any) => {
-    setMessages(event.detail.order_id, event.detail.data.reverse());
+    setMessages(event.data.order_id, event.data.messages.reverse());
   }, []);
 
-  React.useEffect(() => {
+
+
+  const handleNewMessage = useCallback((event: any) => {
+    const newMessage = {
+      message_id: event.data.message_id,
+      created_at: event.data.created_at,
+      message: event.data.message,
+      order_id: event.data.order_id,
+      sender: {
+        sender_id: event.data.sender.sender_id as number,
+        sender_name: event.data.sender.sender_name as string,
+      },
+    };
+
+    setMessages(event.data.order_id, (prev: IMessage[] | undefined) => [
+      ...(prev || []),
+      newMessage,
+    ]);
+  }, [setMessages]); // ✅ Только setMessages — стабильно!
+
+  useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages,isModalOpen]);
 
   const { sendMessage } = useWebSocket({
-    history_chat_message: handleHistory,
+    new_chat_message: handleNewMessage,
+    chat_history: handleHistory,
   });
 
-  // useEffect(() => {
-  //   if (orderId !== 1) {
-  //     const messageBody = {
-  //       type: "chat_history_order",
-  //       order_id: orderId,
-  //       is_online: true,
-  //     };
-
-  //     sendMessage(messageBody);
-  //   }
-  // }, [orderId]);
-
-  // useEffect(() => {
-  //   if (orderId !== 1) {
-  //     return () => {
-  //       const messageBody = {
-  //         type: "chat_history_order",
-  //         order_id: orderId,
-  //         is_online: false,
-  //       };
-
-  //       sendMessage(messageBody);
-  //     };
-  //   }
-  // }, []);
+  useEffect(() => {
+    console.log(messages)
+  },[messages])
 
 
   useEffect(() => {
@@ -81,9 +89,8 @@ export default function ChatCore({ orderId }: Props) {
     // Проверяем: если это первая вкладка с этим orderId — отправляем is_online: true
     if (getTabCount(orderId) === 1) {
       sendMessage({
-        type: "chat_history_order",
+        type: "join_chat",
         order_id: orderId,
-        is_online: true,
       });
     }
 
@@ -95,9 +102,8 @@ export default function ChatCore({ orderId }: Props) {
       // Если после закрытия вкладки больше нет — отправляем is_online: false
       if (getTabCount(orderId) === 0) {
         sendMessage({
-          type: "chat_history_order",
+          type: "leave_chat",
           order_id: orderId,
-          is_online: false,
         });
       }
     };
@@ -105,23 +111,36 @@ export default function ChatCore({ orderId }: Props) {
 
   const meData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
-  const sendTestMessage = (message: string) => {
+  const sendMessageInChat = useCallback((message: string) => {
+    if (!message.trim()) return; // Защита от пустых сообщений
+
     const messageBody = {
       type: "chat_message",
-      is_online: true,
       order_id: orderId,
       message,
     };
-    if (message) {
-      const success = sendMessage(messageBody);
-      if (success) {
-        setInputValue("");
-      } else {
-        alert("Не удалось отправить сообщение. Сокет не подключён.");
-      }
+
+    const success = sendMessage(messageBody);
+
+    if (success) {
+      setInputValue(""); // Очищаем инпут
+
+      const newMessage = {
+        created_at: getCurrentDateWithMicroseconds(),
+        message: messageBody.message,
+        order_id: messageBody.order_id,
+        sender: {
+          sender_id: meData?.employee?.buyer_id as number,
+          sender_name: meData?.employee?.buyer_name as string,
+        },
+      };
+
+      // ✅ Функциональное обновление — без зависимости от `messages`
+      setMessages(orderId, (prev) => [...(prev || []), newMessage]);
     } else {
+      alert("Не удалось отправить сообщение. Сокет не подключён.");
     }
-  };
+  }, [orderId, sendMessage, setMessages, meData]); // ✅ Без `messages`!
 
   if (isModalOpen) {
     return (
@@ -140,7 +159,7 @@ export default function ChatCore({ orderId }: Props) {
           messages={messages?.messages || []}
           messagesEndRef={messagesEndRef}
           orderId={orderId}
-          sendMessage={sendTestMessage}
+          sendMessage={sendMessageInChat}
           setInputValue={setInputValue}
           setIsModalOpen={setIsModalOpen}
           setIsOpenEmojiPicker={setIsOpenEmojiPicker}
@@ -159,7 +178,7 @@ export default function ChatCore({ orderId }: Props) {
         messages={messages?.messages || []}
         messagesEndRef={messagesEndRef}
         orderId={orderId}
-        sendMessage={sendTestMessage}
+        sendMessage={sendMessageInChat}
         setInputValue={setInputValue}
         setIsModalOpen={setIsModalOpen}
         setIsOpenEmojiPicker={setIsOpenEmojiPicker}

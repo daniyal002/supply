@@ -12,7 +12,7 @@ import { useApprovalStore } from "../../../../store/approvalStore";
 import { BellOutlined } from "@ant-design/icons";
 import { useThemeStore } from "../../../../store/themeStore";
 
-export default function DropdownMenu() {
+export default function DropdownNotifications() {
   const notifications = useNotificationStore((state) => state.notifications);
   const [items, setItems] = useState<MenuProps["items"]>([]);
   const { mutate: markAsReadNotification } = useMarkAsReadNotification();

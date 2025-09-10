@@ -31,7 +31,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ msg }) => {
             : styles.messageContentOtherUser
         }`}
       >
-        <Tooltip title={msg.sender.sender_name}>
+        <Tooltip title={msg?.sender?.sender_name}>
         <Avatar
           style={{
             backgroundColor: background,
@@ -41,11 +41,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ msg }) => {
 
           }}
           size="default"
-          alt={msg.sender.sender_name}
+          alt={msg?.sender?.sender_name}
 
         >
-          {msg.sender.sender_name.split(" ")[0][0]}
-          {msg.sender.sender_name.split(" ")[1][0]}
+          {msg?.sender?.sender_name?.split(" ")[0][0]}
+          {msg?.sender?.sender_name?.split(" ")[1][0]}
         </Avatar>
         </Tooltip>
 

@@ -6,10 +6,8 @@ import { Modal, Button } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 interface BroadcastMessage {
-  detail: {
     type: 'broadcast';
     data: string;
-  };
 }
 
 export default function BroadcastModal() {
@@ -48,7 +46,7 @@ useWebSocket({
         </Button>,
       ]}
     >
-      <p>{message?.detail.data}</p>
+      <p>{message?.data}</p>
     </Modal>
   );
 }

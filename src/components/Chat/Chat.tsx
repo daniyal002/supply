@@ -62,8 +62,8 @@ export default function Chat({
             </div>
             {/* Сообщения за эту дату */}
             <div style={{display:'flex', flexDirection:"column", gap:"15px"}}>
-            {msgs.map((msg) => (
-              <MessageBubble msg={msg} key={msg.message_id} />
+            {msgs.map((msg,index) => (
+              <MessageBubble msg={msg} key={index} />
             ))}
             </div>
           </div>

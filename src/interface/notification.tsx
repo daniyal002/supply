@@ -3,7 +3,7 @@ export interface INotification{
     notification_message:string,
     is_red:boolean,
     created_at:string,
-    notification_type:"new_order"| "step_approval"| "rejection"| "info",
+    notification_type:"new_order"| "step_approval"| "rejection"| "info" | 'info_chat_message',
     buyer_id:number,
     data_id:number,
 }

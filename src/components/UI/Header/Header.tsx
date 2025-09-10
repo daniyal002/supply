@@ -16,7 +16,7 @@ import { usePathname } from "next/navigation";
 import { useLogout } from "@/hook/useAuth";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
-import DropdownMenu from "../DropdownMenu/DropdownMenu";
+import DropdownMenu from "../DropdownMenu/DropdownNotifications";
 export default function Header() {
   const setLogin = useHeaderStore((state) => state.setLogin);
   const login = useHeaderStore((state) => state.login);
