@@ -15,8 +15,8 @@ import { useThemeStore } from "../../../../store/themeStore";
 export default function DropdownNotifications() {
   const notifications = useNotificationStore((state) => state.notifications);
   const [items, setItems] = useState<MenuProps["items"]>([]);
-  const { mutate: markAsReadNotification } = useMarkAsReadNotification();
-  const { mutate: markAsReadAllNotification } = useMarkAsReadAllNotification();
+  const { mutate: markAsReadNotification } = useMarkAsReadNotification("info");
+  const { mutate: markAsReadAllNotification } = useMarkAsReadAllNotification("info");
   const setActiveMainTabKey = useTabStore((state) => state.setActiveMainTabKey);
 
   const setApprovalOrderId = useApprovalStore(

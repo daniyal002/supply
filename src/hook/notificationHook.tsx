@@ -2,6 +2,7 @@ import { notificationService } from "@/services/notification.service";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNotificationStore } from "../../store/notificationStore";
 import { message } from "antd";
+import { useNotificationChatStore } from "../../store/notificationChatStore";
 
 export const useNotificationData = () => {
   const {
@@ -16,9 +17,13 @@ export const useNotificationData = () => {
   return { notificationData, isLoading, error };
 };
 
-export const useMarkAsReadNotification = () => {
+export const useMarkAsReadNotification = (type: 'chat' | 'info') => {
   const deleteNotification = useNotificationStore(
     (state) => state.deleteNotification
+  );
+
+  const deleteNotificationChat = useNotificationChatStore(
+    (state) => state.deleteNotificationChat
   );
 
   const { mutate } = useMutation({
@@ -26,23 +31,28 @@ export const useMarkAsReadNotification = () => {
     mutationFn: (notification_id: number) =>
       notificationService.markAsReadNotification(notification_id),
     onSuccess(data, variables) {
-      deleteNotification(variables);
+      type === 'chat' ? deleteNotificationChat(variables) : deleteNotification(variables);
+
     },
   });
 
   return { mutate };
 };
 
-export const useMarkAsReadAllNotification = () => {
+export const useMarkAsReadAllNotification = (type: 'chat' | 'info') => {
   const deleteAllNotification = useNotificationStore(
     (state) => state.deleteAllNotification
+  );
+
+  const deleteAllNotificationChat = useNotificationChatStore(
+    (state) => state.deleteAllNotificationChat
   );
 
   const { mutate } = useMutation({
     mutationKey: ["markAsRead"],
     mutationFn: notificationService.markAsReadAllNotifications,
     onSuccess() {
-      deleteAllNotification();
+      type === 'chat' ? deleteAllNotificationChat() : deleteAllNotification();
     },
   });
 
