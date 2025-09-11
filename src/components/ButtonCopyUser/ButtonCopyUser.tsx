@@ -41,7 +41,7 @@ export default function CopyFormDataButton({
 `.trim();
 
     navigator.clipboard
-      .writeText(textToCopy)
+      ?.writeText(textToCopy)
       .then(() => {
         onCopySuccess?.(textToCopy);
       })

@@ -13,6 +13,8 @@ import { IUser } from "@/interface/user";
 import { useState } from "react";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IProductGroup } from "@/interface/product";
+import { ProductNameList } from "@/components/UI/ProductNameList/ProductNameList";
+import styles from './ApprovalListTable.module.scss'
 
 interface ApprovalListProps {
   OrderData: IOrderItem[] | undefined;
@@ -280,6 +282,21 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({
     },
   ];
 
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+
+  const handleExpand = (expanded: boolean, record: IOrderItem) => {
+    const key = record.order_id;
+    let newExpandedRowKeys = [...expandedRowKeys];
+
+    if (expanded) {
+      newExpandedRowKeys.push(key as number);
+    } else {
+      newExpandedRowKeys = newExpandedRowKeys.filter((k) => k !== key);
+    }
+
+    setExpandedRowKeys(newExpandedRowKeys);
+  };
+
   const dataSource = OrderData?.map((order) => ({
     ...order,
     key: order.order_id, // Ensure each item has a unique key
@@ -324,6 +341,17 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({
       }}
       locale={{ emptyText: "Нет заявок" }}
       loading={loading}
+      expandable={{
+        expandedRowKeys,
+        onExpand: handleExpand,
+        expandedRowRender: (record) => {
+          return (
+            <div className={styles.productContainer}>
+              <ProductNameList orderId={record.order_id as number} expandedRowKeys={expandedRowKeys} />
+            </div>
+          );
+        },
+      }}
     />
   );
 };

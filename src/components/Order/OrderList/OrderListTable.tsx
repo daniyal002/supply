@@ -21,6 +21,8 @@ import ContextMenu from "@/components/UI/ContextMenu/ContextMenu";
 import { useTabStore } from "../../../../store/tabStore";
 import { IProductGroup } from "@/interface/product";
 import { IOrderStatus } from "@/interface/orderStatus";
+import { ProductNameList } from "@/components/UI/ProductNameList/ProductNameList";
+import styles from './OrderListTable.module.scss'
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -342,6 +344,21 @@ const OrderListTable: React.FC<OrderListProps> = ({
     },
   ];
 
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+
+    const handleExpand = (expanded: boolean, record: IOrderItem) => {
+      const key = record.order_id;
+      let newExpandedRowKeys = [...expandedRowKeys];
+
+      if (expanded) {
+        newExpandedRowKeys.push(key as number);
+      } else {
+        newExpandedRowKeys = newExpandedRowKeys.filter((k) => k !== key);
+      }
+
+      setExpandedRowKeys(newExpandedRowKeys);
+    };
+
   const dataSource = OrderData?.map((order) => ({
     ...order,
     key: order.order_id, // Ensure each item has a unique key
@@ -422,6 +439,17 @@ const OrderListTable: React.FC<OrderListProps> = ({
         }}
         locale={{ emptyText: "Нет заявок" }}
         loading={loading}
+        expandable={{
+          expandedRowKeys,
+          onExpand: handleExpand,
+          expandedRowRender: (record) => {
+            return (
+              <div className={styles.productContainer}>
+                <ProductNameList orderId={record.order_id as number} expandedRowKeys={expandedRowKeys} />
+              </div>
+            );
+          },
+        }}
       />
 
       <ContextMenu

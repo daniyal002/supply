@@ -24,12 +24,15 @@ export const useGetOrderById = (id: string) => {
   const {
     data: getOrderByIdData,
     isLoading,
+    isError,
     error,
     isRefetching,
+    refetch,
   } = useQuery({
     queryKey: ["getOrderById", id],
     queryFn: () => orderService.getOrderById(id),
     enabled: !!id,
+    // staleTime: 0, // ❗Данные считаются устаревшими сразу после загрузки
   });
 
   useEffect(() => {
@@ -39,7 +42,7 @@ export const useGetOrderById = (id: string) => {
     }
   }, [isRefetching]);
 
-  return { getOrderByIdData, isLoading, error };
+  return { getOrderByIdData, isLoading, error, refetch,isError};
 };
 
 export const useOrderUserData = () => {
