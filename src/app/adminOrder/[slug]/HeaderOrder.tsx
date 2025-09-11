@@ -16,6 +16,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
 import { useEmployeeData } from "@/hook/employeeHook";
+import { optionsOrderTypes, optionsStorage } from "@/helper/options";
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -159,15 +160,7 @@ export default function HeaderOrder({
 
 
 
-  const optionsStorage = GetMeData?.employee?.storages?.map((storage) => ({
-    value: storage.storage_id,
-    label: storage.storage_name,
-  }));
 
-  const optionsOrderTypes: { value: string; label: string }[] = [
-    { value: EnumOrderTypes.WAREHOUSE, label: "Заявка на склад" },
-    { value: EnumOrderTypes.PURCHASE, label: "Заявка на закуп" },
-  ];
 
 
   return (
@@ -249,7 +242,7 @@ export default function HeaderOrder({
                   {...field}
                   disabled={disabledOrder || (orderType === undefined && (GetMeData?.role?.role_name === "user_purchase" ||
                     GetMeData?.role?.role_name === "admin"))}
-                  options={optionsStorage}
+                  options={optionsStorage(GetMeData?.employee?.storages || [])}
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? "")

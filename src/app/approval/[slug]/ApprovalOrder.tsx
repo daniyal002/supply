@@ -328,6 +328,7 @@ export default function ApprovalOrder({
             : "Заявка на склад",
       },
       order_author_name: getOrderByIdData?.order_author_name,
+      storage_id:{label:getOrderByIdData?.storage?.storage_name,value:getOrderByIdData?.storage?.storage_id}
     });
   }, [reset, type, orderid, getOrderByIdData]);
 
