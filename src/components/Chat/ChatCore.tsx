@@ -75,10 +75,6 @@ export default function ChatCore({ orderId }: Props) {
     chat_history: handleHistory,
   });
 
-  useEffect(() => {
-    console.log(messages)
-  },[messages])
-
 
   useEffect(() => {
     if (orderId === 1) return;
