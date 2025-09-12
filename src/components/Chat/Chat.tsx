@@ -1,10 +1,10 @@
-import { Button, Input, Popover, Space, Typography } from "antd";
+import { Button, Input, Popover, Space } from "antd";
 import {
   FullscreenOutlined,
   SendOutlined,
   SmileOutlined,
 } from "@ant-design/icons";
-import React, { Ref, useEffect } from "react";
+import React, { Ref } from "react";
 import styles from "./Chat.module.scss";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
@@ -12,7 +12,6 @@ import { IMessage } from "@/interface/message";
 import { MessageBubble } from "./MessageBubble";
 import { groupMessagesByDate } from "@/helper/groupMessagesByDate";
 
-const { Text } = Typography;
 
 interface Props {
   orderId: number;
@@ -21,7 +20,7 @@ interface Props {
   setIsOpenEmojiPicker: (isOpenEmojiPicker: boolean) => void;
   messagesEndRef: Ref<HTMLDivElement>;
   supplyTheme: string;
-  sendMessage: (message:string) => void;
+  sendMessage: (message: string) => void;
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   isModalOpen: boolean;
@@ -61,33 +60,67 @@ export default function Chat({
               <span>{date}</span>
             </div>
             {/* Сообщения за эту дату */}
-            <div style={{display:'flex', flexDirection:"column", gap:"15px"}}>
-            {msgs.map((msg,index) => (
-              <MessageBubble msg={msg} key={index} />
-            ))}
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+            >
+              {msgs.map((msg) => (
+                  <MessageBubble msg={msg}  key={msg.message_id} />
+              ))}
             </div>
           </div>
         ))}
 
         <div ref={messagesEndRef} />
-        {!isModalOpen && (
-          <Button
-            style={{
-              position: "absolute",
-              right: 30,
-              bottom: 150,
-              backgroundColor: "#00000061",
-              display: isModalOpen ? "none" : "block",
-            }}
-            onClick={() => setIsModalOpen(true)}
-          >
-            <FullscreenOutlined style={{ color: "#fff" }} />
-          </Button>
-        )}
       </div>
 
-      <div className={styles.inputContainer}>
-        <Input.TextArea
+      <div
+        className={styles.inputContainer}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "8px 12px",
+          background: "#f1f3f5",
+          // borderRadius: "9999px",
+        }}
+      >
+        {/* Кнопка эмодзи */}
+        <Popover
+          className={styles.emojiPicker}
+          content={
+            <Picker
+              data={data}
+              onEmojiSelect={(e: { native: string }) =>
+                setInputValue((prev) => prev + e.native)
+              }
+              locale="ru"
+              theme={supplyTheme === "dark" ? "dark" : "light"}
+              emojiSize={18}
+              previewPosition="none"
+              searchPosition="none"
+            />
+          }
+          trigger="click"
+          open={isOpenEmojiPicker}
+          onOpenChange={setIsOpenEmojiPicker}
+          placement="top"
+        >
+          <Button
+            shape="circle"
+            size="large"
+            icon={<SmileOutlined style={{ fontSize: 28, color: "#678098" }} />}
+            style={{
+              // background: "#ffffff",
+              border: "none",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+            }}
+            type="text"
+          />
+        </Popover>
+
+        {/* Поле ввода с анимацией ширины */}
+
+        <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onPressEnter={(e) => {
@@ -97,45 +130,43 @@ export default function Chat({
             }
           }}
           placeholder="Введите сообщение... (Shift + Enter для новой строки)"
-          autoSize={{ minRows: 1, maxRows: 3 }}
           style={{
-            borderRadius: 16,
-            padding: "12px 16px",
-            fontSize: 14,
-            boxShadow: "0 2px 8px var(--ant-shadow-color)",
+            borderRadius: "9999px",
+            border: "1px solid #d0d7de",
+            background: "#ffffff",
+            padding: "10px 16px",
+            fontSize: 18,
+            width: "100%",
           }}
         />
-        <div className={styles.inputFooter}>
-          <Popover
-            className={styles.emojiPicker}
-            content={
-              <Picker
-                data={data}
-                onEmojiSelect={(e: { native: string }) =>
-                  setInputValue((prev) => prev + e.native)
-                }
-                locale="ru"
-                theme={supplyTheme === "dark" ? "dark" : "light"}
-                emojiSize={16}
-                previewPosition="none"
-                searchPosition="none"
-              />
-            }
-            title={null}
-            trigger="click"
-            open={isOpenEmojiPicker}
-            onOpenChange={setIsOpenEmojiPicker}
-            placement="top"
-          >
+
+        {/* Кнопка отправки */}
             <Button
-              type="dashed"
-              icon={<SmileOutlined style={{ fontSize: 18 }} />}
+              type="primary"
+              shape="circle"
+              size="large"
+              icon={<SendOutlined />}
+              onClick={() => sendMessage(inputValue)}
+              style={{
+                boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+                // background: inputValue.trim().length === 0 ? 'gray' : 'red'
+              }}
+              disabled={inputValue.trim().length === 0}
+              title="Отправить сообщение"
             />
-          </Popover>
-          <Button type="primary" icon={<SendOutlined />} onClick={() => sendMessage(inputValue)}>
-            Отправить
-          </Button>
-        </div>
+          {!isModalOpen && (
+            <Button
+              style={{
+                display: isModalOpen ? "none" : "block",
+              }}
+              size="large"
+              onClick={() => setIsModalOpen(true)}
+              type="primary"
+              shape="circle"
+              icon={<FullscreenOutlined style={{ color: "#fff" }} />}
+              title="На полный экран"
+            />
+          )}
       </div>
     </div>
   );

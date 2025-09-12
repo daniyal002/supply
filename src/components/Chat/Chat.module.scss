@@ -119,6 +119,7 @@
 
                     .messageText{
                         margin-bottom: 0;
+                        font-size: 18px;
                     }
 
                     .messageCreateAt{
@@ -166,10 +167,23 @@
         border-top: 1px solid var(--ant-color-border);
         background: var(--ant-color-bg-container);
 
+        .chatInput{
+            border-radius: 24px;
+            padding: 12px 90px 12px 44px; // оставляем место под кнопки справа и слева
+            font-size: 14px;
+            box-shadow: 0 2px 8px var(--ant-shadow-color);
+            width: 100%;
+
+            @media(max-width:768px){
+                padding: 12px 90px 12px 12px;
+            }
+        }
+
         @media(max-width:768px) {
             .emojiPicker {
                 display: none;
             }
+
         }
 
         .inputFooter {

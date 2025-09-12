@@ -126,6 +126,7 @@ export default function ChatCore({ orderId }: Props) {
       setInputValue(""); // Очищаем инпут
 
       const newMessage = {
+        message_id: Date.now() * -1, // 👈 временный отрицательный ID // ← временный уникальный id
         created_at: getCurrentDateWithMicroseconds(),
         message: messageBody.message,
         order_id: messageBody.order_id,

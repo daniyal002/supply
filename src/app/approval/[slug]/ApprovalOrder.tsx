@@ -51,7 +51,7 @@ export default function ApprovalOrder({
     handleSubmit,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const notifications = useNotificationStore((state) => state.notifications);
-  const { mutate: markAsReadNotification } = useMarkAsReadNotification();
+  const { mutate: markAsReadNotification } = useMarkAsReadNotification('info');
 
   // Print
   const contentRef = useRef<HTMLDivElement>(null);
@@ -86,6 +86,9 @@ export default function ApprovalOrder({
   const [note, setnote] = React.useState("");
 
   const orderId = useTabStore((state => state.activeTabApproval))
+  const [activeTabKey,setActiveTabKey] = useState<number>()
+
+
 
   const items: TabsProps["items"] = readonly ? [
     {
@@ -355,16 +358,16 @@ export default function ApprovalOrder({
            Согласовать
           </button> */}
         {/* </form> */}
-        <Tabs defaultActiveKey="1" items={items} />
+        <Tabs defaultActiveKey="1" items={items} onChange={(e) => setActiveTabKey(Number(e))} />
         {!readonly && !isPrinting && (
-          <div className={style.commentAndButtons}>
+          <div className={style.commentAndButtons} style={{display: activeTabKey === 4 ? 'none' : 'flex'}}>
             <TextArea
               placeholder="Комментарий"
               className={style.comment}
               value={note}
               onChange={(e) => setnote(e.target.value)}
             />
-            <div className={style.buttonGroup}>
+            <div className={style.buttonGroup} >
               <button
                 className={style.buttonOrderApproval}
                 onClick={() => agreedOrder(Number(orderid))}
