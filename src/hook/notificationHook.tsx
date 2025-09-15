@@ -60,7 +60,7 @@ export const useMarkAsReadAllNotification = (type: 'chat' | 'info') => {
 };
 
 export const useSendBroadcastNotification = () => {
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending,data, isSuccess } = useMutation({
     mutationKey: ["sendBroadcast"],
     mutationFn: (message: string) =>
       notificationService.sendBroadcastNotification(message),
@@ -72,5 +72,5 @@ export const useSendBroadcastNotification = () => {
     },
   });
 
-  return { mutate, isPending };
+  return { mutate, isPending,data,isSuccess };
 };

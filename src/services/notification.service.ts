@@ -26,9 +26,9 @@ export const notificationService = {
       },
 
       async sendBroadcastNotification(message:string){
-        const response = await axiosWidthAuth.post<string>(`/notify/send_broadcast_notification?notification_message=${message}`)
+        const response = await axiosWidthAuth.post<{detail:string}>(`/notify/send_broadcast_notification?notification_message=${message}`)
 
-        return response.data
+        return response.data.detail
       }
 
 
