@@ -330,7 +330,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                         : NaN
                     );
                     showModal();
-                    setIsNewProduct(record.product ? false : true);
+                    setIsNewProduct(record.order_product_name ? true : false);
                     // @ts-ignore: Unreachable code error
                     setProductIndex(record.key);
                   }}
