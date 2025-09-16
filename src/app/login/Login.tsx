@@ -4,8 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import style from "./Login.module.scss";
 import { useLogin } from "@/hook/useAuth";
 import { ILoginRequest } from "@/interface/auth";
-import { toast, Toaster } from "sonner";
-import { Alert } from "antd";
+import { Alert, message } from "antd";
 import { useState } from "react";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 
@@ -68,12 +67,11 @@ export function Login() {
           )}
         </div>
         <div className={style.loginForgotPassword}>
-          <Toaster />
 
           <button
             className={style.loginForgotPasswordText}
             onClick={() =>
-              toast(
+              message.info(
                 "Обратитесь в отдел разработки по внутренему номеру 194, 195"
               )
             }
