@@ -367,7 +367,7 @@ export default function HeaderOrder({
                   options={optionsProductGroup}
                   // disabled={disabledOrder ? true : productSelect ? true : false}
                   disabled={
-                    disabledOrder || productSelect || !departmentId?.value
+                    disabledOrder || !departmentId?.value
                   }
                   showSearch
                   filterOption={(input, option) =>

@@ -359,7 +359,7 @@ export default function HeaderOrder({
                 <Select
                   {...field}
                   options={optionsProductGroup}
-                  disabled={disabledOrder ? true : productSelect ? true : false}
+                  disabled={disabledOrder}
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? "")
