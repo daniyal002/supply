@@ -36,7 +36,7 @@ export default function ChatCore({ orderId }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Глобальный онлайн-стор
-  const { openTab, closeTab, isAnyTabOpen, getTabCount } = useOnlineStore();
+  const { openTab, closeTab, getTabCount } = useOnlineStore();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,20 +120,6 @@ export default function ChatCore({ orderId }: Props) {
 
     if (success) {
       setInputValue(""); // Очищаем инпут
-
-      const newMessage = {
-        message_id: Date.now() * -1, // 👈 временный отрицательный ID // ← временный уникальный id
-        created_at: getCurrentDateWithMicroseconds(),
-        message: messageBody.message,
-        order_id: messageBody.order_id,
-        sender: {
-          sender_id: meData?.employee?.buyer_id as number,
-          sender_name: meData?.employee?.buyer_name as string,
-        },
-      };
-
-      // ✅ Функциональное обновление — без зависимости от `messages`
-      setMessages(orderId, (prev) => [...(prev || []), newMessage]);
     } else {
       alert("Не удалось отправить сообщение. Сокет не подключён.");
     }
