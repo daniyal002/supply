@@ -10,3 +10,16 @@ export const filterBySearchText = (searchValue: string, dataIndex: string): bool
 
   return searchWords.every(word => target.includes(word));
 };
+
+export const matchesSearch = (cell: any, value: string): boolean => {
+  if (!value) return true;
+
+  const searchWords = String(value)
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const target = String(cell ?? "").toLowerCase();
+
+  return searchWords.every((word) => target.includes(word));
+};

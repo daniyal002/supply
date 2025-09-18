@@ -10,6 +10,11 @@ import {
 } from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { Modal } from "antd";
+import { Filters, Sorts } from "@/interface/tableType";
+import { useSearch } from "@/helper/TableFilters/hook/useSearch";
+import { getSelectProductTableColumns } from "@/components/ProductTableColumns/SelectProductTableColumns";
+import { useColumnFilterShortcut } from "@/helper/TableFilters/hook/useColumnFilterShortcut";
+import ProductSidebarTable from "@/components/ProductSidebarTable/ProductSidebarTable";
 
 interface Props {
   watch: UseFormWatch<IOrderItemFormValues>;
@@ -38,6 +43,9 @@ export default function SelectProductOrder({
     setIsModalOpen(true);
   };
 
+   const { visibleColumnKey, setVisibleColumnKey } =
+      useColumnFilterShortcut("product_name");
+
   useEffect(() => {
     const filteredProductDataInGroup = productData?.filter(
       (product) =>
@@ -61,6 +69,29 @@ export default function SelectProductOrder({
       setFilterProductData([]);
     }
   }, [productData, productGroup]);
+
+  const [filteredInfo, setFilteredInfo] = useState<Filters>({});
+    const [sortedInfo, setSortedInfo] = useState<Sorts>({});
+    const [countProduct, setCountProduct] = useState<number>(productData?.length ?? 0);
+
+    const { searchText, searchedColumn, searchInput, handleSearch, handleReset, resetSearch } =
+          useSearch();
+
+    const columns = getSelectProductTableColumns({
+      filteredInfo,
+      sortedInfo,
+      data: filterProductData ?? [],
+      showModal,
+      setProductId,
+      visibleColumnKey,
+      setVisibleColumnKey,
+      handleReset,
+      handleSearch,
+      searchInput,
+      searchText,
+      searchedColumn,
+    });
+
   return (
     <>
     <Modal
@@ -98,14 +129,39 @@ export default function SelectProductOrder({
         editProductId={null}
         isNewProduct={false}
       />
-      <SelectProductOrderTableColumn
-        productData={filterProductData ? filterProductData : []}
-        setProductId={setProductId}
-        showModal={showModal}
-        getValues={getValues}
-        refetch={refetch}
-        watch={watch}
-      />
+      <ProductSidebarTable
+        filteredInfo={filteredInfo}
+          productData={filterProductData ?? []}
+          setFilteredInfo={setFilteredInfo}
+          setSortedInfo={setSortedInfo}
+          setCountProduct={setCountProduct}
+          resetSearch={resetSearch}
+        >
+          {({
+            filteredProducts,
+            expandedRowKeys,
+            setExpandedRowKeys,
+            clearAll,
+          }) => (
+            <SelectProductOrderTableColumn
+            onChange={(p, f, s, e) => {
+              setFilteredInfo(f);
+              setSortedInfo(s as any);
+            }}
+              productData={filteredProducts} // <-- используем уже отфильтрованные продукты
+              setProductId={setProductId}
+              showModal={showModal}
+              getValues={getValues}
+              refetch={refetch}
+              watch={watch}
+              expandedRowKeys={expandedRowKeys} // если твоя таблица поддерживает expandable rows
+              setExpandedRowKeys={setExpandedRowKeys}
+              currentFilters={countProduct} // например, для отображения количества фильтрованных продуктов
+              clearAll={clearAll}
+              columns={columns} // кнопка очистки
+            />
+          )}
+        </ProductSidebarTable>
     </Modal>
     </>
 

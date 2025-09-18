@@ -31,8 +31,15 @@ export interface IProductUnit{
     directory_unit_measurement:IUnit[]
     product_article?:string
     product_kod_1c:string
+    product_kod_1c_parent:string
+    is_group:boolean
     remainder?:number
 }
+
+export interface IProductUnitNode extends IProductUnit {
+    key: string;
+    children?: IProductUnitNode[];
+  }
 
 export interface IProductResponse{
     detail:IProductUnit[]

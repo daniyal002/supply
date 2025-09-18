@@ -1,10 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { InputRef } from 'antd';
 
 export const useSearch = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef<InputRef>(null);
+
+
 
   const handleSearch = (
     selectedKeys: string[],
@@ -21,12 +23,18 @@ export const useSearch = () => {
     setSearchText("");
   };
 
+  const resetSearch = () => {
+    setSearchText("");
+    setSearchedColumn("");
+  };
+
   return {
     searchText,
     searchedColumn,
     searchInput,
     handleSearch,
     handleReset,
-    setSearchedColumn
+    setSearchedColumn,
+    resetSearch
   };
 };
