@@ -9,6 +9,7 @@ import {
   MinusCircleOutlined,
 } from "@ant-design/icons";
 import { IProductUnit } from "@/interface/product";
+import "./ProductFolderSidebar.scss"
 
 interface Props {
   folderTree: any[];
