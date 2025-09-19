@@ -160,6 +160,11 @@ export const ExpandedRowContent = ({
                         key: "product_quantity",
                       },
                       {
+                        title: "Согласованное количество",
+                        dataIndex: "product_count",
+                        key: "product_quantity",
+                      },
+                      {
                         title: "На кого",
                         dataIndex: "buyer_name",
                         key: "buyer_name",

@@ -2,7 +2,7 @@ import { formatNotificationDate } from "@/helper/DataFormat";
 import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
-import { Collapse, Table } from "antd";
+import { Collapse, Table, Tooltip } from "antd";
 
 interface Props {
   orderProductComments: IOrderProductCommentsResponse[];
@@ -60,6 +60,15 @@ export const ExpandedRowContent = ({
                         title: "Комментарий",
                         dataIndex: "comment",
                         key: "comment",
+                        render: (comment: string) => (
+                          comment && comment.length > 50 ? (
+                            <Tooltip title={comment}>
+                              {`${comment.substring(0, 50)}...`}
+                            </Tooltip>
+                          ) : (
+                            comment
+                          )
+                        )
                       },
                       {
                         title: "Дата",

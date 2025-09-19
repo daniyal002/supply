@@ -57,6 +57,7 @@ export interface IProductPreviousOrders {
   order_product_id: number;
   order_product_name: string;
   product_quantity: number;
+  product_count: number;
   updated_at: string;
   order_id:number;
   buyer_name:string;
