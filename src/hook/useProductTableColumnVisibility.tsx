@@ -5,6 +5,7 @@ import { IProductTable } from "@/interface/productTable";
 interface ColumnVisibility {
   hasOrderProductName: boolean;
   hasOrderProductLink: boolean;
+  hasOrderProductComment: boolean;
   hasBuyers: boolean;
   hasNote: boolean;
 }
@@ -17,6 +18,7 @@ export const useProductTableColumnVisibility = (
       return {
         hasOrderProductName: false,
         hasOrderProductLink: false,
+        hasOrderProductComment: false,
         hasBuyers: false,
         hasNote: false,
       };
@@ -25,6 +27,7 @@ export const useProductTableColumnVisibility = (
     return {
       hasOrderProductName: productTableData.some((p) => p.order_product_name),
       hasOrderProductLink: productTableData.some((p) => p.order_product_link),
+      hasOrderProductComment: productTableData.some((p) => p.order_product_comment?.length || 0 > 0),
       hasBuyers: productTableData.some((p) => p.buyers?.length || 0 > 0),
       hasNote: productTableData.some((p) => p.note),
     };

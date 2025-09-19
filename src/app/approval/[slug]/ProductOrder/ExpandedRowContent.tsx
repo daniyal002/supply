@@ -3,7 +3,7 @@ import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
 import { CloseOutlined } from "@ant-design/icons";
-import { Button, Collapse, Space, Table } from "antd";
+import { Button, Collapse, Space, Table, Tooltip } from "antd";
 
 interface Props {
   order_product_id: number;
@@ -93,6 +93,16 @@ export const ExpandedRowContent = ({
                         title: "Комментарий",
                         dataIndex: "comment",
                         key: "comment",
+                        render: (comment: string) => (
+                          comment && comment.length > 50 ? (
+                            <Tooltip title={comment}>
+                              {`${comment.substring(0, 50)}...`}
+                            </Tooltip>
+                          ) : (
+                            comment
+                          )
+                        )
+
                       },
                       {
                         title: "Дата",
