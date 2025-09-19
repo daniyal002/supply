@@ -308,11 +308,17 @@ export default function ApprovalHeaderOrder({
       <div className={style.headerOrderTextArea}>
         <div className={style.formItem}>
           <label className={style.formItemLabel}>Примечание</label>
-          <TextArea
-            placeholder="Примечание"
-            disabled
-            className={style.modalTextArea}
-            {...register("note")}
+          <Controller
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <TextArea
+                placeholder="Примечание"
+                className={style.modalTextArea}
+                disabled
+                {...field}
+              />
+            )}
           />
         </div>
       </div>
