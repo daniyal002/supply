@@ -4,6 +4,8 @@ import { IOrderProductCommentsResponse } from "@/interface/orderProductComments"
 import { IProductPreviousOrders } from "@/interface/productTable";
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Collapse, Space, Table, Tooltip } from "antd";
+import { useOrderIdStore } from "../../../../../store/orderIdStore";
+import { useTabStore } from "../../../../../store/tabStore";
 
 interface Props {
   order_product_id: number;
@@ -15,8 +17,8 @@ interface Props {
   showModal: () => void;
   setProductIndex: (key: number) => void;
   orderId: number;
-  is_cancel:boolean;
-  readonly?:boolean
+  is_cancel: boolean;
+  readonly?: boolean;
 }
 
 export const ExpandedRowContent = ({
@@ -30,52 +32,53 @@ export const ExpandedRowContent = ({
   showModal,
   orderId,
   is_cancel,
-  readonly = false
+  readonly = false,
 }: Props) => {
-  const dataSourceProductComments: IOrderProductCommentsResponse[] = orderProductComments?.map(
-    (product, index) => ({
+  const dataSourceProductComments: IOrderProductCommentsResponse[] =
+    orderProductComments?.map((product, index) => ({
       ...product,
       key: index, // Ensure each item has a unique key
-    })
-  );
+    }));
 
-  const dataSourceProductPreviousOrders: IProductPreviousOrders[] = productPreviousOrders?.map(
-    (product, index) => ({
+  const dataSourceProductPreviousOrders: IProductPreviousOrders[] =
+    productPreviousOrders?.map((product, index) => ({
       ...product,
       key: index, // Ensure each item has a unique key
-    })
-  );
-
+    }));
 
   const { mutate: deleteOrderProductCommentMutation } =
     useDeleteOrderProductCommentMutation(orderId);
+  const setActiveMainTabKey = useTabStore((state) => state.setActiveMainTabKey);
+
+  const setAllOrderId = useOrderIdStore((state) => state.setAllOrderId);
 
   return (
     <>
-    {!is_cancel && !readonly && (
-      <Button
-        onClick={() => {
-          setOrderProductId(order_product_id as number);
-          setProductId(product_id as number);
-          showModal();
-          setProductIndex(order_product_id);
-        }}
-        style={{ marginBottom: "10px" }}
-        title="Добавить комментарий"
-      >
-        Добавить комментарий
-      </Button>
-    )}
-  <div style={{display:'flex', flexDirection:"column", gap:"10px"}}>
-      {!dataSourceProductComments || dataSourceProductComments?.length === 0 ? (
-        <div style={{margin:"12px 16px"}}>Данные не найдены</div>
-      ) : (
-        <Collapse
-          items={[
-            {
-              key: "comments-panel", // Уникальный ключ для панели
-              label: "Комментарии к товару", // Заголовок (можно оставить пустым)
-              children: (
+      {!is_cancel && !readonly && (
+        <Button
+          onClick={() => {
+            setOrderProductId(order_product_id as number);
+            setProductId(product_id as number);
+            showModal();
+            setProductIndex(order_product_id);
+          }}
+          style={{ marginBottom: "10px" }}
+          title="Добавить комментарий"
+        >
+          Добавить комментарий
+        </Button>
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {!dataSourceProductComments ||
+        dataSourceProductComments?.length === 0 ? (
+          <div style={{ margin: "12px 16px" }}>Данные не найдены</div>
+        ) : (
+          <Collapse
+            items={[
+              {
+                key: "comments-panel", // Уникальный ключ для панели
+                label: "Комментарии к товару", // Заголовок (можно оставить пустым)
+                children: (
                   <Table
                     dataSource={dataSourceProductComments}
                     columns={[
@@ -93,22 +96,20 @@ export const ExpandedRowContent = ({
                         title: "Комментарий",
                         dataIndex: "comment",
                         key: "comment",
-                        render: (comment: string) => (
+                        render: (comment: string) =>
                           comment && comment.length > 50 ? (
                             <Tooltip title={comment}>
                               {`${comment.substring(0, 50)}...`}
                             </Tooltip>
                           ) : (
                             comment
-                          )
-                        )
-
+                          ),
                       },
                       {
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
-                        render: (data: string) => formatNotificationDate(data)
+                        render: (data: string) => formatNotificationDate(data),
                       },
                       {
                         title: "Действия",
@@ -130,22 +131,24 @@ export const ExpandedRowContent = ({
                     ]}
                     pagination={false}
                   />
-              ),
-            },
-          ]}
-        />
-      )}
+                ),
+              },
+            ]}
+          />
+        )}
 
-      {!dataSourceProductPreviousOrders || dataSourceProductPreviousOrders?.length === 0 ? (
-        <div style={{margin:"12px 16px"}}>Ранее этот товар не заказывали</div>
-      ) : (
-        <Collapse
-          items={[
-            {
-              key: "product-previous-orders-panel", // Уникальный ключ для панели
-              label: "Предыдущие заказы за год", // Заголовок (можно оставить пустым)
-              children: (
-
+        {!dataSourceProductPreviousOrders ||
+        dataSourceProductPreviousOrders?.length === 0 ? (
+          <div style={{ margin: "12px 16px" }}>
+            Ранее этот товар не заказывали
+          </div>
+        ) : (
+          <Collapse
+            items={[
+              {
+                key: "product-previous-orders-panel", // Уникальный ключ для панели
+                label: "Предыдущие заказы за год", // Заголовок (можно оставить пустым)
+                children: (
                   <Table
                     dataSource={dataSourceProductPreviousOrders}
                     columns={[
@@ -153,6 +156,17 @@ export const ExpandedRowContent = ({
                         title: "В Заявке",
                         dataIndex: "order_id",
                         key: "order_id",
+                        render: (order_id: number) => (
+                          <Button
+                            onClick={() => {
+                              setAllOrderId(String(order_id));
+                              setActiveMainTabKey("5")
+                            }}
+                            title={`Перейти в заявку ${order_id}`}
+                          >
+                            {order_id}
+                          </Button>
+                        ),
                       },
                       {
                         title: "Количество",
@@ -173,17 +187,17 @@ export const ExpandedRowContent = ({
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
-                        render: (data:string) => formatNotificationDate(data)
+                        render: (data: string) => formatNotificationDate(data),
                       },
                     ]}
                     pagination={false}
                   />
-              ),
-            },
-          ]}
-        />
-      )}
-</div>
+                ),
+              },
+            ]}
+          />
+        )}
+      </div>
     </>
   );
 };

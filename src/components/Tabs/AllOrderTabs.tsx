@@ -123,7 +123,7 @@ export default function AllOrderTabs() {
         style={{ padding: "0 10px" }}
         destroyInactiveTabPane={false}
         defaultActiveKey={activeTabAllOrders}
-        animated
+        // animated
       />
   );
 }
