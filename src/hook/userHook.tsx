@@ -4,8 +4,6 @@ import { IUser } from "@/interface/user";
 import { message } from "antd";
 import axios, { AxiosError } from "axios";
 import { IErrorResponse } from "@/interface/error";
-import { getAccessToken } from "@/services/auth-token.service";
-import { tree } from "next/dist/build/templates/app-page";
 
 export const useUserData = () => {
   const {

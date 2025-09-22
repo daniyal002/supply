@@ -11,3 +11,13 @@ export interface INotification{
 export interface INotificationResponse{
     detail:INotification[]
 }
+
+export interface IConnectedUser{
+    buyer_id:number,
+    buyer_name:string,
+    connected_at:string
+}
+
+export interface IConnectedUserResponse{
+    detail:IConnectedUser[]
+}

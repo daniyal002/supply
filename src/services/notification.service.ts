@@ -1,5 +1,5 @@
 import { axiosWidthAuth } from "@/api/interseptors";
-import { INotificationResponse } from "@/interface/notification";
+import { IConnectedUserResponse, INotificationResponse } from "@/interface/notification";
 
 export const notificationService = {
 
@@ -29,7 +29,19 @@ export const notificationService = {
         const response = await axiosWidthAuth.post<{detail:string}>(`/notify/send_broadcast_notification?notification_message=${message}`)
 
         return response.data.detail
-      }
+      },
+
+      async getConnectedUsers(){
+        const response = await axiosWidthAuth.get<IConnectedUserResponse>(`/notify/get_connected_users`)
+
+        return response.data.detail
+      },
+
+      async sendNotificationMessage(employee_id:string,message:string){
+        const response = await axiosWidthAuth.post<string>(`/notify/send_notification_message?employee_id=${employee_id}&message=${message}`)
+
+        return response.data
+      },
 
 
 }

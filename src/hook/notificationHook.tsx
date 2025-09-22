@@ -17,6 +17,19 @@ export const useNotificationData = () => {
   return { notificationData, isLoading, error };
 };
 
+export const useConnectedUsersData = () => {
+  const {
+    data: connectedUsersData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["connectedUsers"],
+    queryFn: notificationService.getConnectedUsers,
+    staleTime: 1000, // 1 minute
+  });
+  return { connectedUsersData, isLoading, error };
+};
+
 export const useMarkAsReadNotification = (type: 'chat' | 'info') => {
   const deleteNotification = useNotificationStore(
     (state) => state.deleteNotification
@@ -38,6 +51,7 @@ export const useMarkAsReadNotification = (type: 'chat' | 'info') => {
 
   return { mutate };
 };
+
 
 export const useMarkAsReadAllNotification = (type: 'chat' | 'info') => {
   const deleteAllNotification = useNotificationStore(
@@ -73,4 +87,21 @@ export const useSendBroadcastNotification = () => {
   });
 
   return { mutate, isPending,data,isSuccess };
+};
+
+
+export const useSendNotificationMessage = () => {
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["sendNotificationMessage"],
+    mutationFn: (sendMessageQuery:{buyer_id:string, message:string}) =>
+      notificationService.sendNotificationMessage(sendMessageQuery.buyer_id, sendMessageQuery.message),
+    onSuccess() {
+      message.success("Сообщение отправлено пользователю")
+    },
+    onError: (error: any) => {
+      message.error(`Ошибка отправки сообщения пользователю: ${error.response?.data?.message || 'Ошибка отправки'}`)
+    }
+  });
+
+  return { mutate, isPending };
 };

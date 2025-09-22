@@ -46,3 +46,8 @@ export interface IUserFormValues{
     employee:IEmployeeOption,
     is_archive?: boolean,
 }
+
+export interface IUserOnline extends IUser{
+    is_online:boolean
+    connected_at:string
+}

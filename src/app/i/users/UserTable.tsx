@@ -2,24 +2,27 @@
 
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
-import { IUser } from "@/interface/user";
+import { IUser, IUserOnline } from "@/interface/user";
 import { useArchiveUserMutation, useDeleteUserMutation } from "@/hook/userHook";
 import { IEmployee } from "@/interface/employee";
 import { IRole } from "@/interface/role";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
+import { MessageOutlined, SearchOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import Highlighter from "react-highlight-words";
 import { useRoleData } from "@/hook/roleHook";
+import { formatNotificationDate } from "@/helper/DataFormat";
 
 interface userTableProps {
-  userData: IUser[] | undefined;
+  userData: IUserOnline[] | undefined;
   onEdit: (id: number) => void;
   isArchive:boolean
+  setBuyerId: (id: number) => void;
+  setIsModalMessageOpen: (open: boolean) => void;
 }
 
-const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) => {
+const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive,setBuyerId,setIsModalMessageOpen }) => {
   const { mutate: deleteUserMutation } = useDeleteUserMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -27,7 +30,12 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
 
   const {mutate:archiveUserMutation} = useArchiveUserMutation()
 
-  const columns: TableColumnsType<IUser> = [
+  const openModalMessage = (buyerId: number) => {
+    setBuyerId(buyerId);
+    setIsModalMessageOpen(true);
+  };
+
+  const columns: TableColumnsType<IUserOnline> = [
     {
       title: "ID",
       dataIndex: "user_id",
@@ -169,9 +177,27 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
       onFilter: (value, record) => record.role?.role_id === value,
     },
     {
+      title:"Онлайн",
+      dataIndex:"is_online",
+      key:"is_online",
+      render: (is_online: boolean) => (
+        <span style={{ color: is_online ? "green" : "red" }}>
+          {is_online ? `Да` : "Нет"}
+        </span>
+      ),
+      filters: [{ text: "Да", value: true }, { text: "Нет", value: false }],
+      onFilter: (value, record) => record.is_online === value,
+    },
+    {
+      title: "Последний вход",
+      dataIndex: "connected_at",
+      key: "connected_at",
+      render: (connected_at: string) => connected_at ? formatNotificationDate(connected_at) : "-"
+    },
+    {
       title: "Действия",
       key: "action",
-      render: (_: any, record: IUser) => (
+      render: (_: any, record: IUserOnline) => (
         <Space size="middle">
           <Button
             type="dashed"
@@ -201,6 +227,14 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive }) =>
           <Button onClick={() => archiveUserMutation(record)}>
             {record.is_archive ? "Разархивировать" : "Архивировать"}
           </Button>
+          {record.is_online && (
+            <Button
+              type="default"
+              onClick={() => openModalMessage(record.employee.buyer_id as number)}
+              title="Отправить сообщение"
+              icon={<MessageOutlined/>}
+            />
+          )}
         </Space>
       ),
     },
