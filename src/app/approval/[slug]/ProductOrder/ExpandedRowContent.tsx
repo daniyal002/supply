@@ -179,6 +179,11 @@ export const ExpandedRowContent = ({
                         key: "product_quantity",
                       },
                       {
+                        title: "Ед. измерения",
+                        dataIndex: "unit_measurement_name",
+                        key: "unit_measurement_name",
+                      },
+                      {
                         title: "На кого",
                         dataIndex: "buyer_name",
                         key: "buyer_name",

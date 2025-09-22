@@ -61,4 +61,5 @@ export interface IProductPreviousOrders {
   updated_at: string;
   order_id:number;
   buyer_name:string;
+  unit_measurement_name:string
 }
