@@ -10,12 +10,13 @@ export const useParlorData = () => {
     data: parlorData,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["Parlors"],
     queryFn: parlorService.getParlor,
     staleTime: Infinity,
   });
-  return { parlorData, isLoading, error };
+  return { parlorData, isLoading, error, refetch };
 };
 
 export const useCreateParlorMutation = () => {

@@ -9,7 +9,7 @@ import { useDepartmentData } from "@/hook/departmentHook";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminDepartment() {
-  const { departmentData } = useDepartmentData();
+  const { departmentData, refetch } = useDepartmentData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [departmentId, setDepartmentId] = useState<number>();
 
@@ -56,7 +56,7 @@ export default function AdminDepartment() {
         title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
-      <DepartmentTable departmentData={departmentData} onEdit={onEdit} isArchive={isArchive}/>
+      <DepartmentTable departmentData={departmentData} onEdit={onEdit} isArchive={isArchive} refetch={refetch}/>
     </div>
   );
 }

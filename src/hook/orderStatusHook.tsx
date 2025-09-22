@@ -11,13 +11,14 @@ export const useGetOrderStatus = () => {
     data: orderStatusData,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["orderStatus"],
     queryFn: orderStatusService.getStatus,
     staleTime: Infinity,
   });
 
-  return { orderStatusData, isLoading, error };
+  return { orderStatusData, isLoading, error, refetch };
 };
 
 export const useCreateOrderStatusMutation = () => {

@@ -10,12 +10,13 @@ export const usePostData = () => {
     data: postData,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["Posts"],
     queryFn: postService.getPost,
     staleTime: Infinity,
   });
-  return { postData, isLoading, error };
+  return { postData, isLoading, error, refetch };
 };
 
 export const useCreatePostMutation = () => {

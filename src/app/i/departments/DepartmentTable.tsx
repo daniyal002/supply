@@ -9,21 +9,24 @@ import {
 } from "@/hook/departmentHook";
 import { IHousing } from "@/interface/housing";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { Key, useMemo } from "react";
+import { Key, useEffect, useMemo, useState } from "react";
 
 interface PostTableProps {
   departmentData: IDepartment[] | undefined;
   onEdit: (id: number) => void;
   isArchive: boolean;
+  refetch: () => void;
+
 }
 
 const DepartmentTable: React.FC<PostTableProps> = ({
   departmentData,
   onEdit,
+  refetch,
   isArchive = false,
 }) => {
   const { mutate: deleteDepartmentMutation } = useDeleteDepartmentMutation();
@@ -214,12 +217,22 @@ const DepartmentTable: React.FC<PostTableProps> = ({
     },
   ];
 
-  const dataSource = departmentData
+  const dataSource = useMemo(() => { return departmentData
     ?.map((department) => ({
       ...department,
       key: department.department_id, // Ensure each item has a unique key
     }))
     .filter((depatment) => depatment.is_archive === isArchive);
+  }, [departmentData, isArchive])
+
+
+    const [currentFilters, setCurrentFilters] = useState<number>(
+          dataSource?.length as number
+        );
+
+        useEffect(() => {
+          setCurrentFilters(dataSource?.length as number)
+        },[departmentData, isArchive])
 
   return (
     <Table
@@ -227,6 +240,40 @@ const DepartmentTable: React.FC<PostTableProps> = ({
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Подразделений" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>
+           Подразделений: {currentFilters ?? 0}
+          </p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>
+          Подразделений: {currentFilters ?? 0}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить подразделения">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(extra.currentDataSource.length === 0 ? 0 : extra.currentDataSource.length);
+      }}
     />
   );
 };

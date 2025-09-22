@@ -9,7 +9,7 @@ import { useHousingData } from "@/hook/housingHook";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminHousing() {
-  const { housingsData } = useHousingData();
+  const { housingsData, refetch } = useHousingData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [housingId, setHousingId] = useState<number>();
 
@@ -57,7 +57,7 @@ export default function AdminHousing() {
         title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
-      <HousingTable housingsData={housingsData} onEdit={onEdit} isArchive={isArchive}/>
+      <HousingTable housingsData={housingsData} onEdit={onEdit} isArchive={isArchive} refetch={refetch}/>
     </div>
   );
 }

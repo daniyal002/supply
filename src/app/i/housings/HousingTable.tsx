@@ -1,13 +1,15 @@
 "use client";
 
-import { IPost } from "@/interface/post";
 import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IHousing } from "@/interface/housing";
-import { useArchiveHousingMutation, useDeleteHousingMutation } from "@/hook/housingHook";
+import {
+  useArchiveHousingMutation,
+  useDeleteHousingMutation,
+} from "@/hook/housingHook";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
-import { Key } from "react";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
+import { Key, useEffect, useMemo, useState } from "react";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
@@ -15,14 +17,20 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 interface PostTableProps {
   housingsData: IHousing[] | undefined;
   onEdit: (id: number) => void;
-  isArchive:boolean
+  isArchive: boolean;
+  refetch: () => void;
 }
 
-const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchive }) => {
+const HousingTable: React.FC<PostTableProps> = ({
+  housingsData,
+  onEdit,
+  isArchive,
+  refetch,
+}) => {
   const { mutate: deletePostMutation } = useDeleteHousingMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
-    const {mutate:archiveHousingMutation} = useArchiveHousingMutation()
+  const { mutate: archiveHousingMutation } = useArchiveHousingMutation();
   const columns: TableColumnsType<IHousing> = [
     {
       title: "ID",
@@ -49,7 +57,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
         />
       ),
       onFilter: (value, record) =>
-      (record.housing_id as number)
+        (record.housing_id as number)
           .toString()
           .toLowerCase()
           .includes((value as string).toLowerCase()),
@@ -59,9 +67,7 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
         }
       },
       render: (text) => {
-        const formattedID = text
-          ? text.toString().replace(/^0+/, "")
-          : "";
+        const formattedID = text ? text.toString().replace(/^0+/, "") : "";
         return searchedColumn === "housing_id" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -94,7 +100,9 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value: boolean | Key, record: IHousing) => {
         const searchValue = (value as string).toLowerCase();
@@ -152,10 +160,22 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
     },
   ];
 
-  const dataSource = housingsData?.map((housing) => ({
-    ...housing,
-    key: housing.housing_id, // Ensure each item has a unique key
-  })).filter((housing) => housing.is_archive === isArchive);;
+  const dataSource = useMemo(() => {
+    return housingsData
+      ?.map((housing) => ({
+        ...housing,
+        key: housing.housing_id, // Ensure each item has a unique key
+      }))
+      .filter((housing) => housing.is_archive === isArchive);
+  }, [housingsData, isArchive]);
+
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [housingsData, isArchive]);
 
   return (
     <Table
@@ -163,6 +183,40 @@ const HousingTable: React.FC<PostTableProps> = ({ housingsData, onEdit, isArchiv
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Корпусов" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>Корпусов: {currentFilters ?? 0}</p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Корпусов: {currentFilters ?? 0}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить корпуса">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
+      }}
     />
   );
 };

@@ -7,12 +7,13 @@ import { useArchiveUserMutation, useDeleteUserMutation } from "@/hook/userHook";
 import { IEmployee } from "@/interface/employee";
 import { IRole } from "@/interface/role";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { MessageOutlined, SearchOutlined } from "@ant-design/icons";
+import { MessageOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import Highlighter from "react-highlight-words";
 import { useRoleData } from "@/hook/roleHook";
 import { formatNotificationDate } from "@/helper/DataFormat";
+import { useEffect, useMemo, useState } from "react";
 
 interface userTableProps {
   userData: IUserOnline[] | undefined;
@@ -20,9 +21,10 @@ interface userTableProps {
   isArchive:boolean
   setBuyerId: (id: number) => void;
   setIsModalMessageOpen: (open: boolean) => void;
+  refetch: () => void;
 }
 
-const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive,setBuyerId,setIsModalMessageOpen }) => {
+const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive,setBuyerId,setIsModalMessageOpen,refetch }) => {
   const { mutate: deleteUserMutation } = useDeleteUserMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
@@ -240,10 +242,21 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive,setBu
     },
   ];
 
-  const dataSource = userData?.map((user) => ({
-    ...user,
-    key: user.user_id, // Ensure each item has a unique key
-  })).filter((user) => user.is_archive === isArchive);
+
+  const dataSource = useMemo(() => {
+    return userData?.map((user) => ({
+      ...user,
+      key: user.user_id, // Ensure each item has a unique key
+    })).filter((user) => user.is_archive === isArchive);
+  }, [userData, isArchive])
+
+   const [currentFilters, setCurrentFilters] = useState<number>(
+      dataSource?.length as number
+    );
+
+    useEffect(() => {
+      setCurrentFilters(dataSource?.length as number)
+    },[userData, isArchive])
 
   return (
     <Table
@@ -251,6 +264,40 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive,setBu
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Пользователей" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>
+           Пользователей: {currentFilters ?? 0}
+          </p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>
+          Пользователей: {currentFilters ?? 0}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить пользователей">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(extra.currentDataSource.length === 0 ? 0 : extra.currentDataSource.length);
+      }}
     />
   );
 };

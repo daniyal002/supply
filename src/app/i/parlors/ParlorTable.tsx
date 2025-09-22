@@ -6,19 +6,20 @@ import { IDepartment } from "@/interface/department";
 import { IParlor } from "@/interface/parlor";
 import { useArchiveParlorMutation, useDeleteParlorMutation } from "@/hook/parlorHook";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface ParlorTableProps {
   parlorData: IParlor[] | undefined;
   onEdit: (id: number) => void;
   isArchive:boolean
+  refetch: () => void;
 }
 
-const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive }) => {
+const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive,refetch }) => {
   const { mutate: deleteParlorMutation } = useDeleteParlorMutation();
   const {mutate:archiveParlorMutation} = useArchiveParlorMutation()
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
@@ -188,10 +189,21 @@ const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive
     },
   ];
 
-  const dataSource = parlorData?.map((parlor) => ({
-    ...parlor,
-    key: parlor.parlor_id, // Ensure each item has a unique key
-  })).filter((parlor) => parlor.is_archive === isArchive);
+  const dataSource = useMemo(() => {
+   return parlorData?.map((parlor) => ({
+      ...parlor,
+      key: parlor.parlor_id, // Ensure each item has a unique key
+    })).filter((parlor) => parlor.is_archive === isArchive);
+  }, [parlorData, isArchive])
+
+
+  const [currentFilters, setCurrentFilters] = useState<number>(
+        dataSource?.length as number
+      );
+
+      useEffect(() => {
+        setCurrentFilters(dataSource?.length as number)
+      },[parlorData, isArchive])
 
   return (
     <Table
@@ -199,6 +211,40 @@ const ParlorTable: React.FC<ParlorTableProps> = ({ parlorData, onEdit, isArchive
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Кабинетов" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>
+           Кабинетов: {currentFilters ?? 0}
+          </p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>
+          Кабинетов: {currentFilters ?? 0}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить кабинеты">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(extra.currentDataSource.length === 0 ? 0 : extra.currentDataSource.length);
+      }}
     />
   );
 };

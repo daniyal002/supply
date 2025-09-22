@@ -4,7 +4,6 @@ import OrderListTable from "./OrderListAllTable";
 import { useOrdersData, useOrdersWhereUserIsApproverData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
-import { IOrderItem } from "@/interface/orderItem";
 import { DatePicker } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";

@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { useArchivePostMutation, useDeletePostMutation } from "@/hook/postHook";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
-import { Key } from "react";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
+import { Key, useEffect, useMemo, useState } from "react";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 
@@ -15,12 +15,14 @@ interface PostTableProps {
   postData: IPost[] | undefined;
   onEdit: (id: number) => void;
   isArchive: boolean;
+  refetch: () => void;
 }
 
 const PostTable: React.FC<PostTableProps> = ({
   postData,
   onEdit,
   isArchive,
+  refetch
 }) => {
   const { mutate: deletePostMutation } = useDeletePostMutation();
   const { mutate: archivePostMutation } = useArchivePostMutation();
@@ -157,19 +159,61 @@ const PostTable: React.FC<PostTableProps> = ({
     },
   ];
 
-  const dataSource = postData
+  const dataSource = useMemo(() => { return postData
     ?.map((post) => ({
       ...post,
       key: post.post_id, // Ensure each item has a unique key
     }))
     .filter((post) => post.is_archive === isArchive);
+  }, [postData, isArchive])
 
-  return (
+  const [currentFilters, setCurrentFilters] = useState<number>(
+        dataSource?.length as number
+      );
+
+      useEffect(() => {
+        setCurrentFilters(dataSource?.length as number)
+      },[postData, isArchive])
+    return (
     <Table
       dataSource={dataSource}
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Должностей" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>
+          Должностей: {currentFilters ?? 0}
+          </p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>
+          Должностей: {currentFilters ?? 0}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить должности">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(extra.currentDataSource.length === 0 ? 0 : extra.currentDataSource.length);
+      }}
     />
   );
 };

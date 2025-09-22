@@ -9,7 +9,7 @@ import { useParlorData } from "@/hook/parlorHook";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminParlor() {
-  const { parlorData } = useParlorData();
+  const { parlorData, refetch } = useParlorData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [parlorId, setParlorId] = useState<number>();
 
@@ -57,7 +57,7 @@ export default function AdminParlor() {
         title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
-      <ParlorTable parlorData={parlorData} onEdit={onEdit} isArchive={isArchive}/>
+      <ParlorTable parlorData={parlorData} onEdit={onEdit} isArchive={isArchive} refetch={refetch}/>
     </div>
   );
 }

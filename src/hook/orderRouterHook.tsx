@@ -14,11 +14,12 @@ export const useOrderRouteData = () => {
       data: orderRouteData,
       isLoading,
       error,
+      refetch
     } = useQuery({
       queryKey: ["newOrderRoute"],
       queryFn: orderRouteService.getOrderRoute,
     });
-    return { orderRouteData, isLoading, error };
+    return { orderRouteData, isLoading, error, refetch };
   };
 
   export const useOrderRouteByIdData = (routeId:number) => {

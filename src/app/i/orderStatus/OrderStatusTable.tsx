@@ -4,8 +4,8 @@ import { Button, ColorPicker, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
-import { Key } from "react";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
+import { Key, useEffect, useMemo, useState } from "react";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { IOrderStatus } from "@/interface/orderStatus";
@@ -15,12 +15,14 @@ interface OrderStatusTableProps {
   orderStatusData: IOrderStatus[] | undefined;
   onEdit: (id: number) => void;
   isArchive: boolean;
+  refetch: () => void;
 }
 
 const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
   orderStatusData,
   onEdit,
   isArchive,
+  refetch,
 }) => {
   const { mutate: deleteOrderStatusMutation } = useDeleteOrderStatusMutation();
   // const {mutate: archivePostMutation} = useArchivePostMutation()
@@ -53,7 +55,7 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
         />
       ),
       onFilter: (value, record) =>
-      (record.status_id as number)
+        (record.status_id as number)
           .toString()
           .toLowerCase()
           .includes((value as string).toLowerCase()),
@@ -63,9 +65,7 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
         }
       },
       render: (text) => {
-        const formattedID = text
-          ? text.toString().replace(/^0+/, "")
-          : "";
+        const formattedID = text ? text.toString().replace(/^0+/, "") : "";
         return searchedColumn === "status_id" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -166,25 +166,65 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
           >
             Удалить
           </Button>
-          {/* <Button onClick={() => archivePostMutation(record)}>
-            {record.is_archive ? "Разархивировать" : "Архивировать"}
-          </Button> */}
         </Space>
       ),
     },
   ];
 
-  const dataSource = orderStatusData?.map((status) => ({
-    ...status,
-    key: status.status_id, // Ensure each item has a unique key
-  }));
+  const dataSource = useMemo(() => {
+    return orderStatusData?.map((status) => ({
+      ...status,
+      key: status.status_id, // Ensure each item has a unique key
+    }));
+  }, [orderStatusData, isArchive]);
 
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [orderStatusData, isArchive]);
   return (
     <Table
       dataSource={dataSource}
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Должностей" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>Статусов: {currentFilters ?? 0}</p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Статусов: {currentFilters ?? 0}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить статусы">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
+      }}
     />
   );
 };

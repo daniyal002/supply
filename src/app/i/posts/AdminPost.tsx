@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { usePostData } from "@/hook/postHook";
 import { Button } from "antd";
@@ -9,14 +9,13 @@ import { useState } from "react";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminPost() {
-  const { postData } = usePostData();
+  const { postData, refetch } = usePostData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [postId, setPostId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [isArchive,setIsArchive] = useState<boolean>(false)
-
+  const [isArchive, setIsArchive] = useState<boolean>(false);
 
   const onAdd = () => {
     setPostId(undefined);
@@ -39,25 +38,34 @@ export default function AdminPost() {
         setIsModalOpen={setIsModalOpen}
         postId={postId}
       />
-      <div style={{display:'flex', gap:'10px'}}>
+      <div style={{ display: "flex", gap: "10px" }}>
         <Button
-        type="primary"
-        shape="circle"
-        icon={<PlusOutlined />}
-        onClick={onAdd}
-        style={{ marginBottom: "10px" }}
-        title="Добавить"
-      />
-     <Button
-        type="primary"
-        shape="circle"
-        icon={<BookFilled />}
-        onClick={() => setIsArchive(!isArchive)}
-        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
-        title={isArchive ? 'Не архивные' : 'Архивные'}
-      />
+          type="primary"
+          shape="circle"
+          icon={<PlusOutlined />}
+          onClick={onAdd}
+          style={{ marginBottom: "10px" }}
+          title="Добавить"
+        />
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<BookFilled />}
+          onClick={() => setIsArchive(!isArchive)}
+          style={{
+            marginBottom: "10px",
+            color: isArchive ? "" : "#fff",
+            backgroundColor: isArchive ? "" : "gray",
+          }}
+          title={isArchive ? "Не архивные" : "Архивные"}
+        />
       </div>
-      <PostTable postData={postData} onEdit={onEdit} isArchive={isArchive} />
+      <PostTable
+        postData={postData}
+        onEdit={onEdit}
+        isArchive={isArchive}
+        refetch={refetch}
+      />
     </div>
   );
 }

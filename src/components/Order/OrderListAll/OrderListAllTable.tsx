@@ -9,7 +9,7 @@ import { EyeTwoTone, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { IProductGroup } from "@/interface/product";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IUser } from "@/interface/user";
@@ -391,7 +391,7 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
             }}
           >
             <p style={{ padding: 0 }}>
-              Заявок: {currentFilters ? currentFilters : dataSource?.length}
+              Заявок: {currentFilters}
             </p>
             <Switch
               checkedChildren={"Все заявки"}
@@ -416,7 +416,7 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
             }}
           >
             <p>
-              Заявок: {currentFilters ? currentFilters : dataSource?.length}
+              Заявок: {currentFilters}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <Button onClick={() => refetch()} title="Обновить заявки">
@@ -429,7 +429,7 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
           onDoubleClick: () => setAllOrderId(String(record.order_id)),
         })}
         onChange={(pagination, filters, sorter, extra) => {
-          setCurrentFilters(extra.currentDataSource.length);
+          setCurrentFilters(extra.currentDataSource.length === 0 ? 0 : extra.currentDataSource.length);
         }}
         locale={{ emptyText: "Нет заявок" }}
         loading={loading}

@@ -11,9 +11,9 @@ import {
 import Link from "next/link";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
-import { Key, useMemo } from "react";
+import { Key, useEffect, useMemo, useState } from "react";
 import Highlighter from "react-highlight-words";
 import { EnumOrderTypes } from "@/interface/orderItem";
 
@@ -21,9 +21,14 @@ interface RouteTableProps {
   routeData: IOrderRouteResponseDetail[] | undefined;
   onEdit: (id: number) => void;
   isArchive: boolean;
+  refetch: () => void;
 }
 
-const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
+const RouteTable: React.FC<RouteTableProps> = ({
+  routeData,
+  isArchive,
+  refetch,
+}) => {
   const { mutate: deleteOrderRouteMutation } = useDeleteOrderRouteMutation();
   const { mutate: archiveOrderRouteMutation } = useArchiveOrderRouteMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
@@ -56,7 +61,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
         />
       ),
       onFilter: (value, record) =>
-      (record.route_id as number)
+        (record.route_id as number)
           .toString()
           .toLowerCase()
           .includes((value as string).toLowerCase()),
@@ -66,9 +71,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
         }
       },
       render: (text) => {
-        const formattedID = text
-          ? text.toString().replace(/^0+/, "")
-          : "";
+        const formattedID = text ? text.toString().replace(/^0+/, "") : "";
         return searchedColumn === "route_id" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -156,8 +159,8 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
         );
       }, [routeData]),
       onFilter: (value, record) => record.department?.department_id === value,
-      filterMode:'menu',
-      filterSearch:true
+      filterMode: "menu",
+      filterSearch: true,
     },
     {
       title: "Тип маршрута",
@@ -222,18 +225,63 @@ const RouteTable: React.FC<RouteTableProps> = ({ routeData, isArchive }) => {
     },
   ];
 
-  const dataSource = routeData
-    ?.map((route) => ({
-      ...route,
-      key: route.route_id, // Ensure each item has a unique key
-    }))
-    .filter((route) => route.is_archive === isArchive);
+  const dataSource = useMemo(() => {
+    return routeData
+      ?.map((route) => ({
+        ...route,
+        key: route.route_id, // Ensure each item has a unique key
+      }))
+      .filter((route) => route.is_archive === isArchive);
+  }, [routeData, isArchive]);
+
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [routeData, isArchive]);
+
   return (
     <Table
       dataSource={dataSource}
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Маршрутов" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}> Маршрутов: {currentFilters ?? 0}</p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Маршрутов: {currentFilters ?? 0}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить маршруты">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
+      }}
     />
   );
 };

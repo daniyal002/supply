@@ -9,7 +9,7 @@ import EmployeeTable from "./EmployeeTable";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminEmployee() {
-  const { employeeData } = useEmployeeData();
+  const { employeeData, refetch } = useEmployeeData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [employeeId, setEmployeeId] = useState<number>();
 
@@ -58,7 +58,7 @@ export default function AdminEmployee() {
         title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
-      <EmployeeTable employeeData={employeeData} onEdit={onEdit} isArchive={isArchive}/>
+      <EmployeeTable employeeData={employeeData} onEdit={onEdit} isArchive={isArchive} refetch={refetch}/>
     </div>
   );
 }

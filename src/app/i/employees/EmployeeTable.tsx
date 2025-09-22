@@ -1,43 +1,43 @@
 "use client";
 
-import { Button, Space, Table, TableColumnsType, TableProps } from "antd";
+import { Button, Space, Table, TableColumnsType } from "antd";
 import { toast } from "sonner";
 import { IParlor } from "@/interface/parlor";
 import { IEmployee } from "@/interface/employee";
 import { IPost } from "@/interface/post";
-import { useArchiveEmployeeMutation, useDeleteEmployeeMutation } from "@/hook/employeeHook";
+import {
+  useArchiveEmployeeMutation,
+  useDeleteEmployeeMutation,
+} from "@/hook/employeeHook";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
-import { useEffect } from "react";
 import { useColumnFilterShortcut } from "@/helper/TableFilters/hook/useColumnFilterShortcut";
 import SearchFilteredIcon from "@/components/UI/FilteredIcon/SearchFilteredIcon";
+import { useEffect, useMemo, useState } from "react";
 
 interface EmployeeTableProps {
   employeeData: IEmployee[] | undefined;
   onEdit: (id: number) => void;
-  isArchive:boolean
+  isArchive: boolean;
+  refetch: () => void;
 }
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employeeData,
   onEdit,
-  isArchive
+  isArchive,
+  refetch,
 }) => {
   const { mutate: deleteEmployeeMutation } = useDeleteEmployeeMutation();
-  const {mutate:archiveEmployeeMutation} = useArchiveEmployeeMutation()
-  const {
-    searchText,
-    searchedColumn,
-    searchInput,
-    handleSearch,
-    handleReset,
-  } = useSearch();
+  const { mutate: archiveEmployeeMutation } = useArchiveEmployeeMutation();
+  const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
+    useSearch();
 
-      const { visibleColumnKey, setVisibleColumnKey } = useColumnFilterShortcut("buyer_name");
-
+  const { visibleColumnKey, setVisibleColumnKey } =
+    useColumnFilterShortcut("buyer_name");
 
   const columns: TableColumnsType<IEmployee> = [
     {
@@ -65,7 +65,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         />
       ),
       onFilter: (value, record) =>
-      (record.buyer_id as number)
+        (record.buyer_id as number)
           .toString()
           .toLowerCase()
           .includes((value as string).toLowerCase()),
@@ -75,9 +75,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         }
       },
       render: (text) => {
-        const formattedID = text
-          ? text.toString().replace(/^0+/, "")
-          : "";
+        const formattedID = text ? text.toString().replace(/^0+/, "") : "";
         return searchedColumn === "buyer_id" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -124,7 +122,11 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         //   >
         //     <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }} />
         //   </span>
-         <SearchFilteredIcon filtered={filtered} setVisibleColumnKey={setVisibleColumnKey} visibleColumnKey="buyer_name"/>
+        <SearchFilteredIcon
+          filtered={filtered}
+          setVisibleColumnKey={setVisibleColumnKey}
+          visibleColumnKey="buyer_name"
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -188,7 +190,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         />
       ),
       filterIcon: (filtered: boolean) => (
-        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined, fontSize:"18px" }} />
+        <SearchOutlined
+          style={{ color: filtered ? "#1677ff" : undefined, fontSize: "18px" }}
+        />
       ),
       onFilter: (value, record) => {
         const searchValue = (value as string).toLowerCase();
@@ -204,7 +208,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         return parlors.map((parlor, index) => {
           const shouldHighlight =
             searchedColumn === "parlors" &&
-            parlor.parlor_name?.toLowerCase()?.includes(searchText?.toLowerCase());
+            parlor.parlor_name
+              ?.toLowerCase()
+              ?.includes(searchText?.toLowerCase());
 
           return (
             <div key={index}>
@@ -271,10 +277,22 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     },
   ];
 
-  const dataSource = employeeData?.map((employee) => ({
-    ...employee,
-    key: employee.buyer_id, // Ensure each item has a unique key
-  })).filter((employee) => employee.is_archive === isArchive);
+  const dataSource = useMemo(() => {
+    return employeeData
+      ?.map((employee) => ({
+        ...employee,
+        key: employee.buyer_id, // Ensure each item has a unique key
+      }))
+      .filter((employee) => employee.is_archive === isArchive);
+  }, [employeeData, isArchive]);
+
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [employeeData, isArchive]);
 
   return (
     <Table
@@ -282,6 +300,40 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Сотрудников" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>Сотрудники: {currentFilters ?? 0}</p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Сотрудники: {currentFilters ?? 0}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить сотрудников">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
+      }}
     />
   );
 };

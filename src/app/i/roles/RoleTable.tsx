@@ -6,24 +6,27 @@ import { IRole } from "@/interface/role";
 import { useArchiveRoleMutation, useDeleteRoleMutation } from "@/hook/roleHook";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
+import { useEffect, useMemo, useState } from "react";
 
 interface RoleTableProps {
   roleData: IRole[] | undefined;
   onEdit: (id: number) => void;
   isArchive: boolean;
+  refetch: () => void;
 }
 
 const RoleTable: React.FC<RoleTableProps> = ({
   roleData,
   onEdit,
   isArchive,
+  refetch,
 }) => {
   const { mutate: deleteRoleMutation } = useDeleteRoleMutation();
   const { mutate: archiveRoleMutation } = useArchiveRoleMutation();
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
-      useSearch();
+    useSearch();
 
   const columns: TableColumnsType<IRole> = [
     {
@@ -51,7 +54,7 @@ const RoleTable: React.FC<RoleTableProps> = ({
         />
       ),
       onFilter: (value, record) =>
-      (record.role_id as number)
+        (record.role_id as number)
           .toString()
           .toLowerCase()
           .includes((value as string).toLowerCase()),
@@ -61,9 +64,7 @@ const RoleTable: React.FC<RoleTableProps> = ({
         }
       },
       render: (text) => {
-        const formattedID = text
-          ? text.toString().replace(/^0+/, "")
-          : "";
+        const formattedID = text ? text.toString().replace(/^0+/, "") : "";
         return searchedColumn === "role_id" ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -126,12 +127,22 @@ const RoleTable: React.FC<RoleTableProps> = ({
     },
   ];
 
-  const dataSource = roleData
-    ?.map((role) => ({
-      ...role,
-      key: role.role_id, // Ensure each item has a unique key
-    }))
-    .filter((role) => role.is_archive === isArchive);
+  const dataSource = useMemo(() => {
+    return roleData
+      ?.map((role) => ({
+        ...role,
+        key: role.role_id, // Ensure each item has a unique key
+      }))
+      .filter((role) => role.is_archive === isArchive);
+  }, [roleData, isArchive]);
+
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [roleData, isArchive]);
 
   return (
     <Table
@@ -139,6 +150,40 @@ const RoleTable: React.FC<RoleTableProps> = ({
       columns={columns}
       pagination={{ locale: { items_per_page: "/ Ролей" } }}
       scroll={{ x: 200 }}
+      title={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p style={{ padding: 0 }}>Ролей: {currentFilters ?? 0}</p>
+        </div>
+      )}
+      footer={() => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>Ролей: {currentFilters ?? 0}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Button onClick={() => refetch()} title="Обновить роли">
+              <SyncOutlined />
+            </Button>
+          </div>
+        </div>
+      )}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
+      }}
     />
   );
 };

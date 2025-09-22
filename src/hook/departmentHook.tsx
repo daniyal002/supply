@@ -10,12 +10,13 @@ export const useDepartmentData = () => {
     data: departmentData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["Departments"],
     queryFn: departmentService.getDepartment,
     staleTime: Infinity,
   });
-  return { departmentData, isLoading, error };
+  return { departmentData, isLoading, error, refetch };
 };
 
 export const useCreateDepartmentMutation = () => {

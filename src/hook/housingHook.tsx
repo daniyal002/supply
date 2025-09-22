@@ -10,12 +10,13 @@ export const useHousingData = () => {
     data: housingsData,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["Housings"],
     queryFn: housingService.getHousing,
     staleTime: Infinity,
   });
-  return { housingsData, isLoading, error };
+  return { housingsData, isLoading, error, refetch };
 };
 
 export const useCreateHousingMutation = () => {

@@ -10,12 +10,13 @@ export const useUserData = () => {
     data: userData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["Users"],
     queryFn: userService.getUser,
     staleTime: Infinity,
   });
-  return { userData, isLoading, error };
+  return { userData, isLoading, error, refetch };
 };
 
 export const useGetMe = () => {

@@ -9,7 +9,7 @@ import { BookFilled, PlusOutlined } from "@ant-design/icons";
 import { useGetOrderStatus } from "@/hook/orderStatusHook";
 
 export default function AdminOrderStatus() {
-  const { orderStatusData } = useGetOrderStatus();
+  const { orderStatusData, refetch } = useGetOrderStatus();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [orderStatusId, setOrderStatusId] = useState<number>();
 
@@ -57,7 +57,7 @@ export default function AdminOrderStatus() {
         title={isArchive ? 'Не архивные' : 'Архивные'}
       />
       </div>
-      <OrderStatusTable orderStatusData={orderStatusData} onEdit={onEdit} isArchive={isArchive} />
+      <OrderStatusTable orderStatusData={orderStatusData} onEdit={onEdit} isArchive={isArchive} refetch={refetch}/>
     </div>
   );
 }

@@ -10,12 +10,13 @@ export const useRoleData = () => {
     data: roleData,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["Roles"],
     queryFn: roleService.getRole,
     staleTime: Infinity,
   });
-  return { roleData, isLoading, error };
+  return { roleData, isLoading, error, refetch };
 };
 
 export const useCreateRoleMutation = () => {

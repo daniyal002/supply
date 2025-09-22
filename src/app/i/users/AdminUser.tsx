@@ -12,7 +12,7 @@ import { IUserOnline } from "@/interface/user";
 import ModalSendMessage from "@/components/UI/ModalSendMessage/ModalSendMessage";
 
 export default function AdminUser() {
-  const { userData } = useUserData();
+  const { userData,refetch } = useUserData();
   const { connectedUsersData } = useConnectedUsersData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [userId, setUserId] = useState<number>();
@@ -98,6 +98,7 @@ export default function AdminUser() {
         isArchive={isArchive}
         setBuyerId={setBuyerId}
         setIsModalMessageOpen={setIsModalMessageOpen}
+        refetch={refetch}
       />
     </div>
   );

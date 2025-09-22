@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "antd";
 import { Toaster } from "sonner";
@@ -9,14 +9,13 @@ import { useRoleData } from "@/hook/roleHook";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
 
 export default function AdminRole() {
-  const { roleData } = useRoleData();
+  const { roleData, refetch } = useRoleData();
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [roleId, setRoleId] = useState<number>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [isArchive,setIsArchive] = useState<boolean>(false)
-
+  const [isArchive, setIsArchive] = useState<boolean>(false);
 
   const onAdd = () => {
     setRoleId(undefined);
@@ -39,25 +38,34 @@ export default function AdminRole() {
         setIsModalOpen={setIsModalOpen}
         roleId={roleId}
       />
-      <div style={{display:'flex', gap:'10px'}}>
+      <div style={{ display: "flex", gap: "10px" }}>
         <Button
-        type="primary"
-        shape="circle"
-        icon={<PlusOutlined />}
-        onClick={onAdd}
-        style={{ marginBottom: "10px" }}
-        title="Добавить"
-      />
-     <Button
-        type="primary"
-        shape="circle"
-        icon={<BookFilled />}
-        onClick={() => setIsArchive(!isArchive)}
-        style={{ marginBottom: "10px", color: isArchive ? '' : '#fff', backgroundColor: isArchive ? "" : 'gray' }}
-        title={isArchive ? 'Не архивные' : 'Архивные'}
-      />
+          type="primary"
+          shape="circle"
+          icon={<PlusOutlined />}
+          onClick={onAdd}
+          style={{ marginBottom: "10px" }}
+          title="Добавить"
+        />
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<BookFilled />}
+          onClick={() => setIsArchive(!isArchive)}
+          style={{
+            marginBottom: "10px",
+            color: isArchive ? "" : "#fff",
+            backgroundColor: isArchive ? "" : "gray",
+          }}
+          title={isArchive ? "Не архивные" : "Архивные"}
+        />
       </div>
-      <RoleTable roleData={roleData} onEdit={onEdit} isArchive={isArchive}/>
+      <RoleTable
+        roleData={roleData}
+        onEdit={onEdit}
+        isArchive={isArchive}
+        refetch={refetch}
+      />
     </div>
   );
 }
