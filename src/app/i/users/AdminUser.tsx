@@ -10,6 +10,7 @@ import { BookFilled, PlusOutlined } from "@ant-design/icons";
 import { useConnectedUsersData } from "@/hook/notificationHook";
 import { IUserOnline } from "@/interface/user";
 import ModalSendMessage from "@/components/UI/ModalSendMessage/ModalSendMessage";
+import Broadcast from "../broadcast/Broadcast";
 
 export default function AdminUser() {
   const { userData,refetch } = useUserData();
@@ -21,6 +22,7 @@ export default function AdminUser() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalMessageOpen, setIsModalMessageOpen] = useState(false);
+  const [isModalBroadcastOpen, setIsModalBroadcastOpen] = useState(false);
 
   const [isArchive, setIsArchive] = useState<boolean>(false);
 
@@ -70,6 +72,7 @@ export default function AdminUser() {
         setIsModalOpen={setIsModalMessageOpen}
         buyerId={String(buyerId)}
       />
+      <Broadcast isModalOpen={isModalBroadcastOpen} setIsModalOpen={setIsModalBroadcastOpen} />
       <div style={{ display: "flex", gap: "10px" }}>
         <Button
           type="primary"
@@ -91,6 +94,11 @@ export default function AdminUser() {
           }}
           title={isArchive ? "Не архивные" : "Архивные"}
         />
+         <Button
+          type="primary"
+          onClick={() => setIsModalBroadcastOpen(true)}
+          title="Рассылка"
+        > 📢 Новая рассылка</Button>
       </div>
       <UserTable
         userData={filteredIsOnlineUsers}
