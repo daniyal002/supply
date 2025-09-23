@@ -24,7 +24,7 @@ export default function middleware(req: NextRequest) {
     const userRole = role();
 
     // Проверяем, если путь - это главная страница
-    if (req.nextUrl.pathname === '/') {
+    if (req.nextUrl.pathname === '/' || req.nextUrl.pathname === '/help') {
         return NextResponse.next(); // Разрешаем доступ к главной странице для всех
     }
 

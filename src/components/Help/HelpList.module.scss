@@ -1,0 +1,13 @@
+.helpList{
+    margin-top: 20px;
+    display: grid;
+    /* Будет создано 3 колонки */
+  grid-template-columns: repeat(2, 50%);
+
+  @media(max-width: 1024px){
+  grid-template-columns: repeat(1, 100%);
+  }
+
+  justify-content: center;
+  gap: 20px;
+}

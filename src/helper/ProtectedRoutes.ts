@@ -1,29 +1,34 @@
 import { getAccessToken } from "@/services/auth-token.service";
 
-export const protectedRoutes = [{key:"1",path:'/main',role:['admin','user']},{key:"2",path:'/i',role:['admin']},{key:"3",path:'/adminOrder',role:['admin']}]
+export const protectedRoutes = [
+  { key: "1", path: "/main", role: ["admin", "user"] },
+  { key: "2", path: "/i", role: ["admin"] },
+  { key: "3", path: "/adminOrder", role: ["admin"] },
+  { key: "4", path: "/help", role: ["admin", "user"] },
+];
 
 export function isRole() {
-    const token = getAccessToken();
+  const token = getAccessToken();
 
-    if (!token) {
-        // Handle the case where token is undefined or null
-        return null;
-    }
+  if (!token) {
+    // Handle the case where token is undefined or null
+    return null;
+  }
 
-    const parts = token.toString().split('.');
+  const parts = token.toString().split(".");
 
-    if (parts.length !== 3) {
-        // Handle the case where the token does not have the expected structure
-        return null;
-    }
+  if (parts.length !== 3) {
+    // Handle the case where the token does not have the expected structure
+    return null;
+  }
 
-    try {
-        const decodedPayload = atob(parts[1]);
-        const parsedPayload = JSON.parse(decodedPayload);
-        return parsedPayload.role;
-    } catch (e) {
-        // Handle errors that may occur during decoding or parsing
-        console.error('Error decoding or parsing token payload:', e);
-        return null;
-    }
+  try {
+    const decodedPayload = atob(parts[1]);
+    const parsedPayload = JSON.parse(decodedPayload);
+    return parsedPayload.role;
+  } catch (e) {
+    // Handle errors that may occur during decoding or parsing
+    console.error("Error decoding or parsing token payload:", e);
+    return null;
+  }
 }

@@ -80,6 +80,12 @@ const MainLayout = ({
         label: "Все заявки",
         onClick: () => push("/adminOrder"),
       },
+      {
+        key: "4",
+        icon: <QuestionCircleOutlined  />,
+        label: "Руководство пользования",
+        onClick: () => push("/help"),
+      },
     ];
 
     const filteredItems = items.filter((item) =>
@@ -216,17 +222,8 @@ const MainLayout = ({
           />
 
           <div className={style.headerBellAndButtons}>
-            <Tooltip title={"Техподдержка"}>
-              <Button
-                onClick={() =>
-                  message.info(
-                    "Для связи с техподдержкой позвоните по внутренному телефону на 194 или 195"
-                  )
-                }
-                size={isMobile ? "small" : "middle"}
-              >
-                {isMobile ? <QuestionCircleOutlined /> : "Техподдержка"}
-              </Button>
+            <Tooltip title={"Помощь"}>
+              <Button onClick={() => push("/help")} size={isMobile ? "small" : "middle"}>{isMobile ? <QuestionCircleOutlined /> : "Помощь"}</Button>
             </Tooltip>
 
             {/* <Tooltip

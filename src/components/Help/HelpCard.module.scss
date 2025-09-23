@@ -1,0 +1,46 @@
+.helpCard {
+  border-radius: 16px !important;
+  overflow: hidden;
+  border: 1px solid #d0d7e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: #678098;
+  }
+
+  .ant-card-head {
+    background: linear-gradient(90deg, #678098, #889bb8);
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    border-bottom: none;
+  }
+}
+
+.videoWrapper {
+  position: relative;
+  padding-top: 56.25%; // 16:9
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.helpVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: none;
+  border-radius: 12px;
+}
+
+.description {
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.5;
+}
