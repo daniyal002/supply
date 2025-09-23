@@ -61,10 +61,4 @@ export const AdminPanelList = (push: (url:string) => void) => [
       icon: <CalculatorOutlined />,
       onClick: () => push("/i/oneC"),
     },
-    {
-      key: "14",
-      label: "Broadcast",
-      icon: <MessageOutlined />,
-      onClick: () => push("/i/broadcast"),
-    },
   ]
