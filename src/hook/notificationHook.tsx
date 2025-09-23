@@ -22,12 +22,13 @@ export const useConnectedUsersData = () => {
     data: connectedUsersData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["connectedUsers"],
     queryFn: notificationService.getConnectedUsers,
     staleTime: 1000, // 1 minute
   });
-  return { connectedUsersData, isLoading, error };
+  return { connectedUsersData, isLoading, error, refetch};
 };
 
 export const useMarkAsReadNotification = (type: 'chat' | 'info') => {

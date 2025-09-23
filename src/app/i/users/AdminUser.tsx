@@ -13,8 +13,15 @@ import ModalSendMessage from "@/components/UI/ModalSendMessage/ModalSendMessage"
 import Broadcast from "../broadcast/Broadcast";
 
 export default function AdminUser() {
-  const { userData,refetch } = useUserData();
-  const { connectedUsersData } = useConnectedUsersData();
+  const { userData,refetch:refetchUsers } = useUserData();
+  const { connectedUsersData, refetch: refetchConnectedUsers } = useConnectedUsersData();
+
+  const refetch = () => {
+    refetchUsers();
+    refetchConnectedUsers();
+  };
+
+
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [userId, setUserId] = useState<number>();
   const [buyerId, setBuyerId] = useState<number>();
