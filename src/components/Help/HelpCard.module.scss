@@ -4,6 +4,7 @@
   border: 1px solid #d0d7e1;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-6px);
@@ -39,8 +40,37 @@
   border-radius: 12px;
 }
 
+.title{
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #678098 !important;
+}
+
 .description {
-  font-size: 14px;
-  color: #4a5568;
+  font-size: 14px !important;
+  color: #818181 !important;
   line-height: 1.5;
+  font-weight: 400;
+}
+
+.datePublication {
+  font-size: 14px;
+  color: #678098;
+  font-style: italic;
+}
+
+.titleWrapper{
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  .closeIcon{
+    color: rgb(216, 0, 0);
+    transition: all 0.5s ease;
+    cursor: pointer;
+    font-size: 20px;
+    &:hover{
+      color: rgb(148, 2, 2);
+    }
+  }
 }

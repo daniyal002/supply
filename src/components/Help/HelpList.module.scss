@@ -1,13 +1,37 @@
-.helpList{
-    margin-top: 20px;
-    display: grid;
-    /* Будет создано 3 колонки */
-  grid-template-columns: repeat(2, 50%);
+.helpList {
+  margin-top: 20px;
+  display: grid;
+  /* Будет создано 2 колонки */
+  grid-template-columns: repeat(2, 49.5%);
 
-  @media(max-width: 1024px){
-  grid-template-columns: repeat(1, 100%);
+  @media(max-width: 1024px) {
+    grid-template-columns: repeat(1, 100%);
   }
 
   justify-content: center;
   gap: 20px;
+}
+
+.selectedHelp {
+  margin-top: 20px;
+  display: grid;
+  /* Будет создано 1 колонки */
+  grid-template-columns: repeat(1, 80%);
+
+  justify-content: center;
+  gap: 20px;
+}
+
+.loadingWrapper,
+.errorWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.paginationWrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }

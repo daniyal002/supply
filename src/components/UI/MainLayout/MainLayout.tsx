@@ -5,9 +5,7 @@ import {
   BookOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  MoonOutlined,
   QuestionCircleOutlined,
-  SunOutlined,
   UnorderedListOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -81,7 +79,7 @@ const MainLayout = ({
         onClick: () => push("/adminOrder"),
       },
       {
-        key: "4",
+        key: "14",
         icon: <QuestionCircleOutlined  />,
         label: "Руководство пользования",
         onClick: () => push("/help"),
