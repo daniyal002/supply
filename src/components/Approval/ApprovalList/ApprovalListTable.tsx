@@ -10,7 +10,7 @@ import { useApprovalStore } from "../../../../store/approvalStore";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { IUser } from "@/interface/user";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IProductGroup } from "@/interface/product";
 import { ProductNameList } from "@/components/UI/ProductNameList/ProductNameList";
@@ -297,20 +297,27 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({
     setExpandedRowKeys(newExpandedRowKeys);
   };
 
-  const dataSource = OrderData?.map((order) => ({
+  const dataSource = useMemo(() => {
+    return OrderData?.map((order) => ({
     ...order,
     key: order.order_id, // Ensure each item has a unique key
   }));
+  }, [OrderData]);
+
 
   const [currentFilters, setCurrentFilters] = useState<number>(
     dataSource?.length as number
   );
 
+   useEffect(() => {
+      setCurrentFilters(dataSource?.length as number);
+    }, [OrderData]);
+
   return (
     <Table
       title={() => (
         <p style={{ padding: 0 }}>
-          Заявок: {currentFilters ? currentFilters : dataSource?.length}
+          Заявок: {currentFilters ?? 0}
         </p>
       )}
       dataSource={dataSource}
@@ -325,7 +332,7 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({
             justifyContent: "space-between",
           }}
         >
-          <p>Заявок: {currentFilters ? currentFilters : dataSource?.length}</p>
+          <p>Заявок: {currentFilters ?? 0}</p>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => refetch()} title="Обновить заявки">
               <SyncOutlined />
@@ -337,7 +344,11 @@ const ApprovalListTable: React.FC<ApprovalListProps> = ({
         onDoubleClick: () => setApprovalOrderId(String(record.order_id)),
       })}
       onChange={(pagination, filters, sorter, extra) => {
-        setCurrentFilters(extra.currentDataSource.length);
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
       }}
       locale={{ emptyText: "Нет заявок" }}
       loading={loading}

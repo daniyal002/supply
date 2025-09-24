@@ -16,13 +16,13 @@ import {
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ContextMenu from "@/components/UI/ContextMenu/ContextMenu";
 import { useTabStore } from "../../../../store/tabStore";
 import { IProductGroup } from "@/interface/product";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { ProductNameList } from "@/components/UI/ProductNameList/ProductNameList";
-import styles from './OrderListTable.module.scss'
+import styles from "./OrderListTable.module.scss";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -346,27 +346,33 @@ const OrderListTable: React.FC<OrderListProps> = ({
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
 
-    const handleExpand = (expanded: boolean, record: IOrderItem) => {
-      const key = record.order_id;
-      let newExpandedRowKeys = [...expandedRowKeys];
+  const handleExpand = (expanded: boolean, record: IOrderItem) => {
+    const key = record.order_id;
+    let newExpandedRowKeys = [...expandedRowKeys];
 
-      if (expanded) {
-        newExpandedRowKeys.push(key as number);
-      } else {
-        newExpandedRowKeys = newExpandedRowKeys.filter((k) => k !== key);
-      }
+    if (expanded) {
+      newExpandedRowKeys.push(key as number);
+    } else {
+      newExpandedRowKeys = newExpandedRowKeys.filter((k) => k !== key);
+    }
 
-      setExpandedRowKeys(newExpandedRowKeys);
-    };
+    setExpandedRowKeys(newExpandedRowKeys);
+  };
 
-  const dataSource = OrderData?.map((order) => ({
-    ...order,
-    key: order.order_id, // Ensure each item has a unique key
-  }));
+  const dataSource = useMemo(() => {
+    return OrderData?.map((order) => ({
+      ...order,
+      key: order.order_id, // Ensure each item has a unique key
+    }));
+  }, [OrderData]);
 
   const [currentFilters, setCurrentFilters] = useState<number>(
     dataSource?.length as number
   );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [OrderData]);
 
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
@@ -404,9 +410,7 @@ const OrderListTable: React.FC<OrderListProps> = ({
     <>
       <Table
         title={() => (
-          <p style={{ padding: 0 }}>
-            Заявок: {currentFilters ? currentFilters : dataSource?.length}
-          </p>
+          <p style={{ padding: 0 }}>Заявок: {currentFilters ?? 0}</p>
         )}
         dataSource={dataSource}
         columns={columns}
@@ -420,9 +424,7 @@ const OrderListTable: React.FC<OrderListProps> = ({
               justifyContent: "space-between",
             }}
           >
-            <p>
-              Заявок: {currentFilters ? currentFilters : dataSource?.length}
-            </p>
+            <p>Заявок: {currentFilters ?? 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <Button onClick={() => refetch()} title="Обновить заявки">
                 <SyncOutlined />
@@ -435,7 +437,11 @@ const OrderListTable: React.FC<OrderListProps> = ({
           onDoubleClick: () => setOrderId(String(record.order_id)),
         })}
         onChange={(pagination, filters, sorter, extra) => {
-          setCurrentFilters(extra.currentDataSource.length);
+          setCurrentFilters(
+            extra.currentDataSource.length === 0
+              ? 0
+              : extra.currentDataSource.length
+          );
         }}
         locale={{ emptyText: "Нет заявок" }}
         loading={loading}
@@ -445,7 +451,10 @@ const OrderListTable: React.FC<OrderListProps> = ({
           expandedRowRender: (record) => {
             return (
               <div className={styles.productContainer}>
-                <ProductNameList orderId={record.order_id as number} expandedRowKeys={expandedRowKeys} />
+                <ProductNameList
+                  orderId={record.order_id as number}
+                  expandedRowKeys={expandedRowKeys}
+                />
               </div>
             );
           },

@@ -30,7 +30,7 @@ import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { IUser } from "@/interface/user";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IProductGroup } from "@/interface/product";
 
@@ -419,16 +419,26 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
     },
   ];
 
-  const dataSource = OrderData?.map((order) => ({
-    ...order,
-    key: order.order_id, // Ensure each item has a unique key
-  })).filter((order) => order.is_archive === isArchive);
+  const dataSource = useMemo(() => {
+    return OrderData?.map((order) => ({
+      ...order,
+      key: order.order_id, // Ensure each item has a unique key
+    })).filter((order) => order.is_archive === isArchive);
+  }, [OrderData]);
+
+  const [currentFilters, setCurrentFilters] = useState<number>(
+    dataSource?.length as number
+  );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [OrderData]);
 
   return (
     <Table
       title={() => (
         <p style={{ padding: 0 }}>
-          Заявок: {(dataSource?.length as number) > 0 ? dataSource?.length : 0}
+          Заявок: {currentFilters ?? 0}
         </p>
       )}
       dataSource={dataSource}
@@ -445,7 +455,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
         >
           <p>
             Заявок:{" "}
-            {(dataSource?.length as number) > 0 ? dataSource?.length : 0}
+            {currentFilters ?? 0}
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => refetch()} title="Обновить заявки">
@@ -457,6 +467,13 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
       onRow={(record) => ({
         onDoubleClick: () => setAdminOrderId(String(record.order_id)),
       })}
+      onChange={(pagination, filters, sorter, extra) => {
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
+      }}
     />
   );
 };

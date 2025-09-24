@@ -9,7 +9,7 @@ import { EyeTwoTone, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IProductGroup } from "@/interface/product";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IUser } from "@/interface/user";
@@ -370,14 +370,20 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
     },
   ];
 
-  const dataSource = OrderData?.map((order) => ({
-    ...order,
-    key: order.order_id, // Ensure each item has a unique key
-  }));
+  const dataSource = useMemo(() => {
+    return OrderData?.map((order) => ({
+      ...order,
+      key: order.order_id, // Ensure each item has a unique key
+    }));
+  }, [OrderData]);
 
   const [currentFilters, setCurrentFilters] = useState<number>(
     dataSource?.length as number
   );
+
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [OrderData]);
 
   return (
     <>
@@ -390,9 +396,7 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
               justifyContent: "space-between",
             }}
           >
-            <p style={{ padding: 0 }}>
-              Заявок: {currentFilters}
-            </p>
+            <p style={{ padding: 0 }}>Заявок: {currentFilters ?? 0}</p>
             <Switch
               checkedChildren={"Все заявки"}
               unCheckedChildren={"Я Согласователь"}
@@ -415,9 +419,7 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
               justifyContent: "space-between",
             }}
           >
-            <p>
-              Заявок: {currentFilters}
-            </p>
+            <p>Заявок: {currentFilters ?? 0}</p>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <Button onClick={() => refetch()} title="Обновить заявки">
                 <SyncOutlined />
@@ -429,7 +431,11 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
           onDoubleClick: () => setAllOrderId(String(record.order_id)),
         })}
         onChange={(pagination, filters, sorter, extra) => {
-          setCurrentFilters(extra.currentDataSource.length === 0 ? 0 : extra.currentDataSource.length);
+          setCurrentFilters(
+            extra.currentDataSource.length === 0
+              ? 0
+              : extra.currentDataSource.length
+          );
         }}
         locale={{ emptyText: "Нет заявок" }}
         loading={loading}

@@ -14,10 +14,8 @@ import {
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import SearchFilter from "@/helper/TableFilters/Filters/SearchFilter";
-import StatusFilter from "@/helper/TableFilters/Filters/StatusFilter";
-import CheckboxFilter from "@/helper/TableFilters/Filters/CheckboxFilter";
 import { useSearch } from "@/helper/TableFilters/hook/useSearch";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IProductGroup } from "@/interface/product";
 import { useDeleteDraftOrderByIdMutation } from "@/hook/orderTempHook";
 import { IOrderStatus } from "@/interface/orderStatus";
@@ -35,35 +33,6 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({
 }) => {
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
-  const StatusOption = OrderData
-    ? Array.from(
-        new Set(OrderData.map((order) => order?.order_status?.status_id))
-      ).map((id) => {
-        const orderStatus = OrderData.find(
-          (order) => order?.order_status?.status_id === id
-        )?.order_status;
-        return {
-          value: String(orderStatus?.status_id),
-          label: orderStatus?.status_name || "",
-        };
-      })
-    : [];
-
-  const CategoryOption = OrderData
-    ? Array.from(
-        new Set(
-          OrderData.map((order) => order?.product_group?.product_group_id)
-        )
-      ).map((id) => {
-        const orderCategory = OrderData.find(
-          (order) => order?.product_group?.product_group_id === id
-        )?.product_group;
-        return {
-          value: String(orderCategory?.product_group_id),
-          label: orderCategory?.product_group_name || "",
-        };
-      })
-    : [];
 
   const { mutate: deleteDraftOrderByIdMutation } =
     useDeleteDraftOrderByIdMutation();
@@ -354,22 +323,24 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({
     },
   ];
 
-  const dataSource = OrderData?.map((order) => ({
-    ...order,
-    key: order.order_temp_id, // Ensure each item has a unique key
-  }));
+  const dataSource = useMemo(() => {
+    return OrderData?.map((order) => ({
+      ...order,
+      key: order.order_temp_id, // Ensure each item has a unique key
+    }));
+  }, [OrderData]);
 
   const [currentFilters, setCurrentFilters] = useState<number>(
     dataSource?.length as number
   );
 
+  useEffect(() => {
+    setCurrentFilters(dataSource?.length as number);
+  }, [OrderData]);
+
   return (
     <Table
-      title={() => (
-        <p style={{ padding: 0 }}>
-          Заявок: {currentFilters ? currentFilters : dataSource?.length}
-        </p>
-      )}
+      title={() => <p style={{ padding: 0 }}>Заявок: {currentFilters ?? 0}</p>}
       dataSource={dataSource}
       columns={columns}
       scroll={{ x: 200 }}
@@ -382,7 +353,7 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({
             justifyContent: "space-between",
           }}
         >
-          <p>Заявок: {currentFilters ? currentFilters : dataSource?.length}</p>
+          <p>Заявок: {currentFilters ?? 0}</p>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Button onClick={() => refetch()} title="Обновить заявки">
               <SyncOutlined />
@@ -394,7 +365,11 @@ const DraftOrderListTable: React.FC<OrderListProps> = ({
         onDoubleClick: () => setDraftOrderId(String(record.order_temp_id)),
       })}
       onChange={(pagination, filters, sorter, extra) => {
-        setCurrentFilters(extra.currentDataSource.length);
+        setCurrentFilters(
+          extra.currentDataSource.length === 0
+            ? 0
+            : extra.currentDataSource.length
+        );
       }}
       locale={{ emptyText: "Нет черновиков" }}
       loading={loading}
