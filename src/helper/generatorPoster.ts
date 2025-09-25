@@ -52,7 +52,7 @@ export function generatePoster({
 
     // если текст длинный → перенос на 2 строки
     const maxWidth = width * 0.8;
-    const words = text.split(" ");
+    const words = text?.split(" ");
     let line = "";
     const lines: string[] = [];
     for (let n = 0; n < words.length; n++) {
