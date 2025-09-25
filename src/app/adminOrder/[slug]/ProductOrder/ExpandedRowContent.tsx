@@ -2,7 +2,8 @@ import { formatNotificationDate } from "@/helper/DataFormat";
 import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
-import { Collapse, Space, Table, Tooltip } from "antd";
+import { Collapse, Table, Tooltip } from "antd";
+import style from "./ProductOrderTable.module.scss";
 
 interface Props {
   orderProductComments: IOrderProductCommentsResponse[];
@@ -99,6 +100,14 @@ export const ExpandedRowContent = ({
                 children: (
                   <Table
                     dataSource={dataSourceProductPreviousOrders}
+                    rowClassName={(record) =>
+                      record?.is_cancel === true
+                      ? style.highlightRowIsCancel : ""
+                    }
+                    rowHoverable={false}
+                    onRow={(record) => ({
+                      title: record?.is_cancel ? "Товар отклонен. Перейти в заявку для просмотра комментария" : "",
+                    })}
                     columns={[
                       {
                         title: "В Заявке",

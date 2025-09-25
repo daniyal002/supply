@@ -53,8 +53,8 @@ export default function ApprovalHeaderOrder({
   const optionsProductGroup = Array.from(
     new Set(
       productData?.map((product) => ({
-        value: product.product_group.product_group_id,
-        label: product.product_group.product_group_name,
+        value: product.product_group.product_group_id ?? "",
+        label: product.product_group.product_group_name ?? "",
       }))
     )
   );
@@ -72,8 +72,8 @@ export default function ApprovalHeaderOrder({
           }
         })
         .map((employee) => ({
-          value: employee.buyer_id,
-          label: employee.buyer_name,
+          value: employee.buyer_id ?? "",
+          label: employee.buyer_name ?? "",
         }))
     ) || [];
 
@@ -95,8 +95,8 @@ export default function ApprovalHeaderOrder({
       }
     })
     .map((parlor) => ({
-      value: parlor.department?.department_id,
-      label: parlor.department?.department_name,
+      value: parlor.department?.department_id ?? "",
+      label: parlor.department?.department_name ?? "",
     }));
 
 
@@ -289,8 +289,8 @@ export default function ApprovalHeaderOrder({
                 disabled
                 options={[
                   {
-                    value: getValues("order_author_name"),
-                    title: getValues("order_author_name"),
+                    value: getValues("order_author_name") ?? "",
+                    title: getValues("order_author_name") ?? "",
                   },
                 ]}
                 onChange={(value, option) =>

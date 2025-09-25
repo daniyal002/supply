@@ -6,6 +6,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { Button, Collapse, Space, Table, Tooltip } from "antd";
 import { useOrderIdStore } from "../../../../../store/orderIdStore";
 import { useTabStore } from "../../../../../store/tabStore";
+import style from "./ProductOrderTable.module.scss";
 
 interface Props {
   order_product_id: number;
@@ -151,6 +152,14 @@ export const ExpandedRowContent = ({
                 children: (
                   <Table
                     dataSource={dataSourceProductPreviousOrders}
+                    rowClassName={(record) =>
+                      record?.is_cancel === true
+                      ? style.highlightRowIsCancel : ""
+                    }
+                    rowHoverable={false}
+                    onRow={(record) => ({
+                      title: record?.is_cancel ? "Товар отклонен. Перейти в заявку для просмотра комментария" : "",
+                    })}
                     columns={[
                       {
                         title: "В Заявке",
