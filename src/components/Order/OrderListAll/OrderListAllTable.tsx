@@ -87,13 +87,35 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
       },
     },
     {
-      title: "Дата",
+      title: "Дата создания",
       dataIndex: "created_at",
       showSorterTooltip: { title: "Сортировка по дате" },
       key: "created_at",
       sorter: (a: IOrderItem, b: IOrderItem) => {
         const nameA = a.created_at || "";
         const nameB = b.created_at || "";
+        return nameA.localeCompare(nameB, "ru");
+      },
+      render: (text: string) => {
+        const date = new Date(text);
+        return date.toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+      },
+    },
+    {
+      title: "Дата обновления",
+      dataIndex: "updated_at",
+      showSorterTooltip: { title: "Сортировка по дате" },
+      key: "updated_at",
+      sorter: (a: IOrderItem, b: IOrderItem) => {
+        const nameA = a.updated_at || "";
+        const nameB = b.updated_at || "";
         return nameA.localeCompare(nameB, "ru");
       },
       render: (text: string) => {
