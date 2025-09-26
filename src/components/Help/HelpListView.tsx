@@ -16,6 +16,7 @@ interface Props {
   errorMessage?: string;
   selectedHelp: IHelp | null;
   onSelectHelp: (item: IHelp | null) => void;
+  countHelpData: number;
 }
 
 export default function HelpListView({
@@ -30,6 +31,7 @@ export default function HelpListView({
   errorMessage,
   selectedHelp,
   onSelectHelp,
+  countHelpData,
 }: Props) {
   if (isLoading) {
     return (
@@ -54,6 +56,12 @@ export default function HelpListView({
         />
       )}
 
+      {!selectedHelp && (
+        <div className={styles.countHelpData}>
+          <p>Количество видеоуроков: </p>
+          <span>{countHelpData}</span>
+        </div>
+      )}
       <div className={selectedHelp ? styles.selectedHelp : styles.helpList}>
         {selectedHelp ? (
           <HelpCard

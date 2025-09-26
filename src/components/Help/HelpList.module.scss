@@ -12,6 +12,14 @@
   gap: 20px;
 }
 
+.countHelpData{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 20px;
+  color: gray;
+}
+
 .selectedHelp {
   margin-top: 20px;
   display: grid;

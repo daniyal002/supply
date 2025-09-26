@@ -20,7 +20,7 @@ export function HelpList() {
     if (!searchText) return helpData;
     const lowerCaseSearchText = searchText.toLowerCase();
     return helpData?.filter((item) =>
-      matchesSearch(item.help_name, lowerCaseSearchText)
+      matchesSearch(item.help_name, lowerCaseSearchText) || matchesSearch(item.note, lowerCaseSearchText)
     );
   }, [helpData, searchText]);
 
@@ -29,6 +29,11 @@ export function HelpList() {
     startIndex,
     startIndex + pageSize
   );
+
+  const countHelpData = useMemo(() => {
+    return filteredHelpData?.length || 0;
+  }, [filteredHelpData]);
+
 
   return (
     <>
@@ -61,6 +66,7 @@ export function HelpList() {
         errorMessage={error?.message}
         selectedHelp={selectedHelp}
         onSelectHelp={setSelectedHelp}
+        countHelpData={countHelpData}
       />
     </>
   );
