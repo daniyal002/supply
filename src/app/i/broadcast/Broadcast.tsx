@@ -89,14 +89,18 @@ export default function Broadcast({ isModalOpen, setIsModalOpen }: Props) {
               rules={[
                 { required: true, message: "Введите сообщение!" },
                 {
-                  max: 1000,
-                  message: "Сообщение не должно превышать 1000 символов",
+                  max: 500,
+                  message: "Максимум - 500 символов",
                 },
               ]}
             >
               <Input.TextArea
                 rows={4}
                 placeholder="Введите текст сообщения для рассылки"
+                count={{
+                  show: true,
+                  max: 500,
+                }}
                 onChange={(e) => {
                   form.setFieldsValue({ message: e.target.value });
                   if(form.getFieldValue("message")){
