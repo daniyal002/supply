@@ -4,17 +4,23 @@ import OrderListTable from "./DraftOrderListTable";
 import style from "./DraftOrderList.module.scss";
 import { toast, Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { Button, DatePicker } from "antd";
+import { Button, DatePicker, Switch } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
-import { useDeleteDraftOrderAllMutation, useDraftOrderUserData } from "@/hook/orderTempHook";
+import {
+  useDeleteDraftOrderAllMutation,
+  useDraftOrderUserData,
+} from "@/hook/orderTempHook";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
 
 export default function DraftOrderList() {
-  const { draftOrderUserData,isLoading,refetch } = useDraftOrderUserData();
+  const { draftOrderUserData, isLoading, refetch } = useDraftOrderUserData();
+  const [orderDateType, setOrderDateType] = useState<
+    "created_at" | "updated_at"
+  >("created_at");
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     draftOrderUserData as IOrderItem[]
   );
@@ -28,11 +34,19 @@ export default function DraftOrderList() {
   const handleFilter = (dates: [moment.Moment, moment.Moment] | null) => {
     setDateRange(dates);
   };
+
+  useEffect(() => {
+    setDateRange(null);
+  }, [orderDateType]);
+
   useEffect(() => {
     if (dateRange) {
       const [start, end] = dateRange;
       const filteredData = orderData.filter((order) => {
-        const orderDate = moment(order.created_at).startOf("day");
+        const orderDate =
+          orderDateType === "created_at"
+            ? moment(order.created_at).startOf("day")
+            : moment(order.updated_at).startOf("day");
         const startDate = start.startOf("day");
         const endDate = end.endOf("day");
         const isInRange =
@@ -44,39 +58,55 @@ export default function DraftOrderList() {
     } else {
       setFilteredOrderData(orderData);
     }
-  }, [dateRange, orderData]);
+  }, [dateRange, orderData, orderDateType]);
 
   useEffect(() => {
     setOrderData(draftOrderUserData as IOrderItem[]);
     setFilteredOrderData(draftOrderUserData as IOrderItem[]);
   }, [draftOrderUserData]);
 
-  const {mutate:deleteDraftOrderAllMutation,isPending} = useDeleteDraftOrderAllMutation()
+  const { mutate: deleteDraftOrderAllMutation, isPending } =
+    useDeleteDraftOrderAllMutation();
 
   return (
     <div className={style.orderList}>
-      <Button danger type="primary" loading={isPending} onClick={() =>
-                toast.error("Вы точно хотите удалить все черновики ?", {
-                  style: {
-                    color: "red",
-                  },
-                  action: {
-                    label: "Удалить",
-                    onClick: () =>
-                      deleteDraftOrderAllMutation(),
-                  },
-                })
-              }>Удалить все черновики</Button>
+      <Button
+        danger
+        type="primary"
+        loading={isPending}
+        onClick={() =>
+          toast.error("Вы точно хотите удалить все черновики ?", {
+            style: {
+              color: "red",
+            },
+            action: {
+              label: "Удалить",
+              onClick: () => deleteDraftOrderAllMutation(),
+            },
+          })
+        }
+      >
+        Удалить все черновики
+      </Button>
       <Toaster />
-        <RangePicker
-          //@ts-ignore
-          value={dateRange}
-          //@ts-ignore
-          onChange={handleFilter}
-          style={{ marginBottom: 16 }}
-          format="DD.MM.YYYY"
-        />
-      <OrderListTable OrderData={filteredOrderData} loading={isLoading} refetch={refetch}/>
+      <RangePicker
+        //@ts-ignore
+        value={dateRange}
+        //@ts-ignore
+        onChange={handleFilter}
+        format="DD.MM.YYYY"
+      />
+      <Switch
+        onChange={(e) => setOrderDateType(e ? "updated_at" : "created_at")}
+        checkedChildren={"Дата обновления"}
+        unCheckedChildren={"Дата создания"}
+        style={{ width: "150px", marginBottom: 16 }}
+      />
+      <OrderListTable
+        OrderData={filteredOrderData}
+        loading={isLoading}
+        refetch={refetch}
+      />
     </div>
   );
 }

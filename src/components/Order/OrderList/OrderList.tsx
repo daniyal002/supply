@@ -5,7 +5,7 @@ import { useOrderUserData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { DatePicker } from "antd";
+import { DatePicker, Switch } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -15,6 +15,9 @@ const { RangePicker } = DatePicker;
 
 export default function OrderList() {
   const { orderUserData, isLoading, refetch } = useOrderUserData();
+  const [orderDateType, setOrderDateType] = useState<
+    "created_at" | "updated_at"
+  >("created_at");
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     orderUserData as IOrderItem[]
   );
@@ -28,11 +31,19 @@ export default function OrderList() {
   const handleFilter = (dates: [moment.Moment, moment.Moment] | null) => {
     setDateRange(dates);
   };
+
+  useEffect(() => {
+    setDateRange(null);
+  }, [orderDateType]);
+
   useEffect(() => {
     if (dateRange) {
       const [start, end] = dateRange;
       const filteredData = orderData.filter((order) => {
-        const orderDate = moment(order.created_at).startOf("day");
+        const orderDate =
+          orderDateType === "created_at"
+            ? moment(order.created_at).startOf("day")
+            : moment(order.updated_at).startOf("day");
         const startDate = start.startOf("day");
         const endDate = end.endOf("day");
         const isInRange =
@@ -44,7 +55,7 @@ export default function OrderList() {
     } else {
       setFilteredOrderData(orderData);
     }
-  }, [dateRange, orderData]);
+  }, [dateRange, orderData, orderDateType]);
 
   useEffect(() => {
     setOrderData(orderUserData as IOrderItem[]);
@@ -59,8 +70,13 @@ export default function OrderList() {
         value={dateRange}
         //@ts-ignore
         onChange={handleFilter}
-        style={{ marginBottom: 16 }}
         format="DD.MM.YYYY"
+      />
+      <Switch
+        onChange={(e) => setOrderDateType(e ? "updated_at" : "created_at")}
+        checkedChildren={"Дата обновления"}
+        unCheckedChildren={"Дата создания"}
+        style={{ width: "150px", marginBottom: 16 }}
       />
       <OrderListTable
         OrderData={filteredOrderData}

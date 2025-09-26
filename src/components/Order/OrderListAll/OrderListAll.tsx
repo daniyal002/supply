@@ -1,10 +1,13 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
 import OrderListTable from "./OrderListAllTable";
-import { useOrdersData, useOrdersWhereUserIsApproverData } from "@/hook/orderHook";
+import {
+  useOrdersData,
+  useOrdersWhereUserIsApproverData,
+} from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
-import { DatePicker } from "antd";
+import { DatePicker, Switch } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -14,17 +17,33 @@ const { RangePicker } = DatePicker;
 
 export default function OrderListAll() {
   const [isAllOrder, setIsAllOrder] = useState<boolean>(false);
-  const [dateRange, setDateRange] = useState<[moment.Moment, moment.Moment] | null>(null);
+  const [dateRange, setDateRange] = useState<
+    [moment.Moment, moment.Moment] | null
+  >(null);
+  const [orderDateType, setOrderDateType] = useState<
+    "created_at" | "updated_at"
+  >("created_at");
 
-  const { ordersData: ordersDataIsApprover, isLoading: isLoadingIsApprover, refetch: refetchIsApprover } =
-    useOrdersWhereUserIsApproverData();
-  const { ordersData: ordersDataIsAll, isLoading: isLoadingIsAll, refetch: refetchIsAll } =
-    useOrdersData();
+  const {
+    ordersData: ordersDataIsApprover,
+    isLoading: isLoadingIsApprover,
+    refetch: refetchIsApprover,
+  } = useOrdersWhereUserIsApproverData();
+  const {
+    ordersData: ordersDataIsAll,
+    isLoading: isLoadingIsAll,
+    refetch: refetchIsAll,
+  } = useOrdersData();
 
   // --- Определяем текущие данные (с учётом isAllOrder и самих данных) ---
   const currentOrdersData = isAllOrder ? ordersDataIsAll : ordersDataIsApprover;
   const currentIsLoading = isAllOrder ? isLoadingIsAll : isLoadingIsApprover;
   const currentRefetch = isAllOrder ? refetchIsAll : refetchIsApprover;
+
+  // --- Обработчик фильтрации ---
+  const handleFilter = (dates: [moment.Moment, moment.Moment] | null) => {
+    setDateRange(dates);
+  };
 
   // --- Фильтрация по дате ---
   const filteredOrderData = useMemo(() => {
@@ -38,15 +57,21 @@ export default function OrderListAll() {
     const endDate = end.endOf("day");
 
     return currentOrdersData.filter((order) => {
-      const orderDate = moment(order.created_at).startOf("day");
-      return orderDate.isSameOrAfter(startDate) && orderDate.isSameOrBefore(endDate);
+      // const orderDate = moment(order.created_at).startOf("day");
+      const orderDate =
+        orderDateType === "created_at"
+          ? moment(order.created_at).startOf("day")
+          : moment(order.updated_at).startOf("day");
+      return (
+        orderDate.isSameOrAfter(startDate.format("YYYY-MM-DD")) &&
+        orderDate.isSameOrBefore(endDate.format("YYYY-MM-DD"))
+      );
     });
-  }, [currentOrdersData, dateRange]);
+  }, [currentOrdersData, dateRange, orderDateType]);
 
-  // --- Обработчик фильтрации ---
-  const handleFilter = (dates: [moment.Moment, moment.Moment] | null) => {
-    setDateRange(dates);
-  };
+  useEffect(() => {
+    setDateRange(null);
+  }, [orderDateType]);
 
   useEffect(() => {
     if (isAllOrder) {
@@ -60,12 +85,17 @@ export default function OrderListAll() {
     <div className={style.orderList}>
       <Toaster />
       <RangePicker
-      //@ts-ignore
+        //@ts-ignore
         value={dateRange}
-      //@ts-ignore
+        //@ts-ignore
         onChange={handleFilter}
-        style={{ marginBottom: 16 }}
         format="DD.MM.YYYY"
+      />
+      <Switch
+        onChange={(e) => setOrderDateType(e ? "updated_at" : "created_at")}
+        checkedChildren={"Дата обновления"}
+        unCheckedChildren={"Дата создания"}
+        style={{ width: "150px", marginBottom: 16 }}
       />
       <OrderListTable
         OrderData={filteredOrderData}
