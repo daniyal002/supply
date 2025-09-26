@@ -8,7 +8,7 @@ import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { Key, useEffect, useMemo, useState } from "react";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
-import { IOrderStatus } from "@/interface/orderStatus";
+import { EnumStatusType, IOrderStatus } from "@/interface/orderStatus";
 import { useDeleteOrderStatusMutation } from "@/hook/orderStatusHook";
 
 interface OrderStatusTableProps {
@@ -77,6 +77,7 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
           formattedID
         );
       },
+      width:50
     },
     {
       title: "Статус",
@@ -119,6 +120,7 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
         ) : (
           text
         ),
+      width:250
     },
     {
       title: "Цвет",
@@ -127,11 +129,31 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
       render: (status_color: string) => (
         <ColorPicker value={status_color} disabled />
       ),
+      width:100
+    },
+    {
+      title: "Тип статуса",
+      dataIndex: "status_type",
+      key: "status_type",
+      sorter: (a: IOrderStatus, b: IOrderStatus) => {
+        const nameA = a.status_type;
+        const nameB = b.status_type;
+        return nameA.localeCompare(nameB, "ru");
+      },
+      render: (statusType: string) =>
+        statusType === "unf" ? "1С УНФ" : "Снабжение",
+      filters: [
+        { value: EnumStatusType.UNF, text: "1С УНФ" },
+        { value: EnumStatusType.SNAB, text: "Снабжение" },
+      ],
+      onFilter: (value, record) => record.status_type === value,
+      width:200
     },
     {
       title: "Примечание",
       dataIndex: "note",
       key: "note",
+      width:300
     },
     {
       title: "Действия",
@@ -168,6 +190,7 @@ const OrderStatusTable: React.FC<OrderStatusTableProps> = ({
           </Button>
         </Space>
       ),
+      width:200
     },
   ];
 
