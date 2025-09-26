@@ -161,8 +161,12 @@ export function getProductTableColumns({
             ?.unit_measurement_name ?? "";
         return unitA.localeCompare(unitB, "ru");
       },
-      render: (units: IUnit[]) =>
-        units?.[0]?.unit_measurement.unit_measurement_name,
+      render: (directory_unit_measurement: IUnit[]) => {
+        const mainUnit =
+          directory_unit_measurement.find((unit) => unit.coefficient > 1) ||
+          directory_unit_measurement[0];
+        return mainUnit?.unit_measurement.unit_measurement_name;
+      },
       sortOrder:
         sortedInfo.columnKey === "directory_unit_measurement"
           ? sortedInfo.order
