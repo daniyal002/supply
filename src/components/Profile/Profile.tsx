@@ -35,7 +35,7 @@ const Profile = () => {
   }
 
   const handleGoBack = () => {
-    router.back(); // или router.push('/dashboard') — если нужно на конкретную страницу
+    router.push('/'); // или router.push('/dashboard') — если нужно на конкретную страницу
   };
 
   return (
@@ -81,11 +81,13 @@ const Profile = () => {
               key: "2",
               label: "Настройки",
               children: <ProfileSettings />,
+              disabled: true,
             },
             {
               key: "3",
               label: "Сменить пароль",
               children: <ProfileChangePassword />,
+              disabled: true,
             },
           ]}
         />

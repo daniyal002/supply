@@ -23,6 +23,7 @@ import { AdminPanelList } from "./AdminPanelList";
 import LogoutDropdown from "./LogoutDropdown";
 import DropdownNotificationsChat from "../DropdownMenu/DropdownNotificationsChat";
 import { p } from "framer-motion/client";
+import NewsTicker from "@/components/NewsTicker/NewsTicker";
 
 const { Header, Sider, Content } = Layout;
 
@@ -133,6 +134,8 @@ const MainLayout = ({
     return <>{children}</>;
   }
 
+  const latestNews = `🔥 Теперь из 1С возвращаются статусы заявок в зависимости от их состояния; 🔥 Через кнопку «Помощь» доступны видеоинструкции по работе с программой; 🔥 Нажмите на кнопку «${login[0].toUpperCase()}» рядом с «Выход», чтобы перейти в свой профиль`;
+
   return (
     <Layout
       style={{ minHeight: "100vh", backgroundColor: LayoutToken?.headerBg }}
@@ -191,6 +194,7 @@ const MainLayout = ({
       )}
 
       <Layout style={{ background: LayoutToken?.headerBg }}>
+      <NewsTicker news={latestNews} speed={65} />
         <Header
           style={{
             padding: 0,
