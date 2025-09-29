@@ -33,8 +33,10 @@ export interface IUserAddResponse{
 export interface IGetMe{
     user_id?:number,
     login:string,
-    password:string,
+    password?:string,
     role:IRole | undefined,
+    created_at:string,
+    updated_at:string,
     employee:IEmployeeGetMe,
 }
 

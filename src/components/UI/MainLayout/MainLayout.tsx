@@ -22,6 +22,7 @@ import { useThemeStore } from "../../../../store/themeStore";
 import { AdminPanelList } from "./AdminPanelList";
 import LogoutDropdown from "./LogoutDropdown";
 import DropdownNotificationsChat from "../DropdownMenu/DropdownNotificationsChat";
+import { p } from "framer-motion/client";
 
 const { Header, Sider, Content } = Layout;
 
@@ -250,7 +251,7 @@ const MainLayout = ({
                 <Button
                   icon={<p>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
-                  onClick={() => message.info(`Ваш логин: ${login}`)}
+                  onClick={() => push("/profile")}
                   size={isMobile ? "small" : "middle"}
                 />
               </Tooltip>
