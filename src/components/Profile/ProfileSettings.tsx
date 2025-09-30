@@ -1,27 +1,23 @@
 import { Space, Switch } from "antd";
 import { useState } from "react";
-import styles from './Profile.module.scss';
-
+import styles from "./Profile.module.scss";
 
 const ProfileSettings = () => {
-  const [newsEnabled, setNewsEnabled] = useState(true);
+  const [newsEnabled, setNewsEnabled] = useState(localStorage.getItem("newsEnabled") === "true");
 
+  const handleNewsToggle = (checked: boolean) => {
+    setNewsEnabled(checked);
+    localStorage.setItem("newsEnabled", checked.toString());
+  };
 
-    const handleNewsToggle = (checked: boolean) => {
-        setNewsEnabled(checked);
-        // Здесь можно отправить запрос на бэкенд
-        console.log('Новости включены:', checked);
-      };
-
-    return(
-        <div className={styles.settings}>
-                  <Space align="center" size="large">
-                    <span>Получать новости</span>
-                    <Switch checked={newsEnabled} onChange={handleNewsToggle} />
-                  </Space>
-                </div>
-    )
-
-}
+  return (
+    <div className={styles.settings}>
+      <Space align="center" size="large">
+        <span>Получать новости</span>
+        <Switch checked={newsEnabled} onChange={handleNewsToggle} />
+      </Space>
+    </div>
+  );
+};
 
 export default ProfileSettings;

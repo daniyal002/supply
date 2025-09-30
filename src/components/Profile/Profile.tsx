@@ -1,25 +1,26 @@
 "use client";
 
 import { Tabs, Card, Typography, Button, Spin } from "antd";
-import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
+import { LeftOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import styles from "./Profile.module.scss";
 import ProfileDetails from "./ProfileDetails";
 import ProfileSettings from "./ProfileSettings";
 import ProfileChangePassword from "./ProfileChangePassword";
-import { useGetMe } from "@/hook/userHook";
 import { IEmployeeGetMe } from "@/interface/employee";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/db/db";
 
 const { Title } = Typography;
 
 const Profile = () => {
   const router = useRouter();
-  const { GetMeData, isLoading, error } = useGetMe();
+  const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
-  if (isLoading) {
+  if (!GetMeData) {
     return (
       <Spin
-        spinning={isLoading}
+        spinning={!GetMeData}
         style={{
           height: "100vh",
           display: "flex",
@@ -30,19 +31,15 @@ const Profile = () => {
     );
   }
 
-  if (error) {
-    return <div>Ошибка: {error.message}</div>;
-  }
-
   const handleGoBack = () => {
-    router.push('/'); // или router.push('/dashboard') — если нужно на конкретную страницу
+    router.push("/"); // или router.push('/dashboard') — если нужно на конкретную страницу
   };
 
   return (
     <div className={styles.profileContainer}>
       <Card className={styles.card}>
         <div className={styles.header}>
-        <Button
+          <Button
             type="primary"
             icon={<LeftOutlined />}
             style={{
@@ -81,7 +78,7 @@ const Profile = () => {
               key: "2",
               label: "Настройки",
               children: <ProfileSettings />,
-              disabled: true,
+              // disabled: true,
             },
             {
               key: "3",

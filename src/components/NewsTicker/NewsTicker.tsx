@@ -14,7 +14,7 @@ const NewsTicker: React.FC<NewsTickerProps> = ({
   news = 'Новости не загружены',
   speed = 20,
 }) => {
-  const [isClosed, setIsClosed] = useState(false);
+  const [isClosed, setIsClosed] = useState(localStorage.getItem('newsEnabled') === 'false');
 
   const handleClose = () => {
     setIsClosed(true);
