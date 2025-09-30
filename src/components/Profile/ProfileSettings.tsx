@@ -14,7 +14,7 @@ const ProfileSettings = () => {
     <div className={styles.settings}>
       <Space align="center" size="large">
         <span>Получать новости</span>
-        <Switch checked={newsEnabled} onChange={handleNewsToggle} />
+        <Switch checked={newsEnabled} onChange={handleNewsToggle} /> <span className={styles.settingsNewsDescription}>(Обновите страницу чтобы применить изменения)</span>
       </Space>
     </div>
   );
