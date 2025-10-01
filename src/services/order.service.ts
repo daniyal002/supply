@@ -53,9 +53,9 @@ export const orderService = {
     return response.data.detail;
   },
 
-  async getOrders() {
+  async getOrders(product_ids?: string[]) {
     const response = await axiosWidthAuth.get<IOrderItemResponse>(
-      "/order/get_all_order"
+      `/order/get_all_order${product_ids ? "?" + product_ids.map((id) => `product_id=${id}`).join("&") : ""}`
     );
     return response.data.detail;
   },

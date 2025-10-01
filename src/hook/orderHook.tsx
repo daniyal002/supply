@@ -59,7 +59,7 @@ export const useOrderUserData = () => {
   return { orderUserData, isLoading, error,refetch };
 };
 
-export const useOrdersData = () => {
+export const useOrdersData = (product_ids?:string[]) => {
   const {
     data: ordersData,
     isLoading,
@@ -67,7 +67,7 @@ export const useOrdersData = () => {
     refetch,
   } = useQuery({
     queryKey: ["Orders"],
-    queryFn: orderService.getOrders,
+    queryFn: () => orderService.getOrders(product_ids),
     // staleTime: Infinity,
   });
   return { ordersData, isLoading, error,refetch };

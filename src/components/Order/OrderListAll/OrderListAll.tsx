@@ -7,10 +7,12 @@ import {
 } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
-import { DatePicker, Switch } from "antd";
+import { DatePicker, Select, Switch } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
+import { useProductData } from "@/hook/productHook";
+import { debounce } from "@/helper/debounce";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
@@ -23,6 +25,21 @@ export default function OrderListAll() {
   const [orderDateType, setOrderDateType] = useState<
     "created_at" | "updated_at"
   >("created_at");
+  const [productIds, setProductIds] = useState<string[]>([]);
+
+  // создаём debounced-функцию
+  const [searchValue, setSearchValue] = useState("");
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((val: string) => {
+        setSearchValue(val.toLowerCase());
+      }, 300),
+    []
+  );
+
+
+  const { productData } = useProductData();
 
   const {
     ordersData: ordersDataIsApprover,
@@ -33,7 +50,11 @@ export default function OrderListAll() {
     ordersData: ordersDataIsAll,
     isLoading: isLoadingIsAll,
     refetch: refetchIsAll,
-  } = useOrdersData();
+  } = useOrdersData(productIds);
+
+  useEffect(() => {
+    refetchIsAll();
+  }, [productIds]);
 
   // --- Определяем текущие данные (с учётом isAllOrder и самих данных) ---
   const currentOrdersData = isAllOrder ? ordersDataIsAll : ordersDataIsApprover;
@@ -67,7 +88,7 @@ export default function OrderListAll() {
         orderDate.isSameOrBefore(endDate.format("YYYY-MM-DD"))
       );
     });
-  }, [currentOrdersData, dateRange, orderDateType]);
+  }, [currentOrdersData, dateRange, orderDateType, productIds]);
 
   useEffect(() => {
     setDateRange(null);
@@ -79,11 +100,38 @@ export default function OrderListAll() {
     } else {
       refetchIsApprover();
     }
+    setProductIds([]);
   }, [isAllOrder, refetchIsAll, refetchIsApprover]);
 
   return (
     <div className={style.orderList}>
       <Toaster />
+      {isAllOrder && (
+        <Select
+          mode="multiple"
+          onChange={(e) => setProductIds(e)}
+          value={productIds}
+          placeholder="Выберите товары для фильтрации заявок"
+          showSearch
+          onSearch={debouncedSearch}
+          filterOption={false}
+        >
+          {productData
+        ?.filter((product) =>
+          product.product_name.toLowerCase().includes(searchValue)
+        )
+        .map((product) => (
+          <Select.Option
+            key={product.product_id}
+            value={product.product_id}
+            label={product.product_name}
+          >
+            {product.product_name}
+          </Select.Option>
+        ))}
+        </Select>
+      )}
+
       <RangePicker
         //@ts-ignore
         value={dateRange}
