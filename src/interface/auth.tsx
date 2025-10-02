@@ -21,3 +21,9 @@ export interface IRegisterResponse{
 export interface IRefreshRequest{
     refresh_token:string
 }
+
+export interface IChangePasswordRequest{
+    old_password:string,
+    new_password:string,
+    confirm_password:string,
+}

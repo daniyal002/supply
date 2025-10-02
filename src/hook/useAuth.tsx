@@ -1,4 +1,4 @@
-import { ILoginRequest } from "@/interface/auth";
+import { IChangePasswordRequest, ILoginRequest } from "@/interface/auth";
 import { authService } from "@/services/auth.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
@@ -46,6 +46,29 @@ export const useLogout = () => {
       deleteTabsApproval();
       deleteTabsOrders();
 
+      // Очищаем все кэши React Query
+      await queryClient.resetQueries();
+      queryClient.clear();
+
+      // Редиректим на страницу логина
+      replace("/login");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate, isSuccess, error };
+};
+
+export const useChangePassword = () => {
+  const queryClient = useQueryClient();
+  const { replace } = useRouter();
+
+  const { mutate, isSuccess, error } = useMutation({
+    mutationKey: ["changePassword"],
+    mutationFn: (data:IChangePasswordRequest) => authService.changePassword(data),
+    onSuccess: async () => {
       // Очищаем все кэши React Query
       await queryClient.resetQueries();
       queryClient.clear();

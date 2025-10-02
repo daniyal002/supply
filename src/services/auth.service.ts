@@ -1,5 +1,5 @@
 import { axiosClassic, axiosWidthAuth } from "@/api/interseptors";
-import { ILoginRequest, ILoginResponse, IRefreshRequest } from "@/interface/auth";
+import { IChangePasswordRequest, ILoginRequest, ILoginResponse, IRefreshRequest } from "@/interface/auth";
 import { removeAccessTokenFromStorage, removeRefreshTokenFromStorage, saveAccessToken, saveRefreshToken } from "./auth-token.service";
 import { userService } from "./user.service";
 import { deleteGetMe } from "@/db/db";
@@ -61,6 +61,13 @@ export const authService = {
 
 
       return response.data
+    },
+
+    async changePassword(body:IChangePasswordRequest){
+        const response = await axiosWidthAuth.post('/auth/change_password',body)
+        removeAccessTokenFromStorage()
+        removeRefreshTokenFromStorage()
+        return response.data
     }
 
 }

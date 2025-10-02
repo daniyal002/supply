@@ -1,9 +1,10 @@
 import { Button, Form, Input } from "antd";
 import styles from "./Profile.module.scss";
+import { useChangePassword } from "@/hook/useAuth";
 
 const ProfileChangePassword = () => {
   const [form] = Form.useForm();
-
+const {mutate,isSuccess,error} = useChangePassword()
   const onFinish = (values: {
     oldPassword: string;
     newPassword: string;
@@ -11,6 +12,10 @@ const ProfileChangePassword = () => {
   }) => {
     console.log("Смена пароля:", values);
     // Логика смены пароля
+    mutate({
+      old_password:values.oldPassword,
+      new_password:values.newPassword,
+      confirm_password:values.confirm})
   };
 
   return (
@@ -59,8 +64,8 @@ const ProfileChangePassword = () => {
       </Form.Item>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Сохранить
+        <Button type="primary" htmlType="submit" size="large">
+          Поменять пароль
         </Button>
       </Form.Item>
     </Form>

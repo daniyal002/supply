@@ -78,13 +78,11 @@ const Profile = () => {
               key: "2",
               label: "Настройки",
               children: <ProfileSettings />,
-              // disabled: true,
             },
             {
               key: "3",
               label: "Сменить пароль",
               children: <ProfileChangePassword />,
-              disabled: true,
             },
           ]}
         />
