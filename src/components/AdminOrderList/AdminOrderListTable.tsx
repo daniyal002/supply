@@ -446,7 +446,7 @@ const AdminOrderListTable: React.FC<AdminOrderListProps> = ({
       ...order,
       key: order.order_id, // Ensure each item has a unique key
     })).filter((order) => order.is_archive === isArchive);
-  }, [OrderData]);
+  }, [OrderData, isArchive]);
 
   const [currentFilters, setCurrentFilters] = useState<number>(
     dataSource?.length as number
