@@ -5,7 +5,7 @@ import { useApprovalOrders } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { DatePicker, Switch } from "antd";
+import { DatePicker, Radio, Switch } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -75,12 +75,10 @@ export default function ApprovalList() {
         style={{ marginBottom: 16 }}
         format="DD.MM.YYYY"
       />
-      <Switch
-        onChange={(e) => setOrderDateType(e ? "updated_at" : "created_at")}
-        checkedChildren={"Дата обновления"}
-        unCheckedChildren={"Дата создания"}
-        style={{ width: "150px", marginBottom: 16 }}
-      />
+      <Radio.Group defaultValue={orderDateType}>
+        <Radio value="created_at" onChange={() => setOrderDateType("created_at")}>Дата создания</Radio>
+        <Radio value="updated_at" onChange={() => setOrderDateType("updated_at")}>Дата обновления</Radio>
+      </Radio.Group>
       <ApprovalListTable
         OrderData={filteredOrderData}
         loading={isLoading}
