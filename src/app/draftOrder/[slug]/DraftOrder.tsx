@@ -174,7 +174,7 @@ export default function DraftOrder({
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
+            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
           };
         }),
       };
@@ -237,7 +237,7 @@ export default function DraftOrder({
             unit_measurement_id: product.unit_measurement.unit_measurement
             .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => buyer.buyer_id),
+            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
           };
         }),
       };

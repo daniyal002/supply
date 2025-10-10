@@ -1,6 +1,9 @@
-import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import { IOrderProductStatus, IProductTable } from "@/interface/productTable";
+import {
+  IEmployeeFromProductTable,
+  IOrderProductStatus,
+  IProductTable,
+} from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, theme, Tooltip } from "antd";
 import {
@@ -53,8 +56,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
-  const {hasOrderProductName, hasOrderProductLink, hasBuyers, hasNote} =
-  useProductTableColumnVisibility(productTableData);
+  const { hasOrderProductName, hasOrderProductLink, hasBuyers, hasNote } =
+    useProductTableColumnVisibility(productTableData);
 
   const orderProductGroup = watch("product_group");
 
@@ -149,7 +152,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             "ru"
           ),
       },
-      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group?.product_group_name
+      render: (text: IProduct) =>
+        text?.product_group?.product_group_name === "Без категории"
+          ? "-"
+          : text?.product_group?.product_group_name,
     },
     {
       title: "Артикул",
@@ -164,7 +170,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             "ru"
           ),
       },
-      render: (text: IProduct) => text?.product_article || "_"
+      render: (text: IProduct) => text?.product_article || "_",
     },
     {
       title: "Добавленный товар",
@@ -172,7 +178,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "order_product_name",
       showSorterTooltip: { title: "Сортировка по добавленному товару" },
       width: "400px",
-      hidden:!hasOrderProductName,
+      hidden: !hasOrderProductName,
       sorter: {
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(
@@ -222,7 +228,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "order_product_link",
       key: "order_product_link",
       width: "300px",
-      hidden:!hasOrderProductLink,
+      hidden: !hasOrderProductLink,
       showSorterTooltip: { title: "Сортировка по ссылке товара" },
       sorter: {
         compare: (a: any, b: any) =>
@@ -265,8 +271,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             textToHighlight={text ? text.toString() : ""}
           />
         ) : (
-          text &&
-          <a href={text} target="_blank" style={{color:colorText}}>Нажмите чтобы перейти</a>
+          text && (
+            <a href={text} target="_blank" style={{ color: colorText }}>
+              Нажмите чтобы перейти
+            </a>
+          )
         ),
     },
 
@@ -306,9 +315,15 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "buyers",
       key: "buyers",
       width: "300px",
-      hidden:!hasBuyers,
-      render: (buyers: IEmployeeFromParlorGetMe[]) =>
-        buyers.map((buyer) => buyer.buyer_name).join(", "),
+      hidden: !hasBuyers,
+      render: (buyers: IEmployeeFromProductTable[]) =>
+        buyers
+          ?.map((buyer) =>
+            buyer.product_quantity === 0
+              ? buyer.buyer_name
+              : buyer.buyer_name + " - " + buyer.product_quantity
+          )
+          .join(", "),
       responsive: ["sm"],
     },
     {
@@ -316,7 +331,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       dataIndex: "note",
       width: "150px",
       key: "note",
-      hidden:!hasNote,
+      hidden: !hasNote,
       responsive: ["sm"],
     },
     {
@@ -349,7 +364,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           <Space size="middle">
             {record.is_cancel && (
               <Tooltip
-                title={<span>{record.order_cancel_comment.comment}<br/> Сотрудник: {record.order_cancel_comment.employee}</span>}
+                title={
+                  <span>
+                    {record?.order_cancel_comment?.comment}
+                    <br /> Сотрудник: {record?.order_cancel_comment?.employee}
+                  </span>
+                }
               >
                 <InfoCircleFilled style={{ color: "#fff" }} />
               </Tooltip>
@@ -463,7 +483,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         record?.is_cancel === true
           ? style.highlightRowIsCancel
           : record?.product?.product_group?.product_group_id !==
-            orderProductGroup?.value && !record?.order_product_link
+              orderProductGroup?.value && !record?.order_product_link
           ? style.highlightRowMatchCategory
           : ""
       }
@@ -475,7 +495,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           <>
             <ExpandedRowContent
               orderProductComments={record?.order_product_comment || []}
-              productPreviousOrders={record?.product_previous_orders}
+              productPreviousOrders={record?.product_previous_orders || []}
               orderId={orderId}
             />
 

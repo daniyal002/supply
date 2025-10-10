@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Select } from "antd";
+import { Input, message, Modal, Select } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Controller,
@@ -10,10 +10,14 @@ import {
 } from "react-hook-form";
 import style from "./ModalSelectProductOrder.module.scss";
 import { useAllMesument, useProductData } from "@/hook/productHook";
-import { IProductTableFormValues } from "@/interface/productTable";
+import { IEmployeeFromProductTable, IProductTable, IProductTableFormValues } from "@/interface/productTable";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
+import SelectEmployeeAndQuantity from "./SelectEmployeeAndQuantity";
+import { IProductUnit } from "@/interface/product";
+import { IUnit } from "@/interface/unit";
+import { IEmployeeFormValues } from "@/interface/employee";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -39,18 +43,18 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   isNewProduct,
 }) => {
   const {
-    register,
     handleSubmit,
     formState: { errors },
     reset,
     control,
     getValues: getValuesModal,
+    watch: watchModal,
+    setValue: setModalValue,
   } = useForm<IProductTableFormValues>({ mode: "onChange" });
   const { productData } = useProductData();
   const { allMesument } = useAllMesument();
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
-
-  const employeeIdWatch = watch("employee_id.value");
+  const [disabledQuantity, setDisabledQuantity] = useState(false);
 
   const itemProductData = productData?.find(
     (product) => product.product_id === productId
@@ -63,22 +67,35 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         item.unit_measurement.unit_measurement_id ===
         getValuesModal("unit_measurement.value")
     );
-    const doctors = employees.filter((buyer) =>
-      getValuesModal("buyers")?.some(
-        (selectEmployee) => selectEmployee.value === buyer.buyer_id
-      )
-    );
+
+
+    const doctors = getValuesModal("buyers")?.map((buyer) => {
+      const employee = employees.find(
+        (emp) => emp.buyer_id === buyer.employee_id
+      );
+      return {
+        buyer_id: employee?.buyer_id,
+        buyer_name: employee?.buyer_name,
+        buyer_type: employee?.buyer_type,
+        product_quantity: buyer.product_quantity,
+      };
+    });
+
     const newUnitMesurement = {
       unit_measurement: {
         unit_measurement_id: data.unit_measurement.value,
         unit_measurement_name: data.unit_measurement.label,
       },
     };
-    const productTable = {
+    const productTable:IProductTable = {
       ...data,
-      product: !isNewProduct && itemProductData,
-      buyers: doctors,
-      unit_measurement: isNewProduct ? newUnitMesurement : unit,
+      product: (!isNewProduct && itemProductData) as IProductUnit,
+      buyers: doctors as IEmployeeFromProductTable[],
+      unit_measurement: isNewProduct ? newUnitMesurement as IUnit : unit as IUnit,
+      product_quantity:  data.product_quantity ? Number(data.product_quantity) : doctors?.reduce(
+        (acc, cur) => acc + (Number(cur.product_quantity) || 0),
+        0
+      ) || 0,
     };
 
     const products = getValues("order_products") || [];
@@ -89,13 +106,33 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       );
       // @ts-ignore: Unreachable code error
       setValue("order_products", updatedProducts);
+
     } else {
-      // @ts-ignore: Unreachable code error
-      setValue("order_products", [...products, productTable]);
+      if(products.some(p => p.product.product_id === productTable.product.product_id)){
+        message.warning("Товар уже добавлен в заявку!")
+      }else{
+        // @ts-ignore: Unreachable code error
+        setValue("order_products", [...products, productTable]);
+      }
+
     }
     reset();
     setIsModalOpen(false);
   };
+
+  const buyersWatch = watchModal("buyers") || [];
+
+  useEffect(() => {
+    const hasBuyers = buyersWatch.length > 0;
+    setDisabledQuantity(hasBuyers);
+
+    const totalQuantity = buyersWatch.reduce(
+      (acc, cur) => acc + (Number(cur.product_quantity) || 0),
+      0
+    );
+
+    setModalValue("product_quantity", totalQuantity);
+  }, [buyersWatch.length, JSON.stringify(buyersWatch)]);
 
   const employees =
     GetMeData?.employee?.parlors
@@ -145,9 +182,9 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             productToEdit?.unit_measurement?.unit_measurement
               ?.unit_measurement_name,
         },
-        buyers: productToEdit?.buyers?.map((emp: any) => ({
-          value: emp.buyer_id,
-          label: emp.buyer_name,
+        buyers: productToEdit?.buyers?.map((emp) => ({
+          employee_id:emp.buyer_id,
+          product_quantity: emp.product_quantity
         })),
         order_product_name: productToEdit?.order_product_name,
         order_product_link: productToEdit?.order_product_link,
@@ -156,24 +193,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     }
   }, [type, reset, editProductId, isModalOpen]);
 
-  const optionsEmployees = useMemo(() => {
-    const employeeSet = new Set();
-    return employees
-      .filter((employee) => {
-        if (employee.buyer_type === "employee") {
-          if (employeeSet.has(employee.buyer_id)) {
-            return false;
-          } else {
-            employeeSet.add(employee.buyer_id);
-            return true;
-          }
-        }
-      })
-      .map((employee) => ({
-        value: employee.buyer_id,
-        label: employee.buyer_name,
-      }));
-  }, [employees]);
 
   const optionsUnit = useMemo(() => {
     if (isNewProduct) {
@@ -222,7 +241,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     setIsModalOpen(false);
     reset({
       product: undefined,
-        buyers: undefined,
+        buyers: [{employee_id: undefined, product_quantity: undefined}],
         product_quantity: undefined,
         order_product_link: undefined,
         order_product_name: undefined,
@@ -353,6 +372,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           <Controller
             name="product_quantity"
             control={control}
+            disabled={disabledQuantity}
             rules={{
               required: { value: true, message: "Количество обязательно" },
               pattern: {
@@ -378,34 +398,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         {buyerType === "parlor" && (
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Выберите сотрудника</label>
-            <Controller
-              control={control}
-              name="buyers"
-              rules={
-                {
-                  // required: {
-                  //   value: buyerType === "parlor" ? true : false,
-                  //   message: "Выберите врача",
-                  // },
-                }
-              }
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  mode="multiple"
-                  options={optionsEmployees}
-                  showSearch
-                  filterOption={(input, option) =>
-                    (option?.label ?? "")
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-                  placeholder="сотрудник"
-                  autoClearSearchValue={false}
-                  onChange={(value, option) => field.onChange(option)} // Передаём только значение
-                />
-              )}
-            />
+            <SelectEmployeeAndQuantity control={control} getValues={getValues}/>
           </div>
         )}
         <div className={style.formItem}>
@@ -426,7 +419,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         <button type="submit" className={style.modalSubmit}>
           {type}
         </button>
-        {/* <button  className={style.modalClose} onClick={() => closeModal()}>Отмена</button> */}
       </form>
     </Modal>
   );

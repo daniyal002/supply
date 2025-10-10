@@ -1,6 +1,8 @@
-import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import { IProductTable } from "@/interface/productTable";
+import {
+  IEmployeeFromProductTable,
+  IProductTable,
+} from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, theme } from "antd";
 import { PrinterOutlined, SearchOutlined } from "@ant-design/icons";
@@ -140,7 +142,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             "ru"
           ),
       },
-      render: (text: IProduct) => text?.product_group?.product_group_name === 'Без категории' ? '-' :  text?.product_group?.product_group_name
+      render: (text: IProduct) =>
+        text?.product_group?.product_group_name === "Без категории"
+          ? "-"
+          : text?.product_group?.product_group_name,
     },
     {
       title: "Артикул",
@@ -155,7 +160,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             "ru"
           ),
       },
-      render: (text: IProduct) => text?.product_article || "_"
+      render: (text: IProduct) => text?.product_article || "_",
     },
     {
       title: "Добавленный товар",
@@ -301,8 +306,14 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "buyers",
       hidden: !hasBuyers,
       width: "300px",
-      render: (buyers: IEmployeeFromParlorGetMe[]) =>
-        buyers.map((buyer) => buyer.buyer_name).join(", "),
+      render: (buyers: IEmployeeFromProductTable[]) =>
+        buyers
+      ?.map((buyer) =>
+            buyer.product_quantity === 0
+              ? buyer.buyer_name
+              : buyer.buyer_name + " - " + buyer.product_quantity
+          )
+          .join(", "),
       responsive: ["sm"],
     },
     {
@@ -427,7 +438,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           <>
             <ExpandedRowContent
               orderProductComments={record?.order_product_comment || []}
-              productPreviousOrders={record?.product_previous_orders}
+              productPreviousOrders={record?.product_previous_orders || []}
               orderId={orderId}
             />
 
@@ -437,11 +448,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       }}
       rowClassName={(record) =>
         record?.is_cancel === true
-        ? style.highlightRowIsCancel
-        : record?.product?.product_group?.product_group_id !==
-          orderProductGroup?.value && !record?.order_product_link
-        ? style.highlightRowMatchCategory
-        : ""
+          ? style.highlightRowIsCancel
+          : record?.product?.product_group?.product_group_id !==
+              orderProductGroup?.value && !record?.order_product_link
+          ? style.highlightRowMatchCategory
+          : ""
       }
       rowHoverable={false}
     />

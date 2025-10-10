@@ -1,6 +1,5 @@
-import { IEmployeeFromParlorGetMe } from "@/interface/employee";
 import { IProduct } from "@/interface/product";
-import { IOrderProductStatus, IProductTable } from "@/interface/productTable";
+import { IEmployeeFromProductTable, IOrderProductStatus, IProductTable } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
 import { Button, Space, Table, TableColumnsType, theme } from "antd";
 import {
@@ -305,8 +304,14 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "buyers",
       width: "300px",
       hidden:!hasBuyers,
-      render: (buyers: IEmployeeFromParlorGetMe[]) =>
-        buyers.map((buyer) => buyer.buyer_name).join(", "),
+      render: (buyers: IEmployeeFromProductTable[]) =>
+        buyers
+          ?.map((buyer) =>
+            buyer.product_quantity === 0
+              ? buyer.buyer_name
+              : buyer.buyer_name + " - " + buyer.product_quantity
+          )
+          .join(", "),
       responsive: ["sm"],
     },
     {
@@ -465,7 +470,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                 <>
                   <ExpandedRowContent
                     orderProductComments={record?.order_product_comment || []}
-                    productPreviousOrders={record?.product_previous_orders}
+                    productPreviousOrders={record?.product_previous_orders || []}
                     orderId={orderId}
                   />
 
