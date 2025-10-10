@@ -56,8 +56,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
     useSearch();
 
-  const { hasOrderProductName, hasOrderProductLink, hasBuyers, hasNote } =
-    useProductTableColumnVisibility(productTableData);
+  const {
+    hasOrderProductName,
+    hasOrderProductLink,
+    hasBuyers,
+    hasNote,
+    hasIssuedQuantity,
+  } = useProductTableColumnVisibility(productTableData);
 
   const orderProductGroup = watch("product_group");
 
@@ -333,6 +338,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "note",
       hidden: !hasNote,
       responsive: ["sm"],
+    },
+    {
+      title: "Выданное количество",
+      dataIndex: "issued_quantity",
+      key: "issued_quantity",
+      width: "50px",
+      hidden: !hasIssuedQuantity,
     },
     {
       title: "Статус товара",

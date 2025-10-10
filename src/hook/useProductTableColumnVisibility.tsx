@@ -8,6 +8,7 @@ interface ColumnVisibility {
   hasOrderProductComment: boolean;
   hasBuyers: boolean;
   hasNote: boolean;
+  hasIssuedQuantity?: boolean;
 }
 
 export const useProductTableColumnVisibility = (
@@ -21,6 +22,7 @@ export const useProductTableColumnVisibility = (
         hasOrderProductComment: false,
         hasBuyers: false,
         hasNote: false,
+        hasIssuedQuantity: false,
       };
     }
 
@@ -30,6 +32,7 @@ export const useProductTableColumnVisibility = (
       hasOrderProductComment: productTableData.some((p) => p.order_product_comment?.length || 0 > 0),
       hasBuyers: productTableData.some((p) => p.buyers?.length || 0 > 0),
       hasNote: productTableData.some((p) => p.note),
+      hasIssuedQuantity: productTableData.some((p) => p.issued_quantity),
     };
   }, [productTableData]);
 };

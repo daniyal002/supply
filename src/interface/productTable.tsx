@@ -34,6 +34,7 @@ export interface IProductTable {
   note?: string;
   order_product_status?: IOrderProductStatus;
   remainder?: number;
+  issued_quantity?: number;
 }
 
 export interface IProductTableRequest {

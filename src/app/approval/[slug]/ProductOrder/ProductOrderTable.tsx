@@ -71,6 +71,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     hasBuyers,
     hasNote,
     hasOrderProductComment,
+    hasIssuedQuantity
   } = useProductTableColumnVisibility(productTableData);
 
   const {
@@ -398,6 +399,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       key: "note",
       hidden: !hasNote,
       responsive: ["sm"],
+    },
+    {
+      title: "Выданное количество",
+      dataIndex: "issued_quantity",
+      key: "issued_quantity",
+      width: "50px",
+      hidden: !hasIssuedQuantity,
     },
     {
       title: "Действия",
