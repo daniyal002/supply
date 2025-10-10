@@ -108,7 +108,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       setValue("order_products", updatedProducts);
 
     } else {
-      if(products.some(p => p.product.product_id === productTable.product.product_id)){
+      if(products.some(p => p.product.product_id === productTable.product.product_id ) && !isNewProduct){
         message.warning("Товар уже добавлен в заявку!")
       }else{
         // @ts-ignore: Unreachable code error
