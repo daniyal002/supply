@@ -9,6 +9,7 @@ interface ColumnVisibility {
   hasBuyers: boolean;
   hasNote: boolean;
   hasIssuedQuantity?: boolean;
+  hasIsCancleRow?:boolean
 }
 
 export const useProductTableColumnVisibility = (
@@ -23,6 +24,7 @@ export const useProductTableColumnVisibility = (
         hasBuyers: false,
         hasNote: false,
         hasIssuedQuantity: false,
+        hasIsCancleRow:false,
       };
     }
 
@@ -33,6 +35,7 @@ export const useProductTableColumnVisibility = (
       hasBuyers: productTableData.some((p) => p.buyers?.length || 0 > 0),
       hasNote: productTableData.some((p) => p.note),
       hasIssuedQuantity: productTableData.some((p) => p.issued_quantity),
+      hasIsCancleRow: productTableData.some((p) => p.is_cancel),
     };
   }, [productTableData]);
 };

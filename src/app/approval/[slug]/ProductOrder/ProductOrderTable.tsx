@@ -71,7 +71,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     hasBuyers,
     hasNote,
     hasOrderProductComment,
-    hasIssuedQuantity
+    hasIssuedQuantity,
+    hasIsCancleRow
   } = useProductTableColumnVisibility(productTableData);
 
   const {
@@ -418,10 +419,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Действия",
       key: "action",
       width: "100px",
-      hidden: readonly,
+      hidden:!hasIsCancleRow,
       render: (_: any, record: IProductTable) =>
         !isPrinting &&
-        !readonly && (
+        !readonly ? (
           <Space size="middle">
             {record.is_cancel ? (
               <>
@@ -463,6 +464,22 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               </Button>
             )}
           </Space>
+        ):(
+          <Space size="middle">
+          {record.is_cancel && (
+              <Tooltip
+                title={
+                  <span>
+                    {record?.order_cancel_comment?.comment}
+                    <br /> Сотрудник: {record?.order_cancel_comment?.employee}
+                  </span>
+                }
+              >
+                <InfoCircleFilled style={{ color: "#fff" }} />
+              </Tooltip>
+          )
+        }
+        </Space>
         ),
     },
   ];
