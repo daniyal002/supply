@@ -77,6 +77,7 @@ export const exportOrderToExcel = async (order: IOrderItem, products:IProductUni
     "Сотрудники",
     "Ед. изм.",
     "Кол-во",
+    "Выданное кол-во",
     "Общий остаток",
     "Артикул",
     "Добавленный товар",
@@ -101,9 +102,10 @@ export const exportOrderToExcel = async (order: IOrderItem, products:IProductUni
   order.order_products.forEach((product) => {
     const row = sheet.addRow([
       product.product?.product_name || "",
-      product.buyers?.map((buyers) => buyers.buyer_name).join(", ") || "",
+      product.buyers?.map((buyers) => buyers.buyer_name + ' - ' + buyers.product_quantity).join(", ") || "",
       product.unit_measurement?.unit_measurement?.unit_measurement_name || "",
       product.product_quantity,
+      product.issued_quantity,
       products.find(products => products.product_id === product.product.product_id)?.remainder || "",
       product.product.product_article || "",
       product.order_product_name || "",
