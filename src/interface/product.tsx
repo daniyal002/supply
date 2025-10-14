@@ -34,6 +34,7 @@ export interface IProductUnit{
     product_kod_1c_parent:string
     is_group:boolean
     remainder?:number
+    unit_measurement_name:string
 }
 
 export interface IProductUnitNode extends IProductUnit {

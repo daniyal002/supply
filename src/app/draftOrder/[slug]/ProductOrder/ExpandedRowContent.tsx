@@ -1,5 +1,4 @@
 import { formatNotificationDate } from "@/helper/DataFormat";
-import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
 import { Collapse, Table, Tooltip } from "antd";
@@ -13,7 +12,6 @@ interface Props {
 export const ExpandedRowContent = ({
   orderProductComments,
   productPreviousOrders,
-  orderId,
 }: Props) => {
   const dataSourceProductComments: IOrderProductCommentsResponse[] =
     orderProductComments?.map((product, index) => ({
@@ -27,8 +25,6 @@ export const ExpandedRowContent = ({
       key: index, // Ensure each item has a unique key
     }));
 
-  const { mutate: deleteOrderProductCommentMutation } =
-    useDeleteOrderProductCommentMutation(orderId);
 
   return (
     <>

@@ -1,6 +1,7 @@
 export interface IBasicUnit{
     unit_measurement_id?:number,
     unit_measurement_name:string,
+    unit_measurement_coefficient:number
  }
 
  export interface IUnitMeasurement{

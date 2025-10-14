@@ -1,21 +1,22 @@
 import { formatNotificationDate } from "@/helper/DataFormat";
-import { useDeleteOrderProductCommentMutation } from "@/hook/orderHook";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { IProductPreviousOrders } from "@/interface/productTable";
 import { Collapse, Table, Tooltip } from "antd";
 import style from "./ProductOrderTable.module.scss";
 
-
 interface Props {
   orderProductComments: IOrderProductCommentsResponse[];
   productPreviousOrders: IProductPreviousOrders[];
   orderId: number;
+  coefficient?: number;
+  basicUnit?: string;
 }
 
 export const ExpandedRowContent = ({
   orderProductComments,
   productPreviousOrders,
-  orderId,
+  coefficient,
+  basicUnit
 }: Props) => {
   const dataSourceProductComments: IOrderProductCommentsResponse[] =
     orderProductComments?.map((product, index) => ({
@@ -29,8 +30,6 @@ export const ExpandedRowContent = ({
       key: index, // Ensure each item has a unique key
     }));
 
-  const { mutate: deleteOrderProductCommentMutation } =
-    useDeleteOrderProductCommentMutation(orderId);
 
   return (
     <>
@@ -62,21 +61,20 @@ export const ExpandedRowContent = ({
                         title: "Комментарий",
                         dataIndex: "comment",
                         key: "comment",
-                        render: (comment: string) => (
+                        render: (comment: string) =>
                           comment && comment.length > 50 ? (
                             <Tooltip title={comment}>
                               {`${comment.substring(0, 50)}...`}
                             </Tooltip>
                           ) : (
                             comment
-                          )
-                        )
+                          ),
                       },
                       {
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
-                        render: (data: string) => formatNotificationDate(data)
+                        render: (data: string) => formatNotificationDate(data),
                       },
                     ]}
                     pagination={false}
@@ -103,11 +101,14 @@ export const ExpandedRowContent = ({
                     dataSource={dataSourceProductPreviousOrders}
                     rowClassName={(record) =>
                       record?.is_cancel === true
-                      ? style.highlightRowIsCancel : ""
+                        ? style.highlightRowIsCancel
+                        : ""
                     }
                     rowHoverable={false}
                     onRow={(record) => ({
-                      title: record?.is_cancel ? "Товар отклонен. Перейти в заявку для просмотра комментария" : "",
+                      title: record?.is_cancel
+                        ? "Товар отклонен. Перейти в заявку для просмотра комментария"
+                        : "",
                     })}
                     columns={[
                       {
@@ -124,6 +125,27 @@ export const ExpandedRowContent = ({
                         title: "Согласованное количество",
                         dataIndex: "product_count",
                         key: "product_quantity",
+                      },
+                      {
+                        title: "Выданное количество",
+                        key: "issued_quantity_and_unit_measurement_coefficient",
+                        width: "250px",
+                        render: (record: IProductPreviousOrders) => (
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            <p>{record?.issued_quantity}</p>
+                            {coefficient &&
+                              coefficient !== 1 &&
+                              record?.issued_quantity && (
+                                <p>
+                                  (
+                                  {Math.round(
+                                    record?.issued_quantity * coefficient
+                                  )}{" "}
+                                  {basicUnit})
+                                </p>
+                              )}
+                          </div>
+                        ),
                       },
                       {
                         title: "Ед. измерения",

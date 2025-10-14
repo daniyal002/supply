@@ -360,10 +360,17 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     },
     {
       title: "Выданное количество",
-      dataIndex: "issued_quantity",
-      key: "issued_quantity",
-      width: "50px",
+      key: "issued_quantity_and_unit_measurement_coefficient",
+      width: "250px",
       hidden: !hasIssuedQuantity,
+      render: (record: IProductTable) => (
+        <div style={{ display: "flex", gap: "10px" }}>
+          <p>{record?.issued_quantity} {record.unit_measurement.unit_measurement.unit_measurement_name}</p>
+          {record?.unit_measurement.unit_measurement.unit_measurement_coefficient !== 1 && record?.issued_quantity && (
+            <p>({Math.round(record?.issued_quantity * record?.unit_measurement.unit_measurement.unit_measurement_coefficient)} {record.product.unit_measurement_name})</p>
+          )}
+        </div>
+      )
     },
     {
       title: "Действия",
@@ -494,6 +501,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               orderProductComments={record?.order_product_comment || []}
               productPreviousOrders={record?.product_previous_orders || []}
               orderId={orderId}
+              coefficient={record.unit_measurement.unit_measurement.unit_measurement_coefficient}
+              basicUnit={record.product.unit_measurement_name}
             />
 
             <RemainProduct product_kod_1c={record?.product?.product_kod_1c} />

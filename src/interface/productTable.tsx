@@ -70,4 +70,5 @@ export interface IProductPreviousOrders {
   buyer_name: string;
   unit_measurement_name: string;
   is_cancel: boolean;
+  issued_quantity?:number
 }

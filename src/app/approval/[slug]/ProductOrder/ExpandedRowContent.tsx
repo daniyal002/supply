@@ -20,6 +20,8 @@ interface Props {
   orderId: number;
   is_cancel: boolean;
   readonly?: boolean;
+  coefficient?: number;
+  basicUnit?: string;
 }
 
 export const ExpandedRowContent = ({
@@ -33,7 +35,9 @@ export const ExpandedRowContent = ({
   showModal,
   orderId,
   is_cancel,
+  coefficient,
   readonly = false,
+  basicUnit,
 }: Props) => {
   const dataSourceProductComments: IOrderProductCommentsResponse[] =
     orderProductComments?.map((product, index) => ({
@@ -154,11 +158,14 @@ export const ExpandedRowContent = ({
                     dataSource={dataSourceProductPreviousOrders}
                     rowClassName={(record) =>
                       record?.is_cancel === true
-                      ? style.highlightRowIsCancel : ""
+                        ? style.highlightRowIsCancel
+                        : ""
                     }
                     rowHoverable={false}
                     onRow={(record) => ({
-                      title: record?.is_cancel ? "Товар отклонен. Перейти в заявку для просмотра комментария" : "",
+                      title: record?.is_cancel
+                        ? "Товар отклонен. Перейти в заявку для просмотра комментария"
+                        : "",
                     })}
                     columns={[
                       {
@@ -169,7 +176,7 @@ export const ExpandedRowContent = ({
                           <Button
                             onClick={() => {
                               setAllOrderId(String(order_id));
-                              setActiveMainTabKey("5")
+                              setActiveMainTabKey("5");
                             }}
                             title={`Перейти в заявку ${order_id}`}
                           >
@@ -186,6 +193,27 @@ export const ExpandedRowContent = ({
                         title: "Согласованное количество",
                         dataIndex: "product_count",
                         key: "product_quantity",
+                      },
+                      {
+                        title: "Выданное количество",
+                        key: "issued_quantity_and_unit_measurement_coefficient",
+                        width: "250px",
+                        render: (record: IProductPreviousOrders) => (
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            <p>{record?.issued_quantity}</p>
+                            {coefficient &&
+                              coefficient !== 1 &&
+                              record?.issued_quantity && (
+                                <p>
+                                  (
+                                  {Math.round(
+                                    record?.issued_quantity * coefficient
+                                  )}{" "}
+                                  {basicUnit})
+                                </p>
+                              )}
+                          </div>
+                        ),
                       },
                       {
                         title: "Ед. измерения",
