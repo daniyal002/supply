@@ -198,12 +198,12 @@ export const ExpandedRowContent = ({
                         title: "Выданное количество",
                         key: "issued_quantity_and_unit_measurement_coefficient",
                         width: "250px",
-                        render: (record: IProductPreviousOrders) => (
+                         render: (record: IProductPreviousOrders) => (
                           <div style={{ display: "flex", gap: "10px" }}>
                             <p>{record?.issued_quantity}</p>
                             {coefficient &&
-                              coefficient !== 1 &&
-                              record?.issued_quantity && (
+                              coefficient !== 1  &&
+                              record?.issued_quantity !== 0 && record?.issued_quantity && (
                                 <p>
                                   (
                                   {Math.round(

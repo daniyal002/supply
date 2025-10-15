@@ -419,7 +419,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       title: "Действия",
       key: "action",
       width: "100px",
-      hidden:!hasIsCancleRow,
+      // hidden:!hasIsCancleRow,
       render: (_: any, record: IProductTable) =>
         !isPrinting &&
         !readonly ? (

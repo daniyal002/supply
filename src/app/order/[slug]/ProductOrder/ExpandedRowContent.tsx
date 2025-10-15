@@ -134,8 +134,8 @@ export const ExpandedRowContent = ({
                           <div style={{ display: "flex", gap: "10px" }}>
                             <p>{record?.issued_quantity}</p>
                             {coefficient &&
-                              coefficient !== 1 &&
-                              record?.issued_quantity && (
+                              coefficient !== 1  &&
+                              record?.issued_quantity !== 0 && record?.issued_quantity && (
                                 <p>
                                   (
                                   {Math.round(
