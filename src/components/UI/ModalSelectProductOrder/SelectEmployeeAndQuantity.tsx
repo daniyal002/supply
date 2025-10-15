@@ -1,23 +1,33 @@
 import { db } from "@/db/db";
+import { IOrderItemFormValues } from "@/interface/orderItem";
+import { IProductTableFormValues } from "@/interface/productTable";
 import { Input, Select } from "antd";
 import { useLiveQuery } from "dexie-react-hooks";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Control,
   Controller,
+  FieldErrors,
   UseFormGetValues,
   useWatch,
 } from "react-hook-form";
+import style from "./ModalSelectProductOrder.module.scss";
 
 interface Props {
-  getValues: UseFormGetValues<any>;
+  getValues: UseFormGetValues<IOrderItemFormValues>;
   control: Control<any, any>;
+  getValuesModal: UseFormGetValues<IProductTableFormValues>;
+  errors: FieldErrors<IProductTableFormValues>;
 }
 
 export default function SelectEmployeeAndQuantity({
   control,
   getValues,
+  getValuesModal,
+  errors,
 }: Props) {
+  const [open, setOpen] = React.useState(false);
+
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const employees =
@@ -46,10 +56,11 @@ export default function SelectEmployeeAndQuantity({
       }));
   }, [employees]);
 
-  const buyersWatch = useWatch({
-    control,
-    name: "buyers",
-  }) || [];
+  const buyersWatch =
+    useWatch({
+      control,
+      name: "buyers",
+    }) || [];
 
   return (
     <>
@@ -65,21 +76,29 @@ export default function SelectEmployeeAndQuantity({
             options={optionsEmployees}
             onChange={(selectedIds) => {
               const prev = buyersWatch || [];
+              const baseQuantity = getValuesModal("product_quantity") || 0;
 
               // Добавляем новых сотрудников, сохраняя старые product_quantity
-              const updated = selectedIds.map((id: number) => {
+              const updated = selectedIds.map((id: number, idx: number) => {
+                console.log(idx);
                 const existing = prev.find((b: any) => b.employee_id === id);
-                return existing ?? { employee_id: id, product_quantity: 1 };
+                return (
+                  existing ?? {
+                    employee_id: id,
+                    product_quantity: idx === 0 ? baseQuantity : 0,
+                  }
+                );
               });
 
               field.onChange(updated);
+              setOpen(false); // закрываем список после выбора
             }}
             showSearch
             filterOption={(input, option) =>
-              (option?.label ?? "")
-                .toLowerCase()
-                .includes(input.toLowerCase())
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
+            open={open}
+            onDropdownVisibleChange={setOpen}
           />
         )}
       />
@@ -114,22 +133,42 @@ export default function SelectEmployeeAndQuantity({
             >
               {employee.label}
             </span>
-
             <Controller
               control={control}
               name={`buyers.${index}.product_quantity`}
-            //   defaultValue={buyer.product_quantity ?? 1}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="number"
-                  min={1}
-                  placeholder="Кол-во"
-                  style={{
-                    width: "100%",
-                    textAlign: "center",
-                  }}
-                />
+              rules={{
+                required: { value: true, message: "Количество обязательно" },
+                validate: (value) => {
+                  const num = parseFloat(value);
+                  if (isNaN(num)) return "Введите корректное число";
+                  if (num <= 0) return "Количество должно быть больше 0";
+                  return true;
+                },
+              }}
+              render={({ field, fieldState }) => (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="Кол-во"
+                    style={{ width: "100%", textAlign: "center" }}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^[0-9]*\.?[0-9]*$/.test(value)) {
+                        field.onChange(value);
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (!/[0-9.]/.test(e.key)) e.preventDefault();
+                    }}
+                  />
+                  {/* Отображение ошибки */}
+                  {fieldState.error && (
+                    <span className={style.errorEmployees}>
+                      {fieldState.error.message}
+                    </span>
+                  )}
+                </div>
               )}
             />
           </div>

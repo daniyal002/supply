@@ -10,14 +10,17 @@ import {
 } from "react-hook-form";
 import style from "./ModalSelectProductOrder.module.scss";
 import { useAllMesument, useProductData } from "@/hook/productHook";
-import { IEmployeeFromProductTable, IProductTable, IProductTableFormValues } from "@/interface/productTable";
+import {
+  IEmployeeFromProductTable,
+  IProductTable,
+  IProductTableFormValues,
+} from "@/interface/productTable";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import SelectEmployeeAndQuantity from "./SelectEmployeeAndQuantity";
 import { IProductUnit } from "@/interface/product";
 import { IUnit } from "@/interface/unit";
-import { IEmployeeFormValues } from "@/interface/employee";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -68,7 +71,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         getValuesModal("unit_measurement.value")
     );
 
-
     const doctors = getValuesModal("buyers")?.map((buyer) => {
       const employee = employees.find(
         (emp) => emp.buyer_id === buyer.employee_id
@@ -87,15 +89,19 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         unit_measurement_name: data.unit_measurement.label,
       },
     };
-    const productTable:IProductTable = {
+    const productTable: IProductTable = {
       ...data,
       product: (!isNewProduct && itemProductData) as IProductUnit,
       buyers: doctors as IEmployeeFromProductTable[],
-      unit_measurement: isNewProduct ? newUnitMesurement as IUnit : unit as IUnit,
-      product_quantity:  data.product_quantity ? Number(data.product_quantity) : doctors?.reduce(
-        (acc, cur) => acc + (Number(cur.product_quantity) || 0),
-        0
-      ) || 0,
+      unit_measurement: isNewProduct
+        ? (newUnitMesurement as IUnit)
+        : (unit as IUnit),
+      product_quantity: data.product_quantity
+        ? Number(data.product_quantity)
+        : doctors?.reduce(
+            (acc, cur) => acc + (Number(cur.product_quantity) || 0),
+            0
+          ) || 0,
     };
 
     const products = getValues("order_products") || [];
@@ -106,15 +112,18 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       );
       // @ts-ignore: Unreachable code error
       setValue("order_products", updatedProducts);
-
     } else {
-      if(products.some(p => p.product.product_id === productTable.product.product_id ) && !isNewProduct){
-        message.warning("Товар уже добавлен в заявку!")
-      }else{
+      if (
+        products.some(
+          (p) => p.product.product_id === productTable.product.product_id
+        ) &&
+        !isNewProduct
+      ) {
+        message.warning("Товар уже добавлен в заявку!");
+      } else {
         // @ts-ignore: Unreachable code error
         setValue("order_products", [...products, productTable]);
       }
-
     }
     reset();
     setIsModalOpen(false);
@@ -123,6 +132,11 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const buyersWatch = watchModal("buyers") || [];
 
   useEffect(() => {
+    if (buyersWatch.length === 0) {
+      setDisabledQuantity(false);
+      return;
+    } // <--- добавляем защиту
+
     const hasBuyers = buyersWatch.length > 0;
     setDisabledQuantity(hasBuyers);
 
@@ -155,7 +169,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     if (employee) {
       setBuyerType(employee?.buyer_type);
     }
-  }, [getValues("employee_id.value"),GetMeData]);
+  }, [getValues("employee_id.value"), GetMeData]);
 
   useEffect(() => {
     if (type === "Добавить") {
@@ -183,8 +197,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               ?.unit_measurement_name,
         },
         buyers: productToEdit?.buyers?.map((emp) => ({
-          employee_id:emp.buyer_id,
-          product_quantity: emp.product_quantity
+          employee_id: emp.buyer_id,
+          product_quantity: emp.product_quantity,
         })),
         order_product_name: productToEdit?.order_product_name,
         order_product_link: productToEdit?.order_product_link,
@@ -192,7 +206,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       });
     }
   }, [type, reset, editProductId, isModalOpen]);
-
 
   const optionsUnit = useMemo(() => {
     if (isNewProduct) {
@@ -235,20 +248,20 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       value: maxUnit.unit_measurement.unit_measurement_id,
       label: `${maxUnit.unit_measurement.unit_measurement_name}(${maxUnit.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
     };
-  }, [isNewProduct, itemProductData,allMesument]);
+  }, [isNewProduct, itemProductData, allMesument]);
 
   const closeModal = () => {
     setIsModalOpen(false);
     reset({
       product: undefined,
-        buyers: [{employee_id: undefined, product_quantity: undefined}],
-        product_quantity: undefined,
-        order_product_link: undefined,
-        order_product_name: undefined,
-        unit_measurement: defaultUnit,
-        note: undefined,
+      buyers: [{ employee_id: undefined, product_quantity: undefined }],
+      product_quantity: undefined,
+      order_product_link: undefined,
+      order_product_name: undefined,
+      unit_measurement: defaultUnit,
+      note: undefined,
     });
-  }
+  };
 
   return (
     <Modal
@@ -260,7 +273,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       open={isModalOpen}
       onCancel={() => closeModal()}
       maskClosable={false}
-      footer={(null)}
+      footer={null}
       mask={true}
     >
       <form onSubmit={handleSubmit(onSubmit)} className={style.modalForm}>
@@ -328,8 +341,6 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           </>
         )}
 
-
-
         <div className={style.formItem}>
           <label className={style.formItemLabel}>
             Выберите Единицу измерения
@@ -375,17 +386,28 @@ const ModalSelectProductOrder: React.FC<Props> = ({
             disabled={disabledQuantity}
             rules={{
               required: { value: true, message: "Количество обязательно" },
-              pattern: {
-                value: /^[0-9]*\.?[0-9]+$/, // Обновленное регулярное выражение для целых и дробных чисел
-                message: "Введите корректное число", // Сообщение об ошибке
+              validate: (value) => {
+                const num = parseFloat(String(value));
+                if (isNaN(num)) return "Введите корректное число";
+                if (num <= 0) return "Количество должно быть больше 0";
+                return true;
               },
             }}
             render={({ field }) => (
               <Input
+                {...field}
                 type="text"
                 placeholder="Количество"
                 className={style.modalName}
-                {...field}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^[0-9]*\.?[0-9]*$/.test(value)) {
+                    field.onChange(value);
+                  }
+                }}
+                onKeyPress={(e) => {
+                  if (!/[0-9.]/.test(e.key)) e.preventDefault();
+                }}
               />
             )}
           />
@@ -398,7 +420,12 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         {buyerType === "parlor" && (
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Выберите сотрудника</label>
-            <SelectEmployeeAndQuantity control={control} getValues={getValues}/>
+            <SelectEmployeeAndQuantity
+              control={control}
+              getValues={getValues}
+              getValuesModal={getValuesModal}
+              errors={errors}
+            />
           </div>
         )}
         <div className={style.formItem}>
