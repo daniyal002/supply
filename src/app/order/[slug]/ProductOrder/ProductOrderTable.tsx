@@ -326,7 +326,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ?.map((buyer) =>
             buyer.product_quantity === 0
               ? buyer.buyer_name
-              : buyer.buyer_name + " - " + buyer.product_quantity
+              : buyer.buyer_name + " - " +  Math.round(buyer.product_quantity * 100) / 100
           )
           .join(", "),
       responsive: ["sm"],

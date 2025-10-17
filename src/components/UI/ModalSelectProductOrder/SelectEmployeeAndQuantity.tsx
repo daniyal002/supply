@@ -3,11 +3,13 @@ import { IOrderItemFormValues } from "@/interface/orderItem";
 import { IProductTableFormValues } from "@/interface/productTable";
 import { Input, Select } from "antd";
 import { useLiveQuery } from "dexie-react-hooks";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   Control,
   Controller,
+  FieldArrayWithId,
   FieldErrors,
+  UseFieldArrayReplace,
   UseFormGetValues,
   useWatch,
 } from "react-hook-form";
@@ -18,16 +20,21 @@ interface Props {
   control: Control<any, any>;
   getValuesModal: UseFormGetValues<IProductTableFormValues>;
   errors: FieldErrors<IProductTableFormValues>;
+  fields: FieldArrayWithId<IProductTableFormValues, "buyers" | "product.directory_unit_measurement", "id">[]
+  replace: UseFieldArrayReplace<IProductTableFormValues, "buyers" | "product.directory_unit_measurement">
 }
 
 export default function SelectEmployeeAndQuantity({
   control,
   getValues,
-  getValuesModal,
-  errors,
+  fields,
+  replace,
 }: Props) {
-  const [open, setOpen] = React.useState(false);
 
+  const product_quantity = useWatch({
+    control: control, // 👈 правильный control
+    name: "product_quantity",
+  });
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const employees =
@@ -56,55 +63,35 @@ export default function SelectEmployeeAndQuantity({
       }));
   }, [employees]);
 
-  const buyersWatch =
-    useWatch({
-      control,
-      name: "buyers",
-    }) || [];
+
 
   return (
     <>
       {/* Выбор сотрудников */}
-      <Controller
-        control={control}
-        name="buyers"
-        render={({ field }) => (
-          <Select
-            mode="multiple"
-            placeholder="Выберите сотрудников"
-            value={buyersWatch.map((b: any) => b.employee_id)}
-            options={optionsEmployees}
-            onChange={(selectedIds) => {
-              const prev = buyersWatch || [];
-              const baseQuantity = getValuesModal("product_quantity") || 0;
 
-              // Добавляем новых сотрудников, сохраняя старые product_quantity
-              const updated = selectedIds.map((id: number, idx: number) => {
-                console.log(idx);
-                const existing = prev.find((b: any) => b.employee_id === id);
-                return (
-                  existing ?? {
-                    employee_id: id,
-                    product_quantity: idx === 0 ? baseQuantity : 0,
-                  }
-                );
-              });
+      <Select
+        mode="multiple"
+        placeholder="Выберите сотрудников"
+        //@ts-ignore
+        value={fields.map((f) => f.employee_id)}
+        options={optionsEmployees}
+        onChange={(selectedIds) => {
+          const totalQuantity = Number(product_quantity) || 0;
+          const baseQuantity = totalQuantity / (selectedIds.length || 1);
 
-              field.onChange(updated);
-              setOpen(false); // закрываем список после выбора
-            }}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-            open={open}
-            onDropdownVisibleChange={setOpen}
-          />
-        )}
+          // Сохраняем как строку — чтобы контролы input получали строку
+          const updated = selectedIds.map((id: number) => ({
+            // не даём useFieldArray генерировать старые id — пусть он сгенерирует новые
+            employee_id: id,
+            product_quantity: baseQuantity,
+          }));
+
+          replace(updated);
+        }}
       />
 
       {/* Количество для каждого выбранного сотрудника */}
-      {buyersWatch.map((buyer: any, index: number) => {
+      {fields.map((buyer: any, index: number) => {
         const employee = optionsEmployees.find(
           (opt) => opt.value === buyer.employee_id
         );
@@ -112,7 +99,7 @@ export default function SelectEmployeeAndQuantity({
 
         return (
           <div
-            key={buyer.employee_id}
+            key={buyer.employee_id + buyer.product_quantity}
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 100px",
@@ -133,9 +120,11 @@ export default function SelectEmployeeAndQuantity({
             >
               {employee.label}
             </span>
+
             <Controller
               control={control}
               name={`buyers.${index}.product_quantity`}
+              defaultValue={buyer.product_quantity ?? ""} // <- важно
               rules={{
                 required: { value: true, message: "Количество обязательно" },
                 validate: (value) => {
@@ -149,9 +138,7 @@ export default function SelectEmployeeAndQuantity({
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <Input
                     {...field}
-                    type="text"
-                    placeholder="Кол-во"
-                    style={{ width: "100%", textAlign: "center" }}
+                    value={field.value ?? ""} // на всякий случай
                     onChange={(e) => {
                       const value = e.target.value;
                       if (/^[0-9]*\.?[0-9]*$/.test(value)) {
@@ -161,8 +148,9 @@ export default function SelectEmployeeAndQuantity({
                     onKeyPress={(e) => {
                       if (!/[0-9.]/.test(e.key)) e.preventDefault();
                     }}
+                    placeholder="Кол-во"
+                    style={{ width: "100%", textAlign: "center" }}
                   />
-                  {/* Отображение ошибки */}
                   {fieldState.error && (
                     <span className={style.errorEmployees}>
                       {fieldState.error.message}

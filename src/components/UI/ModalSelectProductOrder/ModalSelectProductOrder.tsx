@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Controller,
   SubmitHandler,
+  useFieldArray,
   useForm,
   UseFormGetValues,
   UseFormSetValue,
@@ -126,6 +127,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       }
     }
     reset();
+    replace([]);
     setIsModalOpen(false);
   };
 
@@ -175,7 +177,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     if (type === "Добавить") {
       reset({
         product: undefined,
-        buyers: undefined,
+        buyers: [],
         product_quantity: undefined,
         order_product_link: undefined,
         order_product_name: undefined,
@@ -251,17 +253,22 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   }, [isNewProduct, itemProductData, allMesument]);
 
   const closeModal = () => {
-    setIsModalOpen(false);
     reset({
       product: undefined,
-      buyers: [{ employee_id: undefined, product_quantity: undefined }],
+      buyers: [],
       product_quantity: undefined,
       order_product_link: undefined,
       order_product_name: undefined,
       unit_measurement: defaultUnit,
       note: undefined,
     });
+    setIsModalOpen(false);
   };
+
+  const { fields, replace } = useFieldArray<IProductTableFormValues>({
+    control,
+    name: "buyers",
+  });
 
   return (
     <Modal
@@ -425,6 +432,8 @@ const ModalSelectProductOrder: React.FC<Props> = ({
               getValues={getValues}
               getValuesModal={getValuesModal}
               errors={errors}
+              fields={fields}
+              replace={replace}
             />
           </div>
         )}
