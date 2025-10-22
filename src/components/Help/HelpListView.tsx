@@ -14,8 +14,6 @@ interface Props {
   isLoading: boolean;
   isError: boolean;
   errorMessage?: string;
-  selectedHelp: IHelp | null;
-  onSelectHelp: (item: IHelp | null) => void;
   countHelpData: number;
 }
 
@@ -29,8 +27,6 @@ export default function HelpListView({
   isLoading,
   isError,
   errorMessage,
-  selectedHelp,
-  onSelectHelp,
   countHelpData,
 }: Props) {
   if (isLoading) {
@@ -47,41 +43,24 @@ export default function HelpListView({
 
   return (
     <div className={styles.helpWrapper}>
-      {!selectedHelp && (
-        <Input.Search
-          placeholder="Поиск видеоуроков"
-          allowClear
-          onSearch={onSearch}
-          className={styles.search}
-        />
-      )}
+      <Input.Search
+        placeholder="Поиск видеоуроков"
+        allowClear
+        onSearch={onSearch}
+        className={styles.search}
+      />
 
-      {!selectedHelp && (
-        <div className={styles.countHelpData}>
-          <p>Количество видеоуроков: </p>
-          <span>{countHelpData}</span>
-        </div>
-      )}
-      <div className={selectedHelp ? styles.selectedHelp : styles.helpList}>
-        {selectedHelp ? (
-          <HelpCard
-            item={selectedHelp}
-            onClick={() => onSelectHelp(null)}
-            type="single"
-          />
-        ) : (
-          items.map((item, index) => (
-            <HelpCard
-              item={item}
-              key={index}
-              onClick={() => onSelectHelp(item)}
-              type="group"
-            />
-          ))
-        )}
+      <div className={styles.countHelpData}>
+        <p>Количество видеоуроков: </p>
+        <span>{countHelpData}</span>
+      </div>
+      <div className={styles.helpList}>
+        {items.map((item, index) => (
+          <HelpCard item={item} key={index} />
+        ))}
       </div>
 
-      {!selectedHelp && total > pageSize && (
+      {total > pageSize && (
         <div className={styles.paginationWrapper}>
           <Pagination
             current={currentPage}

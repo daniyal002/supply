@@ -53,7 +53,19 @@ export default function Tab() {
 
 
   const [activeKey, setActiveKey] = useState(tabsOrders[0].key);
+  const [isWide, setIsWide] = useState(false); // следим за шириной окна
   const newTabIndex = useRef(1);
+
+  // Отслеживание ширины экрана
+  useEffect(() => {
+    const handleResize = () => {
+      setIsWide(window.innerWidth > 500);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   useEffect(() => {
     const id = activeKey.startsWith('order-') ? activeKey.split('order-')[1] : null;
@@ -139,7 +151,7 @@ const remove = (targetKey: TargetKey) => {
         type="editable-card"
         onChange={onChange}
         activeKey={activeKey}
-        addIcon={<div style={{display:"flex", gap:"10px"}}><p>Создать заявку</p></div>}
+        addIcon={<div style={{display:"flex", gap:"10px", justifyContent:"center", alignItems:"center"}}><p>{!isWide ? '+' : 'Создать заявку'}</p></div>}
         onEdit={onEdit}
         items={tabsOrders} // Используем вкладки из глобального состояния
         style={{ padding: "0 10px" }}

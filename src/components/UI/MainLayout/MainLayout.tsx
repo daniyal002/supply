@@ -226,7 +226,12 @@ const MainLayout = ({
 
           <div className={style.headerBellAndButtons}>
             <Tooltip title={"Помощь"}>
-              <Button onClick={() => push("/help")} size={isMobile ? "small" : "middle"}>{isMobile ? <QuestionCircleOutlined /> : "Помощь"}</Button>
+              {isMobile ? <QuestionCircleOutlined  style={{
+                cursor: "pointer",
+                transition: "all 0.3s",
+                fontSize:"28px",
+                color:"#678098"
+              }}onClick={() => push("/help")} /> : (<Button onClick={() => push("/help")}>Помощь</Button>)}
             </Tooltip>
 
             {/* <Tooltip
@@ -243,9 +248,12 @@ const MainLayout = ({
                 {supplyTheme === "light" ? <SunOutlined /> : <MoonOutlined />}
               </Button>
             </Tooltip> */}
-
-            <DropdownNotifications />
-            <DropdownNotificationsChat />
+            {!isMobile &&(
+              <>
+              <DropdownNotifications />
+              <DropdownNotificationsChat />
+              </>
+            )}
 
             <div
               className={style.headerButtons}
@@ -253,10 +261,10 @@ const MainLayout = ({
             >
               <Tooltip title={login}>
                 <Button
-                  icon={<p>{login[0].toUpperCase()}</p>}
+                  icon={<p style={{fontSize:"20px"}}>{login[0].toUpperCase()}</p>}
                   className={style.headerLoginChar}
                   onClick={() => push("/profile")}
-                  size={isMobile ? "small" : "middle"}
+                  // size={isMobile ? "small" : "middle"}
                 />
               </Tooltip>
               <LogoutDropdown isMobile={isMobile} supplyTheme={supplyTheme} />

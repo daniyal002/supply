@@ -3,7 +3,6 @@
 import { useHelpData } from "@/hook/helpHook";
 import { useMemo, useState } from "react";
 import { matchesSearch } from "@/helper/TableFilters/Filters/filterBySearchText";
-import { IHelp } from "@/interface/help";
 import HelpListView from "./HelpListView";
 import Link from "next/link";
 import { Button } from "antd";
@@ -13,7 +12,6 @@ export function HelpList() {
   const { data: helpData, isError, isLoading, error } = useHelpData();
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedHelp, setSelectedHelp] = useState<IHelp | null>(null);
   const pageSize = 6;
 
   const filteredHelpData = useMemo(() => {
@@ -37,7 +35,6 @@ export function HelpList() {
 
   return (
     <>
-      {!selectedHelp && (
         <Link href="/" passHref>
           <Button
             type="primary"
@@ -52,7 +49,6 @@ export function HelpList() {
             Назад
           </Button>
         </Link>
-      )}
 
       <HelpListView
         items={paginatedData || []}
@@ -64,8 +60,6 @@ export function HelpList() {
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.message}
-        selectedHelp={selectedHelp}
-        onSelectHelp={setSelectedHelp}
         countHelpData={countHelpData}
       />
     </>
