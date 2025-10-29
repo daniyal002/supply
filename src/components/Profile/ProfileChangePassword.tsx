@@ -10,7 +10,6 @@ const {mutate,isSuccess,error} = useChangePassword()
     newPassword: string;
     confirm: string;
   }) => {
-    console.log("Смена пароля:", values);
     // Логика смены пароля
     mutate({
       old_password:values.oldPassword,
