@@ -9,7 +9,7 @@ import {
   UnorderedListOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Tooltip, message, theme } from "antd";
+import { Button, Layout, Menu, Tooltip, theme } from "antd";
 import { Waypoints } from "lucide-react";
 import style from "./MainLayout.module.scss";
 import DropdownNotifications from "../DropdownMenu/DropdownNotifications";
@@ -22,7 +22,6 @@ import { useThemeStore } from "../../../../store/themeStore";
 import { AdminPanelList } from "./AdminPanelList";
 import LogoutDropdown from "./LogoutDropdown";
 import DropdownNotificationsChat from "../DropdownMenu/DropdownNotificationsChat";
-import { p } from "framer-motion/client";
 import NewsTicker from "@/components/NewsTicker/NewsTicker";
 
 const { Header, Sider, Content } = Layout;

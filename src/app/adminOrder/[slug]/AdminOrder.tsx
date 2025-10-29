@@ -483,6 +483,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 type="button"
                 onClick={() => createOrder()}
                 className={style.buttonOrderCreate}
+                disabled={createOrderIsPending || updateOrderIsPending}
               >
                 {orderid === "newOrder" ||
                 orderid === `copy${Number(orderid?.split("copy").join(""))}`
@@ -500,6 +501,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 type="button"
                 className={style.buttonOrderSave}
                 onClick={() => saveOrder()}
+                disabled={saveOrderIsPending}
               >
                 {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
               </button>

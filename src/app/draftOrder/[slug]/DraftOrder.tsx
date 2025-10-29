@@ -53,7 +53,7 @@ export default function DraftOrder({
 
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
-  const { mutate: createOrderMutation } = useCreateOrderMutation();
+  const { mutate: createOrderMutation,isPending: createOrderIsPending } = useCreateOrderMutation();
 
   const { isPending: saveOrderIsPending } = useSaveDraftOrderMutation();
   const { mutate: updateDraftOrderMutation } = useUpdateDraftOrderMutation();
@@ -422,6 +422,7 @@ export default function DraftOrder({
               type="button"
               onClick={() => createOrder()}
               className={style.buttonOrderCreate}
+              disabled={createOrderIsPending || DeleteDraftOrderByIisPending}
             >
               {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
             </button>
@@ -430,6 +431,7 @@ export default function DraftOrder({
               type="button"
               className={style.buttonOrderSave}
               onClick={() => saveOrder()}
+              disabled={saveOrderIsPending}
             >
               {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
             </button>

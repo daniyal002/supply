@@ -371,12 +371,14 @@ export default function ApprovalOrder({
               <button
                 className={style.buttonOrderApproval}
                 onClick={() => agreedOrder(Number(orderid))}
+                disabled={agreedOrderPending}
               >
                 Согласовать
               </button>
               <button
                 className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
                 onClick={() => rejectOrder(Number(orderid))}
+                disabled={rejectOrderPending}
               >
                 Отклонить
               </button>
