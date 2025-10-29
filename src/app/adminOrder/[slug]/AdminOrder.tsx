@@ -411,6 +411,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       )}
       <div className={style.newOrder}>
         {!toggle ? (
+          <div>
           <h1 style={{ color: colorText }}>
             {orderid === "newOrder"
               ? "Новая заявка"
@@ -418,6 +419,19 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               ? "Копия"
               : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
           </h1>
+          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+                              статус заявки:{" "}
+                              <span
+                                style={{
+                                  color: getOrderByIdData?.order_status.status_color,
+                                  textTransform: "uppercase",
+                                  fontWeight:"bold"
+                                }}
+                              >
+                                {getOrderByIdData?.order_status.status_name}
+                              </span>
+                            </p>
+                  </div>
         ) : (
           <h1 style={{ color: colorText }}>Выбор товара</h1>
         )}

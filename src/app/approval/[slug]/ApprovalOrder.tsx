@@ -51,7 +51,7 @@ export default function ApprovalOrder({
     handleSubmit,
   } = useForm<IOrderItemFormValues>({ mode: "onChange" });
   const notifications = useNotificationStore((state) => state.notifications);
-  const { mutate: markAsReadNotification } = useMarkAsReadNotification('info');
+  const { mutate: markAsReadNotification } = useMarkAsReadNotification("info");
 
   // Print
   const contentRef = useRef<HTMLDivElement>(null);
@@ -85,81 +85,83 @@ export default function ApprovalOrder({
   } = useRejectOrderMutation();
   const [note, setnote] = React.useState("");
 
-  const orderId = useTabStore((state => state.activeTabApproval))
-  const [activeTabKey,setActiveTabKey] = useState<number>()
+  const orderId = useTabStore((state) => state.activeTabApproval);
+  const [activeTabKey, setActiveTabKey] = useState<number>();
 
-
-
-  const items: TabsProps["items"] = readonly ? [
-    {
-      key: "1",
-      label: "Выбранные товары",
-      children: (
-        <ProductOrder
-          productTableData={getValues("order_products")}
-          getValues={getValues}
-          setValue={setValue}
-          watch={watch}
-          readonly={readonly}
-          exportToExcel={() =>
-            exportOrderToExcel(
-              getOrderByIdData as IOrderItem,
-              productData || []
-            )
-          }
-          handlePrint={handlePrint}
-          isPrinting={isPrinting}
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "История согласования",
-      children: <OrderStepHistory order_id={Number(orderid)} />,
-    },
-    {
-      key: "3",
-      label: "Маршрут",
-      children: <RouteInfo order_id={Number(orderid)} />,
-    },
-  ] : [
-    {
-      key: "1",
-      label: "Выбранные товары",
-      children: (
-        <ProductOrder
-          productTableData={getValues("order_products")}
-          getValues={getValues}
-          setValue={setValue}
-          watch={watch}
-          readonly={readonly}
-          exportToExcel={() =>
-            exportOrderToExcel(
-              getOrderByIdData as IOrderItem,
-              productData || []
-            )
-          }
-          handlePrint={handlePrint}
-          isPrinting={isPrinting}
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "История согласования",
-      children: <OrderStepHistory order_id={Number(orderid)} />,
-    },
-    {
-      key: "3",
-      label: "Маршрут",
-      children: <RouteInfo order_id={Number(orderid)} />,
-    },
-    {
-      key: "4",
-      label: "Чат",
-      children: <ChatCore orderId={Number(orderId.replace("order-", ''))} />,
-    },
-  ];
+  const items: TabsProps["items"] = readonly
+    ? [
+        {
+          key: "1",
+          label: "Выбранные товары",
+          children: (
+            <ProductOrder
+              productTableData={getValues("order_products")}
+              getValues={getValues}
+              setValue={setValue}
+              watch={watch}
+              readonly={readonly}
+              exportToExcel={() =>
+                exportOrderToExcel(
+                  getOrderByIdData as IOrderItem,
+                  productData || []
+                )
+              }
+              handlePrint={handlePrint}
+              isPrinting={isPrinting}
+            />
+          ),
+        },
+        {
+          key: "2",
+          label: "История согласования",
+          children: <OrderStepHistory order_id={Number(orderid)} />,
+        },
+        {
+          key: "3",
+          label: "Маршрут",
+          children: <RouteInfo order_id={Number(orderid)} />,
+        },
+      ]
+    : [
+        {
+          key: "1",
+          label: "Выбранные товары",
+          children: (
+            <ProductOrder
+              productTableData={getValues("order_products")}
+              getValues={getValues}
+              setValue={setValue}
+              watch={watch}
+              readonly={readonly}
+              exportToExcel={() =>
+                exportOrderToExcel(
+                  getOrderByIdData as IOrderItem,
+                  productData || []
+                )
+              }
+              handlePrint={handlePrint}
+              isPrinting={isPrinting}
+            />
+          ),
+        },
+        {
+          key: "2",
+          label: "История согласования",
+          children: <OrderStepHistory order_id={Number(orderid)} />,
+        },
+        {
+          key: "3",
+          label: "Маршрут",
+          children: <RouteInfo order_id={Number(orderid)} />,
+        },
+        {
+          key: "4",
+          label: "Чат",
+          children: (
+            <ChatCore orderId={Number(orderId.replace("order-", ""))} />
+          ),
+        },
+      ];
 
   const agreedOrder = (order_id: number) => {
     agreedOrderMutation(
@@ -331,7 +333,10 @@ export default function ApprovalOrder({
             : "Заявка на склад",
       },
       order_author_name: getOrderByIdData?.order_author_name,
-      storage_id:{label:getOrderByIdData?.storage?.storage_name,value:getOrderByIdData?.storage?.storage_id}
+      storage_id: {
+        label: getOrderByIdData?.storage?.storage_name,
+        value: getOrderByIdData?.storage?.storage_id,
+      },
     });
   }, [reset, type, orderid, getOrderByIdData]);
 
@@ -344,7 +349,18 @@ export default function ApprovalOrder({
       {(agreedOrderPending || rejectOrderPending) && <Spin fullscreen={true} />}
       <div className={style.newOrder}>
         <h1>Заявка на согласовании №: {orderid}</h1>
-
+        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+          статус заявки:{" "}
+          <span
+            style={{
+              color: getOrderByIdData?.order_status.status_color,
+              textTransform: "uppercase",
+              fontWeight: "bold",
+            }}
+          >
+            {getOrderByIdData?.order_status.status_name}
+          </span>
+        </p>
         {/* <form key={1} onSubmit={handleSubmit(onSubmit)}> */}
         <ApprovalHeaderOrder
           register={register}
@@ -358,16 +374,23 @@ export default function ApprovalOrder({
            Согласовать
           </button> */}
         {/* </form> */}
-        <Tabs defaultActiveKey="1" items={items} onChange={(e) => setActiveTabKey(Number(e))} />
+        <Tabs
+          defaultActiveKey="1"
+          items={items}
+          onChange={(e) => setActiveTabKey(Number(e))}
+        />
         {!readonly && !isPrinting && (
-          <div className={style.commentAndButtons} style={{display: activeTabKey === 4 ? 'none' : 'flex'}}>
+          <div
+            className={style.commentAndButtons}
+            style={{ display: activeTabKey === 4 ? "none" : "flex" }}
+          >
             <TextArea
               placeholder="Комментарий"
               className={style.comment}
               value={note}
               onChange={(e) => setnote(e.target.value)}
             />
-            <div className={style.buttonGroup} >
+            <div className={style.buttonGroup}>
               <button
                 className={style.buttonOrderApproval}
                 onClick={() => agreedOrder(Number(orderid))}

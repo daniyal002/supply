@@ -341,6 +341,8 @@ export default function DraftOrder({
         <Spin fullscreen={true} className={style.spin} size="large" />
       )}
       <div className={style.newOrder}>
+        <div>
+
         <div style={{display:"flex",flexDirection:'row-reverse', gap:"10px", alignItems:"center",justifyContent:"flex-end"}}>
         {!toggle ? (
           <h1>
@@ -361,6 +363,20 @@ export default function DraftOrder({
         <InfoCircleFilled style={{fontSize:"20px", color:"red"}} className={style.pulseAnimation} />
         </Tooltip>
         )}
+        </div>
+
+        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+                    статус заявки:{" "}
+                    <span
+                      style={{
+                        color: getOrderByIdData?.order_status.status_color,
+                        textTransform: "uppercase",
+                        fontWeight:"bold"
+                      }}
+                    >
+                      {getOrderByIdData?.order_status.status_name}
+                    </span>
+                  </p>
         </div>
 
         <div
