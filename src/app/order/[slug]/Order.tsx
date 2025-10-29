@@ -100,82 +100,85 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getOrderByIdData]);
 
-  const orderId = useTabStore((state => state.activeTabOrders))
+  const orderId = useTabStore((state) => state.activeTabOrders);
 
-  const items: TabsProps["items"] =  orderid === "newOrder" ? [
-    {
-      key: "1",
-      label: "Выбранные товары",
-      children: (
-        <ProductOrder
-          productTableData={getValues("order_products")}
-          getValues={getValues}
-          setValue={setValue}
-          watch={watch}
-          disabledOrder={disabledOrder}
-          role={GetMeData?.role?.role_name as string}
-          exportToExcel={() =>
-            exportOrderToExcel(
-              getOrderByIdData as IOrderItem,
-              productData || []
-            )
-          }
-          handlePrint={handlePrint}
-          isPrinting={isPrinting}
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "История согласования",
-      children: <OrderStepHistory order_id={Number(orderid)} />,
-    },
-    {
-      key: "3",
-      label: "Маршрут",
-      children: <RouteInfo order_id={Number(orderid)} />,
-    },
-  ] :
-  [
-    {
-      key: "1",
-      label: "Выбранные товары",
-      children: (
-        <ProductOrder
-          productTableData={getValues("order_products")}
-          getValues={getValues}
-          setValue={setValue}
-          watch={watch}
-          disabledOrder={disabledOrder}
-          role={GetMeData?.role?.role_name as string}
-          exportToExcel={() =>
-            exportOrderToExcel(
-              getOrderByIdData as IOrderItem,
-              productData || []
-            )
-          }
-          handlePrint={handlePrint}
-          isPrinting={isPrinting}
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "История согласования",
-      children: <OrderStepHistory order_id={Number(orderid)} />,
-    },
-    {
-      key: "3",
-      label: "Маршрут",
-      children: <RouteInfo order_id={Number(orderid)} />,
-    },
-    {
-      key: "4",
-      label: "Чат",
-      children: <ChatCore  orderId={Number(orderId.replace("order-", ''))} />,
-    },
-  ];
-
+  const items: TabsProps["items"] =
+    orderid === "newOrder"
+      ? [
+          {
+            key: "1",
+            label: "Выбранные товары",
+            children: (
+              <ProductOrder
+                productTableData={getValues("order_products")}
+                getValues={getValues}
+                setValue={setValue}
+                watch={watch}
+                disabledOrder={disabledOrder}
+                role={GetMeData?.role?.role_name as string}
+                exportToExcel={() =>
+                  exportOrderToExcel(
+                    getOrderByIdData as IOrderItem,
+                    productData || []
+                  )
+                }
+                handlePrint={handlePrint}
+                isPrinting={isPrinting}
+              />
+            ),
+          },
+          {
+            key: "2",
+            label: "История согласования",
+            children: <OrderStepHistory order_id={Number(orderid)} />,
+          },
+          {
+            key: "3",
+            label: "Маршрут",
+            children: <RouteInfo order_id={Number(orderid)} />,
+          },
+        ]
+      : [
+          {
+            key: "1",
+            label: "Выбранные товары",
+            children: (
+              <ProductOrder
+                productTableData={getValues("order_products")}
+                getValues={getValues}
+                setValue={setValue}
+                watch={watch}
+                disabledOrder={disabledOrder}
+                role={GetMeData?.role?.role_name as string}
+                exportToExcel={() =>
+                  exportOrderToExcel(
+                    getOrderByIdData as IOrderItem,
+                    productData || []
+                  )
+                }
+                handlePrint={handlePrint}
+                isPrinting={isPrinting}
+              />
+            ),
+          },
+          {
+            key: "2",
+            label: "История согласования",
+            children: <OrderStepHistory order_id={Number(orderid)} />,
+          },
+          {
+            key: "3",
+            label: "Маршрут",
+            children: <RouteInfo order_id={Number(orderid)} />,
+          },
+          {
+            key: "4",
+            label: "Чат",
+            children: (
+              <ChatCore orderId={Number(orderId.replace("order-", ""))} />
+            ),
+          },
+        ];
 
   const onChange = (key: string) => {};
 
@@ -254,7 +257,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
+            employee_ids: product.buyers?.map((buyer) => ({
+              employee_id: buyer.buyer_id,
+              product_quantity: buyer.product_quantity,
+            })),
           };
         }),
       };
@@ -326,7 +332,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
+            employee_ids: product.buyers?.map((buyer) => ({
+              employee_id: buyer.buyer_id,
+              product_quantity: buyer.product_quantity,
+            })),
           };
         }),
       };
@@ -444,7 +453,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         <Spin fullscreen={true} className={style.spin} size="large" />
       )}
       <div className={style.newOrder}>
-        <div
+
+        <div>
+           <div
           style={{
             display: "flex",
             flexDirection: "row-reverse",
@@ -454,16 +465,18 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           }}
         >
           {!toggle ? (
-            <h1 style={{ color: colorText }}>
-              {orderid === "newOrder"
-                ? "Новая заявка"
-                : orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                ? "Копия"
-                : `Заявка №-${getOrderByIdData?.order_number.replace(
-                    /^0+/,
-                    ""
-                  )}`}
-            </h1>
+            <>
+              <h1 style={{ color: colorText }}>
+                {orderid === "newOrder"
+                  ? "Новая заявка"
+                  : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                  ? "Копия"
+                  : `Заявка №-${getOrderByIdData?.order_number.replace(
+                      /^0+/,
+                      ""
+                    )}`}
+              </h1>
+            </>
           ) : (
             <h1 style={{ color: colorText }}>Выбор товара</h1>
           )}
@@ -480,6 +493,20 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             </Tooltip>
           )}
         </div>
+          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+          статус заявки:{" "}
+          <span
+            style={{
+              color: getOrderByIdData?.order_status.status_color,
+              textTransform: "uppercase",
+              fontWeight:"bold"
+            }}
+          >
+            {getOrderByIdData?.order_status.status_name}
+          </span>
+        </p>
+        </div>
+
 
         <div
           className={
