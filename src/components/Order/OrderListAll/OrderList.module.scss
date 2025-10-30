@@ -69,4 +69,22 @@
       }
     }
   }
+
+  .orderListTable{
+    display: block;
+
+    @media(max-width:768px){
+      display: none;
+    }
+  }
+
+  .orderCards{
+    display: none;
+
+    @media(max-width:768px){
+      display: flex;
+      flex-direction: column;
+      gap:16px
+    }
+  }
 }

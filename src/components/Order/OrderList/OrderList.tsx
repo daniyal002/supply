@@ -5,10 +5,11 @@ import { useOrderUserData } from "@/hook/orderHook";
 import style from "./OrderList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { DatePicker, Input, Radio, Switch } from "antd";
+import { DatePicker, Radio } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
+import OrderCardWrapper from "@/components/OrderCard/OrderCardWrapper";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
@@ -73,15 +74,35 @@ export default function OrderList() {
         format="DD.MM.YYYY"
       />
       <Radio.Group defaultValue={orderDateType}>
-        <Radio value="created_at" onChange={() => setOrderDateType("created_at")}>Дата создания</Radio>
-        <Radio value="updated_at" onChange={() => setOrderDateType("updated_at")}>Дата обновления</Radio>
+        <Radio
+          value="created_at"
+          onChange={() => setOrderDateType("created_at")}
+        >
+          Дата создания
+        </Radio>
+        <Radio
+          value="updated_at"
+          onChange={() => setOrderDateType("updated_at")}
+        >
+          Дата обновления
+        </Radio>
       </Radio.Group>
 
-      <OrderListTable
-        OrderData={filteredOrderData}
-        loading={isLoading}
-        refetch={refetch}
-      />
+      <div className={style.orderListTable}>
+        <OrderListTable
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+        />
+      </div>
+      <div className={style.orderCards}>
+        <OrderCardWrapper
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+          isDraft={false}
+        />
+      </div>
     </div>
   );
 }

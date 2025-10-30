@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.scss";
 import QueryClientContextProvider from "./QueryClientContextProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
@@ -9,7 +8,7 @@ import Beforeunload from "@/components/Beforeunload/Beforeunload";
 import BroadcastModal from "./i/broadcast/BroadcastModal";
 import Notification from "@/components/Notification/Notification";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Снабжение",
@@ -33,7 +32,7 @@ export default function RootLayout({
         <QueryClientContextProvider>
           <AntdConfigProvider>
             <Beforeunload>
-              <body className={inter.className}>
+              <body >
                 <MainLayout>
                   <BroadcastModal />
                   {children}

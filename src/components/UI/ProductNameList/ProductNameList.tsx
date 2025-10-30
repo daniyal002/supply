@@ -92,6 +92,8 @@ export const ProductNameList: React.FC<Props> = ({
           <p>Товаров: {currentFilters ?? 0}</p>
         </div>
       )}
+      scroll={{ x: 200 }}
+
     />
   );
 };

@@ -1,0 +1,68 @@
+.orderListWrapper {
+  .orderCardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+    @media (max-width:400px) {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+
+    }
+
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .paginationContainer {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+  }
+}
+
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.searchInput {
+  width: 100%;
+}
+
+.sortSelect {
+  width: 100%;
+  margin-right: 8px;
+}
+
+.sortButton {
+  background: #f5f5f5;
+  border: 1px solid #d9d9d9;
+  padding: 0 8px;
+  height: 32px;
+  font-size: 14px;
+  transition: background 0.3s;
+  &:hover {
+    background: #e6e6e6;
+  }
+}
+
+.refreshButton {
+  margin-left: auto;
+}
+
+.sortSelectWrapper{
+  display: flex;
+  gap: 5px;
+}
+
+.refreshButton{
+  width: 100%;
+}

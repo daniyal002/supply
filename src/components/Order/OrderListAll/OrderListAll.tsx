@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { useProductData } from "@/hook/productHook";
 import { debounce } from "@/helper/debounce";
+import OrderCardWrapper from "@/components/OrderCard/OrderCardWrapper";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
@@ -37,7 +38,6 @@ export default function OrderListAll() {
       }, 300),
     []
   );
-
 
   const { productData } = useProductData();
 
@@ -117,18 +117,18 @@ export default function OrderListAll() {
           filterOption={false}
         >
           {productData
-        ?.filter((product) =>
-          product.product_name.toLowerCase().includes(searchValue)
-        )
-        .map((product) => (
-          <Select.Option
-            key={product.product_id}
-            value={product.product_id}
-            label={product.product_name}
-          >
-            {product.product_name}
-          </Select.Option>
-        ))}
+            ?.filter((product) =>
+              product.product_name.toLowerCase().includes(searchValue)
+            )
+            .map((product) => (
+              <Select.Option
+                key={product.product_id}
+                value={product.product_id}
+                label={product.product_name}
+              >
+                {product.product_name}
+              </Select.Option>
+            ))}
         </Select>
       )}
 
@@ -139,17 +139,46 @@ export default function OrderListAll() {
         onChange={handleFilter}
         format="DD.MM.YYYY"
       />
-       <Radio.Group defaultValue={orderDateType}>
-        <Radio value="created_at" onChange={() => setOrderDateType("created_at")}>Дата создания</Radio>
-        <Radio value="updated_at" onChange={() => setOrderDateType("updated_at")}>Дата обновления</Radio>
+      <Radio.Group defaultValue={orderDateType}>
+        <Radio
+          value="created_at"
+          onChange={() => setOrderDateType("created_at")}
+        >
+          Дата создания
+        </Radio>
+        <Radio
+          value="updated_at"
+          onChange={() => setOrderDateType("updated_at")}
+        >
+          Дата обновления
+        </Radio>
       </Radio.Group>
-      <OrderListTable
-        OrderData={filteredOrderData}
-        loading={currentIsLoading}
-        refetch={currentRefetch}
-        isAllOrder={isAllOrder}
-        setIsAllOrder={setIsAllOrder}
-      />
+      <div className={style.orderListTable}>
+        <OrderListTable
+          OrderData={filteredOrderData}
+          loading={currentIsLoading}
+          refetch={currentRefetch}
+          isAllOrder={isAllOrder}
+          setIsAllOrder={setIsAllOrder}
+        />
+      </div>
+
+      <div className={style.orderCards}>
+        <Switch
+          checkedChildren={"Все заявки"}
+          unCheckedChildren={"Я Согласователь"}
+          title={isAllOrder ? "Все заявки" : "Я Согласователь"}
+          onChange={(e) => {
+            setIsAllOrder(e);
+          }}
+        />
+        <OrderCardWrapper
+          OrderData={filteredOrderData}
+          loading={currentIsLoading}
+          refetch={currentRefetch}
+          isDraft={false}
+        />
+      </div>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { DatePicker, Radio, Switch } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
+import OrderCardWrapper from "@/components/OrderCard/OrderCardWrapper";
 
 dayjs.locale("ru_RU");
 
@@ -76,14 +77,34 @@ export default function ApprovalList() {
         format="DD.MM.YYYY"
       />
       <Radio.Group defaultValue={orderDateType}>
-        <Radio value="created_at" onChange={() => setOrderDateType("created_at")}>Дата создания</Radio>
-        <Radio value="updated_at" onChange={() => setOrderDateType("updated_at")}>Дата обновления</Radio>
+        <Radio
+          value="created_at"
+          onChange={() => setOrderDateType("created_at")}
+        >
+          Дата создания
+        </Radio>
+        <Radio
+          value="updated_at"
+          onChange={() => setOrderDateType("updated_at")}
+        >
+          Дата обновления
+        </Radio>
       </Radio.Group>
-      <ApprovalListTable
-        OrderData={filteredOrderData}
-        loading={isLoading}
-        refetch={refetch}
-      />
+      <div className={style.orderListTable}>
+        <ApprovalListTable
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+        />
+      </div>
+      <div className={style.orderCards}>
+        <OrderCardWrapper
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+          isDraft={false}
+        />
+      </div>
     </div>
   );
 }

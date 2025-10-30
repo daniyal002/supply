@@ -4,7 +4,7 @@ import OrderListTable from "./DraftOrderListTable";
 import style from "./DraftOrderList.module.scss";
 import { toast, Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { Button, DatePicker, Radio, Switch } from "antd";
+import { Button, DatePicker, Radio } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
@@ -12,15 +12,14 @@ import {
   useDeleteDraftOrderAllMutation,
   useDraftOrderUserData,
 } from "@/hook/orderTempHook";
+import OrderCardWrapper from "@/components/OrderCard/OrderCardWrapper";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
 
 export default function DraftOrderList() {
   const { draftOrderUserData, isLoading, refetch } = useDraftOrderUserData();
-  const [orderDateType, setOrderDateType] = useState<
-    "created_at" | "updated_at"
-  >("created_at");
+
   const [orderData, setOrderData] = useState<IOrderItem[]>(
     draftOrderUserData as IOrderItem[]
   );
@@ -35,18 +34,13 @@ export default function DraftOrderList() {
     setDateRange(dates);
   };
 
-  useEffect(() => {
-    setDateRange(null);
-  }, [orderDateType]);
+
 
   useEffect(() => {
     if (dateRange) {
       const [start, end] = dateRange;
       const filteredData = orderData.filter((order) => {
-        const orderDate =
-          orderDateType === "created_at"
-            ? moment(order.created_at).startOf("day")
-            : moment(order.updated_at).startOf("day");
+        const orderDate = moment(order.created_at).startOf("day")
         const startDate = start.startOf("day");
         const endDate = end.endOf("day");
         const isInRange =
@@ -58,7 +52,7 @@ export default function DraftOrderList() {
     } else {
       setFilteredOrderData(orderData);
     }
-  }, [dateRange, orderData, orderDateType]);
+  }, [dateRange, orderData]);
 
   useEffect(() => {
     setOrderData(draftOrderUserData as IOrderItem[]);
@@ -96,15 +90,22 @@ export default function DraftOrderList() {
         onChange={handleFilter}
         format="DD.MM.YYYY"
       />
-     <Radio.Group defaultValue={orderDateType}>
-        <Radio value="created_at" onChange={() => setOrderDateType("created_at")}>Дата создания</Radio>
-        <Radio value="updated_at" onChange={() => setOrderDateType("updated_at")}>Дата обновления</Radio>
-      </Radio.Group>
-      <OrderListTable
-        OrderData={filteredOrderData}
-        loading={isLoading}
-        refetch={refetch}
-      />
+
+      <div className={style.orderListTable}>
+        <OrderListTable
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+        />
+      </div>
+      <div className={style.orderCards}>
+        <OrderCardWrapper
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+          isDraft={true}
+        />
+      </div>
     </div>
   );
 }
