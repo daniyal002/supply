@@ -453,60 +453,61 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         <Spin fullscreen={true} className={style.spin} size="large" />
       )}
       <div className={style.newOrder}>
-
         <div>
-           <div
-          style={{
-            display: "flex",
-            flexDirection: "row-reverse",
-            gap: "10px",
-            alignItems: "center",
-            justifyContent: "flex-end",
-          }}
-        >
-          {!toggle ? (
-            <>
-              <h1 style={{ color: colorText }}>
-                {orderid === "newOrder"
-                  ? "Новая заявка"
-                  : orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                  ? "Копия"
-                  : `Заявка №-${getOrderByIdData?.order_number.replace(
-                      /^0+/,
-                      ""
-                    )}`}
-              </h1>
-            </>
-          ) : (
-            <h1 style={{ color: colorText }}>Выбор товара</h1>
-          )}
-          {categoryMatches && (
-            <Tooltip
-              title={
-                "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"
-              }
-            >
-              <InfoCircleFilled
-                style={{ fontSize: "20px", color: "rgb(131, 124, 230)" }}
-                className={style.pulseAnimation}
-              />
-            </Tooltip>
-          )}
-        </div>
-          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
-          статус заявки:{" "}
-          <span
+          <div
             style={{
-              color: getOrderByIdData?.order_status.status_color,
-              textTransform: "uppercase",
-              fontWeight:"bold"
+              display: "flex",
+              flexDirection: "row-reverse",
+              gap: "10px",
+              alignItems: "center",
+              justifyContent: "flex-end",
             }}
           >
-            {getOrderByIdData?.order_status.status_name}
-          </span>
-        </p>
+            {!toggle ? (
+              <>
+                <h1 style={{ color: colorText }}>
+                  {orderid === "newOrder"
+                    ? "Новая заявка"
+                    : orderid ===
+                      `copy${Number(orderid?.split("copy").join(""))}`
+                    ? "Копия"
+                    : `Заявка №-${getOrderByIdData?.order_number.replace(
+                        /^0+/,
+                        ""
+                      )}`}
+                </h1>
+              </>
+            ) : (
+              <h1 style={{ color: colorText }}>Выбор товара</h1>
+            )}
+            {categoryMatches && (
+              <Tooltip
+                title={
+                  "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"
+                }
+              >
+                <InfoCircleFilled
+                  style={{ fontSize: "20px", color: "rgb(131, 124, 230)" }}
+                  className={style.pulseAnimation}
+                />
+              </Tooltip>
+            )}
+          </div>
+          {orderid !== `copy${Number(orderid?.split("copy").join(""))}` && orderid !== 'newOrder' && (
+            <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+              статус заявки:{" "}
+              <span
+                style={{
+                  color: getOrderByIdData?.order_status.status_color,
+                  textTransform: "uppercase",
+                  fontWeight: "bold",
+                }}
+              >
+                {getOrderByIdData?.order_status.status_name}
+              </span>
+            </p>
+          )}
         </div>
-
 
         <div
           className={
@@ -543,7 +544,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           />
 
           {/* </form> */}
-          {!isPrinting && (
+          {!isPrinting &&  !getOrderByIdData?.is_archive &&(
             <button
               onClick={() => {
                 if (disabledOrder) {
@@ -556,6 +557,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                   setToggle(!toggle);
                 }
               }}
+              disabled={orderid !== "newOrder" && getOrderByIdData?.is_archive}
               className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
             >
               Подбор товара
