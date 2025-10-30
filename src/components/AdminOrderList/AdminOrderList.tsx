@@ -10,12 +10,13 @@ import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { BookFilled } from "@ant-design/icons";
+import OrderCardWrapper from "../OrderCard/OrderCardWrapper";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
 
 export default function AdminOrderList() {
-  const { ordersData, refetch } = useOrdersData();
+  const { ordersData, refetch,isLoading } = useOrdersData();
   const [orderDateType, setOrderDateType] = useState<
     "created_at" | "updated_at"
   >("created_at");
@@ -91,12 +92,22 @@ export default function AdminOrderList() {
         }}
         title={isArchive ? "Не архивные" : "Архивные"}
       />
-
+<div className={style.orderListTable}>
       <OrderListTable
         OrderData={filteredOrderData}
         isArchive={isArchive}
         refetch={refetch}
       />
+      </div>
+      <div className={style.orderCards}>
+        <OrderCardWrapper
+          OrderData={filteredOrderData}
+          loading={isLoading}
+          refetch={refetch}
+          isDraft={false}
+        />
+      </div>
+
     </div>
   );
 }

@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import ApprovalListTable from "./ApprovalListTable";
 import { useApprovalOrders } from "@/hook/orderHook";
-import style from "./OrderList.module.scss";
+import style from "./ApprovalList.module.scss";
 import { Toaster } from "sonner";
 import { IOrderItem } from "@/interface/orderItem";
-import { DatePicker, Radio, Switch } from "antd";
+import { DatePicker, Radio } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
