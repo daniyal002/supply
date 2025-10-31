@@ -28,6 +28,13 @@
     padding-bottom: 50px;
   }
 
+  .newOrderCopy{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
 
   .footerButtonGroup{
     width: 100%;

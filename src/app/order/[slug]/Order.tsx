@@ -6,6 +6,7 @@ import style from "./Order.module.scss";
 import {
   useCreateOrderMutation,
   useGetOrderById,
+  useOrderUserData,
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { useForm } from "react-hook-form";
@@ -21,7 +22,7 @@ import SelectProductOrder from "./SelectProductOrder/SelectProductOrder";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { message, Spin, Tabs, theme, Tooltip } from "antd";
+import { Button, message, Spin, Tabs, theme, Tooltip } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
@@ -33,7 +34,7 @@ import {
 } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
-import { InfoCircleFilled } from "@ant-design/icons";
+import { CopyFilled, InfoCircleFilled } from "@ant-design/icons";
 import ChatCore from "@/components/Chat/ChatCore";
 import { useTabStore } from "../../../../store/tabStore";
 
@@ -47,6 +48,8 @@ interface Props {
 export default function Order({ orderid, type, remove, targetKey }: Props) {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { productData } = useProductData();
+
+  const { orderUserData } = useOrderUserData();
 
   // Print
   const contentRef = useRef<HTMLDivElement>(null);
@@ -79,6 +82,41 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   if (orderid?.startsWith("copy")) {
     orderIdFromGetOrderById = orderid.replace("copy", "");
   }
+
+  const copyLastOrderHeader = () => {
+    if (orderUserData) {
+      const lastOrder = orderUserData[0];
+        if (lastOrder) {
+        reset({
+          employee_id: {
+            value: lastOrder?.buyer?.buyer_id,
+            label: lastOrder?.buyer?.buyer_name,
+          },
+          department_id: {
+            value: lastOrder?.department?.department_id,
+            label: lastOrder?.department?.department_name,
+          },
+          product_group: {
+            value: lastOrder?.product_group?.product_group_id,
+            label: lastOrder?.product_group?.product_group_name,
+          },
+          storage_id: {
+            value: lastOrder?.storage?.storage_id,
+            label: lastOrder?.storage?.storage_name,
+          },
+          oms: lastOrder?.oms,
+
+          order_type: {
+            value: lastOrder?.order_type,
+            label:
+              lastOrder?.order_type === "purchase"
+                ? "Заявка на закупку"
+                : "Заявка на склад",
+          },
+        });
+      }
+    }
+  };
 
   const { getOrderByIdData } = useGetOrderById(
     orderIdFromGetOrderById as string
@@ -453,62 +491,75 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         <Spin fullscreen={true} className={style.spin} size="large" />
       )}
       <div className={style.newOrder}>
-        <div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row-reverse",
-              gap: "10px",
-              alignItems: "center",
-              justifyContent: "flex-end",
-            }}
-          >
-            {!toggle ? (
-              <>
-                <h1 style={{ color: colorText }}>
-                  {orderid === "newOrder"
-                    ? "Новая заявка"
-                    : orderid ===
-                      `copy${Number(orderid?.split("copy").join(""))}`
-                    ? "Копия"
-                    : `Заявка №-${getOrderByIdData?.order_number.replace(
-                        /^0+/,
-                        ""
-                      )}`}
-                </h1>
-              </>
-            ) : (
-              <h1 style={{ color: colorText }}>Выбор товара</h1>
-            )}
-            {categoryMatches && (
-              <Tooltip
-                title={
-                  "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"
-                }
-              >
-                <InfoCircleFilled
-                  style={{ fontSize: "20px", color: "rgb(131, 124, 230)" }}
-                  className={style.pulseAnimation}
-                />
-              </Tooltip>
-            )}
+        <div className={style.newOrderCopy}>
+          <div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                gap: "10px",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
+              {!toggle ? (
+                <>
+                  <h1 style={{ color: colorText }}>
+                    {orderid === "newOrder"
+                      ? "Новая заявка"
+                      : orderid ===
+                        `copy${Number(orderid?.split("copy").join(""))}`
+                      ? "Копия"
+                      : `Заявка №-${getOrderByIdData?.order_number.replace(
+                          /^0+/,
+                          ""
+                        )}`}
+                  </h1>
+                </>
+              ) : (
+                <h1 style={{ color: colorText }}>Выбор товара</h1>
+              )}
+              {categoryMatches && (
+                <Tooltip
+                  title={
+                    "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"
+                  }
+                >
+                  <InfoCircleFilled
+                    style={{ fontSize: "20px", color: "rgb(131, 124, 230)" }}
+                    className={style.pulseAnimation}
+                  />
+                </Tooltip>
+              )}
+            </div>
+            {orderid !== `copy${Number(orderid?.split("copy").join(""))}` &&
+              orderid !== "newOrder" && (
+                <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+                  статус заявки:{" "}
+                  <span
+                    style={{
+                      color: getOrderByIdData?.order_status.status_color,
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {getOrderByIdData?.order_status.status_name}
+                  </span>
+                </p>
+              )}
           </div>
-          {orderid !== `copy${Number(orderid?.split("copy").join(""))}` && orderid !== 'newOrder' && (
-            <p style={{ fontSize: "14px", fontStyle: "italic" }}>
-              статус заявки:{" "}
-              <span
-                style={{
-                  color: getOrderByIdData?.order_status.status_color,
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                }}
-              >
-                {getOrderByIdData?.order_status.status_name}
-              </span>
-            </p>
+          {orderid === "newOrder" && (
+            <div>
+              <Tooltip title={"Скопировать шапку из последней заявки"}>
+                <Button
+                  onClick={copyLastOrderHeader}
+                >
+                  <CopyFilled style={{ fontSize: "20px" }} />
+                </Button>
+              </Tooltip>
+            </div>
           )}
         </div>
-
         <div
           className={
             toggle
@@ -544,7 +595,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           />
 
           {/* </form> */}
-          {!isPrinting &&  !getOrderByIdData?.is_archive &&(
+          {!isPrinting && !getOrderByIdData?.is_archive && (
             <button
               onClick={() => {
                 if (disabledOrder) {
