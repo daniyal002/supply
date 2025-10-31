@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Space, Table, TableColumnsType } from "antd";
+import { Button, Space, Table, TableColumnsType, Tooltip } from "antd";
 import { toast } from "sonner";
 import { IEmployee } from "@/interface/employee";
 import { EnumOrderTypes, IOrderItem } from "@/interface/orderItem";
@@ -8,6 +8,7 @@ import { IDepartment } from "@/interface/department";
 import { useResetOrderMutation } from "@/hook/orderHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import {
+  CopyFilled,
   EyeTwoTone,
   ReloadOutlined,
   SearchOutlined,
@@ -424,15 +425,35 @@ const OrderListTable: React.FC<OrderListProps> = ({
     // Логика создания копии
     toast.success("Копия заявки создана");
     setOrderId(`copy${String(contextMenu.orderId)}`);
+  };
 
-    // Здесь вызовите вашу мутацию для копирования
+  const handleCopyLastOrder = () => {
+    if (!OrderData) return;
+    const lastOrderId = OrderData[0].order_id;
+
+    // Логика создания копии
+    toast.success("Копия заявки создана");
+    setOrderId(`copy${String(lastOrderId)}`);
   };
 
   return (
     <>
       <Table
         title={() => (
-          <p style={{ padding: 0 }}>Заявок: {currentFilters ?? 0}</p>
+          <div className={styles.tableHeader}>
+            <p style={{ padding: 0 }}>Заявок: {currentFilters ?? 0}</p>
+            {dataSource && dataSource?.length > 0 && (
+              <Tooltip title="Повторить последнюю заявку">
+                <Button
+                  onClick={handleCopyLastOrder}
+                  icon={<CopyFilled />}
+                  iconPosition="end"
+                >
+                  Повторить
+                </Button>
+              </Tooltip>
+            )}
+          </div>
         )}
         dataSource={dataSource}
         columns={columns}

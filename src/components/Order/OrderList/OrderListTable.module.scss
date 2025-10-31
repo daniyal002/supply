@@ -3,3 +3,10 @@
     border: 1px solid #6780988c;
     padding: 15px;
   }
+
+  .tableHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
