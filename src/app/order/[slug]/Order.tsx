@@ -548,7 +548,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 </p>
               )}
           </div>
-          {orderid === "newOrder" && (
+          {orderUserData && orderUserData.length > 0 && orderid === "newOrder" && (
             <div>
               <Tooltip title={"Скопировать шапку из последней заявки"}>
                 <Button
