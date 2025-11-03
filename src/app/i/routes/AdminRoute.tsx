@@ -1,15 +1,36 @@
 "use client";
 
-import { Button } from "antd";
+import { Button, Select } from "antd";
 import { Toaster } from "sonner";
 import RouteTable from "./RouteTable";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useOrderRouteData } from "@/hook/orderRouterHook";
 import { BookFilled, PlusOutlined } from "@ant-design/icons";
+import { useEmployeeData } from "@/hook/employeeHook";
+import { debounce } from "@/helper/debounce";
 
 export default function AdminRoute() {
-  const { orderRouteData, refetch } = useOrderRouteData();
+  const [employeeId, setEmployeeId] = useState<string>("");
+
+  const { orderRouteData, refetch } = useOrderRouteData(String(employeeId));
+  const { employeeData } = useEmployeeData();
+
+  // создаём debounced-функцию
+  const [searchValue, setSearchValue] = useState("");
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((val: string) => {
+        setSearchValue(val.toLowerCase());
+      }, 300),
+    []
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [employeeId]);
+
   const [type, setType] = useState<"Добавить" | "Изменить">("Добавить");
   const [postId, setPostId] = useState<number>();
 
@@ -58,6 +79,33 @@ export default function AdminRoute() {
         />
       </div>
 
+      <Select
+        onChange={(value) => {
+          // Когда пользователь нажимает "очистить" (крестик), value === undefined
+          setEmployeeId(value ?? ""); // преобразуем undefined → ""
+        }}
+        value={employeeId}
+        placeholder="Выберите товары для фильтрации заявок"
+        showSearch
+        onSearch={debouncedSearch}
+        filterOption={false}
+        style={{ width: "100%" }}
+        allowClear
+      >
+        {employeeData
+          ?.filter((employee) =>
+            employee.buyer_name.toLowerCase().includes(searchValue)
+          )
+          .map((employee) => (
+            <Select.Option
+              key={employee.buyer_id}
+              value={employee.buyer_id}
+              label={employee.buyer_name}
+            >
+              {employee.buyer_name}
+            </Select.Option>
+          ))}
+      </Select>
       <RouteTable
         routeData={orderRouteData}
         onEdit={onEdit}

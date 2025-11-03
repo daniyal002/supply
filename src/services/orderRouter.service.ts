@@ -1,5 +1,4 @@
 import { axiosWidthAuth } from "@/api/interseptors";
-import { IOrderItemRequestDelete } from "@/interface/orderItem";
 import {
   IAddRouterRequest,
   IOrderRouteByIdResponse,
@@ -9,9 +8,9 @@ import {
 } from "@/interface/orderRoute";
 
 export const orderRouteService = {
-  async getOrderRoute() {
+  async getOrderRoute(employee_id?:string) {
     const response = await axiosWidthAuth.get<IOrderRouteResponse>(
-      "route/get_route"
+      `route/get_route${employee_id ? `?employee_id=${employee_id}` : ""}`
     );
     return response.data.detail;
   },

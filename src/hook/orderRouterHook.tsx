@@ -1,6 +1,5 @@
 import { IErrorResponse } from "@/interface/error";
-import { IOrderItem } from "@/interface/orderItem";
-import { IAddRouterRequest, IOrderRouteDeleteRequest, IOrderRouteResponse, IOrderRouteResponseDetail } from "@/interface/orderRoute";
+import { IAddRouterRequest, IOrderRouteDeleteRequest, IOrderRouteResponseDetail } from "@/interface/orderRoute";
 import { orderRouteService } from "@/services/orderRouter.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
@@ -9,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 
 
-export const useOrderRouteData = () => {
+export const useOrderRouteData = (employee_id?:string) => {
     const {
       data: orderRouteData,
       isLoading,
@@ -17,7 +16,7 @@ export const useOrderRouteData = () => {
       refetch
     } = useQuery({
       queryKey: ["newOrderRoute"],
-      queryFn: orderRouteService.getOrderRoute,
+      queryFn: () => orderRouteService.getOrderRoute(employee_id),
     });
     return { orderRouteData, isLoading, error, refetch };
   };
