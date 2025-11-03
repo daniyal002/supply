@@ -78,34 +78,38 @@ export default function AdminRoute() {
           title={isArchive ? "Не архивные" : "Архивные"}
         />
       </div>
+      <div>
+        <label>Фильтр по сотрудникам</label>
 
-      <Select
-        onChange={(value) => {
-          // Когда пользователь нажимает "очистить" (крестик), value === undefined
-          setEmployeeId(value ?? ""); // преобразуем undefined → ""
-        }}
-        value={employeeId}
-        placeholder="Выберите товары для фильтрации заявок"
-        showSearch
-        onSearch={debouncedSearch}
-        filterOption={false}
-        style={{ width: "100%" }}
-        allowClear
-      >
-        {employeeData
-          ?.filter((employee) =>
-            employee.buyer_name.toLowerCase().includes(searchValue)
-          )
-          .map((employee) => (
-            <Select.Option
-              key={employee.buyer_id}
-              value={employee.buyer_id}
-              label={employee.buyer_name}
-            >
-              {employee.buyer_name}
-            </Select.Option>
-          ))}
-      </Select>
+        <Select
+          onChange={(value) => {
+            // Когда пользователь нажимает "очистить" (крестик), value === undefined
+            setEmployeeId(value ?? ""); // преобразуем undefined → ""
+          }}
+          value={employeeId}
+          placeholder="Выберите товары для фильтрации заявок"
+          showSearch
+          onSearch={debouncedSearch}
+          filterOption={false}
+          style={{ width: "100%" }}
+          allowClear
+        >
+          {employeeData
+            ?.filter((employee) =>
+              employee.buyer_name.toLowerCase().includes(searchValue)
+            )
+            .map((employee) => (
+              <Select.Option
+                key={employee.buyer_id}
+                value={employee.buyer_id}
+                label={employee.buyer_name}
+              >
+                {employee.buyer_name}
+              </Select.Option>
+            ))}
+        </Select>
+      </div>
+
       <RouteTable
         routeData={orderRouteData}
         onEdit={onEdit}
