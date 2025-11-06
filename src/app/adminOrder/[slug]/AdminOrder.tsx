@@ -98,8 +98,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [getOrderByIdData]);
 
-    const orderId = useTabStore((state => state.activeTabAdminOrders))
-
+  const orderId = useTabStore((state) => state.activeTabAdminOrders);
 
   const items: TabsProps["items"] = [
     {
@@ -112,7 +111,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           setValue={setValue}
           watch={watch}
           disabledOrder={disabledOrder}
-          role={GetMeData?.role?.role_name as string}
           exportToExcel={() =>
             exportOrderToExcel(
               getOrderByIdData as IOrderItem,
@@ -137,7 +135,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     {
       key: "4",
       label: "Чат",
-      children: <ChatCore orderId={Number(orderId.replace('order-', ''))} />,
+      children: <ChatCore orderId={Number(orderId.replace("order-", ""))} />,
     },
   ];
 
@@ -184,17 +182,19 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [productsWatch, productGroup]);
 
+  const isPurchase = GetMeData?.role?.permissions.some(
+    (p) => p.permission_code === "purchase_order_type_drop_down_list"
+  );
+
   const createOrder = () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         category_matches: categoryMatches,
         department_id: data.department_id.value,
-        order_type:
-          GetMeData?.role?.role_name === "user_purchase" ||
-          GetMeData?.role?.role_name === "admin"
-            ? data.order_type.value
-            : EnumOrderTypes.WAREHOUSE,
+        order_type: isPurchase
+          ? data.order_type.value
+          : EnumOrderTypes.WAREHOUSE,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
@@ -218,8 +218,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
-
+            employee_ids: product.buyers?.map((buyer) => ({
+              employee_id: buyer.buyer_id,
+              product_quantity: buyer.product_quantity,
+            })),
           };
         }),
       };
@@ -266,8 +268,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
         order_type:
-          GetMeData?.role?.role_name === "user_purchase" ||
-          GetMeData?.role?.role_name === "admin"
+         isPurchase
             ? getValues().order_type.value
             : EnumOrderTypes.WAREHOUSE,
         oms: getValues().oms || false,
@@ -291,8 +292,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
-
+            employee_ids: product.buyers?.map((buyer) => ({
+              employee_id: buyer.buyer_id,
+              product_quantity: buyer.product_quantity,
+            })),
           };
         }),
       };
@@ -412,26 +415,29 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
       <div className={style.newOrder}>
         {!toggle ? (
           <div>
-          <h1 style={{ color: colorText }}>
-            {orderid === "newOrder"
-              ? "Новая заявка"
-              : orderid === `copy${Number(orderid?.split("copy").join(""))}`
-              ? "Копия"
-              : `Заявка №-${getOrderByIdData?.order_number.replace(/^0+/, "")}`}
-          </h1>
-          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
-                              статус заявки:{" "}
-                              <span
-                                style={{
-                                  color: getOrderByIdData?.order_status.status_color,
-                                  textTransform: "uppercase",
-                                  fontWeight:"bold"
-                                }}
-                              >
-                                {getOrderByIdData?.order_status.status_name}
-                              </span>
-                            </p>
-                  </div>
+            <h1 style={{ color: colorText }}>
+              {orderid === "newOrder"
+                ? "Новая заявка"
+                : orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                ? "Копия"
+                : `Заявка №-${getOrderByIdData?.order_number.replace(
+                    /^0+/,
+                    ""
+                  )}`}
+            </h1>
+            <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+              статус заявки:{" "}
+              <span
+                style={{
+                  color: getOrderByIdData?.order_status.status_color,
+                  textTransform: "uppercase",
+                  fontWeight: "bold",
+                }}
+              >
+                {getOrderByIdData?.order_status.status_name}
+              </span>
+            </p>
+          </div>
         ) : (
           <h1 style={{ color: colorText }}>Выбор товара</h1>
         )}

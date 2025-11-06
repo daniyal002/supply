@@ -17,6 +17,7 @@ import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
 import { useEmployeeData } from "@/hook/employeeHook";
 import { optionsOrderTypes, optionsStorage } from "@/helper/options";
+import Can from "@/components/Can/Can";
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -58,10 +59,10 @@ export default function HeaderOrder({
   }, [isProductInTable]);
 
   useEffect(() => {
-      if (orderType?.value === EnumOrderTypes.WAREHOUSE){
-        setValue('is_generic', false)
-      }
-    }, [orderType])
+    if (orderType?.value === EnumOrderTypes.WAREHOUSE) {
+      setValue("is_generic", false);
+    }
+  }, [orderType]);
 
   // Мемоизация опций для product_group
   const optionsProductGroup = useMemo(() => {
@@ -151,16 +152,11 @@ export default function HeaderOrder({
           }));
   }, [GetMeData?.employee?.parlors, getValues()]);
 
-
-
-
-
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-          {(GetMeData?.role?.role_name === "user_purchase" ||
-            GetMeData?.role?.role_name === "admin") && (
+          <Can permission="purchase_order_type_drop_down_list">
             <div className={style.formItem}>
               <label className={style.formItemLabel}>Тип</label>
               <Controller
@@ -200,10 +196,12 @@ export default function HeaderOrder({
                         checked={field.value}
                         checkedChildren={"Обобщенный"}
                         unCheckedChildren={"Частный"}
-                        onChange={(e) => {field.onChange(e);
+                        onChange={(e) => {
+                          field.onChange(e);
                           // @ts-ignore: Unreachable code error
-                          setValue("department_id", undefined);}}
-                          title={field.value ? "Обобщенный": "Частный"}
+                          setValue("department_id", undefined);
+                        }}
+                        title={field.value ? "Обобщенный" : "Частный"}
                       />
                     )}
                   />
@@ -213,7 +211,7 @@ export default function HeaderOrder({
                 <p className={style.error}>{errors.order_type?.message}</p>
               )}
             </div>
-          )}
+          </Can>
 
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Место хранения</label>
@@ -261,7 +259,7 @@ export default function HeaderOrder({
                     checked={field.value}
                     checkedChildren={"ОМС"}
                     unCheckedChildren={"ПУ"}
-                    title={field.value ? "ОМС": "ПУ"}
+                    title={field.value ? "ОМС" : "ПУ"}
                   />
                 )}
               />

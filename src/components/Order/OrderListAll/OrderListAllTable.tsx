@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { IProductGroup } from "@/interface/product";
 import { IOrderStatus } from "@/interface/orderStatus";
 import { IUser } from "@/interface/user";
+import Can from "@/components/Can/Can";
 
 interface OrderListProps {
   OrderData: IOrderItem[] | undefined;
@@ -419,14 +420,16 @@ const OrderListAllTable: React.FC<OrderListProps> = ({
             }}
           >
             <p style={{ padding: 0 }}>Заявок: {currentFilters ?? 0}</p>
-            <Switch
-              checkedChildren={"Все заявки"}
-              unCheckedChildren={"Я Согласователь"}
-              title={isAllOrder ? "Все заявки" : "Я Согласователь"}
-              onChange={(e) => {
-                setIsAllOrder(e);
-              }}
-            />
+            <Can permission="approver_all_orders_switch">
+              <Switch
+                checkedChildren={"Все заявки"}
+                unCheckedChildren={"Я Согласователь"}
+                title={isAllOrder ? "Все заявки" : "Я Согласователь"}
+                onChange={(e) => {
+                  setIsAllOrder(e);
+                }}
+              />
+            </Can>
           </div>
         )}
         dataSource={dataSource}

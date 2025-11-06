@@ -43,17 +43,18 @@ export default function DraftOrder({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   // Print
-    const contentRef = useRef<HTMLDivElement>(null);
-    const [isPrinting, setIsPrinting] = useState(false);
-    const handlePrint = useReactToPrint({
-      contentRef,
-      onBeforePrint: async () => await setIsPrinting(true),
-      onAfterPrint: () => setIsPrinting(false),
-    });
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const handlePrint = useReactToPrint({
+    contentRef,
+    onBeforePrint: async () => await setIsPrinting(true),
+    onAfterPrint: () => setIsPrinting(false),
+  });
 
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
-  const { mutate: createOrderMutation,isPending: createOrderIsPending } = useCreateOrderMutation();
+  const { mutate: createOrderMutation, isPending: createOrderIsPending } =
+    useCreateOrderMutation();
 
   const { isPending: saveOrderIsPending } = useSaveDraftOrderMutation();
   const { mutate: updateDraftOrderMutation } = useUpdateDraftOrderMutation();
@@ -90,7 +91,6 @@ export default function DraftOrder({
           setValue={setValue}
           watch={watch}
           disabledOrder={false}
-          role={GetMeData?.role?.role_name as string}
           handlePrint={handlePrint}
           isPrinting={isPrinting}
         />
@@ -126,32 +126,35 @@ export default function DraftOrder({
     }
   }, [getValues("employee_id")]);
 
-  const [categoryMatches,setCategoryMatches] = useState<boolean>(false)
+  const [categoryMatches, setCategoryMatches] = useState<boolean>(false);
 
-    useEffect(() => {
-      const orderProducts = productsWatch;
+  useEffect(() => {
+    const orderProducts = productsWatch;
 
-      if (Array.isArray(orderProducts)) {
-        const matches = orderProducts.some(product =>
-          product.product?.product_group?.product_group_name !== productGroup.label && !product.order_product_link
-        );
-        setCategoryMatches(matches);
-      }
+    if (Array.isArray(orderProducts)) {
+      const matches = orderProducts.some(
+        (product) =>
+          product.product?.product_group?.product_group_name !==
+            productGroup.label && !product.order_product_link
+      );
+      setCategoryMatches(matches);
+    }
+  }, [productsWatch, productGroup]);
 
-    }, [productsWatch,  productGroup]);
+  const isPurchase = GetMeData?.role?.permissions.some(
+    (p) => p.permission_code === "purchase_order_type_drop_down_list"
+  );
 
   const createOrder = () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IDraftOrderItemRequest = {
-        category_matches:categoryMatches,
+        category_matches: categoryMatches,
         department_id: data.department_id.value,
         employee_id: data.employee_id.value,
-        order_type:
-          GetMeData?.role?.role_name === "user_purchase" ||
-          GetMeData?.role?.role_name === "admin"
-            ? data.order_type.value
-            : EnumOrderTypes.WAREHOUSE,
+        order_type: isPurchase
+          ? data.order_type.value
+          : EnumOrderTypes.WAREHOUSE,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
         order_status_id: 1,
@@ -174,7 +177,10 @@ export default function DraftOrder({
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
+            employee_ids: product.buyers?.map((buyer) => ({
+              employee_id: buyer.buyer_id,
+              product_quantity: buyer.product_quantity,
+            })),
           };
         }),
       };
@@ -207,16 +213,14 @@ export default function DraftOrder({
       getValues().product_group
     ) {
       const order: IDraftOrderItemRequest = {
-        category_matches:categoryMatches,
+        category_matches: categoryMatches,
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
         oms: getValues().oms || false,
-        order_type:
-          GetMeData?.role?.role_name === "user_purchase" ||
-          GetMeData?.role?.role_name === "admin"
-            ? getValues().order_type.value
-            : EnumOrderTypes.WAREHOUSE,
+        order_type: isPurchase
+          ? getValues().order_type.value
+          : EnumOrderTypes.WAREHOUSE,
         order_status_id: 8,
         is_generic: getValues().is_generic,
         note: getValues().note,
@@ -235,9 +239,12 @@ export default function DraftOrder({
             order_product_link: product?.order_product_link,
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
-            .unit_measurement_id as number,
+              .unit_measurement_id as number,
             note: product.note,
-            employee_ids: product.buyers?.map((buyer) => ({employee_id:buyer.buyer_id, product_quantity:buyer.product_quantity})),
+            employee_ids: product.buyers?.map((buyer) => ({
+              employee_id: buyer.buyer_id,
+              product_quantity: buyer.product_quantity,
+            })),
           };
         }),
       };
@@ -261,7 +268,7 @@ export default function DraftOrder({
         product_group: undefined,
         storage_id: undefined,
         order_type: undefined,
-        is_generic:false
+        is_generic: false,
       });
     } else if (
       draftOrderid !== "newOrder"
@@ -297,7 +304,7 @@ export default function DraftOrder({
               ? "Заявка на закупку"
               : "Заявка на склад",
         },
-        is_generic: getOrderByIdData?.is_generic
+        is_generic: getOrderByIdData?.is_generic,
       });
     }
   }, [reset, type, draftOrderid, getOrderByIdData]);
@@ -342,41 +349,55 @@ export default function DraftOrder({
       )}
       <div className={style.newOrder}>
         <div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row-reverse",
+              gap: "10px",
+              alignItems: "center",
+              justifyContent: "flex-end",
+            }}
+          >
+            {!toggle ? (
+              <h1>
+                {draftOrderid === "newOrder"
+                  ? "Новая заявка"
+                  : draftOrderid ===
+                    `copy${Number(draftOrderid?.split("copy").join(""))}`
+                  ? "Копия"
+                  : `Черновик №-${getOrderByIdData?.order_temp_id
+                      ?.toString()
+                      .replace(/^0+/, "")}`}
+              </h1>
+            ) : (
+              <h1>Выбор товара</h1>
+            )}
+            {categoryMatches && (
+              <Tooltip
+                title={
+                  "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"
+                }
+              >
+                <InfoCircleFilled
+                  style={{ fontSize: "20px", color: "red" }}
+                  className={style.pulseAnimation}
+                />
+              </Tooltip>
+            )}
+          </div>
 
-        <div style={{display:"flex",flexDirection:'row-reverse', gap:"10px", alignItems:"center",justifyContent:"flex-end"}}>
-        {!toggle ? (
-          <h1>
-            {draftOrderid === "newOrder"
-              ? "Новая заявка"
-              : draftOrderid ===
-                `copy${Number(draftOrderid?.split("copy").join(""))}`
-              ? "Копия"
-              : `Черновик №-${getOrderByIdData?.order_temp_id
-                  ?.toString()
-                  .replace(/^0+/, "")}`}
-          </h1>
-        ) : (
-          <h1>Выбор товара</h1>
-        )}
-         {categoryMatches && (
-          <Tooltip title={ "В заявке есть товары с разными категориями, заявка будет сначала отправлена на согласование по категориям, если товары окажутся с разными категориями, то товары будут отклонены автоматически"}>
-        <InfoCircleFilled style={{fontSize:"20px", color:"red"}} className={style.pulseAnimation} />
-        </Tooltip>
-        )}
-        </div>
-
-        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
-                    статус заявки:{" "}
-                    <span
-                      style={{
-                        color: getOrderByIdData?.order_status.status_color,
-                        textTransform: "uppercase",
-                        fontWeight:"bold"
-                      }}
-                    >
-                      {getOrderByIdData?.order_status.status_name}
-                    </span>
-                  </p>
+          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+            статус заявки:{" "}
+            <span
+              style={{
+                color: getOrderByIdData?.order_status.status_color,
+                textTransform: "uppercase",
+                fontWeight: "bold",
+              }}
+            >
+              {getOrderByIdData?.order_status.status_name}
+            </span>
+          </p>
         </div>
 
         <div
@@ -415,43 +436,44 @@ export default function DraftOrder({
 
           {/* </form> */}
           {!isPrinting && (
-
-          <button
-            onClick={() => {
-              if (!getValues("product_group.value")) {
-                message.warning("Выберите категорию товара");
-              } else {
-                setToggle(!toggle);
-              }
-            }}
-            className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
-          >
-            Подбор товара
-          </button>
+            <button
+              onClick={() => {
+                if (!getValues("product_group.value")) {
+                  message.warning("Выберите категорию товара");
+                } else {
+                  setToggle(!toggle);
+                }
+              }}
+              className={`${style.toggleBtn} ${toggle ? style.active : ""}`}
+            >
+              Подбор товара
+            </button>
           )}
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
           <div className={style.footerButtonGroup}>
             {!isPrinting && (
               <>
-              <button
-              type="button"
-              onClick={() => createOrder()}
-              className={style.buttonOrderCreate}
-              disabled={createOrderIsPending || DeleteDraftOrderByIisPending}
-            >
-              {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
-            </button>
+                <button
+                  type="button"
+                  onClick={() => createOrder()}
+                  className={style.buttonOrderCreate}
+                  disabled={
+                    createOrderIsPending || DeleteDraftOrderByIisPending
+                  }
+                >
+                  {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
+                </button>
 
-            <button
-              type="button"
-              className={style.buttonOrderSave}
-              onClick={() => saveOrder()}
-              disabled={saveOrderIsPending}
-            >
-              {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
-            </button>
-            </>
+                <button
+                  type="button"
+                  className={style.buttonOrderSave}
+                  onClick={() => saveOrder()}
+                  disabled={saveOrderIsPending}
+                >
+                  {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
+                </button>
+              </>
             )}
           </div>
         </div>

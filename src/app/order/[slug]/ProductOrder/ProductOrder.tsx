@@ -9,6 +9,7 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { Button, message } from "antd";
+import Can from "@/components/Can/Can";
 
 interface Props {
   productTableData: IProductTable[];
@@ -16,10 +17,9 @@ interface Props {
   getValues: UseFormGetValues<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
   disabledOrder: boolean;
-  role: string;
-  exportToExcel: () => void
-  handlePrint: () => void
-  isPrinting: boolean
+  exportToExcel: () => void;
+  handlePrint: () => void;
+  isPrinting: boolean;
 }
 
 export default function ProductOrder({
@@ -28,7 +28,6 @@ export default function ProductOrder({
   setValue,
   watch,
   disabledOrder,
-  role,
   exportToExcel,
   handlePrint,
   isPrinting,
@@ -78,9 +77,8 @@ export default function ProductOrder({
         watch={watch}
         isNewProduct={isNewProduct}
       />
-      {!disabledOrder &&
-        (role === "user_purchase" || role === "admin") &&
-        orderType.value === EnumOrderTypes.PURCHASE && (
+      {!disabledOrder && orderType.value === EnumOrderTypes.PURCHASE && (
+        <Can permission="purchase_order_type_drop_down_list">
           <Button
             onClick={() => {
               if (!getValues("product_group.value")) {
@@ -93,7 +91,8 @@ export default function ProductOrder({
           >
             Добавить новый товар
           </Button>
-        )}
+        </Can>
+      )}
       <ProductOrderTable
         showModal={showModal}
         productTableData={productTableData}

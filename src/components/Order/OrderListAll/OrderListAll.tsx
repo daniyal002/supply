@@ -14,6 +14,7 @@ import "dayjs/locale/ru";
 import { useProductData } from "@/hook/productHook";
 import { debounce } from "@/helper/debounce";
 import OrderCardWrapper from "@/components/OrderCard/OrderCardWrapper";
+import Can from "@/components/Can/Can";
 dayjs.locale("ru_RU");
 
 const { RangePicker } = DatePicker;
@@ -164,6 +165,7 @@ export default function OrderListAll() {
       </div>
 
       <div className={style.orderCards}>
+        <Can permission="approver_all_orders_switch">
         <Switch
           checkedChildren={"Все заявки"}
           unCheckedChildren={"Я Согласователь"}
@@ -172,6 +174,7 @@ export default function OrderListAll() {
             setIsAllOrder(e);
           }}
         />
+        </Can>
         <OrderCardWrapper
           OrderData={filteredOrderData}
           loading={currentIsLoading}

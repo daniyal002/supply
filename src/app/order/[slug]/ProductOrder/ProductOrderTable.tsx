@@ -463,6 +463,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ? false // отключаем пагинацию при печати
           : {
               locale: { items_per_page: "/ Товаров" },
+              showSizeChanger:true
             }
       }
       footer={() => (

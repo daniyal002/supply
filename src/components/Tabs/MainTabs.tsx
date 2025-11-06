@@ -22,9 +22,6 @@ export const MainTabs = () => {
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   useEffect(() => {
-    const userRole = GetMeData?.role?.role_name; // Асинхронно получили роль
-    const isAdmin = userRole === "admin" || userRole === "applicant";
-
     const tabs: TabsProps["items"] = [
       {
         key: "1",
@@ -46,15 +43,12 @@ export const MainTabs = () => {
         label: "Товары",
         children: <ProductList />,
       },
-      ...(isAdmin
-        ? [
-            {
-              key: "5",
-              label: "Все заявки",
-              children: <AllOrderTabs />,
-            },
-          ]
-        : []),
+
+      {
+        key: "5",
+        label: "Все заявки",
+        children: <AllOrderTabs />,
+      },
     ];
 
     setItems(tabs);

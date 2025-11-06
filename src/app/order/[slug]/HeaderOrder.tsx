@@ -17,6 +17,7 @@ import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
 import { useEmployeeData } from "@/hook/employeeHook";
 import { optionsOrderTypes, optionsStorage } from "@/helper/options";
+import Can from "@/components/Can/Can";
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -61,10 +62,10 @@ export default function HeaderOrder({
   }, [isProductInTable]);
 
   useEffect(() => {
-    if (orderType?.value === EnumOrderTypes.WAREHOUSE){
-      setValue('is_generic', false)
+    if (orderType?.value === EnumOrderTypes.WAREHOUSE) {
+      setValue("is_generic", false);
     }
-  }, [orderType])
+  }, [orderType]);
 
   // Мемоизация опций для product_group
   const optionsProductGroup = useMemo(() => {
@@ -154,14 +155,11 @@ export default function HeaderOrder({
           }));
   }, [GetMeData?.employee?.parlors, getValues()]);
 
-
-
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-          {(GetMeData?.role?.role_name === "user_purchase" ||
-            GetMeData?.role?.role_name === "admin") && (
+          <Can permission="purchase_order_type_drop_down_list">
             <div className={style.formItem}>
               <label className={style.formItemLabel}>Тип</label>
               <Controller
@@ -207,7 +205,7 @@ export default function HeaderOrder({
                           setValue("department_id", undefined);
                         }}
                         disabled={disabledOrder}
-                        title={field.value ? "Обобщенный": "Частный"}
+                        title={field.value ? "Обобщенный" : "Частный"}
                       />
                     )}
                   />
@@ -217,7 +215,7 @@ export default function HeaderOrder({
                 <p className={style.error}>{errors.order_type?.message}</p>
               )}
             </div>
-          )}
+          </Can>
 
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Место хранения</label>
@@ -230,8 +228,12 @@ export default function HeaderOrder({
               render={({ field }) => (
                 <Select
                   {...field}
-                  disabled={disabledOrder || (orderType === undefined && (GetMeData?.role?.role_name === "user_purchase" ||
-                    GetMeData?.role?.role_name === "admin"))}
+                  disabled={
+                    disabledOrder ||
+                    (orderType === undefined &&
+                      (GetMeData?.role?.role_name === "user_purchase" ||
+                        GetMeData?.role?.role_name === "admin"))
+                  }
                   options={optionsStorage(GetMeData?.employee?.storages || [])}
                   showSearch
                   filterOption={(input, option) =>
@@ -267,7 +269,7 @@ export default function HeaderOrder({
                     checkedChildren={"ОМС"}
                     unCheckedChildren={"ПУ"}
                     disabled={disabledOrder}
-                    title={field.value ? "ОМС": "ПУ"}
+                    title={field.value ? "ОМС" : "ПУ"}
                   />
                 )}
               />
@@ -366,9 +368,7 @@ export default function HeaderOrder({
                   {...field}
                   options={optionsProductGroup}
                   // disabled={disabledOrder ? true : productSelect ? true : false}
-                  disabled={
-                    disabledOrder || !departmentId?.value
-                  }
+                  disabled={disabledOrder || !departmentId?.value}
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? "")

@@ -17,6 +17,7 @@ import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
 import { useEmployeeData } from "@/hook/employeeHook";
 import { optionsOrderTypes, optionsStorage } from "@/helper/options";
+import Can from "@/components/Can/Can";
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -167,8 +168,7 @@ export default function HeaderOrder({
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-        {GetMeData?.role?.role_name === "user_purchase" ||
-            (GetMeData?.role?.role_name === "admin" && (
+        <Can permission="purchase_order_type_drop_down_list">
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Тип</label>
             <Controller
@@ -226,7 +226,7 @@ export default function HeaderOrder({
               <p className={style.error}>{errors.order_type?.message}</p>
             )}
           </div>
-            ))}
+          </Can>
 
 
           <div className={style.formItem}>

@@ -9,6 +9,8 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useEffect, useMemo, useState } from "react";
+import PermissionTable from "./PermissionTable";
+import styles from './RoleTable.module.scss'
 
 interface RoleTableProps {
   roleData: IRole[] | undefined;
@@ -127,6 +129,21 @@ const RoleTable: React.FC<RoleTableProps> = ({
     },
   ];
 
+   const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+
+    const handleExpand = (expanded: boolean, record: IRole) => {
+      const key = record.role_id;
+      let newExpandedRowKeys = [...expandedRowKeys];
+
+      if (expanded) {
+        newExpandedRowKeys.push(key as number);
+      } else {
+        newExpandedRowKeys = newExpandedRowKeys.filter((k) => k !== key);
+      }
+
+      setExpandedRowKeys(newExpandedRowKeys);
+    };
+
   const dataSource = useMemo(() => {
     return roleData
       ?.map((role) => ({
@@ -184,6 +201,17 @@ const RoleTable: React.FC<RoleTableProps> = ({
             : extra.currentDataSource.length
         );
       }}
+      expandable={{
+          expandedRowKeys,
+          onExpand: handleExpand,
+          expandedRowRender: (record) => {
+            return (
+              <div className={styles.permissionContainer}>
+               <PermissionTable permissionData={record.permissions} roleId={record.role_id as number}/>
+              </div>
+            );
+          },
+        }}
     />
   );
 };

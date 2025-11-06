@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { roleService } from "@/services/role.service";
-import { IRole } from "@/interface/role";
+import { IPermission, IPermissionRequest, IRole } from "@/interface/role";
 import { IErrorResponse } from "@/interface/error";
 import axios, { AxiosError } from "axios";
 import { message } from "antd";
@@ -10,7 +10,7 @@ export const useRoleData = () => {
     data: roleData,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["Roles"],
     queryFn: roleService.getRole,
@@ -26,7 +26,7 @@ export const useCreateRoleMutation = () => {
     mutationKey: ["createRole"],
     mutationFn: (data: IRole) => roleService.addRole(data),
     onSuccess: (newRole) => {
-      message.success(`Роль "${newRole.role.role_name}" успешно создана`)
+      message.success(`Роль "${newRole.role.role_name}" успешно создана`);
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
@@ -47,12 +47,14 @@ export const useUpdateRoleMutation = () => {
     mutationKey: ["updateRole"],
     mutationFn: (data: IRole) => roleService.updateRole(data),
     onSuccess: (updatedRole, variables) => {
-      message.success(`Роль "${variables.role_name}" успешно изменена`)
+      message.success(`Роль "${variables.role_name}" успешно изменена`);
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((role) =>
-          role.role_id === variables.role_id ? {...variables, is_archive:false} : role
+          role.role_id === variables.role_id
+            ? { ...variables, is_archive: false }
+            : role
         );
       });
     },
@@ -70,7 +72,7 @@ export const useDeleteRoleMutation = () => {
     mutationKey: ["deleteRole"],
     mutationFn: (data: IRole) => roleService.deleteRoleById(data),
     onSuccess: (updatedRole, variables) => {
-      message.success(`Роль "${variables.role_name}" успешно удалена`)
+      message.success(`Роль "${variables.role_name}" успешно удалена`);
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
@@ -84,7 +86,6 @@ export const useDeleteRoleMutation = () => {
   return { mutate };
 };
 
-
 export const useArchiveRoleMutation = () => {
   const queryClient = useQueryClient();
 
@@ -92,12 +93,20 @@ export const useArchiveRoleMutation = () => {
     mutationKey: ["archiveRole"],
     mutationFn: (data: IRole) => roleService.archiveRole(data),
     onSuccess: (updatedRole, variables) => {
-      message.success(`Роль "${variables.role_name}" ${variables.is_archive ? "успешно разархивиривано" : "успешно архивировано"}`)
+      message.success(
+        `Роль "${variables.role_name}" ${
+          variables.is_archive
+            ? "успешно разархивиривано"
+            : "успешно архивировано"
+        }`
+      );
       // Update the specific post in the 'Posts' query cache
       queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
         if (!oldData) return [];
         return oldData.map((role) =>
-          role.role_id === variables.role_id ? {...variables, is_archive:!variables.is_archive} : role
+          role.role_id === variables.role_id
+            ? { ...variables, is_archive: !variables.is_archive }
+            : role
         );
       });
     },
@@ -106,4 +115,73 @@ export const useArchiveRoleMutation = () => {
     },
   });
   return { mutate };
+};
+
+export const useCreatePermissionMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["addRolePermission"],
+    mutationFn: (data: IPermissionRequest) =>
+      roleService.addRolePermission(data),
+    onSuccess(createPermission, variables) {
+      const permissions:IPermission[] = queryClient.getQueryData(['getPermission']) as IPermission[];
+      const addPermission = permissions.find(p => p.permission_id === variables.permission_id);
+      queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.map((role) =>
+          role.role_id === variables.role_id
+            ? { ...role, permissions: [...role.permissions, addPermission] }
+            : role
+        );
+      });
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useDeletePermissionMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: ["deleteRolePermission"],
+    mutationFn: (data: IPermissionRequest) =>
+      roleService.deleteRolePermission(data),
+    onSuccess(createPermission, variables) {
+      const permissions:IPermission[] = queryClient.getQueryData(['getPermission']) as IPermission[];
+      const addPermission = permissions.find(p => p.permission_id === variables.permission_id);
+      queryClient.setQueryData(["Roles"], (oldData: IRole[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.map((role) =>
+          role.role_id === variables.role_id
+            ? { ...role, permissions: role.permissions.filter(p => p.permission_id !== addPermission?.permission_id) }
+            : role
+        );
+      });
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+
+  return { mutate };
+};
+
+export const useGetPermission = () => {
+  const {
+    data: permissionData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["getPermission"],
+    queryFn: () => roleService.getPermission(),
+    staleTime: Infinity,
+  });
+
+  return { permissionData, isLoading, error, refetch };
 };

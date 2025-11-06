@@ -37,6 +37,7 @@ import { exportOrderToExcel } from "@/helper/ExportToExcel";
 import { CopyFilled, InfoCircleFilled } from "@ant-design/icons";
 import ChatCore from "@/components/Chat/ChatCore";
 import { useTabStore } from "../../../../store/tabStore";
+import Can from "@/components/Can/Can";
 
 interface Props {
   orderid?: string;
@@ -86,7 +87,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   const copyLastOrderHeader = () => {
     if (orderUserData) {
       const lastOrder = orderUserData[0];
-        if (lastOrder) {
+      if (lastOrder) {
         reset({
           employee_id: {
             value: lastOrder?.buyer?.buyer_id,
@@ -153,7 +154,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 setValue={setValue}
                 watch={watch}
                 disabledOrder={disabledOrder}
-                role={GetMeData?.role?.role_name as string}
                 exportToExcel={() =>
                   exportOrderToExcel(
                     getOrderByIdData as IOrderItem,
@@ -187,7 +187,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 setValue={setValue}
                 watch={watch}
                 disabledOrder={disabledOrder}
-                role={GetMeData?.role?.role_name as string}
                 exportToExcel={() =>
                   exportOrderToExcel(
                     getOrderByIdData as IOrderItem,
@@ -261,17 +260,19 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [productsWatch, productGroup]);
 
+  const isPurchase = GetMeData?.role?.permissions.some(
+    (p) => p.permission_code === "purchase_order_type_drop_down_list"
+  );
+
   const createOrder = () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
         category_matches: categoryMatches,
         department_id: data.department_id.value,
-        order_type:
-          GetMeData?.role?.role_name === "user_purchase" ||
-          GetMeData?.role?.role_name === "admin"
-            ? data?.order_type?.value
-            : EnumOrderTypes.WAREHOUSE,
+        order_type: isPurchase
+          ? data?.order_type?.value
+          : EnumOrderTypes.WAREHOUSE,
         employee_id: data.employee_id.value,
         storage_id: data.storage_id.value,
         oms: data.oms || false,
@@ -344,11 +345,9 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         department_id: getValues().department_id.value,
         employee_id: getValues().employee_id.value,
         storage_id: getValues().storage_id.value,
-        order_type:
-          GetMeData?.role?.role_name === "user_purchase" ||
-          GetMeData?.role?.role_name === "admin"
-            ? getValues().order_type.value
-            : EnumOrderTypes.WAREHOUSE,
+        order_type: isPurchase
+          ? getValues().order_type.value
+          : EnumOrderTypes.WAREHOUSE,
         oms: getValues().oms || false,
         order_status_id: 8,
         is_generic: getValues().is_generic,
@@ -548,17 +547,17 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 </p>
               )}
           </div>
-          {orderUserData && orderUserData.length > 0 && orderid === "newOrder" && (
-            <div>
-              <Tooltip title={"Скопировать шапку из последней заявки"}>
-                <Button
-                  onClick={copyLastOrderHeader}
-                >
-                  <CopyFilled style={{ fontSize: "20px" }} />
-                </Button>
-              </Tooltip>
-            </div>
-          )}
+          {orderUserData &&
+            orderUserData.length > 0 &&
+            orderid === "newOrder" && (
+              <div>
+                <Tooltip title={"Скопировать шапку из последней заявки"}>
+                  <Button onClick={copyLastOrderHeader}>
+                    <CopyFilled style={{ fontSize: "20px" }} />
+                  </Button>
+                </Tooltip>
+              </div>
+            )}
         </div>
         <div
           className={
@@ -616,36 +615,38 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
           )}
 
           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
-          <div className={style.footerButtonGroup}>
-            {!disabledOrder && !isPrinting && (
-              <button
-                type="button"
-                onClick={() => createOrder()}
-                className={style.buttonOrderCreate}
-                disabled={createOrderIsPending || updateOrderIsPending}
-              >
-                {orderid === "newOrder" ||
-                orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                  ? createOrderIsPending
-                    ? "Создается..."
-                    : "Создать"
-                  : updateOrderIsPending
-                  ? "Перезапускается..."
-                  : "Перезапуск"}
-              </button>
-            )}
+          <Can permission="add_order">
+            <div className={style.footerButtonGroup}>
+              {!disabledOrder && !isPrinting && (
+                <button
+                  type="button"
+                  onClick={() => createOrder()}
+                  className={style.buttonOrderCreate}
+                  disabled={createOrderIsPending || updateOrderIsPending}
+                >
+                  {orderid === "newOrder" ||
+                  orderid === `copy${Number(orderid?.split("copy").join(""))}`
+                    ? createOrderIsPending
+                      ? "Создается..."
+                      : "Создать"
+                    : updateOrderIsPending
+                    ? "Перезапускается..."
+                    : "Перезапуск"}
+                </button>
+              )}
 
-            {!disabledOrder && orderid === "newOrder" && !isPrinting && (
-              <button
-                type="button"
-                className={style.buttonOrderSave}
-                onClick={() => saveOrder()}
-                disabled={saveOrderIsPending}
-              >
-                {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
-              </button>
-            )}
-          </div>
+              {!disabledOrder && orderid === "newOrder" && !isPrinting && (
+                <button
+                  type="button"
+                  className={style.buttonOrderSave}
+                  onClick={() => saveOrder()}
+                  disabled={saveOrderIsPending}
+                >
+                  {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
+                </button>
+              )}
+            </div>
+          </Can>
         </div>
       </div>
     </div>
