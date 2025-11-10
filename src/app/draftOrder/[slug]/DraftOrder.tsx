@@ -141,7 +141,7 @@ export default function DraftOrder({
     }
   }, [productsWatch, productGroup]);
 
-  const isPurchase = GetMeData?.role?.permissions.some(
+  const isPurchase = GetMeData?.role?.permissions?.some(
     (p) => p.permission_code === "purchase_order_type_drop_down_list"
   );
 

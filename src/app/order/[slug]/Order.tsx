@@ -260,7 +260,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [productsWatch, productGroup]);
 
-  const isPurchase = GetMeData?.role?.permissions.some(
+  const isPurchase = GetMeData?.role?.permissions?.some(
     (p) => p.permission_code === "purchase_order_type_drop_down_list"
   );
 
