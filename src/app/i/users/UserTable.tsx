@@ -192,9 +192,9 @@ const UserTable: React.FC<userTableProps> = ({ userData, onEdit, isArchive,setBu
     },
     {
       title: "Последний вход",
-      dataIndex: "connected_at",
-      key: "connected_at",
-      render: (connected_at: string) => connected_at ? formatNotificationDate(connected_at) : "-"
+      dataIndex: "last_login_time",
+      key: "last_login_time",
+      render: (last_login_time: string) => last_login_time ? formatNotificationDate(last_login_time) : "-"
     },
     {
       title: "Действия",
