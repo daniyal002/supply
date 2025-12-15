@@ -26,7 +26,7 @@ import { Button, message, Spin, Tabs, theme, Tooltip } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
-import { useProductData } from "@/hook/productHook";
+import { useProductData, useUploadImage } from "@/hook/productHook";
 import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
 import {
   useSaveDraftOrderMutation,
@@ -296,6 +296,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
+            images: product.images,
             employee_ids: product.buyers?.map((buyer) => ({
               employee_id: buyer.buyer_id,
               product_quantity: buyer.product_quantity,

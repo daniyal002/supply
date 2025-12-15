@@ -1,5 +1,5 @@
 import { productService } from "@/services/product.service";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useProductData = () => {
     const { data: productData, isLoading, error, refetch } = useQuery({queryKey:['newProduct'],queryFn:productService.getProduct});
@@ -14,4 +14,22 @@ export const useProductGroupData = () =>{
 export const useAllMesument = () => {
     const { data: allMesument, isLoading, error } = useQuery({queryKey:['allMesument'],queryFn:productService.getAllUnitMeasurment})
     return {allMesument, isLoading, error}
+}
+
+export const useUploadImage = () => {
+    const {mutate: uploadImage, data:uploadImageData} = useMutation({
+        mutationKey:["uploadImage"],
+        mutationFn: (files:File[]) => productService.uploadProductImage(files)
+    })
+
+    return {uploadImage,uploadImageData}
+}
+
+export const useDeleteImage = () => {
+    const {mutate: deleteImage} = useMutation({
+        mutationKey:["deleteImage"],
+        mutationFn: (fileName:string) => productService.deleteProductImage(fileName)
+    })
+
+    return {deleteImage}
 }

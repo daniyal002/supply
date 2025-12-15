@@ -35,6 +35,7 @@ export interface IProductTable {
   order_product_status?: IOrderProductStatus;
   remainder?: number;
   issued_quantity?: number;
+  images?: string[]
 }
 
 export interface IProductTableRequest {
@@ -44,6 +45,7 @@ export interface IProductTableRequest {
   order_product_link?: string;
   product_quantity: number;
   employee_ids?: { employee_id: number; product_quantity: number }[];
+  images?:string[];
   note?: string;
 }
 
@@ -55,6 +57,7 @@ export interface IProductTableFormValues {
   unit_measurement: IBasicUnitOption;
   product_quantity: number;
   buyers?: { employee_id: number; product_quantity: number }[];
+  images?:string[];
   note?: string;
 }
 

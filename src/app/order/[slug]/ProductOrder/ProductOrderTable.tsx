@@ -1,11 +1,20 @@
-import { IProduct } from "@/interface/product";
+import { IProduct, IProductImage } from "@/interface/product";
 import {
   IEmployeeFromProductTable,
   IOrderProductStatus,
   IProductTable,
 } from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Space, Table, TableColumnsType, theme, Tooltip } from "antd";
+import {
+  Button,
+  Image,
+  Popover,
+  Space,
+  Table,
+  TableColumnsType,
+  theme,
+  Tooltip,
+} from "antd";
 import {
   FileExcelFilled,
   InfoCircleFilled,
@@ -326,7 +335,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ?.map((buyer) =>
             buyer.product_quantity === 0
               ? buyer.buyer_name
-              : buyer.buyer_name + " - " +  Math.round(buyer.product_quantity * 100) / 100
+              : buyer.buyer_name +
+                " - " +
+                Math.round(buyer.product_quantity * 100) / 100
           )
           .join(", "),
       responsive: ["sm"],
@@ -346,12 +357,25 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       hidden: !hasIssuedQuantity,
       render: (record: IProductTable) => (
         <div style={{ display: "flex", gap: "10px" }}>
-          <p>{record?.issued_quantity} {record.unit_measurement.unit_measurement.unit_measurement_name}</p>
-          {record?.unit_measurement.unit_measurement.unit_measurement_coefficient !== 1 && record?.issued_quantity && (
-            <p>({Math.round(record?.issued_quantity * record?.unit_measurement.unit_measurement.unit_measurement_coefficient)} {record.product.unit_measurement_name})</p>
-          )}
+          <p>
+            {record?.issued_quantity}{" "}
+            {record.unit_measurement.unit_measurement.unit_measurement_name}
+          </p>
+          {record?.unit_measurement.unit_measurement
+            .unit_measurement_coefficient !== 1 &&
+            record?.issued_quantity && (
+              <p>
+                (
+                {Math.round(
+                  record?.issued_quantity *
+                    record?.unit_measurement.unit_measurement
+                      .unit_measurement_coefficient
+                )}{" "}
+                {record.product.unit_measurement_name})
+              </p>
+            )}
         </div>
-      )
+      ),
     },
     {
       title: "Статус товара",
@@ -373,6 +397,59 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           {order_product_status?.product_status_name}
         </p>
       ),
+    },
+    {
+      title: "Изображения",
+      dataIndex: "images",
+      key: "images",
+      // images: string[]
+      render: (images: string[]) => {
+        if (!images || images.length === 0) {
+          return <span>Нет фото</span>;
+        }
+
+        // Создаем контент для Popover - список всех изображений
+        const content = (
+          <Space size={4} wrap>
+            {" "}
+            {/* Используем Space для аккуратного размещения */}
+            {images.map((image, index) => (
+              <Image // Используем antd Image для встроенного превью (preview)
+                key={index}
+                width={60}
+                height={60}
+                style={{ objectFit: "cover" }}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/upload/product/${image}`}
+                alt={`Фото ${index + 1}`}
+                // group для галереи по умолчанию активен
+              />
+            ))}
+          </Space>
+        );
+
+        return (
+          <Popover
+            content={content}
+            title={`Фотографии товара (${images.length})`}
+            trigger="click" // Всплывает по клику
+            placement="right"
+          >
+            <Image // Отображаем в ячейке только первое фото как "обложку"
+              width={40}
+              height={40}
+              style={{ objectFit: "cover", cursor: "pointer" }}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/upload/product/${images[0]}`}
+              alt="Превью"
+              preview={false} // Отключаем стандартное превью для 'обложки'
+            />
+            {images.length > 1 && (
+              <span style={{ marginLeft: 8, cursor: "pointer" }}>
+                +{images.length - 1}
+              </span>
+            )}
+          </Popover>
+        );
+      },
     },
     {
       title: "Действия",
@@ -463,7 +540,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ? false // отключаем пагинацию при печати
           : {
               locale: { items_per_page: "/ Товаров" },
-              showSizeChanger:true
+              showSizeChanger: true,
             }
       }
       footer={() => (
@@ -517,7 +594,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               orderProductComments={record?.order_product_comment || []}
               productPreviousOrders={record?.product_previous_orders || []}
               orderId={orderId}
-              coefficient={record.unit_measurement.unit_measurement.unit_measurement_coefficient}
+              coefficient={
+                record.unit_measurement.unit_measurement
+                  .unit_measurement_coefficient
+              }
               basicUnit={record.product.unit_measurement_name}
             />
 
