@@ -160,6 +160,13 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     };
 
     const products = getValues("order_products") || [];
+    const productModuleName = getValuesModal("order_product_name");
+
+    if(isNewProduct && products.some((p) => p.order_product_name === productModuleName)) {
+      message.warning("Товар уже добавлен в заявку!");
+      return;
+    }
+
 
     if (editProductId !== null && editProductId !== undefined) {
       const updatedProducts = products.map((product, index) =>
