@@ -32,6 +32,7 @@ import style from "./ProductOrderTable.module.scss";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { UseFormWatch } from "react-hook-form";
 import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
+import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -71,6 +72,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     hasBuyers,
     hasNote,
     hasIssuedQuantity,
+    hasOrderProductComment
   } = useProductTableColumnVisibility(productTableData);
 
   const orderProductGroup = watch("product_group");
@@ -324,6 +326,43 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       },
       responsive: ["sm"],
     },
+    {
+          title: "Согласованное количество",
+          dataIndex: "order_product_comment",
+          key: "order_product_comment",
+          width: "250px",
+          sorter: {
+            compare: (a: any, b: any) => a.count - b.count,
+          },
+          render: (orderProductComment: IOrderProductCommentsResponse[]) => {
+            if (!orderProductComment || orderProductComment.length === 0) {
+              return null;
+            }
+            const latestComment = orderProductComment[0];
+            return (
+              <div style={{ fontSize: "12px" }}>
+                <p style={{ margin: 0 }}>
+                  <strong>Количество:</strong> {latestComment.product_count}
+                </p>
+                <p style={{ margin: 0 }}>
+                  <strong>Комментарий:</strong>{" "}
+                  {latestComment.comment && latestComment.comment.length > 50 ? (
+                    <Tooltip title={latestComment.comment}>
+                      {`${latestComment.comment.substring(0, 50)}...`}
+                    </Tooltip>
+                  ) : (
+                    latestComment.comment
+                  )}
+                </p>
+                <p style={{ margin: 0 }}>
+                  <strong>Сотрудник:</strong> {latestComment.employee}
+                </p>
+              </div>
+            );
+          },
+          hidden: !hasOrderProductComment,
+          responsive: ["sm"],
+        },
     {
       title: "Врач",
       dataIndex: "buyers",
