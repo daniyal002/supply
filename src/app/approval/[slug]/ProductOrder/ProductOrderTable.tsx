@@ -1,8 +1,21 @@
 import { IProduct } from "@/interface/product";
-import { IEmployeeFromProductTable, IProductTable } from "@/interface/productTable";
+import {
+  IEmployeeFromProductTable,
+  IProductTable,
+} from "@/interface/productTable";
 import { IUnit } from "@/interface/unit";
-import { Button, Image, Popover, Space, Table, TableColumnsType, theme, Tooltip } from "antd";
-import { useMemo, useState } from "react";
+import {
+  Button,
+  Image,
+  Popover,
+  Select,
+  Space,
+  Table,
+  TableColumnsType,
+  theme,
+  Tooltip,
+} from "antd";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss";
@@ -18,10 +31,15 @@ import { useSearch } from "@/helper/TableFilters/hook/useSearch";
 import { filterBySearchText } from "@/helper/TableFilters/Filters/filterBySearchText";
 import Highlighter from "react-highlight-words";
 import { useProductData } from "@/hook/productHook";
-import { UseFormWatch } from "react-hook-form";
+import {
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
+import { useEmployeeData } from "@/hook/employeeHook";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -40,6 +58,8 @@ interface productOrderTableProps {
   handlePrint: () => void;
   isPrinting: boolean;
   watch: UseFormWatch<IOrderItemFormValues>;
+  setValue: UseFormSetValue<IOrderItemFormValues>;
+  getValues: UseFormGetValues<IOrderItemFormValues>;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -58,8 +78,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   handlePrint,
   isPrinting,
   watch,
+  setValue,
+  getValues,
 }) => {
   const orderProductGroup = watch("product_group");
+  const { employeeData, error, isLoading } = useEmployeeData();
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
   const { searchText, searchedColumn, searchInput, handleSearch, handleReset } =
@@ -72,7 +95,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     hasNote,
     hasOrderProductComment,
     hasIssuedQuantity,
-    hasIsCancleRow
+    hasIsCancleRow,
   } = useProductTableColumnVisibility(productTableData);
 
   const {
@@ -103,6 +126,19 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ?.unit_measurement_name,
       }));
   }, [productTableData]);
+
+  const initialHasBuyerMapRef = useRef<Map<number | undefined, boolean> | null>(
+    null
+  );
+
+  if (initialHasBuyerMapRef.current === null && productTableData) {
+    initialHasBuyerMapRef.current = new Map(
+      productTableData.map((product) => [
+        product.order_product_id,
+        (product.buyers?.length ?? 0) > 0,
+      ])
+    );
+  }
 
   const columns: TableColumnsType<IProductTable> = [
     {
@@ -378,7 +414,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         )?.remainder || "_",
     },
     {
-      title: "Врач",
+      title: "Сотрудник",
       dataIndex: "buyers",
       width: "300px",
       key: "buyers",
@@ -388,11 +424,65 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ?.map((buyer) =>
             buyer.product_quantity === 0
               ? buyer.buyer_name
-              : buyer.buyer_name + " - " + Number(buyer.product_quantity.toFixed(2))
+              : buyer.buyer_name +
+                " - " +
+                Number(buyer.product_quantity.toFixed(2))
           )
           .join(", "),
+
       responsive: ["sm"],
     },
+    // {
+    //   title: "Сотрудник",
+    //   dataIndex: "buyers",
+    //   width: "300px",
+    //   key: "buyers",
+    //   hidden: !hasBuyers,
+    //   render: (buyers: IEmployeeFromProductTable[], record) => {
+    //       const isReadonly =
+    // initialHasBuyerMapRef.current?.get(record.order_product_id as number) ?? false;
+    //     return (
+    //       <Select
+    //         placeholder="Сотрудник"
+    //         mode="multiple"
+    //         disabled={isReadonly || readonly || isPrinting}
+    //         options={employeeData
+    //           ?.filter((e) => e.buyer_type !== "parlor")
+    //           .map((e) => ({
+    //             value: e.buyer_id,
+    //             label: e.buyer_name,
+    //           }))}
+    //         value={buyers.map((b) => b.buyer_id)}
+    //         className={style.employeeSelect}
+    //         onChange={(values) => {
+    //           setValue(
+    //             "order_products",
+    //             getValues("order_products").map((product) =>
+    //               product.order_product_id === record.order_product_id
+    //                 ? {
+    //                     ...product,
+    //                     buyers: values.map((v) => {
+    //                       const emp = employeeData?.find(
+    //                         (e) => e.buyer_id === v
+    //                       );
+    //                       return {
+    //                         buyer_id: v,
+    //                         buyer_name: emp?.buyer_name ?? "",
+    //                         buyer_type: "employee",
+    //                         product_quantity: record.product_quantity,
+    //                       };
+    //                     }),
+    //                   }
+    //                 : product
+    //             )
+    //           );
+    //         }}
+    //         showSearch
+    //       />
+    //     );
+    //   },
+    //   responsive: ["sm"],
+    // },
     {
       title: "Примечание",
       dataIndex: "note",
@@ -408,14 +498,27 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       hidden: !hasIssuedQuantity,
       render: (record: IProductTable) => (
         <div style={{ display: "flex", gap: "10px" }}>
-          <p>{record?.issued_quantity} {record.unit_measurement.unit_measurement.unit_measurement_name}</p>
-          {record?.unit_measurement.unit_measurement.unit_measurement_coefficient !== 1 && record?.issued_quantity && (
-            <p>({Math.round(record?.issued_quantity * record?.unit_measurement.unit_measurement.unit_measurement_coefficient)} {record.product.unit_measurement_name})</p>
-          )}
+          <p>
+            {record?.issued_quantity}{" "}
+            {record.unit_measurement.unit_measurement.unit_measurement_name}
+          </p>
+          {record?.unit_measurement.unit_measurement
+            .unit_measurement_coefficient !== 1 &&
+            record?.issued_quantity && (
+              <p>
+                (
+                {Math.round(
+                  record?.issued_quantity *
+                    record?.unit_measurement.unit_measurement
+                      .unit_measurement_coefficient
+                )}{" "}
+                {record.product.unit_measurement_name})
+              </p>
+            )}
         </div>
-      )
+      ),
     },
-     {
+    {
       title: "Изображения",
       dataIndex: "images",
       key: "images",
@@ -474,8 +577,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       width: "100px",
       // hidden:!hasIsCancleRow,
       render: (_: any, record: IProductTable) =>
-        !isPrinting &&
-        !readonly ? (
+        !isPrinting && !readonly ? (
           <Space size="middle">
             {record.is_cancel ? (
               <>
@@ -503,23 +605,25 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                 </Tooltip>
               </>
             ) : (
-              <Button
-                onClick={() => {
-                  showModalCancel();
-                  setProductIdCancel(record.product.product_id);
-                  setOrderProductIdCancel(record.order_product_id as number);
-                  // @ts-ignore: Unreachable code error
-                  setProductIndexCancel(record.key);
-                }}
-                title="Отклонить"
-              >
-                Отклонить
-              </Button>
+              <div className={style.actionButtonsContainer}>
+                <Button
+                  onClick={() => {
+                    showModalCancel();
+                    setProductIdCancel(record.product.product_id);
+                    setOrderProductIdCancel(record.order_product_id as number);
+                    // @ts-ignore: Unreachable code error
+                    setProductIndexCancel(record.key);
+                  }}
+                  title="Отклонить"
+                >
+                  Отклонить
+                </Button>
+              </div>
             )}
           </Space>
-        ):(
+        ) : (
           <Space size="middle">
-          {record.is_cancel && (
+            {record.is_cancel && (
               <Tooltip
                 title={
                   <span>
@@ -530,9 +634,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               >
                 <InfoCircleFilled style={{ color: "#fff" }} />
               </Tooltip>
-          )
-        }
-        </Space>
+            )}
+          </Space>
         ),
     },
   ];
@@ -560,7 +663,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           ? false // отключаем пагинацию при печати
           : {
               locale: { items_per_page: "/ Товаров" },
-              showSizeChanger:true
+              showSizeChanger: true,
             }
       }
       rowClassName={(record) =>
@@ -589,7 +692,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                 orderId={orderId}
                 is_cancel={record.is_cancel as boolean}
                 readonly={readonly}
-                coefficient={record.unit_measurement.unit_measurement.unit_measurement_coefficient}
+                coefficient={
+                  record.unit_measurement.unit_measurement
+                    .unit_measurement_coefficient
+                }
                 basicUnit={record.product.unit_measurement_name}
               />
               <RemainProduct product_kod_1c={record.product.product_kod_1c} />

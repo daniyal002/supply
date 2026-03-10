@@ -69,3 +69,12 @@ color: white !important;
 .ant-table-title{
  padding: 10px !important;
 }
+
+
+@media print {
+  .print {
+    transform: scale(0.85);
+    transform-origin: top left;
+    width: calc(100% / 0.85);
+  }
+}

@@ -58,7 +58,7 @@ export default function ApprovalOrder({
   const [isPrinting, setIsPrinting] = useState<boolean>(false);
   const handlePrint = useReactToPrint({
     contentRef,
-    onBeforePrint: async () => await setIsPrinting(true),
+    onBeforePrint: async () => setIsPrinting(true),
     onAfterPrint: () => setIsPrinting(false),
   });
 
@@ -345,7 +345,7 @@ export default function ApprovalOrder({
   };
 
   return (
-    <div ref={contentRef}>
+    <div ref={contentRef} className="print">
       {(agreedOrderPending || rejectOrderPending) && <Spin fullscreen={true} />}
       <div className={style.newOrder}>
         <h1>Заявка на согласовании №: {orderid}</h1>
@@ -408,6 +408,13 @@ export default function ApprovalOrder({
             </div>
           </div>
         )}
+
+        {isPrinting && (
+          <>
+          <h4 style={{marginTop:"10px"}}>История согласования</h4>
+          <OrderStepHistory order_id={Number(orderid)}/>
+          </>
+          )}
       </div>
     </div>
   );

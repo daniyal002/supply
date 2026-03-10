@@ -96,6 +96,8 @@ export default function ProductOrder({
         handlePrint={handlePrint}
         isPrinting={isPrinting}
         watch={watch}
+        setValue={setValue}
+        getValues={getValues}
       />
     </>
   );

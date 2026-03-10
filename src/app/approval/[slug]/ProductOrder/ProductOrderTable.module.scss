@@ -6,3 +6,13 @@
     background: rgb(131, 124, 230); /* Задайте нужный вам цвет */
 
 }
+
+.actionButtonsContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.employeeSelect{
+    width: 260px;
+}
