@@ -3,6 +3,15 @@ import { IOrderProductCommentsResponse } from "@/interface/orderProductComments"
 import { IProductPreviousOrders } from "@/interface/productTable";
 import { Collapse, Table, Tooltip } from "antd";
 import style from "./ProductOrderTable.module.scss";
+const compareText = (left?: string | null, right?: string | null) =>
+  (left ?? "").localeCompare(right ?? "", "ru");
+
+const compareNumber = (left?: number | null, right?: number | null) =>
+  (left ?? 0) - (right ?? 0);
+
+const compareDate = (left?: string | null, right?: string | null) =>
+  new Date(left ?? 0).getTime() - new Date(right ?? 0).getTime();
+
 
 interface Props {
   orderProductComments: IOrderProductCommentsResponse[];
@@ -51,16 +60,25 @@ export const ExpandedRowContent = ({
                         title: "Сотрудник",
                         dataIndex: "employee",
                         key: "employee",
+                        sorter: {
+                          compare: (a, b) => compareText(a.employee, b.employee),
+                        },
                       },
                       {
                         title: "Количество",
                         dataIndex: "product_count",
                         key: "product_count",
+                        sorter: {
+                          compare: (a, b) => compareNumber(a.product_count, b.product_count),
+                        },
                       },
                       {
                         title: "Комментарий",
                         dataIndex: "comment",
                         key: "comment",
+                        sorter: {
+                          compare: (a, b) => compareText(a.comment, b.comment),
+                        },
                         render: (comment: string) =>
                           comment && comment.length > 50 ? (
                             <Tooltip title={comment}>
@@ -74,6 +92,9 @@ export const ExpandedRowContent = ({
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
+                        sorter: {
+                          compare: (a, b) => compareDate(a.created_at, b.created_at),
+                        },
                         render: (data: string) => formatNotificationDate(data),
                       },
                     ]}
@@ -115,20 +136,32 @@ export const ExpandedRowContent = ({
                         title: "В Заявке",
                         dataIndex: "order_id",
                         key: "order_id",
+                        sorter: {
+                          compare: (a, b) => compareNumber(a.order_id, b.order_id),
+                        },
                       },
                       {
                         title: "Количество",
                         dataIndex: "product_quantity",
                         key: "product_quantity",
+                        sorter: {
+                          compare: (a, b) => compareNumber(a.product_quantity, b.product_quantity),
+                        },
                       },
                       {
                         title: "Согласованное количество",
                         dataIndex: "product_count",
                         key: "product_quantity",
+                        sorter: {
+                          compare: (a, b) => compareNumber(a.product_count, b.product_count),
+                        },
                       },
                       {
                         title: "Выданное количество",
                         key: "issued_quantity_and_unit_measurement_coefficient",
+                        sorter: {
+                          compare: (a, b) => compareNumber(a.issued_quantity, b.issued_quantity),
+                        },
                         width: "250px",
                         render: (record: IProductPreviousOrders) => (
                           <div style={{ display: "flex", gap: "10px" }}>
@@ -151,16 +184,25 @@ export const ExpandedRowContent = ({
                         title: "Ед. измерения",
                         dataIndex: "unit_measurement_name",
                         key: "unit_measurement_name",
+                        sorter: {
+                          compare: (a, b) => compareText(a.unit_measurement_name, b.unit_measurement_name),
+                        },
                       },
                       {
                         title: "На кого",
                         dataIndex: "buyer_name",
                         key: "buyer_name",
+                        sorter: {
+                          compare: (a, b) => compareText(a.buyer_name, b.buyer_name),
+                        },
                       },
                       {
                         title: "Дата",
                         dataIndex: "created_at",
                         key: "created_at",
+                        sorter: {
+                          compare: (a, b) => compareDate(a.created_at, b.created_at),
+                        },
                         render: (data: string) => formatNotificationDate(data),
                       },
                     ]}
