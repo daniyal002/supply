@@ -21,6 +21,7 @@ import { useReactToPrint } from "react-to-print";
 import { useProductData } from "@/hook/productHook";
 import ChatCore from "@/components/Chat/ChatCore";
 import { useTabStore } from "../../../../store/tabStore";
+import { normalizeOrderDocuments } from "@/helper/orderDocuments";
 
 interface Props {
   orderid?: string;
@@ -337,6 +338,7 @@ export default function ApprovalOrder({
         label: getOrderByIdData?.storage?.storage_name,
         value: getOrderByIdData?.storage?.storage_id,
       },
+      documents: normalizeOrderDocuments(getOrderByIdData?.documents),
     });
   }, [reset, type, orderid, getOrderByIdData]);
 

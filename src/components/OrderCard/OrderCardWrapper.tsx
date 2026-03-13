@@ -18,6 +18,17 @@ interface OrderCardWrapperProps {
   isDraft: boolean;
 }
 
+const getOrderCardKey = (order: IOrderItem, index: number) => {
+  const draftOrderId = (order as IOrderItem & { order_temp_id?: number }).order_temp_id;
+
+  return (
+    order.order_id ??
+    draftOrderId ??
+    order.order_number ??
+    `order-card-${index}`
+  );
+};
+
 const OrderCardWrapper: React.FC<OrderCardWrapperProps> = ({
   OrderData,
   loading,
@@ -158,8 +169,12 @@ const OrderCardWrapper: React.FC<OrderCardWrapperProps> = ({
       ) : paginatedData.length > 0 ? (
         <>
           <div className={styles.orderCardsGrid}>
-            {paginatedData.map((order) => (
-              <OrderCard key={order.order_id} order={order} isDraft={isDraft} />
+            {paginatedData.map((order, index) => (
+              <OrderCard
+                key={getOrderCardKey(order, index)}
+                order={order}
+                isDraft={isDraft}
+              />
             ))}
           </div>
 

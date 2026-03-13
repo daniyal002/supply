@@ -36,6 +36,8 @@ export default function ProductOrder({
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [type, setType] = useState<"Добавить" | "Изменить">("Изменить");
 
+  console.log(productTableData)
+
   // Следим за полем order_type
   const orderType = watch("order_type")
     ? watch("order_type")

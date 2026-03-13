@@ -2,7 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import style from "./DraftOrder.module.scss";
-import { useCreateOrderMutation } from "@/hook/orderHook";
+import {
+  useCreateOrderMutation,
+  useDeleteOrderDocumentMutation,
+  useUploadOrderDocumentMutation,
+} from "@/hook/orderHook";
 import { useForm } from "react-hook-form";
 import {
   EnumOrderTypes,
@@ -26,6 +30,10 @@ import {
 } from "@/hook/orderTempHook";
 import { useReactToPrint } from "react-to-print";
 import { InfoCircleFilled } from "@ant-design/icons";
+import {
+  createOrderDocumentFormState,
+  submitOrderDocuments,
+} from "@/helper/orderDocumentSubmit";
 
 interface Props {
   draftOrderid?: string;
@@ -53,11 +61,20 @@ export default function DraftOrder({
 
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
-  const { mutate: createOrderMutation, isPending: createOrderIsPending } =
+  const { mutateAsync: createOrderMutationAsync, isPending: createOrderIsPending } =
     useCreateOrderMutation();
 
-  const { isPending: saveOrderIsPending } = useSaveDraftOrderMutation();
-  const { mutate: updateDraftOrderMutation } = useUpdateDraftOrderMutation();
+  const { mutateAsync: saveOrderMutationAsync, isPending: saveOrderIsPending } =
+    useSaveDraftOrderMutation();
+  const { mutateAsync: updateDraftOrderMutationAsync } = useUpdateDraftOrderMutation();
+  const {
+    mutateAsync: uploadOrderDocuments,
+    isPending: uploadOrderDocumentsIsPending,
+  } = useUploadOrderDocumentMutation();
+  const {
+    mutateAsync: deleteOrderDocument,
+    isPending: deleteOrderDocumentIsPending,
+  } = useDeleteOrderDocumentMutation();
   const {
     register,
     formState: { errors },
@@ -145,7 +162,20 @@ export default function DraftOrder({
     (p) => p.permission_code === "purchase_order_type_drop_down_list"
   );
 
-  const createOrder = () => {
+  const syncSubmittedDocuments = (
+    documents: Array<string | { path?: string | null; file_name?: string | null; file_path?: string | null }>
+  ) => {
+    const nextDocumentState = createOrderDocumentFormState(documents);
+
+    setValue("documents", nextDocumentState.documents, { shouldDirty: true });
+    setValue("existingDocuments", nextDocumentState.existingDocuments, {
+      shouldDirty: true,
+    });
+    setValue("removedDocuments", [], { shouldDirty: true });
+    setValue("newDocuments", [], { shouldDirty: true });
+  };
+
+  const createOrder = async () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IDraftOrderItemRequest = {
@@ -162,7 +192,7 @@ export default function DraftOrder({
         note: data.note,
         product_group_id: data.product_group.value,
         products: data.order_products.map((product) => {
-          const productData = product.product || {}; // Если product не существует, используем пустой объект
+          const productData = product.product || {};
           const hasOrderProductName = !!product.order_product_name;
           const hasProductId = !!productData.product_id;
           return {
@@ -176,6 +206,7 @@ export default function DraftOrder({
             product_quantity: product.product_quantity,
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
+            images: product.images,
             note: product.note,
             employee_ids: product.buyers?.map((buyer) => ({
               employee_id: buyer.buyer_id,
@@ -183,27 +214,32 @@ export default function DraftOrder({
             })),
           };
         }),
+        documents: [],
       };
-      if (
-        draftOrderid !== "newOrder" &&
-        draftOrderid !== `copy${draftOrderid?.split("copy")[1]}` &&
-        getOrderByIdData
-      ) {
-        createOrderMutation(order, {
-          onSuccess() {
-            deleteDraftOrderByIdMutation({
-              order_temp_id: Number(draftOrderid),
-            });
-            remove(targetKey);
+      try {
+        await submitOrderDocuments({
+          existingDocuments: data.existingDocuments,
+          removedDocuments: data.removedDocuments,
+          newDocuments: data.newDocuments,
+          uploadDocuments: uploadOrderDocuments,
+          deleteDocument: deleteOrderDocument,
+          submitRequest: async (documents) => {
+            const payload = { ...order, documents };
+            return createOrderMutationAsync(payload);
           },
         });
-      }
+
+        deleteDraftOrderByIdMutation({
+          order_temp_id: Number(draftOrderid),
+        });
+        remove(targetKey);
+      } catch {}
     } else {
       message.warning("Добавьте товары в заявку !");
     }
   };
 
-  const saveOrder = () => {
+  const saveOrder = async () => {
     if (
       getValues().order_products &&
       getValues().order_products.length > 0 &&
@@ -226,7 +262,7 @@ export default function DraftOrder({
         note: getValues().note,
         product_group_id: getValues().product_group.value,
         products: getValues().order_products.map((product) => {
-          const productData = product.product || {}; // Если product не существует, используем пустой объект
+          const productData = product.product || {};
           const hasOrderProductName = !!product.order_product_name;
           const hasProductId = !!productData.product_id;
           return {
@@ -241,18 +277,36 @@ export default function DraftOrder({
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
+            images:product.images,
             employee_ids: product.buyers?.map((buyer) => ({
               employee_id: buyer.buyer_id,
               product_quantity: buyer.product_quantity,
             })),
           };
         }),
+        documents: [],
       };
 
-      updateDraftOrderMutation({
-        ...order,
-        order_temp_id: Number(draftOrderid),
-      });
+      try {
+        const { finalDocumentItems } = await submitOrderDocuments({
+          existingDocuments: getValues().existingDocuments,
+          removedDocuments: getValues().removedDocuments,
+          newDocuments: getValues().newDocuments,
+          uploadDocuments: uploadOrderDocuments,
+          deleteDocument: deleteOrderDocument,
+          submitRequest: async (documents) => {
+            const payload = {
+              ...order,
+              documents,
+              order_temp_id: Number(draftOrderid),
+            };
+
+            return updateDraftOrderMutationAsync(payload);
+          },
+        });
+
+        syncSubmittedDocuments(finalDocumentItems);
+      } catch {}
     } else {
       message.warning("Заполните шапку и товары!");
     }
@@ -269,6 +323,7 @@ export default function DraftOrder({
         storage_id: undefined,
         order_type: undefined,
         is_generic: false,
+        ...createOrderDocumentFormState(),
       });
     } else if (
       draftOrderid !== "newOrder"
@@ -305,6 +360,7 @@ export default function DraftOrder({
               : "Заявка на склад",
         },
         is_generic: getOrderByIdData?.is_generic,
+        ...createOrderDocumentFormState(getOrderByIdData?.documents),
       });
     }
   }, [reset, type, draftOrderid, getOrderByIdData]);
@@ -456,10 +512,13 @@ export default function DraftOrder({
               <>
                 <button
                   type="button"
-                  onClick={() => createOrder()}
+                  onClick={() => void createOrder()}
                   className={style.buttonOrderCreate}
                   disabled={
-                    createOrderIsPending || DeleteDraftOrderByIisPending
+                    createOrderIsPending ||
+                    DeleteDraftOrderByIisPending ||
+                    uploadOrderDocumentsIsPending ||
+                    deleteOrderDocumentIsPending
                   }
                 >
                   {DeleteDraftOrderByIisPending ? "Создается..." : "Создать"}
@@ -468,8 +527,8 @@ export default function DraftOrder({
                 <button
                   type="button"
                   className={style.buttonOrderSave}
-                  onClick={() => saveOrder()}
-                  disabled={saveOrderIsPending}
+                  onClick={() => void saveOrder()}
+                  disabled={saveOrderIsPending || uploadOrderDocumentsIsPending || deleteOrderDocumentIsPending}
                 >
                   {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
                 </button>

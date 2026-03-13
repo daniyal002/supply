@@ -5,8 +5,10 @@ import { useReactToPrint } from "react-to-print";
 import style from "./Order.module.scss";
 import {
   useCreateOrderMutation,
+  useDeleteOrderDocumentMutation,
   useGetOrderById,
   useOrderUserData,
+  useUploadOrderDocumentMutation,
   useUpdateOrderMutation,
 } from "@/hook/orderHook";
 import { useForm } from "react-hook-form";
@@ -26,7 +28,7 @@ import { Button, message, Spin, Tabs, theme, Tooltip } from "antd";
 import OrderStepHistory from "@/components/OrderStepHistory/OrderStepHistory";
 import { TabsProps } from "antd/lib";
 import RouteInfo from "@/components/RouteInfo/RouteInfo";
-import { useProductData, useUploadImage } from "@/hook/productHook";
+import { useProductData } from "@/hook/productHook";
 import ModalSaveOrder from "@/components/UI/ModalSaveOrder/ModalSaveOrder";
 import {
   useSaveDraftOrderMutation,
@@ -34,6 +36,10 @@ import {
 } from "@/hook/orderTempHook";
 import { useOrderIdStore } from "../../../../store/orderIdStore";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
+import {
+  createOrderDocumentFormState,
+  submitOrderDocuments,
+} from "@/helper/orderDocumentSubmit";
 import { CopyFilled, InfoCircleFilled } from "@ant-design/icons";
 import ChatCore from "@/components/Chat/ChatCore";
 import { useTabStore } from "../../../../store/tabStore";
@@ -63,13 +69,21 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
 
   const [toggle, setToggle] = useState<boolean>(false);
   const { isLoading } = useProductData();
-  const { mutate: createOrderMutation, isPending: createOrderIsPending } =
+  const { mutateAsync: createOrderMutationAsync, isPending: createOrderIsPending } =
     useCreateOrderMutation();
-  const { mutate: updateOrderMutation, isPending: updateOrderIsPending } =
+  const { mutateAsync: updateOrderMutationAsync, isPending: updateOrderIsPending } =
     useUpdateOrderMutation();
-  const { mutate: saveOrderMutation, isPending: saveOrderIsPending } =
+  const { mutateAsync: saveOrderMutationAsync, isPending: saveOrderIsPending } =
     useSaveDraftOrderMutation();
-  const { mutate: updateDraftOrderMutation } = useUpdateDraftOrderMutation();
+  const { mutateAsync: updateDraftOrderMutationAsync } = useUpdateDraftOrderMutation();
+  const {
+    mutateAsync: uploadOrderDocuments,
+    isPending: uploadOrderDocumentsIsPending,
+  } = useUploadOrderDocumentMutation();
+  const {
+    mutateAsync: deleteOrderDocument,
+    isPending: deleteOrderDocumentIsPending,
+  } = useDeleteOrderDocumentMutation();
   const {
     register,
     formState: { errors },
@@ -114,6 +128,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 ? "Заявка на закупку"
                 : "Заявка на склад",
           },
+          ...createOrderDocumentFormState(lastOrder?.documents),
         });
       }
     }
@@ -264,7 +279,20 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     (p) => p.permission_code === "purchase_order_type_drop_down_list"
   );
 
-  const createOrder = () => {
+  const syncSubmittedDocuments = (
+    documents: Array<string | { path?: string | null; file_name?: string | null; file_path?: string | null }>
+  ) => {
+    const nextDocumentState = createOrderDocumentFormState(documents);
+
+    setValue("documents", nextDocumentState.documents, { shouldDirty: true });
+    setValue("existingDocuments", nextDocumentState.existingDocuments, {
+      shouldDirty: true,
+    });
+    setValue("removedDocuments", [], { shouldDirty: true });
+    setValue("newDocuments", [], { shouldDirty: true });
+  };
+
+  const createOrder = async () => {
     const data = getValues();
     if (data.order_products && data.order_products.length > 0) {
       const order: IOrderItemRequest = {
@@ -281,7 +309,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         note: data.note,
         product_group_id: data.product_group.value,
         products: data.order_products.map((product) => {
-          const productData = product.product || {}; // Если product не существует, используем пустой объект
+          const productData = product.product || {};
           const hasOrderProductName = !!product.order_product_name;
           const hasProductId = !!productData.product_id;
           return {
@@ -303,25 +331,35 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             })),
           };
         }),
+        documents: [],
       };
-      if (
-        orderid !== "newOrder" &&
-        orderid !== `copy${orderid?.split("copy")[1]}` &&
-        getOrderByIdData
-      ) {
-        order.order_id = Number(orderid);
-        updateOrderMutation(order, {
-          onSuccess() {
-            remove(targetKey);
+
+      try {
+        const { finalDocumentItems } = await submitOrderDocuments({
+          existingDocuments: data.existingDocuments,
+          removedDocuments: data.removedDocuments,
+          newDocuments: data.newDocuments,
+          uploadDocuments: uploadOrderDocuments,
+          deleteDocument: deleteOrderDocument,
+          submitRequest: async (documents) => {
+            const payload = { ...order, documents };
+
+            if (
+              orderid !== "newOrder" &&
+              orderid !== `copy${orderid?.split("copy")[1]}` &&
+              getOrderByIdData
+            ) {
+              payload.order_id = Number(orderid);
+              return updateOrderMutationAsync(payload);
+            }
+
+            return createOrderMutationAsync(payload);
           },
         });
-      } else {
-        createOrderMutation(order, {
-          onSuccess() {
-            remove(targetKey);
-          },
-        });
-      }
+
+        syncSubmittedDocuments(finalDocumentItems);
+        remove(targetKey);
+      } catch {}
     } else {
       message.warning("Добавьте товары в заявку !");
     }
@@ -332,7 +370,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   );
   const draftNewOrderId = useOrderIdStore((state) => state.draftNewOrderId);
 
-  const saveOrder = () => {
+  const saveOrder = async () => {
     if (
       getValues().order_products &&
       getValues().order_products.length > 0 &&
@@ -355,7 +393,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         note: getValues().note,
         product_group_id: getValues().product_group.value,
         products: getValues().order_products.map((product) => {
-          const productData = product.product || {}; // Если product не существует, используем пустой объект
+          const productData = product.product || {};
           const hasOrderProductName = !!product.order_product_name;
           const hasProductId = !!productData.product_id;
           return {
@@ -370,28 +408,43 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
             unit_measurement_id: product.unit_measurement.unit_measurement
               .unit_measurement_id as number,
             note: product.note,
+            images: product.images,
             employee_ids: product.buyers?.map((buyer) => ({
               employee_id: buyer.buyer_id,
               product_quantity: buyer.product_quantity,
             })),
           };
         }),
+        documents: [],
       };
 
-      if (draftNewOrderId && draftNewOrderId !== "0") {
-        updateDraftOrderMutation({
-          ...order,
-          order_temp_id: Number(draftNewOrderId),
-        });
-      } else {
-        saveOrderMutation(order, {
-          onSuccess(data) {
-            if (data.order.order_temp_id) {
-              setDraftNewOrderId(data.order.order_temp_id.toString());
+      try {
+        const { response, finalDocumentItems } = await submitOrderDocuments({
+          existingDocuments: getValues().existingDocuments,
+          removedDocuments: getValues().removedDocuments,
+          newDocuments: getValues().newDocuments,
+          uploadDocuments: uploadOrderDocuments,
+          deleteDocument: deleteOrderDocument,
+          submitRequest: async (documents) => {
+            const payload = { ...order, documents };
+
+            if (draftNewOrderId && draftNewOrderId !== "0") {
+              return updateDraftOrderMutationAsync({
+                ...payload,
+                order_temp_id: Number(draftNewOrderId),
+              });
             }
+
+            return saveOrderMutationAsync(payload);
           },
         });
-      }
+
+        syncSubmittedDocuments(finalDocumentItems);
+
+        if (response.order.order_temp_id) {
+          setDraftNewOrderId(response.order.order_temp_id.toString());
+        }
+      } catch {}
     } else {
       message.warning("Заполните шапку и товары!");
     }
@@ -408,6 +461,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
         storage_id: undefined,
         order_type: undefined,
         is_generic: false,
+        ...createOrderDocumentFormState(),
       });
     } else if (
       orderid !== "newOrder"
@@ -444,6 +498,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               : "Заявка на склад",
         },
         is_generic: getOrderByIdData?.is_generic,
+        ...createOrderDocumentFormState(getOrderByIdData?.documents),
       });
     }
   }, [reset, type, orderid, getOrderByIdData]);
@@ -621,9 +676,14 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
               {!disabledOrder && !isPrinting && (
                 <button
                   type="button"
-                  onClick={() => createOrder()}
+                  onClick={() => void createOrder()}
                   className={style.buttonOrderCreate}
-                  disabled={createOrderIsPending || updateOrderIsPending}
+                  disabled={
+                    createOrderIsPending ||
+                    updateOrderIsPending ||
+                    uploadOrderDocumentsIsPending ||
+                    deleteOrderDocumentIsPending
+                  }
                 >
                   {orderid === "newOrder" ||
                   orderid === `copy${Number(orderid?.split("copy").join(""))}`
@@ -640,8 +700,12 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 <button
                   type="button"
                   className={style.buttonOrderSave}
-                  onClick={() => saveOrder()}
-                  disabled={saveOrderIsPending}
+                  onClick={() => void saveOrder()}
+                  disabled={
+                    saveOrderIsPending ||
+                    uploadOrderDocumentsIsPending ||
+                    deleteOrderDocumentIsPending
+                  }
                 >
                   {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
                 </button>

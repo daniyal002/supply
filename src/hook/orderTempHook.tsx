@@ -41,7 +41,7 @@ export const useDraftOrderUserData = () => {
 export const useSaveDraftOrderMutation = () => {
     const queryClient = useQueryClient();
 
-    const { mutate, isPending } = useMutation({
+    const { mutate, mutateAsync, isPending } = useMutation({
       mutationKey: ["saveDraftOrder"],
       mutationFn: (data: IDraftOrderItemRequest) => orderTempService.saveOrder(data),
       onSuccess: (newOrder, variables) => {
@@ -58,13 +58,13 @@ export const useSaveDraftOrderMutation = () => {
         message.error(error?.response?.data?.detail);
       },
     });
-    return { mutate, isPending };
+    return { mutate, mutateAsync, isPending };
   };
 
 export const useUpdateDraftOrderMutation = () => {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, mutateAsync, isPending } = useMutation({
     mutationKey: ["UpdateDraftOrder"],
     mutationFn: (data: IDraftOrderItemRequest) => orderTempService.updateOrder(data),
     onSuccess: (newOrder, variables) => {
@@ -86,13 +86,13 @@ export const useUpdateDraftOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate, isPending };
+  return { mutate, mutateAsync, isPending };
 };
 
 export const useDeleteDraftOrderByIdMutation = () => {
     const queryClient = useQueryClient();
 
-    const { mutate, isPending } = useMutation({
+    const { mutate, mutateAsync, isPending } = useMutation({
       mutationKey: ["deleteDraftOrder"],
       mutationFn: (data: IOrderDrafttemRequestDelete) => orderTempService.deleteTempOrderById(data),
       onSuccess: (newOrder, variables) => {
@@ -111,7 +111,7 @@ export const useDeleteDraftOrderByIdMutation = () => {
         message.error(error?.response?.data?.detail);
       },
     });
-    return { mutate, isPending };
+    return { mutate, mutateAsync, isPending };
   };
 
 

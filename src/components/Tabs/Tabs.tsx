@@ -157,7 +157,7 @@ const remove = (targetKey: TargetKey) => {
         style={{ padding: "0 10px" }}
         destroyInactiveTabPane={false}
         defaultActiveKey={activeTabOrders}
-        animated
+        animated={{ inkBar: true, tabPane: false }}
       />
   );
 }

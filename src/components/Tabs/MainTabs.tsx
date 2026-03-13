@@ -61,7 +61,7 @@ export const MainTabs = () => {
         items={items}
         activeKey={activeMainTabKey}
         onChange={handleTabChange}
-        animated
+        animated={{ inkBar: true, tabPane: false }}
       />
     </div>
   );

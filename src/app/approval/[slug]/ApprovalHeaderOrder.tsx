@@ -15,6 +15,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/db/db";
 import { useProductData } from "@/hook/productHook";
 import { optionsOrderTypes, optionsStorage } from "@/helper/options";
+import OrderDocumentsView from "@/components/OrderDocuments/OrderDocumentsView";
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -320,6 +321,10 @@ export default function ApprovalHeaderOrder({
               />
             )}
           />
+        </div>
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Документы</label>
+          <OrderDocumentsView documents={watch("documents") || []} />
         </div>
       </div>
     </div>

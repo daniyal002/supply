@@ -20,6 +20,18 @@ export interface IStatusOrderResponse{
   detail:IOrderStatus[]
 }
 
+export interface IOrderDocumentItem {
+  path: string;
+  file_name: string;
+}
+
+export interface IOrderDocumentFormState {
+  documents: string[];
+  existingDocuments: IOrderDocumentItem[];
+  removedDocuments: IOrderDocumentItem[];
+  newDocuments: File[];
+}
+
 export interface IOrderItem {
     order_id?:number;
     order_number: string;
@@ -41,6 +53,7 @@ export interface IOrderItem {
     order_author_name?:string
     is_archive?:boolean
     is_generic:boolean
+    documents?: Array<string | IOrderDocumentItem>
   }
 
   export interface IDraftOrderItem {
@@ -63,6 +76,7 @@ export interface IOrderItem {
     user?:IUser
     is_archive?:boolean
     is_generic:boolean
+    documents?: Array<string | IOrderDocumentItem>
 
   }
 
@@ -90,6 +104,7 @@ export interface IOrderItem {
     products: IProductTableRequest[]
     is_generic:boolean
     category_matches: boolean,
+    documents: string[],
   }
 
   export interface IDraftOrderItemRequest{
@@ -106,6 +121,7 @@ export interface IOrderItem {
     products: IProductTableRequest[]
     is_generic:boolean,
     category_matches: boolean,
+    documents: string[],
   }
 
   export interface IOrderItemRequestDelete{
@@ -136,6 +152,10 @@ export interface IOrderItem {
     is_archive?:boolean
     is_generic:boolean
     category_matches: boolean,
+    documents: string[],
+    existingDocuments: IOrderDocumentItem[],
+    removedDocuments: IOrderDocumentItem[],
+    newDocuments: File[],
   }
 
 
@@ -157,6 +177,23 @@ export interface IOrderItem {
     is_archive?:boolean
     is_generic:boolean
     category_matches: boolean,
+    documents: string[],
+    existingDocuments: IOrderDocumentItem[],
+    removedDocuments: IOrderDocumentItem[],
+    newDocuments: File[],
+  }
+
+  export interface IOrderDocumentUploadItem {
+    file_name: string;
+    file_path: string;
+  }
+
+  export interface IOrderDocumentUploadResponse {
+    detail: IOrderDocumentUploadItem[];
+  }
+
+  export interface IOrderDocumentDeleteRequest {
+    file_name: string;
   }
 
   export interface IOrderItemResponse{

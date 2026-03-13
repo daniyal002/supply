@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental:{appDocumentPreloading:true,viewTransition:true},
+    experimental:{appDocumentPreloading:true},
     reactStrictMode:false,
     images: {
         remotePatterns: [

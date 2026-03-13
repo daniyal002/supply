@@ -1,6 +1,8 @@
 import { axiosWidthAuth } from "@/api/interseptors";
 import {
   IOrderArchiveRequest,
+  IOrderDocumentDeleteRequest,
+  IOrderDocumentUploadResponse,
   IOrderItem,
   IOrderItemAddResponse,
   IOrderItemByIdResponse,
@@ -97,6 +99,30 @@ export const orderService = {
     const response = await axiosWidthAuth.put<IOrderItemAddResponse>(
       "order/update_order",
       data
+    );
+    return response.data;
+  },
+
+  async uploadOrderDocument(files: File[]) {
+    const formData = new FormData();
+
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const response = await axiosWidthAuth.post<IOrderDocumentUploadResponse>(
+      "/order/upload_order_document",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+
+    return response.data.detail;
+  },
+
+  async deleteOrderDocument(data: IOrderDocumentDeleteRequest) {
+    const response = await axiosWidthAuth.delete<string>(
+      "/order/delete_order_document",
+      { data }
     );
     return response.data;
   },

@@ -1,5 +1,10 @@
-import { Input, message, Modal, Select } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+﻿import { Input, message, Modal, Select } from "antd";
+import AttachmentPicker from "@/components/AttachmentPicker/AttachmentPicker";
+import {
+  PRODUCT_IMAGE_PICKER_CONFIG,
+  toRemoteUploadFile,
+} from "@/helper/attachmentPicker";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Controller,
   SubmitHandler,
@@ -27,9 +32,8 @@ import { db } from "@/db/db";
 import SelectEmployeeAndQuantity from "./SelectEmployeeAndQuantity";
 import { IProductUnit } from "@/interface/product";
 import { IUnit } from "@/interface/unit";
-import Dragger from "antd/es/upload/Dragger";
 import { InboxOutlined } from "@ant-design/icons";
-import { UploadProps } from "antd/lib";
+import { UploadFile } from "antd/lib";
 
 interface Props {
   type: "Добавить" | "Изменить";
@@ -68,7 +72,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const GetMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const [disabledQuantity, setDisabledQuantity] = useState(false);
   const [newImagesToUpload, setNewImagesToUpload] = useState<File[]>([]);
-  const [fileList, setFileList] = useState<UploadProps["fileList"]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const { uploadImage } = useUploadImage();
@@ -82,7 +86,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
   const onSubmit: SubmitHandler<IProductTableFormValues> = async (data) => {
     let uploadedImageNames: string[] = [];
 
-    // Загрузка новых изображений
+    // Upload new images before saving the product.
     if (newImagesToUpload.length > 0) {
       try {
         await new Promise<void>((resolve, reject) => {
@@ -103,7 +107,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       }
     }
 
-    // Удаление помеченных изображений
+    // Delete images that were removed while editing the product.
     if (imagesToDelete.length > 0) {
       try {
         for (const imgName of imagesToDelete) {
@@ -115,7 +119,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       }
     }
 
-    // Финальный список изображений: существующие + только что загруженные
+    // Final image list: existing ones plus newly uploaded ones.
     const finalImages = [...existingImages, ...uploadedImageNames];
 
     const unit = itemProductData?.directory_unit_measurement.find(
@@ -160,9 +164,19 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     };
 
     const products = getValues("order_products") || [];
-    const productModuleName = getValuesModal("order_product_name");
+    const productModuleName = getValuesModal("order_product_name")?.trim();
+    const hasDuplicateCustomProduct =
+      isNewProduct &&
+      !!productModuleName &&
+      products.some((product, index) => {
+        if (editProductId !== null && index === editProductId) {
+          return false;
+        }
 
-    if(isNewProduct && products.some((p) => p.order_product_name === productModuleName)) {
+        return product.order_product_name?.trim() === productModuleName;
+      });
+
+    if (hasDuplicateCustomProduct) {
       message.warning("Товар уже добавлен в заявку!");
       return;
     }
@@ -192,48 +206,34 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     setIsModalOpen(false);
   };
 
-  const resetModalState = () => {
-    reset({
-      product: undefined,
-      buyers: [],
-      product_quantity: undefined,
-      order_product_link: undefined,
-      order_product_name: undefined,
-      images: [],
-      unit_measurement: defaultUnit,
-      note: undefined,
-    });
-    replace([]);
-    setNewImagesToUpload([]);
-    setFileList([]);
-    setExistingImages([]);
-    setImagesToDelete([]);
-  };
-
-  const buyersWatch = watchModal("buyers") || [];
+  const buyersWatch = watchModal("buyers");
 
   useEffect(() => {
-    if (buyersWatch.length === 0) {
+    const buyers = buyersWatch || [];
+
+    if (buyers.length === 0) {
       setDisabledQuantity(false);
       return;
     }
 
-    const hasBuyers = buyersWatch.length > 0;
+    const hasBuyers = buyers.length > 0;
     setDisabledQuantity(hasBuyers);
 
-    const totalQuantity = buyersWatch.reduce(
+    const totalQuantity = buyers.reduce(
       (acc, cur) => acc + (Number(cur.product_quantity) || 0),
       0
     );
 
     setModalValue("product_quantity", totalQuantity);
-  }, [buyersWatch.length, JSON.stringify(buyersWatch)]);
+  }, [buyersWatch, setModalValue]);
+
+  const selectedEmployeeId = getValues("employee_id.value");
 
   const employees =
     GetMeData?.employee?.parlors
       ?.filter((parlor) =>
         parlor.employees.some(
-          (employee) => employee.buyer_id === getValues("employee_id.value")
+          (employee) => employee.buyer_id === selectedEmployeeId
         )
       )
       ?.flatMap((parlor) => parlor.employees) || [];
@@ -242,62 +242,15 @@ const ModalSelectProductOrder: React.FC<Props> = ({
     const employee = GetMeData?.employee.parlors
       ?.filter((parlor) =>
         parlor.employees.some(
-          (employee) => employee.buyer_id === getValues("employee_id.value")
+          (employee) => employee.buyer_id === selectedEmployeeId
         )
       )
       .flatMap((parlor) => parlor.employees)
-      .find((employee) => employee.buyer_id === getValues("employee_id.value"));
+      .find((employee) => employee.buyer_id === selectedEmployeeId);
     if (employee) {
       setBuyerType(employee?.buyer_type);
     }
-  }, [getValues("employee_id.value"), GetMeData]);
-
-  useEffect(() => {
-    if (type === "Добавить") {
-      resetModalState();
-    } else if (type === "Изменить" && editProductId !== null) {
-      const products = getValues("order_products") || [];
-      const productToEdit = products[editProductId as number];
-
-      // Устанавливаем существующие изображения
-      const existingImgs = productToEdit?.images || [];
-      setExistingImages(existingImgs);
-      setImagesToDelete([]);
-      setNewImagesToUpload([]);
-
-      // Создаем fileList для отображения существующих изображений
-      const existingFiles: UploadProps["fileList"] = existingImgs.map(
-        (fileName, index) => ({
-          uid: `existing-${index}-${fileName}`,
-          name: fileName,
-          status: "done",
-          url: `${process.env.NEXT_PUBLIC_API_URL}/upload/product/${fileName}`,
-        })
-      );
-      setFileList(existingFiles);
-
-      reset({
-        product: itemProductData,
-        product_quantity: productToEdit?.product_quantity,
-        unit_measurement: {
-          value:
-            productToEdit?.unit_measurement?.unit_measurement
-              .unit_measurement_id,
-          label:
-            productToEdit?.unit_measurement?.unit_measurement
-              ?.unit_measurement_name,
-        },
-        buyers: productToEdit?.buyers?.map((emp) => ({
-          employee_id: emp.buyer_id,
-          product_quantity: emp.product_quantity,
-        })),
-        order_product_name: productToEdit?.order_product_name,
-        order_product_link: productToEdit?.order_product_link,
-        note: productToEdit?.note,
-        images: existingImgs,
-      });
-    }
-  }, [type, reset, editProductId, isModalOpen]);
+  }, [GetMeData, selectedEmployeeId]);
 
   const optionsUnit = useMemo(() => {
     if (isNewProduct) {
@@ -339,93 +292,90 @@ const ModalSelectProductOrder: React.FC<Props> = ({
       value: maxUnit.unit_measurement.unit_measurement_id,
       label: `${maxUnit.unit_measurement.unit_measurement_name}(${maxUnit.coefficient} ${itemProductData.unit_measurement.unit_measurement_name})`,
     };
-  }, [isNewProduct, itemProductData, allMesument]);
-
-  const closeModal = () => {
-    resetModalState();
-    setIsModalOpen(false);
-  };
+  }, [isNewProduct, itemProductData]);
 
   const { fields, replace } = useFieldArray<IProductTableFormValues>({
     control,
     name: "buyers",
   });
 
-  const [errorUploadMessage,setErrorUploadMessage] = useState<string>('')
+  const resetModalState = useCallback(() => {
+    reset({
+      product: undefined,
+      buyers: [],
+      product_quantity: undefined,
+      order_product_link: undefined,
+      order_product_name: undefined,
+      images: [],
+      unit_measurement: defaultUnit,
+      note: undefined,
+    });
+    replace([]);
+    setNewImagesToUpload([]);
+    setFileList([]);
+    setExistingImages([]);
+    setImagesToDelete([]);
+  }, [defaultUnit, replace, reset]);
 
-  const props: UploadProps = {
-    name: "file",
-    multiple: true,
-    listType: "picture-card",
-    fileList: fileList,
-    beforeUpload: (file) => {
-      // Предотвращаем автоматическую загрузку
-      // console.log(file.type)
-      const isImage = file.type.startsWith("image/");
-      if (!isImage) {
-        message.error("Можно загружать только изображения!");
-        return false;
-      }
+  useEffect(() => {
+    if (type === "Добавить") {
+      resetModalState();
+    } else if (type === "Изменить" && editProductId !== null) {
+      const products = getValues("order_products") || [];
+      const productToEdit = products[editProductId as number];
 
-      if (fileList && fileList.length >= 5) {
-        message.error(`Вы можете загрузить не более ${5} изображений.`);
-        return false; // Говорит компоненту antd игнорировать этот файл
-      }
+      // Preload existing images into the picker when editing.
+      const existingImgs = productToEdit?.images || [];
+      setExistingImages(existingImgs);
+      setImagesToDelete([]);
+      setNewImagesToUpload([]);
 
-      return true;
-    },
-    onChange(info) {
-      if(info.file.status !== 'removed')
-      if (!info.file?.type?.startsWith("image/") ) {
-        setErrorUploadMessage("Можно загружать только изображения!");
-      }
-      else if ( !info.fileList.some((f) => f.type?.startsWith("image/"))) {
-        setErrorUploadMessage("Можно загружать только изображения!");
-      } else if (info.fileList.length > 5) {
-        setErrorUploadMessage(`Вы можете загрузить не более ${5} изображений.`);
-      }else{
+      const existingFiles: UploadFile[] = existingImgs.map((fileName, index) =>
+        toRemoteUploadFile({
+          uid: `existing-${index}-${fileName}`,
+          name: fileName,
+          url: `${process.env.NEXT_PUBLIC_API_URL}/upload/product/${fileName}`,
+        })
+      );
+      setFileList(existingFiles);
 
+      reset({
+        product: itemProductData,
+        product_quantity: productToEdit?.product_quantity,
+        unit_measurement: {
+          value:
+            productToEdit?.unit_measurement?.unit_measurement
+              .unit_measurement_id,
+          label:
+            productToEdit?.unit_measurement?.unit_measurement
+              ?.unit_measurement_name,
+        },
+        buyers: productToEdit?.buyers?.map((emp) => ({
+          employee_id: emp.buyer_id,
+          product_quantity: emp.product_quantity,
+        })),
+        order_product_name: productToEdit?.order_product_name,
+        order_product_link: productToEdit?.order_product_link,
+        note: productToEdit?.note,
+        images: existingImgs,
+      });
+    }
+  }, [editProductId, getValues, isModalOpen, itemProductData, reset, resetModalState, type]);
 
-      setFileList(info.fileList.filter((file) => !!file.status));
-      // Собираем новые файлы для загрузки
-      const newFiles = info.fileList
-        .filter((file) => file.originFileObj && !file.url) // Только новые, без url
-        .map((file) => file.originFileObj as File);
-
-      setNewImagesToUpload(newFiles);
-      setErrorUploadMessage('')
-      }
-
-    },
-    onRemove(file) {
-      // Если у файла есть url - это существующее изображение
-      if (file.url && file.name) {
-        // Добавляем в список на удаление
-        setImagesToDelete((prev) => [...prev, file.name]);
-        // Убираем из списка существующих
-        setExistingImages((prev) => prev.filter((name) => name !== file.name));
-      }
-
-      // Убираем из fileList
-      setFileList((prevList) => prevList?.filter((f) => f.uid !== file.uid));
-
-      // Если это новый файл (с originFileObj), убираем из списка на загрузку
-      if (file.originFileObj) {
-        setNewImagesToUpload((prev) =>
-          prev.filter((f) => f.name !== file.originFileObj?.name)
-        );
-      }
-      setErrorUploadMessage('')
-      return true;
-    },
+  const closeModal = () => {
+    resetModalState();
+    setIsModalOpen(false);
   };
+
+  const [errorUploadMessage, setErrorUploadMessage] = useState<string>("");
+  const imageFileList = useMemo<UploadFile[]>(() => fileList || [], [fileList]);
 
   return (
     <Modal
       title={
         !isNewProduct
           ? `${type} ${itemProductData?.product_name}`
-          : "Новый товар - если вы не нашли товар по подбору"
+          : "Новый товар, если вы не нашли товар по подбору"
       }
       open={isModalOpen}
       onCancel={() => closeModal()}
@@ -438,17 +388,49 @@ const ModalSelectProductOrder: React.FC<Props> = ({
           <>
             <div className={style.formItem}>
               <label className={style.formItemLabel}>Изображения</label>
-              <Dragger {...props}>
-                <p className="ant-upload-drag-icon">
-                  <InboxOutlined />
-                </p>
-                <p className="ant-upload-text">
-                  Кликните или перетащите изображение
-                </p>
-                <p className="ant-upload-hint">
-                  Поддержка одиночной или множественной загрузки изображений
-                </p>
-              </Dragger>
+              <AttachmentPicker
+                fileList={imageFileList}
+                accept="image/*"
+                listType="picture-card"
+                maxFiles={PRODUCT_IMAGE_PICKER_CONFIG.maxFiles}
+                title={PRODUCT_IMAGE_PICKER_CONFIG.title}
+                hint={PRODUCT_IMAGE_PICKER_CONFIG.hint}
+                icon={<InboxOutlined />}
+                onValidationError={(errorText) => {
+                  if (errorText === "Недопустимый тип файла") {
+                    setErrorUploadMessage("Можно загружать только изображения!");
+                    return;
+                  }
+
+                  setErrorUploadMessage(errorText);
+                }}
+                onFilesSelected={(nextFiles, nextFileList) => {
+                  setFileList(nextFileList as UploadFile[]);
+                  setNewImagesToUpload(nextFiles);
+                  setErrorUploadMessage("");
+                }}
+                onRemove={(file) => {
+                  if (file.url && file.name) {
+                    setImagesToDelete((prev) => [...prev, file.name]);
+                    setExistingImages((prev) =>
+                      prev.filter((name) => name !== file.name)
+                    );
+                  }
+
+                  setFileList((prevList) =>
+                    prevList?.filter((item) => item.uid !== file.uid)
+                  );
+
+                  if (file.originFileObj) {
+                    setNewImagesToUpload((prev) =>
+                      prev.filter((item) => item.name !== file.originFileObj?.name)
+                    );
+                  }
+
+                  setErrorUploadMessage("");
+                  return true;
+                }}
+              />
 
               {errorUploadMessage && (
                 <p className={style.error}>{errorUploadMessage}</p>
@@ -494,7 +476,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
                 rules={{
                   required: {
                     value: isNewProduct,
-                    message: "Наименование товара обязательна",
+                    message: "Наименование товара обязательно",
                   },
                 }}
                 render={({ field }) => (
@@ -517,9 +499,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
         )}
 
         <div className={style.formItem}>
-          <label className={style.formItemLabel}>
-            Выберите Единицу измерения
-          </label>
+          <label className={style.formItemLabel}>Выберите единицу измерения</label>
           <Controller
             control={control}
             name="unit_measurement"
@@ -629,3 +609,7 @@ const ModalSelectProductOrder: React.FC<Props> = ({
 };
 
 export default ModalSelectProductOrder;
+
+
+
+

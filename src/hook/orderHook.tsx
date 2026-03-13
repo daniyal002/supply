@@ -1,6 +1,7 @@
 import { IErrorResponse } from "@/interface/error";
 import {
   IOrderArchiveRequest,
+  IOrderDocumentDeleteRequest,
   IOrderItem,
   IOrderItemRequest,
   IOrderItemRequestDelete,
@@ -9,7 +10,7 @@ import {
 import { orderService } from "@/services/order.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useOrderIdStore } from "../../store/orderIdStore";
 import { useEffect } from "react";
 import {
@@ -141,7 +142,7 @@ export const useCreateOrderMutation = () => {
   const setDraftNewOrderId = useOrderIdStore((state) => state.setDraftNewOrderId);
   const setDraftOrderId = useOrderIdStore((state) => state.setDraftOrderId);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, mutateAsync, isPending } = useMutation({
     mutationKey: ["createOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.addOrder(data),
     onSuccess: (newOrder, variables) => {
@@ -160,14 +161,14 @@ export const useCreateOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate, isPending };
+  return { mutate, mutateAsync, isPending };
 };
 
 export const useUpdateOrderMutation = () => {
   const queryClient = useQueryClient();
   const setOrderId = useOrderIdStore((state) => state.setOrderId);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, mutateAsync, isPending } = useMutation({
     mutationKey: ["updateOrder"],
     mutationFn: (data: IOrderItemRequest) => orderService.updateOrder(data),
     onSuccess: (newOrder, variables) => {
@@ -191,7 +192,42 @@ export const useUpdateOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate, isPending };
+  return { mutate, mutateAsync, isPending };
+};
+
+export const useUploadOrderDocumentMutation = () => {
+  const { mutate, mutateAsync, isPending } = useMutation({
+    mutationKey: ["uploadOrderDocument"],
+    mutationFn: (files: File[]) => orderService.uploadOrderDocument(files),
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail || "Ошибка загрузки документа");
+    },
+  });
+
+  return { mutate, mutateAsync, isPending };
+};
+
+export const useDeleteOrderDocumentMutation = () => {
+  const { mutate, mutateAsync, isPending } = useMutation({
+    mutationKey: ["deleteOrderDocument"],
+    mutationFn: (data: IOrderDocumentDeleteRequest) =>
+      orderService.deleteOrderDocument(data),
+    onSuccess(successMessage) {
+      const messageText =
+        typeof successMessage === "string"
+          ? successMessage
+          : (successMessage as { detail?: string })?.detail;
+
+      if (messageText) {
+        message.success(messageText);
+      }
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail || "Ошибка удаления документа");
+    },
+  });
+
+  return { mutate, mutateAsync, isPending };
 };
 
 export const useAgreedOrderMutation = () => {

@@ -122,7 +122,7 @@ export default function ApprovalTabs() {
         style={{ padding: "0 10px" }}
         destroyInactiveTabPane={false}
         defaultActiveKey={activeTabApproval}
-        animated
+        animated={{ inkBar: true, tabPane: false }}
       />
   );
 }

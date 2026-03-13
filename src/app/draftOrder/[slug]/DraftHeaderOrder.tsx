@@ -18,6 +18,20 @@ import { useProductData } from "@/hook/productHook";
 import { useEmployeeData } from "@/hook/employeeHook";
 import { optionsOrderTypes, optionsStorage } from "@/helper/options";
 import Can from "@/components/Can/Can";
+import OrderDocumentsUpload from "@/components/OrderDocuments/OrderDocumentsUpload";
+
+type SelectOption = {
+  value?: string | number;
+  label?: string;
+};
+
+const resolveSelectValue = (
+  value: SelectOption | null | undefined,
+  options: SelectOption[],
+) => {
+  if (!value?.value) return undefined;
+  return options.find((option) => option.value === value.value) ?? value;
+};
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -167,7 +181,9 @@ export default function HeaderOrder({
                 }}
                 render={({ field }) => (
                   <Select
-                    {...field}
+                    value={resolveSelectValue(field.value, optionsOrderTypes)}
+                    onBlur={field.onBlur}
+                    labelInValue
                     disabled={disabledOrder}
                     options={optionsOrderTypes}
                     showSearch
@@ -176,9 +192,8 @@ export default function HeaderOrder({
                         .toLowerCase()
                         .includes(input.toLowerCase())
                     }
-                    onChange={(value, option) => {
-                      // @ts-ignore: Unreachable code error
-                      field.onChange({ value: value, label: option.label });
+                    onChange={(option) => {
+                      field.onChange(option);
                     }}
                     placeholder="Тип"
                     className={style.formItemSelect}
@@ -199,7 +214,7 @@ export default function HeaderOrder({
                         onChange={(e) => {
                           field.onChange(e);
                           // @ts-ignore: Unreachable code error
-                          setValue("department_id", undefined);
+                          setValue("department_id", undefined as never);
                         }}
                         title={field.value ? "Обобщенный" : "Частный"}
                       />
@@ -223,7 +238,12 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(
+                    field.value,
+                    optionsStorage(GetMeData?.employee?.storages || []),
+                  )}
+                  onBlur={field.onBlur}
+                  labelInValue
                   disabled={disabledOrder}
                   options={optionsStorage(GetMeData?.employee?.storages || [])}
                   showSearch
@@ -232,14 +252,11 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    setValue("storage_id.value", value);
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+                  onChange={(option) => {
+                    setValue("storage_id.value", Number(option.value));
+                    field.onChange(option);
                     GetMeData?.employee?.storages?.find(
-                      (storage) =>
-                        storage.storage_id === getValues("storage_id.value")
+                      (storage) => storage.storage_id === Number(option.value),
                     )?.oms
                       ? setValue("oms", true)
                       : setValue("oms", false);
@@ -281,7 +298,9 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(field.value, optionsEmployee)}
+                  onBlur={field.onBlur}
+                  labelInValue
                   disabled={disabledOrder}
                   options={optionsEmployee}
                   showSearch
@@ -290,14 +309,11 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    setValue("employee_id.value", value);
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+                  onChange={(option) => {
+                    setValue("employee_id.value", Number(option.value));
+                    field.onChange(option);
                     if (getValues("department_id")) {
-                      // @ts-ignore: Unreachable code error
-                      setValue("department_id", undefined);
+                      setValue("department_id", undefined as never);
                     }
                   }}
                   placeholder="Сотрудник/Кабинет"
@@ -320,7 +336,9 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(field.value, optionsDepartment)}
+                  onBlur={field.onBlur}
+                  labelInValue
                   disabled={disabledOrder}
                   options={optionsDepartment}
                   showSearch
@@ -329,11 +347,9 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    setValue("department_id.value", value);
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+                  onChange={(option) => {
+                    setValue("department_id.value", Number(option.value));
+                    field.onChange(option);
                   }}
                   placeholder="Подразделение"
                   className={style.formItemSelect}
@@ -355,7 +371,9 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(field.value, optionsProductGroup)}
+                  onBlur={field.onBlur}
+                  labelInValue
                   options={optionsProductGroup}
                   disabled={disabledOrder}
                   showSearch
@@ -364,10 +382,7 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) =>
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label })
-                  }
+                  onChange={(option) => field.onChange(option)}
                   placeholder="Категория товара"
                   className={style.formItemSelect}
                 />
@@ -393,6 +408,14 @@ export default function HeaderOrder({
                 {...field}
               />
             )}
+          />
+        </div>
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Документы</label>
+          <OrderDocumentsUpload
+            setValue={setValue}
+            watch={watch}
+            disabled={disabledOrder}
           />
         </div>
       </div>

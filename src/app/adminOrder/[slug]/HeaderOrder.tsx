@@ -18,6 +18,20 @@ import { useProductData } from "@/hook/productHook";
 import { useEmployeeData } from "@/hook/employeeHook";
 import { optionsOrderTypes, optionsStorage } from "@/helper/options";
 import Can from "@/components/Can/Can";
+import OrderDocumentsUpload from "@/components/OrderDocuments/OrderDocumentsUpload";
+
+type SelectOption = {
+  value?: string | number;
+  label?: string;
+};
+
+const resolveSelectValue = (
+  value: SelectOption | null | undefined,
+  options: SelectOption[],
+) => {
+  if (!value?.value) return undefined;
+  return options.find((option) => option.value === value.value) ?? value;
+};
 
 interface Props {
   control: Control<IOrderItemFormValues>;
@@ -43,10 +57,10 @@ export default function HeaderOrder({
   const { productData } = useProductData();
   const [productSelect, setProductSelect] = useState<boolean>(false);
   const [moreParlor, setMoreParlor] = useState<boolean>(false);
-   const { employeeData, error, isLoading } = useEmployeeData();
+  const { employeeData, error, isLoading } = useEmployeeData();
 
-    const isGeneric = watch("is_generic");
-    const orderType = watch("order_type");
+  const isGeneric = watch("is_generic");
+  const orderType = watch("order_type");
 
   const employee_idWatch = watch("employee_id");
   const isProductInTable = watch("order_products");
@@ -63,143 +77,135 @@ export default function HeaderOrder({
     }
   }, [isProductInTable]);
 
-   useEffect(() => {
-      if (orderType?.value === EnumOrderTypes.WAREHOUSE){
-        setValue('is_generic', false)
-      }
-    }, [orderType])
+  useEffect(() => {
+    if (orderType?.value === EnumOrderTypes.WAREHOUSE) {
+      setValue("is_generic", false);
+    }
+  }, [orderType]);
 
+  // Мемоизация опций для product_group
+  const optionsProductGroup = useMemo(() => {
+    if (!productData || !Array.isArray(productData)) return [];
 
+    const seen = new Set();
+    return productData
+      .map((product) => product.product_group)
+      .filter((productGroup) => {
+        if (!productGroup?.product_group_id) return false;
+        if (seen.has(productGroup.product_group_id)) return false;
+        seen.add(productGroup.product_group_id);
+        return true;
+      })
+      .map((productGroup) => ({
+        value: productGroup.product_group_id,
+        label: productGroup.product_group_name,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, "ru"));
+  }, [productData]);
 
-    // Мемоизация опций для product_group
-    const optionsProductGroup = useMemo(() => {
-      if (!productData || !Array.isArray(productData)) return [];
+  // Мемоизация опций для сотрудников (employee)
+  const optionsEmployee = useMemo(() => {
+    if (isGeneric) {
+      return (
+        employeeData?.map((employee) => ({
+          value: employee.buyer_id,
+          label: employee.buyer_name,
+        })) || []
+      );
+    }
 
-      const seen = new Set();
-      return productData
-        .map((product) => product.product_group)
-        .filter((productGroup) => {
-          if (!productGroup?.product_group_id) return false;
-          if (seen.has(productGroup.product_group_id)) return false;
-          seen.add(productGroup.product_group_id);
+    if (!GetMeData?.employee?.parlors) return [];
+
+    const seen = new Set();
+    return GetMeData.employee.parlors.flatMap((parlor) =>
+      parlor.employees
+        .filter((employee) => {
+          if (!employee?.buyer_id) return false;
+          if (seen.has(employee.buyer_id)) return false;
+          seen.add(employee.buyer_id);
           return true;
         })
-        .map((productGroup) => ({
-          value: productGroup.product_group_id,
-          label: productGroup.product_group_name,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label, "ru"));
-    }, [productData]);
+        .map((employee) => ({
+          value: employee.buyer_id,
+          label: employee.buyer_name,
+        })),
+    );
+  }, [isGeneric, employeeData, GetMeData?.employee?.parlors]);
 
-    // Мемоизация опций для сотрудников (employee)
-    const optionsEmployee = useMemo(() => {
-      if (isGeneric) {
-        return (
-          employeeData?.map((employee) => ({
-            value: employee.buyer_id,
-            label: employee.buyer_name,
-          })) || []
-        );
-      }
+  // Мемоизация опций для департаментов (department)
+  const optionsDepartment = useMemo(() => {
+    if (!GetMeData?.employee?.parlors || !getValues) return [];
 
-      if (!GetMeData?.employee?.parlors) return [];
+    const employeeId = getValues("employee_id.value");
+    if (!employeeId) return [];
 
-      const seen = new Set();
-      return GetMeData.employee.parlors.flatMap((parlor) =>
-        parlor.employees
-          .filter((employee) => {
-            if (!employee?.buyer_id) return false;
-            if (seen.has(employee.buyer_id)) return false;
-            seen.add(employee.buyer_id);
-            return true;
-          })
-          .map((employee) => ({
-            value: employee.buyer_id,
-            label: employee.buyer_name,
+    const seen = new Set();
+    return isGeneric
+      ? GetMeData?.employee?.parlors
+          ?.filter((parlor) => parlor.department?.is_generic === true)
+          .map((parlor) => ({
+            value: parlor.department?.department_id,
+            label: parlor.department?.department_name,
           }))
-      );
-    }, [isGeneric, employeeData, GetMeData?.employee?.parlors]);
-
-    // Мемоизация опций для департаментов (department)
-    const optionsDepartment = useMemo(() => {
-      if (!GetMeData?.employee?.parlors || !getValues) return [];
-
-      const employeeId = getValues("employee_id.value");
-      if (!employeeId) return [];
-
-      const seen = new Set();
-      return isGeneric
-        ? GetMeData?.employee?.parlors
-            ?.filter((parlor) => parlor.department?.is_generic === true)
-            .map((parlor) => ({
-              value: parlor.department?.department_id,
-              label: parlor.department?.department_name,
-            }))
-        : GetMeData?.employee?.parlors
-            ?.flatMap((parlor) =>
-              parlor.employees.some(
-                (employee) => employee.buyer_id === employeeId
-              )
-                ? [parlor]
-                : []
+      : GetMeData?.employee?.parlors
+          ?.flatMap((parlor) =>
+            parlor.employees.some(
+              (employee) => employee.buyer_id === employeeId,
             )
-            .filter((parlor) => {
-              if (seen.has(parlor.department?.department_id)) {
-                return false;
-              } else {
-                seen.add(parlor.department?.department_id);
-                return true;
-              }
-            })
-            .filter((parlor) => parlor.department?.is_generic === false)
-            .map((parlor) => ({
-              value: parlor.department?.department_id,
-              // label: `${parlor.department?.department_name}-${parlor.department?.housing?.housing_name}`,
-              label: parlor.department?.department_name,
-            }));
-    }, [GetMeData?.employee?.parlors, getValues()]);
-
-
-
-
-
+              ? [parlor]
+              : [],
+          )
+          .filter((parlor) => {
+            if (seen.has(parlor.department?.department_id)) {
+              return false;
+            } else {
+              seen.add(parlor.department?.department_id);
+              return true;
+            }
+          })
+          .filter((parlor) => parlor.department?.is_generic === false)
+          .map((parlor) => ({
+            value: parlor.department?.department_id,
+            // label: `${parlor.department?.department_name}-${parlor.department?.housing?.housing_name}`,
+            label: parlor.department?.department_name,
+          }));
+  }, [GetMeData?.employee?.parlors, getValues()]);
 
   return (
     <div className={style.headerOrder}>
       <div className={style.headerOrderSelect}>
         <div className={style.CheckboxStorage}>
-        <Can permission="purchase_order_type_drop_down_list">
-          <div className={style.formItem}>
-            <label className={style.formItemLabel}>Тип</label>
-            <Controller
-              control={control}
-              name="order_type"
-              rules={{
-                required: { message: "Выберите тип", value: true },
-              }}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  disabled={disabledOrder}
-                  options={optionsOrderTypes}
-                  showSearch
-                  filterOption={(input, option) =>
-                    (option?.label ?? "")
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
-                  }}
-                  placeholder="Тип"
-                  className={style.formItemSelect}
-                />
-              )}
-
-            />
-            {orderType?.value === EnumOrderTypes.PURCHASE && (
+          <Can permission="purchase_order_type_drop_down_list">
+            <div className={style.formItem}>
+              <label className={style.formItemLabel}>Тип</label>
+              <Controller
+                control={control}
+                name="order_type"
+                rules={{
+                  required: { message: "Выберите тип", value: true },
+                }}
+                render={({ field }) => (
+                  <Select
+                    value={resolveSelectValue(field.value, optionsOrderTypes)}
+                    onBlur={field.onBlur}
+                    labelInValue
+                    disabled={disabledOrder}
+                    options={optionsOrderTypes}
+                    showSearch
+                    filterOption={(input, option) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    onChange={(option) => {
+                      field.onChange(option);
+                    }}
+                    placeholder="Тип"
+                    className={style.formItemSelect}
+                  />
+                )}
+              />
+              {orderType?.value === EnumOrderTypes.PURCHASE && (
                 <div className={`${style.Checkbox}`}>
                   <Controller
                     control={control}
@@ -213,21 +219,20 @@ export default function HeaderOrder({
                         onChange={(e) => {
                           field.onChange(e);
                           // @ts-ignore: Unreachable code error
-                          setValue("department_id", undefined);
+                          setValue("department_id", undefined as never);
                         }}
                         disabled={disabledOrder}
-                        title={field.value ? "Обобщенный": "Частный"}
+                        title={field.value ? "Обобщенный" : "Частный"}
                       />
                     )}
                   />
                 </div>
               )}
-            {errors && (
-              <p className={style.error}>{errors.order_type?.message}</p>
-            )}
-          </div>
+              {errors && (
+                <p className={style.error}>{errors.order_type?.message}</p>
+              )}
+            </div>
           </Can>
-
 
           <div className={style.formItem}>
             <label className={style.formItemLabel}>Место хранения</label>
@@ -239,9 +244,18 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
-                  disabled={disabledOrder || (orderType === undefined && (GetMeData?.role?.role_name === "user_purchase" ||
-                    GetMeData?.role?.role_name === "admin"))}
+                  value={resolveSelectValue(
+                    field.value,
+                    optionsStorage(GetMeData?.employee?.storages || []),
+                  )}
+                  onBlur={field.onBlur}
+                  labelInValue
+                  disabled={
+                    disabledOrder ||
+                    (orderType === undefined &&
+                      (GetMeData?.role?.role_name === "user_purchase" ||
+                        GetMeData?.role?.role_name === "admin"))
+                  }
                   options={optionsStorage(GetMeData?.employee?.storages || [])}
                   showSearch
                   filterOption={(input, option) =>
@@ -249,14 +263,11 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    setValue("storage_id.value", value);
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+                  onChange={(option) => {
+                    setValue("storage_id.value", Number(option.value));
+                    field.onChange(option);
                     GetMeData?.employee?.storages?.find(
-                      (storage) =>
-                        storage.storage_id === getValues("storage_id.value")
+                      (storage) => storage.storage_id === Number(option.value),
                     )?.oms
                       ? setValue("oms", true)
                       : setValue("oms", false);
@@ -266,7 +277,7 @@ export default function HeaderOrder({
                 />
               )}
             />
-             <div className={`${style.Checkbox}`}>
+            <div className={`${style.Checkbox}`}>
               <Controller
                 control={control}
                 name="oms"
@@ -277,7 +288,7 @@ export default function HeaderOrder({
                     checkedChildren={"ОМС"}
                     unCheckedChildren={"ПУ"}
                     disabled={disabledOrder}
-                    title={field.value ? "ОМС": "ПУ"}
+                    title={field.value ? "ОМС" : "ПУ"}
                   />
                 )}
               />
@@ -299,7 +310,9 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(field.value, optionsEmployee)}
+                  onBlur={field.onBlur}
+                  labelInValue
                   disabled={disabledOrder || !storageId}
                   options={optionsEmployee}
                   showSearch
@@ -308,14 +321,11 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    setValue("employee_id.value", value);
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+                  onChange={(option) => {
+                    setValue("employee_id.value", Number(option.value));
+                    field.onChange(option);
                     if (getValues("department_id")) {
-                      // @ts-ignore: Unreachable code error
-                      setValue("department_id", undefined);
+                      setValue("department_id", undefined as never);
                     }
                   }}
                   placeholder="Сотрудник/Кабинет"
@@ -347,7 +357,9 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(field.value, optionsDepartment)}
+                  onBlur={field.onBlur}
+                  labelInValue
                   disabled={disabledOrder || !employeeId}
                   options={optionsDepartment}
                   showSearch
@@ -356,11 +368,9 @@ export default function HeaderOrder({
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) => {
-                    // @ts-ignore: Unreachable code error
-                    setValue("department_id.value", value);
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label });
+                  onChange={(option) => {
+                    setValue("department_id.value", Number(option.value));
+                    field.onChange(option);
                   }}
                   placeholder="Подразделение"
                   className={style.formItemSelect}
@@ -382,22 +392,19 @@ export default function HeaderOrder({
               }}
               render={({ field }) => (
                 <Select
-                  {...field}
+                  value={resolveSelectValue(field.value, optionsProductGroup)}
+                  onBlur={field.onBlur}
+                  labelInValue
                   options={optionsProductGroup}
                   // disabled={disabledOrder ? true : productSelect ? true : false}
-                  disabled={
-                    disabledOrder  || !departmentId?.value
-                  }
+                  disabled={disabledOrder || !departmentId?.value}
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? "")
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  onChange={(value, option) =>
-                    // @ts-ignore: Unreachable code error
-                    field.onChange({ value: value, label: option.label })
-                  }
+                  onChange={(option) => field.onChange(option)}
                   placeholder="Категория товара"
                   className={style.formItemSelect}
                 />
@@ -423,6 +430,14 @@ export default function HeaderOrder({
                 {...field}
               />
             )}
+          />
+        </div>
+        <div className={style.formItem}>
+          <label className={style.formItemLabel}>Документы</label>
+          <OrderDocumentsUpload
+            setValue={setValue}
+            watch={watch}
+            disabled={disabledOrder}
           />
         </div>
       </div>
