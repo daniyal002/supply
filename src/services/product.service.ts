@@ -5,6 +5,7 @@ import {
   IProductImageResponse,
   IProductResponse,
 } from "@/interface/product";
+import { IUpdateOrderProductEmployeesRequest } from "@/interface/productTable";
 
 export const productService = {
   async getProduct() {
@@ -60,6 +61,15 @@ export const productService = {
     const response = await axiosWidthAuth.delete<string>(
       "/product/delete_product_image",
       { data: { file_name: fileName } }
+    );
+
+    return response.data;
+  },
+
+  async updateOrderProductEmployees(data: IUpdateOrderProductEmployeesRequest) {
+    const response = await axiosWidthAuth.put<string>(
+      "/order/update_order_product_employees",
+      data
     );
 
     return response.data;

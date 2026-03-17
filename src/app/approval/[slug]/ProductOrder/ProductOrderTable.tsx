@@ -1,4 +1,4 @@
-import { IProduct } from "@/interface/product";
+﻿import { IProduct } from "@/interface/product";
 import {
   IEmployeeFromProductTable,
   IProductTable,
@@ -7,6 +7,7 @@ import { IUnit } from "@/interface/unit";
 import {
   Button,
   Image,
+  InputNumber,
   Popover,
   Select,
   Space,
@@ -15,7 +16,7 @@ import {
   theme,
   Tooltip,
 } from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExpandedRowContent } from "./ExpandedRowContent";
 import { useDeleteOrderProductCancelCommentMutation } from "@/hook/orderHook";
 import style from "./ProductOrderTable.module.scss";
@@ -40,6 +41,8 @@ import { IOrderItemFormValues } from "@/interface/orderItem";
 import { useProductTableColumnVisibility } from "@/hook/useProductTableColumnVisibility";
 import { IOrderProductCommentsResponse } from "@/interface/orderProductComments";
 import { useEmployeeData } from "@/hook/employeeHook";
+import { db } from "@/db/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
@@ -82,6 +85,8 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   getValues,
 }) => {
   const orderProductGroup = watch("product_group");
+  const selectedEmployeeId = watch("employee_id")?.value;
+  const getMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
   const { employeeData, error, isLoading } = useEmployeeData();
   const { mutate: deleteOrderProductCancelCommentMutation } =
     useDeleteOrderProductCancelCommentMutation(orderId);
@@ -102,6 +107,20 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     token: { colorText },
   } = theme.useToken();
   const { productData } = useProductData();
+  const isSelectedEmployeeTypeEmployee = useMemo(
+    () =>
+      employeeData?.find((employee) => employee.buyer_id === selectedEmployeeId)
+        ?.buyer_type === "employee",
+    [employeeData, selectedEmployeeId]
+  );
+  const hasUpdateOrderProductEmployeesPermission = useMemo(
+    () =>
+      (getMeData?.role?.permissions || []).some(
+        (permission) =>
+          permission.permission_code === "update_order_product_employees"
+      ),
+    [getMeData]
+  );
 
   const unitGroup = useMemo(() => {
     const productSet = new Set();
@@ -127,18 +146,81 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       }));
   }, [productTableData]);
 
-  const initialHasBuyerMapRef = useRef<Map<number | undefined, boolean> | null>(
-    null
+  const employeeOptions = useMemo(
+    () =>
+      employeeData
+        ?.filter((employee) => employee.buyer_type !== "parlor")
+        .map((employee) => ({
+          value: employee.buyer_id as number,
+          label: employee.buyer_name,
+        })) || [],
+    [employeeData]
   );
 
-  if (initialHasBuyerMapRef.current === null && productTableData) {
-    initialHasBuyerMapRef.current = new Map(
-      productTableData.map((product) => [
-        product.order_product_id,
-        (product.buyers?.length ?? 0) > 0,
-      ])
+  const updateProductBuyers = (
+    orderProductId: number | undefined,
+    nextBuyers: IEmployeeFromProductTable[]
+  ) => {
+    setValue(
+      "order_products",
+      getValues("order_products").map((product) =>
+        product.order_product_id === orderProductId
+          ? {
+              ...product,
+              buyers: nextBuyers,
+            }
+          : product
+      )
     );
-  }
+  };
+
+  const handleBuyerSelectionChange = (
+    record: IProductTable,
+    selectedBuyerIds: number[]
+  ) => {
+    const currentBuyers = record.buyers || [];
+
+    const nextBuyers = selectedBuyerIds.map((buyerId, index) => {
+      const existingBuyer = currentBuyers.find(
+        (buyer) => buyer.buyer_id === buyerId
+      );
+
+      if (existingBuyer) {
+        return existingBuyer;
+      }
+
+      const employee = employeeData?.find((item) => item.buyer_id === buyerId);
+
+      return {
+        buyer_id: buyerId,
+        buyer_name: employee?.buyer_name ?? "",
+        buyer_type: "employee" as const,
+        product_quantity:
+          selectedBuyerIds.length === 1 && index === 0
+            ? record.product_quantity
+            : 0,
+      };
+    });
+
+    updateProductBuyers(record.order_product_id, nextBuyers);
+  };
+
+  const handleBuyerQuantityChange = (
+    record: IProductTable,
+    buyerId: number,
+    quantity: number | null
+  ) => {
+    const nextBuyers = (record.buyers || []).map((buyer) =>
+      buyer.buyer_id === buyerId
+        ? {
+            ...buyer,
+            product_quantity: Number(quantity ?? 0),
+          }
+        : buyer
+    );
+
+    updateProductBuyers(record.order_product_id, nextBuyers);
+  };
 
   const columns: TableColumnsType<IProductTable> = [
     {
@@ -413,78 +495,133 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           (product) => product.product_id === record.product.product_id
         )?.remainder || "_",
     },
+    hasUpdateOrderProductEmployeesPermission
+      ? {
+          title: "Сотрудники",
+          dataIndex: "buyers",
+          width: "300px",
+          key: "buyers",
+          hidden:
+            isSelectedEmployeeTypeEmployee || (readonly ? !hasBuyers : false),
+          render: (buyers: IEmployeeFromProductTable[], record) => {
+            const normalizedBuyers = buyers || [];
+            const totalAssignedQuantity = Number(
+              normalizedBuyers
+                .reduce(
+                  (sum, buyer) => sum + Number(buyer.product_quantity || 0),
+                  0
+                )
+                .toFixed(2)
+            );
+            const expectedQuantity = Number(record.product_quantity.toFixed(2));
+            const quantityMatches =
+              Math.abs(totalAssignedQuantity - expectedQuantity) <= 0.001;
+
+            return (
+              <div className={style.employeeEditor}>
+                <Select
+                  placeholder="Сотрудники"
+                  mode="multiple"
+                  disabled={readonly || isPrinting}
+                  options={employeeOptions}
+                  value={normalizedBuyers.map((buyer) => buyer.buyer_id)}
+                  className={style.employeeSelect}
+                  onChange={(values) => handleBuyerSelectionChange(record, values)}
+                  showSearch
+                  optionFilterProp="label"
+                  allowClear
+                  maxTagCount="responsive"
+                  maxTagPlaceholder={(omittedValues) =>
+                    `+${omittedValues.length} сотруд.`
+                  }
+                  dropdownMatchSelectWidth={320}
+                />
+                {!!normalizedBuyers.length && (
+                  <div className={style.employeeQuantityList}>
+                    <div className={style.employeeQuantityHeader}>
+                      <span className={style.employeeQuantityHeaderLabel}>
+                        {"Распределение"}
+                      </span>
+                      <span
+                        className={
+                          quantityMatches
+                            ? style.employeeQuantitySummaryOk
+                            : style.employeeQuantitySummaryError
+                        }
+                      >
+                        {`${totalAssignedQuantity} / ${expectedQuantity}`}
+                      </span>
+                    </div>
+                    {normalizedBuyers.map((buyer) => (
+                      <div
+                        key={`${record.order_product_id}-${buyer.buyer_id}`}
+                        className={style.employeeQuantityRow}
+                      >
+                        <div className={style.employeeQuantityMeta}>
+                          <span className={style.employeeQuantityName}>
+                            {buyer.buyer_name}
+                          </span>
+                          <span className={style.employeeQuantityCaption}>
+                            {"Количество"}
+                          </span>
+                        </div>
+                        <div className={style.employeeQuantityControl}>
+                          <InputNumber
+                            min={0}
+                            precision={2}
+                            step={1}
+                            value={buyer.product_quantity}
+                            disabled={readonly || isPrinting}
+                            className={style.employeeQuantityInput}
+                            onChange={(value) =>
+                              handleBuyerQuantityChange(
+                                record,
+                                buyer.buyer_id,
+                                value
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <div
+                      className={
+                        quantityMatches
+                          ? style.employeeQuantitySummary
+                          : `${style.employeeQuantitySummary} ${style.employeeQuantitySummaryInvalid}`
+                      }
+                    >
+                      {quantityMatches
+                        ? "Количество распределено корректно"
+                        : "Сумма по сотрудникам должна совпадать с количеством товара"}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          },
+          responsive: ["sm"],
+        }
+      : {
+          title: "Сотрудник",
+          dataIndex: "buyers",
+          width: "300px",
+          key: "buyers",
+          hidden: !hasBuyers,
+          render: (buyers: IEmployeeFromProductTable[]) =>
+            buyers
+              ?.map((buyer) =>
+                buyer.product_quantity === 0
+                  ? buyer.buyer_name
+                  : buyer.buyer_name +
+                    " - " +
+                    Number(buyer.product_quantity.toFixed(2))
+              )
+              .join(", "),
+          responsive: ["sm"],
+        },
     {
       title: "Сотрудник",
-      dataIndex: "buyers",
-      width: "300px",
-      key: "buyers",
-      hidden: !hasBuyers,
-      render: (buyers: IEmployeeFromProductTable[]) =>
-        buyers
-          ?.map((buyer) =>
-            buyer.product_quantity === 0
-              ? buyer.buyer_name
-              : buyer.buyer_name +
-                " - " +
-                Number(buyer.product_quantity.toFixed(2))
-          )
-          .join(", "),
-
-      responsive: ["sm"],
-    },
-    // {
-    //   title: "Сотрудник",
-    //   dataIndex: "buyers",
-    //   width: "300px",
-    //   key: "buyers",
-    //   hidden: !hasBuyers,
-    //   render: (buyers: IEmployeeFromProductTable[], record) => {
-    //       const isReadonly =
-    // initialHasBuyerMapRef.current?.get(record.order_product_id as number) ?? false;
-    //     return (
-    //       <Select
-    //         placeholder="Сотрудник"
-    //         mode="multiple"
-    //         disabled={isReadonly || readonly || isPrinting}
-    //         options={employeeData
-    //           ?.filter((e) => e.buyer_type !== "parlor")
-    //           .map((e) => ({
-    //             value: e.buyer_id,
-    //             label: e.buyer_name,
-    //           }))}
-    //         value={buyers.map((b) => b.buyer_id)}
-    //         className={style.employeeSelect}
-    //         onChange={(values) => {
-    //           setValue(
-    //             "order_products",
-    //             getValues("order_products").map((product) =>
-    //               product.order_product_id === record.order_product_id
-    //                 ? {
-    //                     ...product,
-    //                     buyers: values.map((v) => {
-    //                       const emp = employeeData?.find(
-    //                         (e) => e.buyer_id === v
-    //                       );
-    //                       return {
-    //                         buyer_id: v,
-    //                         buyer_name: emp?.buyer_name ?? "",
-    //                         buyer_type: "employee",
-    //                         product_quantity: record.product_quantity,
-    //                       };
-    //                     }),
-    //                   }
-    //                 : product
-    //             )
-    //           );
-    //         }}
-    //         showSearch
-    //       />
-    //     );
-    //   },
-    //   responsive: ["sm"],
-    // },
-    {
-      title: "Примечание",
       dataIndex: "note",
       width: "150px",
       key: "note",

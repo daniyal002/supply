@@ -68,6 +68,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   });
 
   const [toggle, setToggle] = useState<boolean>(false);
+  const submitActionRef = useRef<"create" | "save" | null>(null);
+  const [submitAction, setSubmitAction] = useState<"create" | "save" | null>(
+    null,
+  );
   const { isLoading } = useProductData();
   const { mutateAsync: createOrderMutationAsync, isPending: createOrderIsPending } =
     useCreateOrderMutation();
@@ -97,6 +101,11 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   if (orderid?.startsWith("copy")) {
     orderIdFromGetOrderById = orderid.replace("copy", "");
   }
+
+
+   const isPurchase = GetMeData?.role?.permissions?.some(
+    (p) => p.permission_code === "purchase_order_type_drop_down_list"
+  );
 
   const copyLastOrderHeader = () => {
     if (orderUserData) {
@@ -275,10 +284,6 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     }
   }, [productsWatch, productGroup]);
 
-  const isPurchase = GetMeData?.role?.permissions?.some(
-    (p) => p.permission_code === "purchase_order_type_drop_down_list"
-  );
-
   const syncSubmittedDocuments = (
     documents: Array<string | { path?: string | null; file_name?: string | null; file_path?: string | null }>
   ) => {
@@ -292,76 +297,99 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
     setValue("newDocuments", [], { shouldDirty: true });
   };
 
+  const beginSubmitAction = (action: "create" | "save") => {
+    if (submitActionRef.current) {
+      return false;
+    }
+
+    submitActionRef.current = action;
+    setSubmitAction(action);
+    return true;
+  };
+
+  const finishSubmitAction = () => {
+    submitActionRef.current = null;
+    setSubmitAction(null);
+  };
+
   const createOrder = async () => {
-    const data = getValues();
-    if (data.order_products && data.order_products.length > 0) {
-      const order: IOrderItemRequest = {
-        category_matches: categoryMatches,
-        department_id: data.department_id.value,
-        order_type: isPurchase
-          ? data?.order_type?.value
-          : EnumOrderTypes.WAREHOUSE,
-        employee_id: data.employee_id.value,
-        storage_id: data.storage_id.value,
-        oms: data.oms || false,
-        order_status_id: 1,
-        is_generic: data.is_generic,
-        note: data.note,
-        product_group_id: data.product_group.value,
-        products: data.order_products.map((product) => {
-          const productData = product.product || {};
-          const hasOrderProductName = !!product.order_product_name;
-          const hasProductId = !!productData.product_id;
-          return {
-            product_id: hasOrderProductName
-              ? NaN
-              : hasProductId
-              ? productData.product_id
-              : NaN,
-            order_product_name: product?.order_product_name,
-            order_product_link: product?.order_product_link,
-            product_quantity: product.product_quantity,
-            unit_measurement_id: product.unit_measurement.unit_measurement
-              .unit_measurement_id as number,
-            note: product.note,
-            images: product.images,
-            employee_ids: product.buyers?.map((buyer) => ({
-              employee_id: buyer.buyer_id,
-              product_quantity: buyer.product_quantity,
-            })),
-          };
-        }),
-        documents: [],
-      };
+    if (!beginSubmitAction("create")) {
+      return;
+    }
 
-      try {
-        const { finalDocumentItems } = await submitOrderDocuments({
-          existingDocuments: data.existingDocuments,
-          removedDocuments: data.removedDocuments,
-          newDocuments: data.newDocuments,
-          uploadDocuments: uploadOrderDocuments,
-          deleteDocument: deleteOrderDocument,
-          submitRequest: async (documents) => {
-            const payload = { ...order, documents };
+    try {
+      const data = getValues();
+      if (data.order_products && data.order_products.length > 0) {
+        const order: IOrderItemRequest = {
+          category_matches: categoryMatches,
+          department_id: data.department_id.value,
+          order_type: isPurchase
+            ? data?.order_type?.value
+            : EnumOrderTypes.WAREHOUSE,
+          employee_id: data.employee_id.value,
+          storage_id: data.storage_id.value,
+          oms: data.oms || false,
+          order_status_id: 1,
+          is_generic: data.is_generic,
+          note: data.note,
+          product_group_id: data.product_group.value,
+          products: data.order_products.map((product) => {
+            const productData = product.product || {};
+            const hasOrderProductName = !!product.order_product_name;
+            const hasProductId = !!productData.product_id;
+            return {
+              product_id: hasOrderProductName
+                ? NaN
+                : hasProductId
+                ? productData.product_id
+                : NaN,
+              order_product_name: product?.order_product_name,
+              order_product_link: product?.order_product_link,
+              product_quantity: product.product_quantity,
+              unit_measurement_id: product.unit_measurement.unit_measurement
+                .unit_measurement_id as number,
+              note: product.note,
+              images: product.images,
+              employee_ids: product.buyers?.map((buyer) => ({
+                employee_id: buyer.buyer_id,
+                product_quantity: buyer.product_quantity,
+              })),
+            };
+          }),
+          documents: [],
+        };
 
-            if (
-              orderid !== "newOrder" &&
-              orderid !== `copy${orderid?.split("copy")[1]}` &&
-              getOrderByIdData
-            ) {
-              payload.order_id = Number(orderid);
-              return updateOrderMutationAsync(payload);
-            }
+        try {
+          const { finalDocumentItems } = await submitOrderDocuments({
+            existingDocuments: data.existingDocuments,
+            removedDocuments: data.removedDocuments,
+            newDocuments: data.newDocuments,
+            uploadDocuments: uploadOrderDocuments,
+            deleteDocument: deleteOrderDocument,
+            submitRequest: async (documents) => {
+              const payload = { ...order, documents };
 
-            return createOrderMutationAsync(payload);
-          },
-        });
+              if (
+                orderid !== "newOrder" &&
+                orderid !== `copy${orderid?.split("copy")[1]}` &&
+                getOrderByIdData
+              ) {
+                payload.order_id = Number(orderid);
+                return updateOrderMutationAsync(payload);
+              }
 
-        syncSubmittedDocuments(finalDocumentItems);
-        remove(targetKey);
-      } catch {}
-    } else {
-      message.warning("Добавьте товары в заявку !");
+              return createOrderMutationAsync(payload);
+            },
+          });
+
+          syncSubmittedDocuments(finalDocumentItems);
+          remove(targetKey);
+        } catch {}
+      } else {
+        message.warning("Добавьте товары в заявку !");
+      }
+    } finally {
+      finishSubmitAction();
     }
   };
 
@@ -371,82 +399,90 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
   const draftNewOrderId = useOrderIdStore((state) => state.draftNewOrderId);
 
   const saveOrder = async () => {
-    if (
-      getValues().order_products &&
-      getValues().order_products.length > 0 &&
-      getValues().department_id &&
-      getValues().employee_id &&
-      getValues().storage_id &&
-      getValues().product_group
-    ) {
-      const order: IDraftOrderItemRequest = {
-        category_matches: categoryMatches,
-        department_id: getValues().department_id.value,
-        employee_id: getValues().employee_id.value,
-        storage_id: getValues().storage_id.value,
-        order_type: isPurchase
-          ? getValues().order_type.value
-          : EnumOrderTypes.WAREHOUSE,
-        oms: getValues().oms || false,
-        order_status_id: 8,
-        is_generic: getValues().is_generic,
-        note: getValues().note,
-        product_group_id: getValues().product_group.value,
-        products: getValues().order_products.map((product) => {
-          const productData = product.product || {};
-          const hasOrderProductName = !!product.order_product_name;
-          const hasProductId = !!productData.product_id;
-          return {
-            product_id: hasOrderProductName
-              ? NaN
-              : hasProductId
-              ? productData.product_id
-              : NaN,
-            order_product_name: product?.order_product_name,
-            order_product_link: product?.order_product_link,
-            product_quantity: product.product_quantity,
-            unit_measurement_id: product.unit_measurement.unit_measurement
-              .unit_measurement_id as number,
-            note: product.note,
-            images: product.images,
-            employee_ids: product.buyers?.map((buyer) => ({
-              employee_id: buyer.buyer_id,
-              product_quantity: buyer.product_quantity,
-            })),
-          };
-        }),
-        documents: [],
-      };
+    if (!beginSubmitAction("save")) {
+      return;
+    }
 
-      try {
-        const { response, finalDocumentItems } = await submitOrderDocuments({
-          existingDocuments: getValues().existingDocuments,
-          removedDocuments: getValues().removedDocuments,
-          newDocuments: getValues().newDocuments,
-          uploadDocuments: uploadOrderDocuments,
-          deleteDocument: deleteOrderDocument,
-          submitRequest: async (documents) => {
-            const payload = { ...order, documents };
+    try {
+      if (
+        getValues().order_products &&
+        getValues().order_products.length > 0 &&
+        getValues().department_id &&
+        getValues().employee_id &&
+        getValues().storage_id &&
+        getValues().product_group
+      ) {
+        const order: IDraftOrderItemRequest = {
+          category_matches: categoryMatches,
+          department_id: getValues().department_id.value,
+          employee_id: getValues().employee_id.value,
+          storage_id: getValues().storage_id.value,
+          order_type: isPurchase
+            ? getValues().order_type.value
+            : EnumOrderTypes.WAREHOUSE,
+          oms: getValues().oms || false,
+          order_status_id: 8,
+          is_generic: getValues().is_generic,
+          note: getValues().note,
+          product_group_id: getValues().product_group.value,
+          products: getValues().order_products.map((product) => {
+            const productData = product.product || {};
+            const hasOrderProductName = !!product.order_product_name;
+            const hasProductId = !!productData.product_id;
+            return {
+              product_id: hasOrderProductName
+                ? NaN
+                : hasProductId
+                ? productData.product_id
+                : NaN,
+              order_product_name: product?.order_product_name,
+              order_product_link: product?.order_product_link,
+              product_quantity: product.product_quantity,
+              unit_measurement_id: product.unit_measurement.unit_measurement
+                .unit_measurement_id as number,
+              note: product.note,
+              images: product.images,
+              employee_ids: product.buyers?.map((buyer) => ({
+                employee_id: buyer.buyer_id,
+                product_quantity: buyer.product_quantity,
+              })),
+            };
+          }),
+          documents: [],
+        };
 
-            if (draftNewOrderId && draftNewOrderId !== "0") {
-              return updateDraftOrderMutationAsync({
-                ...payload,
-                order_temp_id: Number(draftNewOrderId),
-              });
-            }
+        try {
+          const { response, finalDocumentItems } = await submitOrderDocuments({
+            existingDocuments: getValues().existingDocuments,
+            removedDocuments: getValues().removedDocuments,
+            newDocuments: getValues().newDocuments,
+            uploadDocuments: uploadOrderDocuments,
+            deleteDocument: deleteOrderDocument,
+            submitRequest: async (documents) => {
+              const payload = { ...order, documents };
 
-            return saveOrderMutationAsync(payload);
-          },
-        });
+              if (draftNewOrderId && draftNewOrderId !== "0") {
+                return updateDraftOrderMutationAsync({
+                  ...payload,
+                  order_temp_id: Number(draftNewOrderId),
+                });
+              }
 
-        syncSubmittedDocuments(finalDocumentItems);
+              return saveOrderMutationAsync(payload);
+            },
+          });
 
-        if (response.order.order_temp_id) {
-          setDraftNewOrderId(response.order.order_temp_id.toString());
-        }
-      } catch {}
-    } else {
-      message.warning("Заполните шапку и товары!");
+          syncSubmittedDocuments(finalDocumentItems);
+
+          if (response.order.order_temp_id) {
+            setDraftNewOrderId(response.order.order_temp_id.toString());
+          }
+        } catch {}
+      } else {
+        message.warning("Заполните шапку и товары!");
+      }
+    } finally {
+      finishSubmitAction();
     }
   };
 
@@ -679,6 +715,7 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                   onClick={() => void createOrder()}
                   className={style.buttonOrderCreate}
                   disabled={
+                    submitAction !== null ||
                     createOrderIsPending ||
                     updateOrderIsPending ||
                     uploadOrderDocumentsIsPending ||
@@ -687,10 +724,10 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                 >
                   {orderid === "newOrder" ||
                   orderid === `copy${Number(orderid?.split("copy").join(""))}`
-                    ? createOrderIsPending
+                    ? createOrderIsPending || submitAction === "create"
                       ? "Создается..."
                       : "Создать"
-                    : updateOrderIsPending
+                    : updateOrderIsPending || submitAction === "create"
                     ? "Перезапускается..."
                     : "Перезапуск"}
                 </button>
@@ -702,12 +739,15 @@ export default function Order({ orderid, type, remove, targetKey }: Props) {
                   className={style.buttonOrderSave}
                   onClick={() => void saveOrder()}
                   disabled={
+                    submitAction !== null ||
                     saveOrderIsPending ||
                     uploadOrderDocumentsIsPending ||
                     deleteOrderDocumentIsPending
                   }
                 >
-                  {saveOrderIsPending ? "Сохраняется..." : "Сохранить"}
+                  {saveOrderIsPending || submitAction === "save"
+                    ? "Сохраняется..."
+                    : "Сохранить"}
                 </button>
               )}
             </div>

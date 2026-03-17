@@ -1,5 +1,8 @@
 import { productService } from "@/services/product.service";
+import { IErrorResponse } from "@/interface/error";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { message } from "antd";
+import { AxiosError } from "axios";
 
 export const useProductData = () => {
     const { data: productData, isLoading, error, refetch } = useQuery({queryKey:['newProduct'],queryFn:productService.getProduct});
@@ -32,4 +35,16 @@ export const useDeleteImage = () => {
     })
 
     return {deleteImage}
+}
+
+export const useUpdateOrderProductEmployeesMutation = () => {
+    const { mutate, mutateAsync, isPending } = useMutation({
+        mutationKey: ["updateOrderProductEmployees"],
+        mutationFn: productService.updateOrderProductEmployees,
+        onError(error: AxiosError<IErrorResponse>) {
+            message.error(error?.response?.data?.detail || "Ошибка обновления сотрудников товара");
+        }
+    });
+
+    return { mutate, mutateAsync, isPending };
 }

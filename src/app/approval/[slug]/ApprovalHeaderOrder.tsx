@@ -194,7 +194,7 @@ export default function ApprovalHeaderOrder({
         </div>
         <div className={style.EmployeeDepartmentCategory}>
         <div className={style.formItem}>
-          <label className={style.formItemLabel}>Сотрудник</label>
+          <label className={style.formItemLabel}>Cотрудник/Кабинет</label>
           {/* <label className={style.formItemLabel}>Выберите сотрудника</label> */}
           <Controller
             control={control}

@@ -18,10 +18,15 @@ import { useNotificationStore } from "../../../../store/notificationStore";
 import { useMarkAsReadNotification } from "@/hook/notificationHook";
 import { exportOrderToExcel } from "@/helper/ExportToExcel";
 import { useReactToPrint } from "react-to-print";
-import { useProductData } from "@/hook/productHook";
+import {
+  useProductData,
+  useUpdateOrderProductEmployeesMutation,
+} from "@/hook/productHook";
+import { useEmployeeData } from "@/hook/employeeHook";
 import ChatCore from "@/components/Chat/ChatCore";
 import { useTabStore } from "../../../../store/tabStore";
 import { normalizeOrderDocuments } from "@/helper/orderDocuments";
+import { IProductTable } from "@/interface/productTable";
 
 interface Props {
   orderid?: string;
@@ -40,6 +45,7 @@ export default function ApprovalOrder({
 }: Props) {
   const { TextArea } = Input;
   const { productData } = useProductData();
+  const { employeeData } = useEmployeeData();
 
   const {
     reset,
@@ -75,16 +81,24 @@ export default function ApprovalOrder({
 
   const { getOrderByIdData } = useGetOrderById(orderid as string);
   const {
-    mutate: agreedOrderMutation,
+    mutateAsync: agreedOrderMutationAsync,
     isPending: agreedOrderPending,
     isSuccess: agreedOrderSuccess,
   } = useAgreedOrderMutation();
   const {
-    mutate: rejectOrderMutation,
+    mutateAsync: rejectOrderMutationAsync,
     isPending: rejectOrderPending,
     isSuccess: rejectOrderSuccess,
   } = useRejectOrderMutation();
+  const {
+    mutateAsync: updateOrderProductEmployeesMutationAsync,
+    isPending: updateOrderProductEmployeesPending,
+  } = useUpdateOrderProductEmployeesMutation();
   const [note, setnote] = React.useState("");
+  const selectedEmployeeId = watch("employee_id")?.value;
+  const isSelectedEmployeeTypeEmployee =
+    employeeData?.find((employee) => employee.buyer_id === selectedEmployeeId)
+      ?.buyer_type === "employee";
 
   const orderId = useTabStore((state) => state.activeTabApproval);
   const [activeTabKey, setActiveTabKey] = useState<number>();
@@ -164,31 +178,111 @@ export default function ApprovalOrder({
         },
       ];
 
-  const agreedOrder = (order_id: number) => {
-    agreedOrderMutation(
-      { order_id, note },
-      {
-        onSuccess() {
-          remove(targetKey);
-        },
-      }
+  const validateAndUpdateOrderProductEmployees = async () => {
+    const orderProducts = getValues("order_products") || [];
+    const productsForValidation = orderProducts.filter(
+      (product) => product.order_product_id && !product.is_cancel
     );
+
+    if (isSelectedEmployeeTypeEmployee) {
+      return true;
+    }
+
+    for (const product of productsForValidation) {
+      const buyers = product.buyers || [];
+      const productName =
+        product.order_product_name ||
+        product.product?.product_name ||
+        "товара";
+
+      if (buyers.length === 0) {
+        message.warning(
+          `Заполните сотрудников для ${productName}`
+        );
+        return false;
+      }
+
+      if (
+        buyers.some(
+          (buyer) => !buyer.buyer_id || Number(buyer.product_quantity) <= 0
+        )
+      ) {
+        message.warning(
+          `Укажите корректное количество по сотрудникам для ${productName}`
+        );
+        return false;
+      }
+
+      const totalQuantity = buyers.reduce(
+        (sum, buyer) => sum + Number(buyer.product_quantity || 0),
+        0
+      );
+
+      if (
+        Math.abs(
+          Number(totalQuantity.toFixed(2)) -
+            Number(product.product_quantity.toFixed(2))
+        ) > 0.001
+      ) {
+        message.warning(
+          `Сумма количеств по сотрудникам должна быть равна количеству товара для ${productName}`
+        );
+        return false;
+      }
+    }
+
+    const productsForUpdate = productsForValidation.filter(
+      (product) => (product.buyers || []).length > 0
+    );
+
+    if (productsForUpdate.length === 0) {
+      return true;
+    }
+
+    await updateOrderProductEmployeesMutationAsync(
+      productsForUpdate.map((product: IProductTable) => ({
+        order_product_id: product.order_product_id as number,
+        employees: (product.buyers || []).map((buyer) => ({
+          employee_id: buyer.buyer_id,
+          product_quantity: Number(buyer.product_quantity),
+        })),
+      }))
+    );
+
+    return true;
   };
 
-  const rejectOrder = (order_id: number) => {
+  const agreedOrder = async (order_id: number) => {
+    const isValid = await validateAndUpdateOrderProductEmployees();
+    if (!isValid) {
+      return;
+    }
+
+    try {
+      await agreedOrderMutationAsync({ order_id, note });
+      remove(targetKey);
+    } catch {}
+  };
+
+  const rejectOrder = async (order_id: number) => {
     if (note === "") {
-      message.warning("Введите комментарий");
-    } else if (note.length < 5) {
-      message.warning("Введите корректный комментарий");
-    } else {
-      rejectOrderMutation(
-        { order_id, note },
-        {
-          onSuccess() {
-            remove(targetKey);
-          },
-        }
+      message.warning(
+        "Введите корректный комментарий"
       );
+    } else if (note.length < 5) {
+      message.warning(
+        "Введите корректный комментарий"
+      );
+    } else {
+      const isValid = await validateAndUpdateOrderProductEmployees();
+      if (!isValid) {
+        return;
+      }
+
+      try {
+        await rejectOrderMutationAsync({ order_id, note });
+        remove(targetKey);
+      } catch {}
     }
   };
 
@@ -348,7 +442,7 @@ export default function ApprovalOrder({
 
   return (
     <div ref={contentRef} className="print">
-      {(agreedOrderPending || rejectOrderPending) && <Spin fullscreen={true} />}
+      {(agreedOrderPending || rejectOrderPending || updateOrderProductEmployeesPending) && <Spin fullscreen={true} />}
       <div className={style.newOrder}>
         <h1>Заявка на согласовании №: {orderid}</h1>
         <p style={{ fontSize: "14px", fontStyle: "italic" }}>
@@ -395,15 +489,15 @@ export default function ApprovalOrder({
             <div className={style.buttonGroup}>
               <button
                 className={style.buttonOrderApproval}
-                onClick={() => agreedOrder(Number(orderid))}
-                disabled={agreedOrderPending}
+                onClick={() => void agreedOrder(Number(orderid))}
+                disabled={agreedOrderPending || updateOrderProductEmployeesPending}
               >
                 Согласовать
               </button>
               <button
                 className={`${style.buttonOrderApproval} ${style.buttonOrderApprovalReject}`}
-                onClick={() => rejectOrder(Number(orderid))}
-                disabled={rejectOrderPending}
+                onClick={() => void rejectOrder(Number(orderid))}
+                disabled={rejectOrderPending || updateOrderProductEmployeesPending}
               >
                 Отклонить
               </button>

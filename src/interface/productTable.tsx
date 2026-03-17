@@ -13,6 +13,19 @@ export interface IEmployeeFromProductTable {
   product_quantity: number;
 }
 
+export interface IOrderProductEmployeeRequestItem {
+  employee_id: number;
+  product_quantity: number;
+}
+
+export interface IUpdateOrderProductEmployeesItemRequest {
+  order_product_id: number;
+  employees: IOrderProductEmployeeRequestItem[];
+}
+
+export type IUpdateOrderProductEmployeesRequest =
+  IUpdateOrderProductEmployeesItemRequest[];
+
 export interface IOrderProductStatus {
   product_status_id?: number;
   product_status_name?: string;

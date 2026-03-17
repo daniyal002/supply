@@ -233,7 +233,7 @@ export const useDeleteOrderDocumentMutation = () => {
 export const useAgreedOrderMutation = () => {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate, mutateAsync, isPending, isSuccess } = useMutation({
     mutationKey: ["agreedOrder"],
     mutationFn: (data: { order_id: number; note: string }) =>
       orderService.agreedOrder(data.order_id, data.note),
@@ -253,13 +253,13 @@ export const useAgreedOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate, isPending, isSuccess };
+  return { mutate, mutateAsync, isPending, isSuccess };
 };
 
 export const useRejectOrderMutation = () => {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate, mutateAsync, isPending, isSuccess } = useMutation({
     mutationKey: ["rejectOrder"],
     mutationFn: (data: { order_id: number; note: string }) =>
       orderService.rejectOrder(data.order_id, data.note),
@@ -279,7 +279,7 @@ export const useRejectOrderMutation = () => {
       message.error(error?.response?.data?.detail);
     },
   });
-  return { mutate, isPending, isSuccess };
+  return { mutate, mutateAsync, isPending, isSuccess };
 };
 
 export const useDeleteOrderMutation = () => {
