@@ -27,6 +27,8 @@ import ChatCore from "@/components/Chat/ChatCore";
 import { useTabStore } from "../../../../store/tabStore";
 import { normalizeOrderDocuments } from "@/helper/orderDocuments";
 import { IProductTable } from "@/interface/productTable";
+import { db } from "@/db/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 interface Props {
   orderid?: string;
@@ -46,6 +48,7 @@ export default function ApprovalOrder({
   const { TextArea } = Input;
   const { productData } = useProductData();
   const { employeeData } = useEmployeeData();
+  const getMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
 
   const {
     reset,
@@ -99,6 +102,11 @@ export default function ApprovalOrder({
   const isSelectedEmployeeTypeEmployee =
     employeeData?.find((employee) => employee.buyer_id === selectedEmployeeId)
       ?.buyer_type === "employee";
+  const hasUpdateOrderProductEmployeesPermission =
+    getMeData?.role?.permissions?.some(
+      (permission) =>
+        permission.permission_code === "update_order_product_employees"
+    ) ?? false;
 
   const orderId = useTabStore((state) => state.activeTabApproval);
   const [activeTabKey, setActiveTabKey] = useState<number>();
@@ -179,6 +187,10 @@ export default function ApprovalOrder({
       ];
 
   const validateAndUpdateOrderProductEmployees = async () => {
+    if (!hasUpdateOrderProductEmployeesPermission) {
+      return true;
+    }
+
     const orderProducts = getValues("order_products") || [];
     const productsForValidation = orderProducts.filter(
       (product) => product.order_product_id && !product.is_cancel
