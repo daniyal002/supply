@@ -81,7 +81,7 @@ export const useOrdersWhereUserIsApproverData = () => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["Orders"],
+    queryKey: ["OrdersApproverData"],
     queryFn: orderService.getOrdersWhereUserIsApprover,
     // staleTime: Infinity,
   });
@@ -542,4 +542,36 @@ export const useArchiveOrderMutation = () => {
     },
   });
   return { mutate, isPending };
+};
+
+
+export const useUpdateOrderPartialMutation = () => {
+  const queryClient = useQueryClient();
+  const setOrderId = useOrderIdStore((state) => state.setOrderId);
+
+  const { mutate, mutateAsync, isPending } = useMutation({
+    mutationKey: ["updateOrderPartial"],
+    mutationFn: (data: Partial<IOrderItemRequest>) => orderService.updateOrderPartial(data),
+    onSuccess: (newOrder, variables) => {
+      // queryClient.invalidateQueries({queryKey:['OrderUser']})
+      setOrderId("0");
+      queryClient.setQueryData(
+        ["OrdersApproverData"],
+        (oldData: IOrderItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((order) => {
+            if (order.order_id === variables.order_id) {
+              return newOrder.order;
+            }
+            return order;
+          });
+        }
+      );
+      message.success("Заявка успешно обновлена !");
+    },
+    onError(error: AxiosError<IErrorResponse>) {
+      message.error(error?.response?.data?.detail);
+    },
+  });
+  return { mutate, mutateAsync, isPending };
 };

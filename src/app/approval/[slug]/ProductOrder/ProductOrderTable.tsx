@@ -43,10 +43,12 @@ import { IOrderProductCommentsResponse } from "@/interface/orderProductComments"
 import { useEmployeeData } from "@/hook/employeeHook";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import Can from "@/components/Can/Can";
 
 interface productOrderTableProps {
   productTableData: IProductTable[] | undefined;
   showModal: () => void;
+  showModalProduct: () => void;
   showModalCancel: () => void;
   setOrderProductId: (product: number) => void;
   setOrderProductIdCancel: (product: number) => void;
@@ -63,6 +65,7 @@ interface productOrderTableProps {
   watch: UseFormWatch<IOrderItemFormValues>;
   setValue: UseFormSetValue<IOrderItemFormValues>;
   getValues: UseFormGetValues<IOrderItemFormValues>;
+  setIsNewProduct: (isNewProduct: boolean) => void;
 }
 
 const ProductOrderTable: React.FC<productOrderTableProps> = ({
@@ -72,6 +75,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   setProductId,
   setProductIdCancel,
   showModal,
+  showModalProduct,
   showModalCancel,
   setProductIndex,
   setProductIndexCancel,
@@ -83,7 +87,11 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   watch,
   setValue,
   getValues,
+  deleteProduct,
+  setIsNewProduct,
+
 }) => {
+
   const orderProductGroup = watch("product_group");
   const selectedEmployeeId = watch("employee_id")?.value;
   const getMeData = useLiveQuery(() => db.getMe.toCollection().first(), []);
@@ -111,15 +119,23 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
     () =>
       employeeData?.find((employee) => employee.buyer_id === selectedEmployeeId)
         ?.buyer_type === "employee",
-    [employeeData, selectedEmployeeId]
+    [employeeData, selectedEmployeeId],
   );
   const hasUpdateOrderProductEmployeesPermission = useMemo(
     () =>
       (getMeData?.role?.permissions || []).some(
         (permission) =>
-          permission.permission_code === "update_order_product_employees"
+          permission.permission_code === "update_order_product_employees",
       ),
-    [getMeData]
+    [getMeData],
+  );
+
+  const hasDeleteOrderProductPermission = useMemo(
+    () =>
+      (getMeData?.role?.permissions || []).some(
+        (permission) => permission.permission_code === "update_order_in_route",
+      ),
+    [getMeData],
   );
 
   const unitGroup = useMemo(() => {
@@ -128,13 +144,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       ?.filter((product) => {
         if (
           productSet.has(
-            product?.unit_measurement?.unit_measurement?.unit_measurement_id
+            product?.unit_measurement?.unit_measurement?.unit_measurement_id,
           )
         ) {
           return false;
         } else {
           productSet.add(
-            product?.unit_measurement?.unit_measurement?.unit_measurement_id
+            product?.unit_measurement?.unit_measurement?.unit_measurement_id,
           );
           return true;
         }
@@ -154,12 +170,12 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
           value: employee.buyer_id as number,
           label: employee.buyer_name,
         })) || [],
-    [employeeData]
+    [employeeData],
   );
 
   const updateProductBuyers = (
     orderProductId: number | undefined,
-    nextBuyers: IEmployeeFromProductTable[]
+    nextBuyers: IEmployeeFromProductTable[],
   ) => {
     setValue(
       "order_products",
@@ -169,20 +185,20 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               ...product,
               buyers: nextBuyers,
             }
-          : product
-      )
+          : product,
+      ),
     );
   };
 
   const handleBuyerSelectionChange = (
     record: IProductTable,
-    selectedBuyerIds: number[]
+    selectedBuyerIds: number[],
   ) => {
     const currentBuyers = record.buyers || [];
 
     const nextBuyers = selectedBuyerIds.map((buyerId, index) => {
       const existingBuyer = currentBuyers.find(
-        (buyer) => buyer.buyer_id === buyerId
+        (buyer) => buyer.buyer_id === buyerId,
       );
 
       if (existingBuyer) {
@@ -208,7 +224,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   const handleBuyerQuantityChange = (
     record: IProductTable,
     buyerId: number,
-    quantity: number | null
+    quantity: number | null,
   ) => {
     const nextBuyers = (record.buyers || []).map((buyer) =>
       buyer.buyer_id === buyerId
@@ -216,7 +232,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
             ...buyer,
             product_quantity: Number(quantity ?? 0),
           }
-        : buyer
+        : buyer,
     );
 
     updateProductBuyers(record.order_product_id, nextBuyers);
@@ -282,7 +298,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) =>
           a.product.product_group.product_group_name.localeCompare(
             b.product.product_group.product_group_name,
-            "ru"
+            "ru",
           ),
       },
       render: (text: IProduct) =>
@@ -300,7 +316,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) =>
           a.product?.product_article?.localeCompare(
             b.product?.product_article,
-            "ru"
+            "ru",
           ),
       },
       render: (text: IProduct) => text?.product_article || "_",
@@ -316,7 +332,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) =>
           a?.product?.order_product_name?.localeCompare(
             b?.product?.order_product_name,
-            "ru"
+            "ru",
           ),
       },
       filterDropdown: (props) => (
@@ -367,7 +383,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) =>
           a?.product?.order_product_link?.localeCompare(
             b?.product?.order_product_link,
-            "ru"
+            "ru",
           ),
       },
       filterDropdown: (props) => (
@@ -422,7 +438,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         compare: (a: any, b: any) =>
           a.unit_measurement?.unit_measurement.unit_measurement_name.localeCompare(
             b.unit_measurement?.unit_measurement.unit_measurement_name,
-            "ru"
+            "ru",
           ),
       },
       render: (unit_measurement: IUnit) =>
@@ -492,7 +508,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       responsive: ["sm"],
       render: (value: number, record) =>
         productData?.find(
-          (product) => product.product_id === record.product.product_id
+          (product) => product.product_id === record.product.product_id,
         )?.remainder || "_",
     },
     hasUpdateOrderProductEmployeesPermission
@@ -509,9 +525,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
               normalizedBuyers
                 .reduce(
                   (sum, buyer) => sum + Number(buyer.product_quantity || 0),
-                  0
+                  0,
                 )
-                .toFixed(2)
+                .toFixed(2),
             );
             const expectedQuantity = Number(record.product_quantity.toFixed(2));
             const quantityMatches =
@@ -526,7 +542,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   options={employeeOptions}
                   value={normalizedBuyers.map((buyer) => buyer.buyer_id)}
                   className={style.employeeSelect}
-                  onChange={(values) => handleBuyerSelectionChange(record, values)}
+                  onChange={(values) =>
+                    handleBuyerSelectionChange(record, values)
+                  }
                   showSearch
                   optionFilterProp="label"
                   allowClear
@@ -577,7 +595,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                               handleBuyerQuantityChange(
                                 record,
                                 buyer.buyer_id,
-                                value
+                                value,
                               )
                             }
                           />
@@ -615,13 +633,13 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   ? buyer.buyer_name
                   : buyer.buyer_name +
                     " - " +
-                    Number(buyer.product_quantity.toFixed(2))
+                    Number(buyer.product_quantity.toFixed(2)),
               )
               .join(", "),
           responsive: ["sm"],
         },
     {
-      title: "Сотрудник",
+      title: "Примечание",
       dataIndex: "note",
       width: "150px",
       key: "note",
@@ -647,7 +665,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                 {Math.round(
                   record?.issued_quantity *
                     record?.unit_measurement.unit_measurement
-                      .unit_measurement_coefficient
+                      .unit_measurement_coefficient,
                 )}{" "}
                 {record.product.unit_measurement_name})
               </p>
@@ -716,8 +734,24 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       render: (_: any, record: IProductTable) =>
         !isPrinting && !readonly ? (
           <Space size="middle">
+            {hasDeleteOrderProductPermission && (
+              <Button
+                danger
+                type="primary"
+                onClick={() => {
+                  // @ts-ignore: Unreachable code error
+                  deleteProduct(record.order_product_id);
+                }}
+                title="Удалить"
+              >
+                Удалить
+              </Button>
+
+            )}
+
             {record.is_cancel ? (
-              <>
+              !hasDeleteOrderProductPermission && (
+                <>
                 <Button
                   onClick={() =>
                     deleteOrderProductCancelCommentMutation({
@@ -740,8 +774,10 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                 >
                   <InfoCircleFilled style={{ color: "#fff" }} />
                 </Tooltip>
-              </>
+                </>
+              )
             ) : (
+               !hasDeleteOrderProductPermission && (
               <div className={style.actionButtonsContainer}>
                 <Button
                   onClick={() => {
@@ -756,6 +792,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
                   Отклонить
                 </Button>
               </div>
+               )
             )}
           </Space>
         ) : (
@@ -786,7 +823,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
       (prev) =>
         expanded
           ? [...prev, key] // Добавляем ключ при раскрытии
-          : prev.filter((k) => k !== key) // Удаляем ключ при сворачивании
+          : prev.filter((k) => k !== key), // Удаляем ключ при сворачивании
     );
   };
 
@@ -807,9 +844,9 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
         record?.is_cancel === true
           ? style.highlightRowIsCancel
           : record?.product?.product_group?.product_group_id !==
-              orderProductGroup?.value && !record?.order_product_link
-          ? style.highlightRowMatchCategory
-          : ""
+                orderProductGroup?.value && !record?.order_product_link
+            ? style.highlightRowMatchCategory
+            : ""
       }
       expandable={{
         expandedRowKeys,

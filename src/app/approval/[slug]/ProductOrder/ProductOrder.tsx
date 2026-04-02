@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ProductOrderTable from "./ProductOrderTable";
 import { IProductTable } from "@/interface/productTable";
-import { IOrderItemFormValues } from "@/interface/orderItem";
+import { EnumOrderTypes, IOrderItemFormValues } from "@/interface/orderItem";
 import {
   UseFormGetValues,
   UseFormSetValue,
@@ -9,6 +9,9 @@ import {
 } from "react-hook-form";
 import ModalCommentSelectProductOrder from "./ModalCommentSelectProductOrder/ModalCommentSelectProductOrder";
 import ModalCommentCancelSelectProductOrder from "./ModalCommentCancelSelectProductOrder/ModalCommentCancelSelectProductOrder";
+import ModalSelectProductOrder from "@/components/UI/ModalSelectProductOrder/ModalSelectProductOrder";
+import Can from "@/components/Can/Can";
+import { Button, message } from "antd";
 
 interface Props {
   productTableData: IProductTable[];
@@ -32,35 +35,70 @@ export default function ProductOrder({
   watch,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpenProduct, setIsModalOpenProduct] = useState<boolean>(false);
   const [productId, setProductId] = useState<number>();
   const [orderProductId, setOrderProductId] = useState<number>();
-  const [productIndex, setProductIndex] = useState<number>();
+  const [productIndex, setProductIndex] = useState<number | null>();
+  const [isNewProduct, setIsNewProduct] = useState(false);
 
   const [isModalOpenCancel, setIsModalOpenCancel] = useState<boolean>(false);
   const [productIdCancel, setProductIdCancel] = useState<number>();
   const [orderProductIdCancel, setOrderProductIdCancel] = useState<number>();
   const [productIndexCancel, setProductIndexCancel] = useState<number>();
+  const [type, setType] = useState<"Добавить" | "Изменить">("Изменить");
 
 
   const orderId = getValues("order_id");
 
+    // Следим за полем order_type
+    const orderType = watch("order_type")
+      ? watch("order_type")
+      : { value: EnumOrderTypes.WAREHOUSE };
+
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+    const showModalProduct = () => {
+    setIsModalOpenProduct(true);
+    setIsNewProduct(false);
+    setType("Изменить");
+  };
+
+  const showModalIsNewProduct = () => {
+    setType("Добавить");
+    setIsNewProduct(true);
+    setProductIndex(null);
+    setIsModalOpenProduct(true);
   };
 
   const showModalCancel = () => {
     setIsModalOpenCancel(true)
   }
 
+
+
   const deleteProduct = (productIndex: number) => {
+    console.log(productIndex)
     const updatedProducts = getValues("order_products").filter(
-      (_, index) => index !== productIndex
+      (product) => product.order_product_id !== productIndex
     );
     setValue("order_products", updatedProducts);
   };
 
   return (
     <>
+    <ModalSelectProductOrder
+        type={type}
+        isModalOpen={isModalOpenProduct}
+        editProductId={productIndex as number}
+        productId={productId}
+        setIsModalOpen={setIsModalOpen}
+        getValues={getValues}
+        setValue={setValue}
+        watch={watch}
+        isNewProduct={isNewProduct}
+      />
       <ModalCommentSelectProductOrder
         type="Изменить"
         isModalOpen={isModalOpen}
@@ -69,6 +107,7 @@ export default function ProductOrder({
         setIsModalOpen={setIsModalOpen}
         orderProductId={orderProductId}
         orderId={orderId as number}
+
       />
       <ModalCommentCancelSelectProductOrder
        type="Изменить"
@@ -79,8 +118,28 @@ export default function ProductOrder({
        orderProductId={orderProductIdCancel}
        orderId={orderId as number}
       />
+      { orderType.value === EnumOrderTypes.PURCHASE && (
+        <Can permission="purchase_order_type_drop_down_list">
+        <Can permission="update_order_in_route">
+
+          <Button
+            onClick={() => {
+              if (!getValues("product_group.value")) {
+                message.warning("Выберите категорию товара");
+              } else {
+                showModalIsNewProduct();
+              }
+            }}
+            style={{ width: "100%", marginBottom: "10px" }}
+          >
+            Добавить новый товар
+          </Button>
+        </Can>
+        </Can>
+      )}
       <ProductOrderTable
         showModal={showModal}
+        showModalProduct={showModalProduct}
         showModalCancel={showModalCancel}
         productTableData={productTableData}
         setProductId={setProductId}
@@ -98,6 +157,7 @@ export default function ProductOrder({
         watch={watch}
         setValue={setValue}
         getValues={getValues}
+        setIsNewProduct={setIsNewProduct}
       />
     </>
   );

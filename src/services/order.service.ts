@@ -198,5 +198,10 @@ export const orderService = {
   async archiveOrder(data:IOrderArchiveRequest){
     const response = await axiosWidthAuth.put<string>('/order/archive_order',data)
     return response.data
+  },
+
+  async updateOrderPartial(data:Partial<IOrderItemRequest>){
+    const response = await axiosWidthAuth.put<IOrderItemAddResponse>('/order/update_order_partial',data)
+    return response.data
   }
 };
