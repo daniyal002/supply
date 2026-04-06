@@ -133,7 +133,7 @@ const ProductOrderTable: React.FC<productOrderTableProps> = ({
   const hasDeleteOrderProductPermission = useMemo(
     () =>
       (getMeData?.role?.permissions || []).some(
-        (permission) => permission.permission_code === "update_order_in_route",
+        (permission) => permission.permission_code === "update_order_partial",
       ),
     [getMeData],
   );

@@ -120,7 +120,7 @@ export default function ProductOrder({
       />
       { orderType.value === EnumOrderTypes.PURCHASE && (
         <Can permission="purchase_order_type_drop_down_list">
-        <Can permission="update_order_in_route">
+        <Can permission="update_order_partial">
 
           <Button
             onClick={() => {

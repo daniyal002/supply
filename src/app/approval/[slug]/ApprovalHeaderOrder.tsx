@@ -47,7 +47,7 @@ export default function ApprovalHeaderOrder({
   const hasDeleteOrderProductPermission = useMemo(
     () =>
       (GetMeData?.role?.permissions || []).some(
-        (permission) => permission.permission_code === "update_order_in_route",
+        (permission) => permission.permission_code === "update_order_partial",
       ),
     [GetMeData],
   );
