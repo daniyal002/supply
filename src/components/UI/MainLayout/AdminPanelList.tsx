@@ -57,6 +57,12 @@ export const AdminPanelList = (push: (url:string) => void) => [
     },
     {
       key: "13",
+      label: "Склады",
+      icon: <ShopOutlined />,
+      onClick: () => push("/i/storages"),
+    },
+    {
+      key: "14",
       label: "1C",
       icon: <CalculatorOutlined />,
       onClick: () => push("/i/oneC"),
