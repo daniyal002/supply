@@ -241,10 +241,10 @@ export default function ApprovalOrder({
       const productName =
         product.order_product_name || product.product?.product_name || "товара";
 
-      if (buyers.length === 0) {
-        message.warning(`Заполните сотрудников для ${productName}`);
-        return false;
-      }
+      // if (buyers.length === 0) {
+      //   message.warning(`Заполните сотрудников для ${productName}`);
+      //   return false;
+      // }
 
       if (
         buyers.some(
@@ -262,7 +262,7 @@ export default function ApprovalOrder({
         0,
       );
 
-      if (
+      if ( buyers.length !== 0 &&
         Math.abs(
           Number(totalQuantity.toFixed(2)) -
             Number(product.product_quantity.toFixed(2)),

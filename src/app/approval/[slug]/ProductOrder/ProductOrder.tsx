@@ -93,7 +93,7 @@ export default function ProductOrder({
         isModalOpen={isModalOpenProduct}
         editProductId={productIndex as number}
         productId={productId}
-        setIsModalOpen={setIsModalOpen}
+        setIsModalOpen={setIsModalOpenProduct}
         getValues={getValues}
         setValue={setValue}
         watch={watch}
